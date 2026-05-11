@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Penrose · Pentaplex Explorer — twistj.com</title>
+<meta name="description" content="Pentaplex Explorer — Penrose tilings as a Galois projection of ζ ↦ ζ². Part of TWIST-J.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script>
+  // Apply saved theme as early as possible to avoid FOUC.
+  (function(){ var t = localStorage.getItem('twistj-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── Theme: light (parchment) ── */
+  :root {
+    --bg: #F0EDE6;
+    --canvas-bg: #FAF7F1;
+    --text: #1A1A1A;
+    --muted: #5C4A2E;
+    --accent: #B8860B;
+    --accent-hover: #8B6914;
+    --rule: rgba(26, 26, 26, 0.18);
+    --rule-soft: rgba(26, 26, 26, 0.06);
+    --accent-glow: rgba(184, 134, 11, 0.08);
+    --btn-bg: rgba(250, 247, 241, 0.92);
+    --btn-border: rgba(26, 26, 26, 0.3);
+    --toast-bg: rgba(26, 26, 26, 0.85);
+    --toast-text: #FAF7F1;
+    --toast-kbd-bg: rgba(184, 134, 11, 0.4);
+    --toast-kbd-border: rgba(250, 247, 241, 0.3);
+    --canvas-stroke: #1A1A1A;
+    --panel-bg: rgba(250, 247, 241, 0.95);
+    --panel-border: rgba(26, 26, 26, 0.18);
+    --slider-track: rgba(26, 26, 26, 0.22);
+    --select-bg: rgba(243, 240, 234, 0.9);
+    --select-text: #5C4A2E;
+  }
+  /* ── Theme: dark (matches main twistj.com palette) ── */
+  [data-theme="dark"] {
+    --bg: #1c1915;
+    --canvas-bg: #252118;
+    --text: #d4cfc6;
+    --muted: #9a9488;
+    --accent: #b08050;
+    --accent-hover: #c89066;
+    --rule: rgba(212, 207, 198, 0.16);
+    --rule-soft: rgba(212, 207, 198, 0.04);
+    --accent-glow: rgba(176, 128, 80, 0.10);
+    --btn-bg: rgba(37, 33, 24, 0.92);
+    --btn-border: rgba(212, 207, 198, 0.3);
+    --toast-bg: rgba(212, 207, 198, 0.92);
+    --toast-text: #1c1915;
+    --toast-kbd-bg: rgba(176, 128, 80, 0.4);
+    --toast-kbd-border: rgba(28, 25, 21, 0.3);
+    --canvas-stroke: #d4cfc6;
+    --panel-bg: rgba(28, 25, 21, 0.95);
+    --panel-border: rgba(212, 207, 198, 0.18);
+    --slider-track: rgba(212, 207, 198, 0.22);
+    --select-bg: rgba(37, 33, 24, 0.9);
+    --select-text: #9a9488;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+      --bg: #1c1915;
+      --canvas-bg: #252118;
+      --text: #d4cfc6;
+      --muted: #9a9488;
+      --accent: #b08050;
+      --accent-hover: #c89066;
+      --rule: rgba(212, 207, 198, 0.16);
+      --rule-soft: rgba(212, 207, 198, 0.04);
+      --accent-glow: rgba(176, 128, 80, 0.10);
+      --btn-bg: rgba(37, 33, 24, 0.92);
+      --btn-border: rgba(212, 207, 198, 0.3);
+      --toast-bg: rgba(212, 207, 198, 0.92);
+      --toast-text: #1c1915;
+      --toast-kbd-bg: rgba(176, 128, 80, 0.4);
+      --toast-kbd-border: rgba(28, 25, 21, 0.3);
+      --canvas-stroke: #d4cfc6;
+      --panel-bg: rgba(28, 25, 21, 0.95);
+      --panel-border: rgba(212, 207, 198, 0.18);
+      --slider-track: rgba(212, 207, 198, 0.22);
+      --select-bg: rgba(37, 33, 24, 0.9);
+      --select-text: #9a9488;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', 'Garamond', 'Hoefler Text', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+  .app { max-width: 1200px; margin: 0 auto; padding: 44px 24px 24px; }
+  header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    gap: 12px; flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Cinzel', 'Trajan Pro', 'Optima', serif;
+    font-size: 22px; font-weight: 500; letter-spacing: 0.16em;
+    margin: 0; text-transform: uppercase;
+  }
+  .subtitle {
+    font-style: italic; font-size: 14px; margin: 4px 0 0;
+    color: var(--muted); letter-spacing: 0.02em;
+  }
+  .info {
+    font-size: 11px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    color: var(--muted); text-align: right; font-variant-numeric: tabular-nums;
+    line-height: 1.55; letter-spacing: 0.02em;
+  }
+  .info b { color: var(--text); font-weight: 500; }
+  .canvas-wrap {
+    position: relative; background: var(--canvas-bg); border-radius: 1px;
+    box-shadow: 0 1px 2px var(--rule-soft), 0 4px 28px var(--accent-glow);
+    overflow: hidden; user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  canvas.dragging { cursor: grabbing; }
+  .loading {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-style: italic; font-size: 15px;
+    color: var(--muted); letter-spacing: 0.04em; background: var(--canvas-bg); z-index: 5;
+  }
+  .controls {
+    position: absolute; right: 14px; bottom: 14px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .controls button {
+    width: 36px; height: 36px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 0; padding: 0;
+    font-family: 'Cinzel', serif; font-size: 18px; line-height: 1;
+  }
+  .controls button:hover { background: var(--accent); color: var(--canvas-bg); }
+  .controls button:active { background: var(--accent-hover); }
+  #ssm, #slg { font-size: 13px; letter-spacing: -0.05em; }
+  footer {
+    margin-top: 14px; font-size: 13px; font-style: italic;
+    color: var(--muted); line-height: 1.5; letter-spacing: 0.01em;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer .count {
+    color: var(--text); font-style: normal; font-family: ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.04em;
+  }
+
+  /* back-link to main page (standard twistj.com pattern) */
+  .back-link {
+    position: fixed; top: 14px; left: 16px;
+    color: var(--muted);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    text-decoration: none; opacity: 0.65;
+    transition: color 0.2s, opacity 0.2s;
+    z-index: 50;
+  }
+  .back-link:hover { color: var(--accent); opacity: 1; }
+
+  /* theme toggle (matches storyteller pattern, smaller) */
+  .theme-toggle {
+    position: fixed; top: 12px; right: 14px;
+    width: 32px; height: 32px; padding: 0;
+    border: 1px solid var(--btn-border); border-radius: 50%;
+    background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 50;
+    transition: all 0.2s ease; opacity: 0.6;
+  }
+  .theme-toggle:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* ── Audio player (matches main page pattern) ── */
+  .audio-toggle {
+    position: fixed; top: 12px; right: 54px;
+    width: 32px; height: 32px;
+    border: 1px solid transparent; border-radius: 50%;
+    background: transparent; color: var(--muted);
+    opacity: 0.6; font-size: 1.05rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 50;
+    transition: all 0.3s ease; user-select: none;
+  }
+  .audio-toggle:hover { opacity: 1; color: var(--accent); }
+  .audio-toggle.playing {
+    opacity: 1; color: var(--accent);
+    border-color: var(--accent); background: var(--panel-bg);
+  }
+  .audio-panel {
+    position: fixed; top: 92px; right: 14px;
+    background: var(--panel-bg); border: 1px solid var(--panel-border);
+    border-radius: 8px; padding: 0.9rem 1.1rem;
+    z-index: 50;
+    display: flex; flex-direction: column; gap: 0.6rem;
+    min-width: 180px;
+    opacity: 0; transform: translateY(-8px); pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .audio-panel.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .audio-panel label {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 0.82rem; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: lowercase;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .audio-panel label span.val {
+    color: var(--text); font-size: 0.78rem;
+    min-width: 2.2rem; text-align: right;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  .audio-panel input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 90px; height: 3px;
+    background: var(--slider-track); border-radius: 2px;
+    outline: none; cursor: pointer;
+  }
+  .audio-panel input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .audio-panel input[type="range"]::-moz-range-thumb {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: none; cursor: pointer;
+  }
+  .audio-panel select {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 0.82rem; letter-spacing: 0.08em;
+    background: var(--select-bg); color: var(--select-text);
+    border: 1px solid var(--panel-border); border-radius: 4px;
+    padding: 3px 6px; cursor: pointer; outline: none;
+  }
+  .audio-panel select:focus { border-color: var(--accent); }
+  .audio-chevron {
+    position: fixed; top: 56px; right: 54px;
+    width: 32px; height: 24px;
+    text-align: center; font-size: 1.4rem; line-height: 24px;
+    color: var(--accent); opacity: 0;
+    cursor: pointer; z-index: 51;
+    transition: all 0.3s ease; user-select: none; pointer-events: none;
+  }
+  .audio-chevron.show { opacity: 0.7; pointer-events: auto; }
+  .audio-chevron.show:hover { opacity: 1; }
+  .audio-chevron.open { transform: rotate(180deg); }
+
+  @media (max-width: 600px) {
+    .app { padding: 40px 12px 16px; }
+    h1 { font-size: 18px; letter-spacing: 0.12em; }
+    .subtitle { font-size: 13px; }
+    .info { font-size: 10px; }
+    .back-link { top: 10px; left: 12px; }
+    .theme-toggle { top: 8px; right: 10px; width: 28px; height: 28px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    .audio-toggle { top: 8px; right: 44px; width: 28px; height: 28px; font-size: 0.95rem; }
+    .audio-chevron { top: 44px; right: 44px; width: 28px; }
+    .audio-panel { top: 76px; right: 10px; min-width: 160px; padding: 0.7rem 0.9rem; }
+  }
+
+  /* immersive: hide all UI chrome, canvas fills viewport */
+  body.immersive { background: var(--canvas-bg); overflow: hidden; }
+  body.immersive .app { max-width: none; padding: 0; height: 100vh; }
+  body.immersive header,
+  body.immersive footer,
+  body.immersive .controls,
+  body.immersive .loading,
+  body.immersive .back-link,
+  body.immersive .theme-toggle,
+  body.immersive .audio-toggle,
+  body.immersive .audio-panel,
+  body.immersive .audio-chevron { display: none !important; }
+  body.immersive .canvas-wrap {
+    position: fixed; inset: 0; box-shadow: none; border-radius: 0;
+    width: 100vw !important; height: 100vh !important;
+  }
+
+  /* showcase: same as immersive + hides cursor + has inertia */
+  body.showcase { background: var(--canvas-bg); overflow: hidden; }
+  body.showcase .app { max-width: none; padding: 0; height: 100vh; }
+  body.showcase header,
+  body.showcase footer,
+  body.showcase .controls,
+  body.showcase .loading,
+  body.showcase .back-link,
+  body.showcase .theme-toggle,
+  body.showcase .audio-toggle,
+  body.showcase .audio-panel,
+  body.showcase .audio-chevron { display: none !important; }
+  body.showcase .canvas-wrap {
+    position: fixed; inset: 0; box-shadow: none; border-radius: 0;
+    width: 100vw !important; height: 100vh !important;
+  }
+  body.showcase canvas,
+  body.showcase canvas.dragging { cursor: none !important; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%);
+    background: var(--toast-bg); color: var(--toast-text);
+    padding: 10px 18px; font-size: 13px; letter-spacing: 0.04em;
+    font-family: 'EB Garamond', serif;
+    border-radius: 2px; pointer-events: none;
+    opacity: 0; transition: opacity 0.4s;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .toast kbd {
+    display: inline-block; padding: 1px 6px;
+    background: var(--toast-kbd-bg);
+    border: 1px solid var(--toast-kbd-border);
+    border-radius: 2px; font-family: 'Cinzel', serif;
+    font-size: 11px; margin: 0 2px;
+  }
+
+  /* ── Demo identity overlay: full-screen presentation cards ── */
+  .demo-overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .demo-overlay.show { opacity: 1; }
+  /* Radial vignette in page bg color — dims the Penrose pattern behind
+     the text without fully hiding the periphery. Two stacked gradients:
+     a deeper inner one for readability, a soft outer one for blend. */
+  .demo-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 35% at center, var(--bg) 0%, transparent 100%),
+      radial-gradient(ellipse at center, var(--bg) 0%, transparent 70%);
+    opacity: 0.75;
+  }
+  .demo-overlay-content {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 0 6vw;
+    transform: translateY(28px) scale(0.96);
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .demo-overlay.show .demo-overlay-content {
+    transform: translateY(0) scale(1);
+  }
+  .demo-overlay-label {
+    font-family: 'Cinzel', 'Trajan Pro', 'Optima', serif;
+    font-size: clamp(13px, 1.9vw, 22px);
+    font-weight: 400;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-left: 0.5em;  /* offset trailing letter-spacing */
+    margin-bottom: clamp(22px, 4vh, 48px);
+    text-shadow: 0 0 30px var(--accent-glow);
+  }
+  .demo-overlay-eq {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(38px, 7.5vw, 104px);
+    letter-spacing: 0.005em;
+    color: var(--text);
+    line-height: 1.18;
+    /* Soft halo in the page bg color so the text reads cleanly against
+       busy tile patterns, in both light and dark themes. */
+    text-shadow:
+      0 0 14px var(--bg),
+      0 0 28px var(--bg),
+      0 2px 6px var(--bg);
+  }
+  .demo-overlay-eq sup {
+    font-size: 0.55em;
+    vertical-align: super;
+    line-height: 0;
+  }
+  .demo-overlay-coords {
+    display: inline-block;
+    margin-left: 0.5em;
+    color: var(--muted);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-style: normal;
+    font-size: 0.42em;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    opacity: 0.85;
+  }
+  @media (max-width: 600px) {
+    .demo-overlay-label { letter-spacing: 0.35em; }
+    .demo-overlay-eq { font-size: clamp(28px, 9vw, 56px); }
+  }
+</style>
+</head>
+<body>
+<a href="/" class="back-link">&#8592; twistj.com</a>
+<div class="audio-toggle" id="audioToggle" title="Toggle audio">&#x1f507;</div>
+<div class="audio-panel" id="audioPanel">
+  <label>volume <input type="range" id="audioVol" min="0" max="100" value="50"> <span class="val" id="audioVolVal">50</span></label>
+  <label>speed <input type="range" id="audioSpeed" min="0" max="100" value="51" step="1"> <span class="val" id="audioSpeedVal">10</span></label>
+  <label>riff
+    <select id="audioRiff">
+      <option value="calm">calm</option>
+      <option value="drift" selected>drift</option>
+      <option value="pulse">pulse</option>
+      <option value="storm">storm</option>
+      <option value="layers">layers</option>
+      <option value="weave">weave</option>
+    </select>
+  </label>
+</div>
+<div class="audio-chevron" id="audioChevron" title="Toggle controls">&#x25BE;</div>
+<button class="theme-toggle" id="themeToggle" title="Toggle theme: auto / light / dark" aria-label="Toggle theme">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+</button>
+<script>
+(function() {
+  const modes = ['auto', 'light', 'dark'];
+  const icons = {
+    auto:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M12 7a5 5 0 0 1 0 10z" fill="currentColor" opacity="0.4"/></svg>',
+    light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>',
+    dark:  '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>'
+  };
+  const titles = { auto: 'Theme: auto (follows system)', light: 'Theme: light', dark: 'Theme: dark' };
+  let current = localStorage.getItem('twistj-theme') || 'auto';
+  const btn = document.getElementById('themeToggle');
+  function apply(mode) {
+    current = mode;
+    localStorage.setItem('twistj-theme', mode);
+    if (mode === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', mode);
+    btn.innerHTML = icons[mode];
+    btn.title = titles[mode];
+    window.dispatchEvent(new CustomEvent('twistj-theme-changed'));
+  }
+  btn.addEventListener('click', function() { apply(modes[(modes.indexOf(current) + 1) % modes.length]); });
+  apply(current);
+  // React to system theme changes when in 'auto' mode
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      if (current === 'auto') window.dispatchEvent(new CustomEvent('twistj-theme-changed'));
+    });
+  }
+})();
+</script>
+<div class="app">
+  <header>
+    <div>
+      <h1>Penrose · Pentaplex</h1>
+      <p class="subtitle">ζ ↦ ζ² &nbsp;·&nbsp; polární kódování Galoisovy projekce</p>
+    </div>
+    <div class="info">
+      zoom · <b id="z">28.0</b><br>
+      x · <b id="cx">0.00</b><br>
+      y · <b id="cy">0.00</b>
+    </div>
+  </header>
+  <div class="canvas-wrap" id="wrap">
+    <div class="loading" id="loading">Generuji pentaplexovou hvězdu…</div>
+    <canvas id="cv"></canvas>
+    <div class="controls">
+      <button id="zin"  title="přiblížit">+</button>
+      <button id="zout" title="oddálit">−</button>
+      <button id="zdet" title="rychlý detail">⊕</button>
+      <button id="rst"  title="výchozí">↺</button>
+      <button id="ssm"  title="menší hvězda">★−</button>
+      <button id="slg"  title="větší hvězda">★+</button>
+      <button id="clr"  title="schéma barev (C)">◐</button>
+      <button id="dmo"  title="demo (D)">▶</button>
+      <button id="hid"  title="skrýt UI (H)">⛶</button>
+      <button id="shw"  title="showcase (S)">◉</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <footer>
+    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>,</kbd> <kbd>.</kbd> · hvězda &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>S</kbd> · showcase &nbsp;·&nbsp; <kbd>H</kbd> · UI</span>
+    <span class="count" id="cnt">…</span>
+  </footer>
+</div>
+
+<!-- Demo identity overlay (visible only during demo mode) -->
+<div class="demo-overlay" id="demoOverlay" aria-hidden="true">
+  <div class="demo-overlay-content">
+    <div class="demo-overlay-label" id="demoOverlayLabel"></div>
+    <div class="demo-overlay-eq" id="demoOverlayEq"></div>
+  </div>
+</div>
+
+<!-- Schumann riff audio engine (shared with /jam/) -->
+<script src="audio.js"></script>
+<script>
+(()=>{
+  const RIFF_PRESETS={
+    calm:{tempo:5,reverb:0.95,breath:0.9,silence:0.7,wander:false,seed:0,vTM:[1,1,1,1,1]},
+    drift:{tempo:10,reverb:0.85,breath:0.75,silence:0.55,wander:false,seed:0,vTM:[1,1,1,1,1]},
+    pulse:{tempo:15,reverb:0.6,breath:0.45,silence:0.30,wander:false,seed:500,vTM:[1,1,1,1,1]},
+    storm:{tempo:25,reverb:0.4,breath:0.2,silence:0.10,wander:true,seed:1000,vTM:[1,1,1,1,1]},
+    layers:{tempo:10,reverb:0.93,breath:0.5,silence:0.08,wander:false,seed:200,vTM:[1,2/3,3/2,2,1/2]},
+    weave:{tempo:12,reverb:0.7,breath:0.35,silence:0.15,wander:true,seed:777,vTM:[1,5/3,3/5,4/3,3/4]}
+  };
+  const engine=TwistJ({tempo:10,reverb:0.85,breath:0.75,silence:0.55,wander:false});
+  let playing=false;
+  const btn=document.getElementById('audioToggle'),panel=document.getElementById('audioPanel');
+  const volS=document.getElementById('audioVol'),volV=document.getElementById('audioVolVal');
+  const spdS=document.getElementById('audioSpeed'),spdV=document.getElementById('audioSpeedVal');
+  const riffS=document.getElementById('audioRiff'),chev=document.getElementById('audioChevron');
+  let panelOpen=false;
+  function s2b(v){return Math.round(0.5*Math.pow(360,v/100)*10)/10;}
+  function b2s(b){return Math.round(100*Math.log(b/0.5)/Math.log(360));}
+  function preset(n){const p=RIFF_PRESETS[n];if(!p)return;spdS.value=b2s(p.tempo);spdV.textContent=p.tempo;engine.forceAllVoices(n==='layers'||n==='weave');engine.set({reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,tempo:p.tempo,vTM:p.vTM||[1,1,1,1,1]});if(playing){engine.stop();engine.forceAllVoices(n==='layers'||n==='weave');engine.start(p.seed);}}
+  btn.addEventListener('click',()=>{
+    if(!playing){playing=true;const ks=Object.keys(RIFF_PRESETS),rk=ks[Math.floor(Math.random()*ks.length)];riffS.value=rk;const p=RIFF_PRESETS[rk];engine.forceAllVoices(rk==='layers'||rk==='weave');engine.set({tempo:s2b(spdS.value),reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,vTM:p.vTM||[1,1,1,1,1]});engine.start(p.seed);if(engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);btn.textContent='\u{1f50a}';btn.classList.add('playing');chev.classList.add('show');panel.classList.add('visible');chev.classList.add('open');panelOpen=true;}
+    else{playing=false;engine.stop();btn.textContent='\u{1f507}';btn.classList.remove('playing');panel.classList.remove('visible');chev.classList.remove('show','open');panelOpen=false;}
+  });
+  chev.addEventListener('click',()=>{panelOpen=!panelOpen;panel.classList.toggle('visible',panelOpen);chev.classList.toggle('open',panelOpen);});
+  volS.addEventListener('input',()=>{volV.textContent=volS.value;if(playing&&engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);});
+  spdS.addEventListener('input',()=>{const b=s2b(spdS.value);spdV.textContent=b<10?b.toFixed(1):Math.round(b);engine.setTempo(b);});
+  riffS.addEventListener('change',()=>{preset(riffS.value);});
+})();
+</script>
+
+<script>
+(() => {
+  const N = 5;
+  const e = [], f = [];
+  for (let k = 0; k < N; k++) {
+    e.push([Math.cos(2*Math.PI*k/N), Math.sin(2*Math.PI*k/N)]);
+    f.push([Math.cos(4*Math.PI*k/N), Math.sin(4*Math.PI*k/N)]);
+  }
+  const gammas = [0.13, 0.27, -0.18, 0.45, 0.33];
+
+  const cache = new Map();
+  let ixMid = 0, iyMid = 0, rMax = 4;
+  let normalised = false;
+  const camera = { x: 0, y: 0, zoom: 28 };
+  const dim = { w: 800, h: 1000 };
+
+  // Theme-aware canvas colors. Read from CSS vars so light/dark switch is automatic.
+  const themeColors = {
+    canvasBg: '#FAF7F1',
+    canvasBgU32: (255 << 24) | (241 << 16) | (247 << 8) | 250,  // little-endian RGBA
+    stroke: '#1A1A1A'
+  };
+  function hexToRgb(hex) {
+    const m = (hex || '').trim().match(/^#?([0-9a-f]{6})$/i);
+    if (!m) return null;
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
+  }
+  function readThemeColors() {
+    const cs = getComputedStyle(document.documentElement);
+    const bg = cs.getPropertyValue('--canvas-bg').trim() || '#FAF7F1';
+    const stroke = cs.getPropertyValue('--canvas-stroke').trim() || '#1A1A1A';
+    themeColors.canvasBg = bg;
+    themeColors.stroke = stroke;
+    const rgb = hexToRgb(bg);
+    if (rgb) {
+      const [r, g, b] = rgb;
+      themeColors.canvasBgU32 = (255 << 24) | (b << 16) | (g << 8) | r;
+    }
+  }
+  window.addEventListener('twistj-theme-changed', () => { readThemeColors(); requestRender(); });
+
+  // Hard cap on physical render radius (in world units, per side from camera).
+  // At extreme zoom-out we generate a finite patch; the rest is background.
+  let MAX_PATCH_HALF = 120;       // half-radius of fixed star patch in world units
+  let starTiles = null;           // fixed array of all tiles, generated once
+
+  // ===== Color schemes =====
+  const SCHEMES = ['polar', 'orbit', 'pair', 'spectral', 'angle', 'shells', 'classic', 'grey'];
+  const SCHEME_NAMES = {
+    polar:    'polar (Galois)',
+    orbit:    'orbit (σ₁/σ₂)',
+    pair:     'pair (10 tříd)',
+    spectral: 'spectral (radius)',
+    angle:    'angle (rainbow)',
+    shells:   'shells (SS-PI Fibonacci)',
+    classic:  'classic (Penrose)',
+    grey:     'grey (orientace)'
+  };
+  let currentScheme = 'polar';
+
+  // SS-PI Fibonacci shells: Q ∈ {1, 2, 3, 5, 8, 13, 21, ...}.
+  // Map Q-value → Fibonacci index for color cycling.
+  const FIB_INDEX = new Map([
+    [1,0],   [2,1],   [3,2],   [5,3],   [8,4],   [13,5],
+    [21,6],  [34,7],  [55,8],  [89,9],  [144,10],[233,11],
+    [377,12],[610,13],[987,14],[1597,15],[2584,16],[4181,17]
+  ]);
+
+  // Maps (r,s) with r<s in {0..4} to 0..9 (lex order)
+  function pairIndex(r, ss) {
+    let idx = 0;
+    for (let rr = 0; rr < r; rr++) idx += (4 - rr);
+    return idx + (ss - r - 1);
+  }
+
+  // Returns [H, S, L] for a tile. H in [0,360), S/L in [0,100].
+  function paletteFor(t) {
+    const dx = t.intX - ixMid, dy = t.intY - iyMid;
+    const r = Math.min(1.0, Math.sqrt(dx*dx + dy*dy) / rMax);
+
+    switch (currentScheme) {
+      case 'polar': {
+        const angle = Math.atan2(dy, dx);
+        const hueCycle = (((5*angle)/(2*Math.PI)) % 1 + 1) % 1;
+        const H = 28 + 22*hueCycle;
+        const L = Math.max(15, Math.min(85, 75 - 55*r));
+        const S = Math.max(20, Math.min(80, 50 + 40*(1 - 4*(r-0.5)*(r-0.5))));
+        return [H, S, L];
+      }
+      case 'orbit': {
+        // σ₁ (thick) = warm gold; σ₂ (thin) = cool slate. Radius modulates lightness.
+        const H = t.isThin ? 215 : 38;
+        const S = t.isThin ? 32 : 70;
+        const L = Math.max(25, Math.min(75, 60 - 25*r));
+        return [H, S, L];
+      }
+      case 'pair': {
+        // 10 distinct hues per (r,s) pair. Equal lightness/saturation.
+        const idx = pairIndex(t.r, t.ss);
+        const H = 36 * idx;
+        return [H, 55, 60];
+      }
+      case 'spectral': {
+        // Viridis-ish: dark purple (r=0) → blue → teal → green → yellow (r=1)
+        const H = 270 - 220 * r;
+        const S = 60 + 25 * (1 - 2*Math.abs(r - 0.5));
+        const L = 25 + 50 * r;
+        return [H, S, L];
+      }
+      case 'angle': {
+        // Pure rainbow from internal angle, single cycle.
+        const angle = Math.atan2(dy, dx);
+        const H = ((angle + Math.PI) / (2*Math.PI)) * 360;
+        return [H, 70, 55];
+      }
+      case 'shells': {
+        // φ-spaced bands by internal radius. Tiles with internal radius
+        // in [φ^(-n-1), φ^(-n)] all share one color → concentric rings
+        // around every 5-fold rosette center, spaced at golden ratio.
+        // This IS the SS-PI Fibonacci spacing visible: F_{n+1}/F_n → φ,
+        // so log-φ bands ARE Fibonacci shells in the asymptotic limit.
+        const dx = t.intX - ixMid, dy = t.intY - iyMid;
+        const r = Math.min(1, Math.sqrt(dx*dx + dy*dy) / rMax);
+        if (r < 0.001) return [0, 0, 95];
+        const PHI_LOG = Math.log((1 + Math.sqrt(5)) / 2);
+        const idx = Math.max(0, Math.min(7, Math.floor(-Math.log(r) / PHI_LOG)));
+        const H = (idx * 45 + 20) % 360;
+        return [H, 72, 55];
+      }
+      case 'classic': {
+        // Two-tone warm Penrose: solid gold thick + solid copper thin.
+        // No radius modulation — the printed-paper look. Both clearly
+        // distinguishable from cream background.
+        if (t.isThin) return [16, 62, 42];
+        return [42, 60, 60];
+      }
+      case 'grey': {
+        // Asymmetric Penrose grayscale: only thick rhombi (σ₁ orbit) carry
+        // the orientation-based 3D-cube grayscale; thin rhombi (σ₂) are
+        // uniform mid gray, acting as quiet connective background.
+        // The cubes pop because only one orbit class is doing visual work,
+        // and σ₁ at decagonal rosette vertices forms the iconic illusion.
+        if (t.isThin) {
+          const flicker = (t.Q & 1) ? 1.5 : -1.5;
+          return [0, 0, 55 + flicker];
+        }
+        const ax = e[t.r][0] + e[t.ss][0];
+        const ay = e[t.r][1] + e[t.ss][1];
+        const mod = ((Math.atan2(ay, ax) / Math.PI) + 2) % 1;
+        const idx = Math.floor(mod * 5) % 5;
+        const grays = [58, 92, 25, 78, 8];
+        const flicker = (t.Q & 1) ? 2.5 : -2.5;
+        const L = Math.max(2, Math.min(98, grays[idx] + flicker));
+        return [0, 0, L];
+      }
+    }
+    return [0, 0, 50];
+  }
+
+  function colorize(t) {
+    const [H, S, L] = paletteFor(t);
+    return 'hsl(' + H.toFixed(0) + ',' + S.toFixed(0) + '%,' + L.toFixed(0) + '%)';
+  }
+
+  // Fast HSL→packed BGRA (Uint32, little-endian RGBA) for ImageData direct writes.
+  function colorizeU32(t) {
+    const [H, S, L] = paletteFor(t);
+    const L01 = L / 100, S01 = S / 100;
+    const C = (1 - Math.abs(2*L01 - 1)) * S01;
+    const Hp = H / 60;
+    const X = C * (1 - Math.abs(Hp % 2 - 1));
+    let R, G, B;
+    if (Hp < 1)      { R = C; G = X; B = 0; }
+    else if (Hp < 2) { R = X; G = C; B = 0; }
+    else if (Hp < 3) { R = 0; G = C; B = X; }
+    else if (Hp < 4) { R = 0; G = X; B = C; }
+    else if (Hp < 5) { R = X; G = 0; B = C; }
+    else             { R = C; G = 0; B = X; }
+    const m = L01 - C/2;
+    const r8 = Math.round((R + m) * 255);
+    const g8 = Math.round((G + m) * 255);
+    const b8 = Math.round((B + m) * 255);
+    return (255 << 24) | (b8 << 16) | (g8 << 8) | r8;
+  }
+
+  function applyScheme() {
+    if (!starTiles) return;
+    for (let i = 0; i < starTiles.length; i++) {
+      const t = starTiles[i];
+      t.color = colorize(t);
+      t.rgb32 = colorizeU32(t);
+    }
+    requestRender();
+  }
+
+  function cycleScheme(dir) {
+    const i = SCHEMES.indexOf(currentScheme);
+    const ni = (i + (dir || 1) + SCHEMES.length) % SCHEMES.length;
+    currentScheme = SCHEMES[ni];
+    showToast('schéma · ' + SCHEME_NAMES[currentScheme], 1400);
+    applyScheme();
+  }
+
+  function computeTile(r, ss, kr, ks) {
+    const er = e[r], es = e[ss];
+    const det = er[0]*es[1] - er[1]*es[0];
+    const cr = kr + gammas[r], cs = ks + gammas[ss];
+    const x = (cr*es[1] - cs*er[1]) / det;
+    const y = (cs*er[0] - cr*es[0]) / det;
+    const K = [0,0,0,0,0];
+    K[r] = kr; K[ss] = ks;
+    for (let l = 0; l < N; l++) {
+      if (l === r || l === ss) continue;
+      K[l] = Math.ceil(x*e[l][0] + y*e[l][1] - gammas[l] - 1e-9);
+    }
+    const corners = [];
+    const offs = [[0,0],[1,0],[1,1],[0,1]];
+    for (let m = 0; m < 4; m++) {
+      const dr = offs[m][0], ds = offs[m][1];
+      let cx = 0, cy = 0;
+      for (let l = 0; l < N; l++) {
+        const kl = K[l] + (l === r ? dr : 0) + (l === ss ? ds : 0);
+        cx += kl*e[l][0]; cy += kl*e[l][1];
+      }
+      corners.push([cx, cy]);
+    }
+    let intX = 0, intY = 0;
+    for (let l = 0; l < N; l++) {
+      intX += K[l]*f[l][0]; intY += K[l]*f[l][1];
+    }
+    intX += 0.5*(f[r][0] + f[ss][0]);
+    intY += 0.5*(f[r][1] + f[ss][1]);
+    const ds = (ss - r) % N;
+    const isThin = (ds === 2 || ds === 3);
+    // Q = |K|² in Z⁵ — integer-valued shell index. SS-PI Fibonacci shells
+    // are the subset where Q ∈ {1, 2, 3, 5, 8, 13, 21, ...}.
+    let Q = 0;
+    for (let l = 0; l < N; l++) Q += K[l]*K[l];
+    const t = { corners, intX, intY, r, ss, isThin, Q };
+    t.color = colorize(t);
+    t.rgb32 = colorizeU32(t);
+    return t;
+  }
+
+  function tilesInRect(xmin, xmax, ymin, ymax, buffer) {
+    if (buffer === undefined) buffer = 2;
+    const out = [];
+    const corners = [
+      [xmin-buffer, ymin-buffer], [xmax+buffer, ymin-buffer],
+      [xmax+buffer, ymax+buffer], [xmin-buffer, ymax+buffer],
+    ];
+    for (let r = 0; r < N; r++) {
+      for (let ss = r+1; ss < N; ss++) {
+        const er = e[r], es = e[ss];
+        if (Math.abs(er[0]*es[1] - er[1]*es[0]) < 1e-10) continue;
+        let mnR=Infinity, mxR=-Infinity, mnS=Infinity, mxS=-Infinity;
+        for (let i = 0; i < 4; i++) {
+          const px=corners[i][0], py=corners[i][1];
+          const vR = px*er[0]+py*er[1], vS = px*es[0]+py*es[1];
+          if (vR<mnR) mnR=vR; if (vR>mxR) mxR=vR;
+          if (vS<mnS) mnS=vS; if (vS>mxS) mxS=vS;
+        }
+        const kr_min = Math.floor(mnR - gammas[r]) - 1;
+        const kr_max = Math.ceil(mxR - gammas[r])  + 1;
+        const ks_min = Math.floor(mnS - gammas[ss]) - 1;
+        const ks_max = Math.ceil(mxS - gammas[ss])  + 1;
+        for (let kr = kr_min; kr <= kr_max; kr++) {
+          for (let ks = ks_min; ks <= ks_max; ks++) {
+            const key = r+','+ss+','+kr+','+ks;
+            let t = cache.get(key);
+            if (!t) { t = computeTile(r, ss, kr, ks); cache.set(key, t); }
+            out.push(t);
+          }
+        }
+      }
+    }
+    return out;
+  }
+
+  function normalise() {
+    const sample = tilesInRect(-12, 12, -12, 12, 0);
+    let mnIx=Infinity, mxIx=-Infinity, mnIy=Infinity, mxIy=-Infinity;
+    for (const t of sample) {
+      if (t.intX<mnIx) mnIx=t.intX; if (t.intX>mxIx) mxIx=t.intX;
+      if (t.intY<mnIy) mnIy=t.intY; if (t.intY>mxIy) mxIy=t.intY;
+    }
+    ixMid = (mnIx+mxIx)/2; iyMid = (mnIy+mxIy)/2;
+    const ixHalf = (mxIx-mnIx)/2, iyHalf = (mxIy-mnIy)/2;
+    rMax = Math.sqrt(ixHalf*ixHalf + iyHalf*iyHalf) || 4;
+    for (const t of cache.values()) {
+      t.color = colorize(t);
+      t.rgb32 = colorizeU32(t);
+    }
+    normalised = true;
+  }
+
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let renderPending = false;
+  function requestRender() {
+    if (renderPending) return;
+    renderPending = true;
+    requestAnimationFrame(() => { renderPending = false; render(); });
+  }
+
+  function ensureCanvasSize() {
+    const dpr = window.devicePixelRatio || 1;
+    const targetW = Math.floor(dim.w*dpr), targetH = Math.floor(dim.h*dpr);
+    if (cv.width !== targetW || cv.height !== targetH) {
+      cv.width = targetW; cv.height = targetH;
+      cv.style.width = dim.w + 'px';
+      cv.style.height = dim.h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+  }
+
+  function render() {
+    if (!normalised) return;
+    ensureCanvasSize();
+    const w = dim.w, h = dim.h;
+    ctx.fillStyle = themeColors.canvasBg;
+    ctx.fillRect(0, 0, w, h);
+
+    const halfW = w/2, halfH = h/2;
+    const z = camera.zoom;
+
+    // Star is FIXED in world space [-MAX_PATCH_HALF, MAX_PATCH_HALF]² around origin.
+    // We generate it once and just transform per frame — no viewport-coupled
+    // regeneration, so panning never breaks the structure.
+    const tiles = starTiles || [];
+
+    const showStroke = z > 8;
+    const strokeWidth = Math.max(0.1, Math.min(3.5, z*0.014));
+    const strokeAlpha = Math.max(0.12, Math.min(0.55, (z-5)*0.022));
+
+    let drawn = 0;
+    const buffer = 80;
+    const dpr = window.devicePixelRatio || 1;
+
+    // Common viewport-in-world bounds + clamped grid range. Used by both
+    // render paths so neither has to scan the full 970k tile array.
+    const halfW_w = halfW / z, halfH_w = halfH / z;
+    const buf_w = 4;  // world-unit buffer for tile size + cull margin
+    const xmin = camera.x - halfW_w - buf_w;
+    const xmax = camera.x + halfW_w + buf_w;
+    const ymin = camera.y - halfH_w - buf_w;
+    const ymax = camera.y + halfH_w + buf_w;
+    const gxMin = Math.max(starGridMinX, Math.floor(xmin / STAR_GRID_CELL));
+    const gxMax = Math.min(starGridMaxX, Math.floor(xmax / STAR_GRID_CELL));
+    const gyMin = Math.max(starGridMinY, Math.floor(ymin / STAR_GRID_CELL));
+    const gyMax = Math.min(starGridMaxY, Math.floor(ymax / STAR_GRID_CELL));
+
+    // FAST PATH: at low zoom (sub-few-pixel tiles), skip canvas paths entirely
+    // and write pixels directly to ImageData. ~10× speedup.
+    if (z < 3.5) {
+      const cw = cv.width, ch = cv.height;  // physical pixels
+      const imgData = ctx.createImageData(cw, ch);
+      const view32 = new Uint32Array(imgData.data.buffer);
+
+      // background fill, theme-aware (little-endian RGBA)
+      view32.fill(themeColors.canvasBgU32);
+
+      const block = Math.max(1, Math.round(z * dpr));
+      const halfWdpr = halfW * dpr, halfHdpr = halfH * dpr;
+      const camX = camera.x, camY = camera.y;
+      const blockHalf = block >> 1;
+
+      // Spatial-grid cull: at mid-zoom (z ~ 1–3) viewport covers a few
+      // thousand cells out of 70k+, skipping the otherwise full 970k-tile
+      // linear scan. At full zoom-out grid simply visits every cell.
+      for (let gx = gxMin; gx <= gxMax; gx++) {
+        for (let gy = gyMin; gy <= gyMax; gy++) {
+          const bucket = starGrid && starGrid.get(gx * 100003 + gy);
+          if (!bucket) continue;
+          for (let i = 0; i < bucket.length; i++) {
+            const t = bucket[i];
+            const sx = Math.round((t.cx - camX) * z * dpr + halfWdpr);
+            const sy = Math.round((camY - t.cy) * z * dpr + halfHdpr);
+            if (sx < -block || sx >= cw+block || sy < -block || sy >= ch+block) continue;
+            const rgb = t.rgb32;
+            const x0 = Math.max(0, sx - blockHalf);
+            const y0 = Math.max(0, sy - blockHalf);
+            const x1 = Math.min(cw, x0 + block);
+            const y1 = Math.min(ch, y0 + block);
+            for (let py = y0; py < y1; py++) {
+              const row = py * cw;
+              for (let px = x0; px < x1; px++) {
+                view32[row + px] = rgb;
+              }
+            }
+            drawn++;
+          }
+        }
+      }
+
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.putImageData(imgData, 0, 0);
+      ctx.restore();
+    } else {
+      // SLOW PATH: spatially-culled polygon paths via grid lookup.
+      // Compute viewport bounds in world coords, iterate only cells that
+      // overlap. Reduces 600K-tile linear scan to ~tens of cells at high zoom.
+
+      for (let gx = gxMin; gx <= gxMax; gx++) {
+        for (let gy = gyMin; gy <= gyMax; gy++) {
+          const bucket = starGrid && starGrid.get(gx * 100003 + gy);
+          if (!bucket) continue;
+          for (let i = 0; i < bucket.length; i++) {
+            const t = bucket[i]; const c = t.corners;
+            const sx = (t.cx - camera.x)*z + halfW;
+            const sy = (camera.y - t.cy)*z + halfH;
+            if (sx < -buffer || sx > w+buffer || sy < -buffer || sy > h+buffer) continue;
+            ctx.beginPath();
+            ctx.moveTo((c[0][0]-camera.x)*z+halfW, (camera.y-c[0][1])*z+halfH);
+            ctx.lineTo((c[1][0]-camera.x)*z+halfW, (camera.y-c[1][1])*z+halfH);
+            ctx.lineTo((c[2][0]-camera.x)*z+halfW, (camera.y-c[2][1])*z+halfH);
+            ctx.lineTo((c[3][0]-camera.x)*z+halfW, (camera.y-c[3][1])*z+halfH);
+            ctx.closePath();
+            ctx.fillStyle = t.color;
+            ctx.fill();
+            if (showStroke) {
+              ctx.lineWidth = strokeWidth;
+              ctx.strokeStyle = themeColors.stroke;
+              ctx.globalAlpha = strokeAlpha;
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
+            drawn++;
+          }
+        }
+      }
+    }
+    document.getElementById('cnt').textContent =
+      drawn.toLocaleString() + ' v okně · ' + (starTiles ? starTiles.length.toLocaleString() : '0') +
+      ' v hvězdě · r=' + MAX_PATCH_HALF;
+    document.getElementById('z').textContent  = z.toFixed(z < 1 ? 2 : 1);
+    document.getElementById('cx').textContent = camera.x.toFixed(2);
+    document.getElementById('cy').textContent = camera.y.toFixed(2);
+  }
+
+  let drag = null, pinch = null;
+  function pt(e) {
+    const r = cv.getBoundingClientRect();
+    return [(e.clientX || e.touches[0].clientX) - r.left,
+            (e.clientY || e.touches[0].clientY) - r.top];
+  }
+  cv.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    if (demoState) { stopDemo(); return; }
+    stopInertia(); stopZoomAnim();
+    const [px, py] = pt(e);
+    drag = { px, py, cx: camera.x, cy: camera.y, lastT: performance.now(), lastPx: px, lastPy: py };
+    cv.classList.add('dragging');
+  });
+  cv.addEventListener('mousemove', (e) => {
+    if (!drag) return;
+    const [px, py] = pt(e);
+    camera.x = drag.cx - (px - drag.px) / camera.zoom;
+    camera.y = drag.cy + (py - drag.py) / camera.zoom;
+    // velocity tracking — used by inertia in showcase mode
+    const now = performance.now();
+    const dt = (now - drag.lastT) / 1000;
+    if (dt > 0.005) {
+      inertiaVx = -(px - drag.lastPx) / dt / camera.zoom;
+      inertiaVy =  (py - drag.lastPy) / dt / camera.zoom;
+      drag.lastT = now; drag.lastPx = px; drag.lastPy = py;
+    }
+    requestRender();
+  });
+  const endDrag = () => {
+    if (drag) startInertia();
+    drag = null; cv.classList.remove('dragging');
+  };
+  cv.addEventListener('mouseup', endDrag);
+  cv.addEventListener('mouseleave', endDrag);
+
+  cv.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (demoState) { stopDemo(); return; }
+    stopInertia(); stopZoomAnim();
+    if (e.touches.length === 1) {
+      const r = cv.getBoundingClientRect();
+      const px = e.touches[0].clientX - r.left, py = e.touches[0].clientY - r.top;
+      drag = { px, py, cx: camera.x, cy: camera.y, lastT: performance.now(), lastPx: px, lastPy: py };
+    } else if (e.touches.length === 2) {
+      drag = null;
+      const r = cv.getBoundingClientRect();
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const x1 = t1.clientX - r.left, y1 = t1.clientY - r.top;
+      const x2 = t2.clientX - r.left, y2 = t2.clientY - r.top;
+      const cx = (x1+x2)/2, cy = (y1+y2)/2;
+      const d  = Math.hypot(x2-x1, y2-y1);
+      pinch = { d, cx, cy, zoom: camera.zoom, camx: camera.x, camy: camera.y };
+    }
+  }, { passive: false });
+  cv.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1 && drag) {
+      const r = cv.getBoundingClientRect();
+      const px = e.touches[0].clientX - r.left, py = e.touches[0].clientY - r.top;
+      camera.x = drag.cx - (px - drag.px) / camera.zoom;
+      camera.y = drag.cy + (py - drag.py) / camera.zoom;
+      const now = performance.now();
+      const dt = (now - drag.lastT) / 1000;
+      if (dt > 0.005) {
+        inertiaVx = -(px - drag.lastPx) / dt / camera.zoom;
+        inertiaVy =  (py - drag.lastPy) / dt / camera.zoom;
+        drag.lastT = now; drag.lastPx = px; drag.lastPy = py;
+      }
+      requestRender();
+    } else if (e.touches.length === 2 && pinch) {
+      const r = cv.getBoundingClientRect();
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const x1 = t1.clientX - r.left, y1 = t1.clientY - r.top;
+      const x2 = t2.clientX - r.left, y2 = t2.clientY - r.top;
+      const d  = Math.hypot(x2-x1, y2-y1);
+      const factor = d / pinch.d;
+      const newZoom = Math.max(0.1, Math.min(500, pinch.zoom * factor));
+      const halfW = dim.w/2, halfH = dim.h/2;
+      const wx = (pinch.cx - halfW)/pinch.zoom + pinch.camx;
+      const wy = pinch.camy - (pinch.cy - halfH)/pinch.zoom;
+      camera.zoom = newZoom;
+      camera.x = wx - (pinch.cx - halfW)/newZoom;
+      camera.y = wy + (pinch.cy - halfH)/newZoom;
+      requestRender();
+    }
+  }, { passive: false });
+  cv.addEventListener('touchend', () => {
+    if (drag) startInertia();
+    drag = null; pinch = null;
+  });
+
+  // ===== smooth zoom (used in showcase mode) =====
+  let zoomTarget = null;
+  let zoomAnchor = null;
+  let zoomAnimRAF = null;
+
+  function stopZoomAnim() {
+    if (zoomAnimRAF) { cancelAnimationFrame(zoomAnimRAF); zoomAnimRAF = null; }
+    zoomTarget = null;
+  }
+  function smoothZoomBy(factor, anchorMx, anchorMy) {
+    if (zoomTarget === null) zoomTarget = camera.zoom;
+    zoomTarget = Math.max(0.1, Math.min(500, zoomTarget * factor));
+    zoomAnchor = { mx: anchorMx, my: anchorMy };
+    if (zoomAnimRAF) return;
+    let lastT = performance.now();
+    function step(now) {
+      const dt = Math.min(0.05, (now - lastT) / 1000);
+      lastT = now;
+      const ratio = zoomTarget / camera.zoom;
+      if (Math.abs(Math.log(ratio)) < 0.005) {
+        camera.zoom = zoomTarget;
+        zoomAnimRAF = null;
+        zoomTarget = null;
+        requestRender();
+        return;
+      }
+      const stepFactor = Math.pow(ratio, Math.min(1, dt * 9));
+      const newZoom = camera.zoom * stepFactor;
+      if (zoomAnchor) {
+        const halfW = dim.w/2, halfH = dim.h/2;
+        const wx = (zoomAnchor.mx - halfW) / camera.zoom + camera.x;
+        const wy = camera.y - (zoomAnchor.my - halfH) / camera.zoom;
+        camera.x = wx - (zoomAnchor.mx - halfW) / newZoom;
+        camera.y = wy + (zoomAnchor.my - halfH) / newZoom;
+      }
+      camera.zoom = newZoom;
+      requestRender();
+      zoomAnimRAF = requestAnimationFrame(step);
+    }
+    zoomAnimRAF = requestAnimationFrame(step);
+  }
+  function isShowcase() { return document.body.classList.contains('showcase'); }
+
+  cv.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (demoState) { stopDemo(); return; }
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const factor = Math.exp(-e.deltaY * 0.0015);
+    if (isShowcase()) {
+      smoothZoomBy(factor, mx, my);
+    } else {
+      const halfW = dim.w/2, halfH = dim.h/2;
+      const wx = (mx - halfW)/camera.zoom + camera.x;
+      const wy = camera.y - (my - halfH)/camera.zoom;
+      const newZoom = Math.max(0.1, Math.min(500, camera.zoom * factor));
+      camera.x = wx - (mx - halfW)/newZoom;
+      camera.y = wy + (my - halfH)/newZoom;
+      camera.zoom = newZoom;
+      requestRender();
+    }
+  }, { passive: false });
+
+  cv.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    if (isShowcase()) {
+      smoothZoomBy(2.4, mx, my);
+    } else {
+      const halfW = dim.w/2, halfH = dim.h/2;
+      const wx = (mx - halfW)/camera.zoom + camera.x;
+      const wy = camera.y - (my - halfH)/camera.zoom;
+      const newZoom = Math.min(500, camera.zoom * 2.4);
+      camera.x = wx - (mx - halfW)/newZoom;
+      camera.y = wy + (my - halfH)/newZoom;
+      camera.zoom = newZoom;
+      requestRender();
+    }
+  });
+
+  function zoomBtn(factor) {
+    if (isShowcase()) {
+      smoothZoomBy(factor, dim.w/2, dim.h/2);
+    } else {
+      camera.zoom = Math.max(0.1, Math.min(500, camera.zoom * factor));
+      requestRender();
+    }
+  }
+  document.getElementById('zin') .addEventListener('click', () => zoomBtn(1.5));
+  document.getElementById('zout').addEventListener('click', () => zoomBtn(1/1.5));
+  document.getElementById('zdet').addEventListener('click', () => zoomBtn(3));
+  document.getElementById('rst') .addEventListener('click', () => {
+    stopZoomAnim(); stopInertia();
+    camera.x = 0; camera.y = 0; camera.zoom = 28; requestRender();
+  });
+  document.getElementById('clr').addEventListener('click', () => cycleScheme(1));
+
+  function shrinkStar() {
+    MAX_PATCH_HALF = Math.max(40, MAX_PATCH_HALF - 20);
+    showToast('hvězda · ' + MAX_PATCH_HALF, 1200);
+    regenerateStar(); requestRender();
+  }
+  function growStar() {
+    MAX_PATCH_HALF = Math.min(280, MAX_PATCH_HALF + 20);
+    showToast('hvězda · ' + MAX_PATCH_HALF, 1200);
+    regenerateStar(); requestRender();
+  }
+  document.getElementById('ssm').addEventListener('click', shrinkStar);
+  document.getElementById('slg').addEventListener('click', growStar);
+
+  function fitSize() {
+    const wrap = document.getElementById('wrap');
+    const fullViewport = document.body.classList.contains('immersive') ||
+                          document.body.classList.contains('showcase');
+    let w, h;
+    if (fullViewport) {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      wrap.style.height = '';  // clear any inline height left over from windowed mode
+    } else {
+      w = wrap.clientWidth || 800;
+      const maxH = Math.max(420, window.innerHeight - 180);
+      h = Math.min(maxH, Math.floor(w * 1.18));
+      wrap.style.height = h + 'px';
+    }
+    dim.w = w; dim.h = h;
+    requestRender();
+  }
+  window.addEventListener('resize', fitSize);
+
+  // ===== immersive mode =====
+  const toastEl = document.getElementById('toast');
+  let toastTimer = null;
+  function showToast(html, ms) {
+    if (!toastEl) return;
+    toastEl.innerHTML = html;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms || 1800);
+  }
+  function toggleImmersive() {
+    document.body.classList.remove('showcase');  // exit showcase if active
+    const wasImmersive = document.body.classList.contains('immersive');
+    document.body.classList.toggle('immersive');
+    fitSize();
+    if (!wasImmersive) {
+      showToast('<kbd>H</kbd> · <kbd>F</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+    }
+  }
+  function toggleShowcase() {
+    document.body.classList.remove('immersive');  // exit immersive if active
+    const wasShowcase = document.body.classList.contains('showcase');
+    document.body.classList.toggle('showcase');
+    fitSize();
+    if (!wasShowcase) {
+      showToast('showcase &nbsp;·&nbsp; <kbd>S</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+    } else {
+      stopInertia();
+    }
+  }
+  document.getElementById('hid').addEventListener('click', toggleImmersive);
+  document.getElementById('shw').addEventListener('click', toggleShowcase);
+
+  // ===== demo mode: fullscreen + procedural pentatonic drone + auto camera =====
+  let demoState = null;
+  const DEMO_SCHEME_DURATION = 60000;  // ms per scheme
+
+  // TWIST-J identities shown as full-screen presentation cards during demo.
+  // Same set + order as the main twistj.com page — keeps the narrative.
+  const TWIST_J_IDENTITIES = [
+    { label: 'axiom',   eq: 'J = 1 + j²',                       coords: '= (1, 0, 1, 0)'   },
+    { label: 'polar',   eq: 'J = (1/φ) · e<sup>i · 2π/5</sup>', coords: ''                  },
+    { label: 'inverse', eq: 'J⁻¹ = −j − j²',                    coords: '= (0, −1, −1, 0)' },
+    { label: 'golden',  eq: 'φ = −j² − j³',                     coords: '= (0, 0, −1, −1)' },
+    { label: 'bridge',  eq: 'J · φ = j',                        coords: ''                  },
+    { label: 'cubic',   eq: '(J − 1)³ = j',                     coords: ''                  },
+    { label: 'quintic', eq: 'J⁵ = φ⁻⁵',                         coords: ''                  }
+  ];
+  const IDENTITY_VISIBLE_MS = 4500;       // how long each card stays
+  const IDENTITY_PERIOD_MIN = 10000;      // min ms between appearances
+  const IDENTITY_PERIOD_MAX = 20000;      // max ms between appearances
+
+  function showIdentity(idx) {
+    const id = TWIST_J_IDENTITIES[idx];
+    const lab = document.getElementById('demoOverlayLabel');
+    const eq  = document.getElementById('demoOverlayEq');
+    lab.textContent = id.label;
+    eq.innerHTML = id.eq +
+      (id.coords ? '<span class="demo-overlay-coords">' + id.coords + '</span>' : '');
+    document.getElementById('demoOverlay').classList.add('show');
+  }
+  function hideIdentity() {
+    document.getElementById('demoOverlay').classList.remove('show');
+  }
+
+  function startAmbientAudio() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    let ctx;
+    try { ctx = new Ctx(); } catch(e) { return null; }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+    // Master with slow fade-in
+    const master = ctx.createGain();
+    master.gain.value = 0;
+    master.connect(ctx.destination);
+    master.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 3);
+
+    // Lowpass for warmth — base 1100 Hz, modulated by long-term LFO below
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 1100; filter.Q.value = 0.5;
+    filter.connect(master);
+
+    // Delay feedback for ambient bloom
+    const delay = ctx.createDelay(2);
+    delay.delayTime.value = 0.62;
+    const fb = ctx.createGain(); fb.gain.value = 0.48;
+    delay.connect(fb).connect(delay);
+    delay.connect(filter);
+
+    // ===== Long-term modulation: minute-scale evolution layer =====
+    // Three slow LFOs at non-commensurate periods (170s, 210s, 290s) so
+    // the combined modulation never exactly repeats. Subtle by design —
+    // listener feels evolution without recognizing the source.
+
+    // (1) Filter cutoff sweep: spectrum slowly opens (bright) and closes (dark)
+    const filterLFO = ctx.createOscillator();
+    filterLFO.type = 'sine'; filterLFO.frequency.value = 1 / 170;
+    const filterLFOG = ctx.createGain(); filterLFOG.gain.value = 480;
+    filterLFO.connect(filterLFOG).connect(filter.frequency);
+    filterLFO.start();
+
+    // (2) Delay time drift: spatial bloom depth slowly morphs
+    const delayLFO = ctx.createOscillator();
+    delayLFO.type = 'sine'; delayLFO.frequency.value = 1 / 210;
+    const delayLFOG = ctx.createGain(); delayLFOG.gain.value = 0.18;
+    delayLFO.connect(delayLFOG).connect(delay.delayTime);
+    delayLFO.start();
+
+    // (3) Master volume long-period swell (subtle)
+    const volLFO = ctx.createOscillator();
+    volLFO.type = 'sine'; volLFO.frequency.value = 1 / 290;
+    const volLFOG = ctx.createGain(); volLFOG.gain.value = 0.018;
+    volLFO.connect(volLFOG).connect(master.gain);
+    volLFO.start();
+
+    // A minor pentatonic over base 110 Hz — matches Penrose 5-fold symmetry
+    const baseFreqs = [55, 110, 130.81, 146.83, 164.81, 196.00, 220, 261.63];
+    const oscs = [];
+    for (let i = 0; i < baseFreqs.length; i++) {
+      const f = baseFreqs[i];
+      const osc = ctx.createOscillator();
+      osc.type = (i === 0) ? 'triangle' : 'sine';
+      osc.frequency.value = f;
+      const g = ctx.createGain(); g.gain.value = 0;
+      // Fast LFO on volume — voice breathing (seconds)
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine'; lfo.frequency.value = 0.04 + Math.random() * 0.08;
+      const lfoG = ctx.createGain(); lfoG.gain.value = 0.06;
+      lfo.connect(lfoG).connect(g.gain);
+      // DC offset to keep gain mostly positive; quieter for higher voices
+      const dc = ctx.createConstantSource();
+      dc.offset.value = 0.10 / Math.sqrt(i + 1);
+      dc.connect(g.gain);
+      // Per-voice slow detune — each voice swims at unique non-commensurate
+      // period 90–270s. Creates beating patterns and shifting harmonic
+      // relationships at minute scale; barely perceptible per-cycle but
+      // builds genuine long-term evolution.
+      const slowDetune = ctx.createOscillator();
+      slowDetune.type = 'sine';
+      slowDetune.frequency.value = 1 / (90 + i * 22 + Math.random() * 30);
+      const slowDetuneG = ctx.createGain(); slowDetuneG.gain.value = 7;
+      slowDetune.connect(slowDetuneG).connect(osc.detune);
+      slowDetune.start();
+      osc.connect(g);
+      g.connect(filter); g.connect(delay);
+      osc.start(); lfo.start(); dc.start();
+      oscs.push({ osc, lfo, dc, slowDetune });
+    }
+
+    return {
+      stop: () => {
+        const now = ctx.currentTime;
+        master.gain.cancelScheduledValues(now);
+        master.gain.setValueAtTime(master.gain.value, now);
+        master.gain.linearRampToValueAtTime(0, now + 1.5);
+        setTimeout(() => {
+          [filterLFO, delayLFO, volLFO].forEach(o => { try { o.stop(); } catch(e){} });
+          oscs.forEach(o => { try { o.osc.stop(); o.lfo.stop(); o.dc.stop(); o.slowDetune.stop(); } catch(e){} });
+          ctx.close().catch(() => {});
+        }, 1700);
+      }
+    };
+  }
+
+  // Riff-player state helpers. Audio gating for demo follows whatever
+  // the user set in the riff player before entering demo: enabled → demo
+  // gets ambient drone (riff is paused while demo runs, restored on exit);
+  // disabled → demo runs silently. Demo doesn't expose its own toggle.
+  function isRiffPlaying() {
+    const btn = document.getElementById('audioToggle');
+    return !!(btn && btn.classList.contains('playing'));
+  }
+  function toggleRiff() {
+    const btn = document.getElementById('audioToggle');
+    if (btn) btn.click();
+  }
+
+  function startDemo() {
+    if (demoState) return;
+
+    // Try fullscreen — fallback gracefully if denied/unavailable
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (req) try { req.call(el).catch(() => {}); } catch(e) {}
+
+    // Force showcase (cursor hidden, UI hidden, inertia path)
+    document.body.classList.remove('immersive');
+    document.body.classList.add('showcase');
+    fitSize();
+    stopInertia(); stopZoomAnim();
+
+    // Audio gating: the riff toggle on the page is the master switch.
+    // If it was on, demo replaces it with its own ambient drone for the
+    // duration of the run; we restore the riff on exit. If it was off,
+    // demo stays silent — there's no way to toggle from inside demo.
+    const audioWanted = isRiffPlaying();
+    if (audioWanted) toggleRiff();   // pause the riff while demo runs
+
+    // Boot audio (must happen inside the click for browser autoplay policy)
+    const audio = audioWanted ? startAmbientAudio() : null;
+
+    const startT = performance.now();
+    let lastSchemeChange = startT;
+    let schemeIdx = SCHEMES.indexOf(currentScheme);
+
+    function step(now) {
+      if (!demoState) return;
+      const t = (now - startT) / 1000;
+      // Logarithmic zoom — typical ~12, dives to ~80 for close detail,
+      // pulls back to ~3 for overview. Two non-commensurate oscillators
+      // give non-repeating zoom rhythm.
+      const lnZ = 2.5 + 1.5 * Math.sin(t * 0.041) + 0.6 * Math.cos(t * 0.089);
+      camera.zoom = Math.max(2.5, Math.min(80, Math.exp(lnZ)));
+      // Pan radius scales inversely with zoom — wide exploration at low
+      // zoom, tight motion at high zoom. exponent 0.6 keeps it from
+      // collapsing too aggressively when deep in detail.
+      const panR = 35 / Math.pow(camera.zoom / 10, 0.6);
+      camera.x = panR * (Math.sin(t * 0.052) + 0.6 * Math.cos(t * 0.137));
+      camera.y = panR * (Math.cos(t * 0.071) + 0.6 * Math.sin(t * 0.113));
+      requestRender();
+
+      // Cycle scheme every minute
+      if (now - lastSchemeChange >= DEMO_SCHEME_DURATION) {
+        schemeIdx = (schemeIdx + 1) % SCHEMES.length;
+        currentScheme = SCHEMES[schemeIdx];
+        showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2500);
+        applyScheme();
+        lastSchemeChange = now;
+      }
+      demoState.raf = requestAnimationFrame(step);
+    }
+    demoState = {
+      audio,
+      raf: requestAnimationFrame(step),
+      restoreRiff: audioWanted,
+      identityIdx: 0,
+      identityShowTimer: null,
+      identityHideTimer: null
+    };
+    showToast(
+      'demo · <kbd>Esc</kbd> ven' + (audioWanted ? '' : ' &nbsp;·&nbsp; bez zvuku'),
+      2500
+    );
+
+    // Cycle identity cards: each is visible for IDENTITY_VISIBLE_MS, then the
+    // next is scheduled IDENTITY_PERIOD_MIN..MAX after the current was shown.
+    function cycleIdentity() {
+      if (!demoState) return;
+      showIdentity(demoState.identityIdx);
+      demoState.identityIdx =
+        (demoState.identityIdx + 1) % TWIST_J_IDENTITIES.length;
+      demoState.identityHideTimer = setTimeout(() => {
+        if (demoState) hideIdentity();
+      }, IDENTITY_VISIBLE_MS);
+      const period = IDENTITY_PERIOD_MIN +
+        Math.random() * (IDENTITY_PERIOD_MAX - IDENTITY_PERIOD_MIN);
+      demoState.identityShowTimer = setTimeout(cycleIdentity, period);
+    }
+    // First card appears 4–6s in, after the entry toast clears
+    demoState.identityShowTimer = setTimeout(cycleIdentity, 4000 + Math.random() * 2000);
+  }
+
+  function stopDemo() {
+    if (!demoState) return;
+    cancelAnimationFrame(demoState.raf);
+    if (demoState.audio) demoState.audio.stop();
+    if (demoState.identityShowTimer) clearTimeout(demoState.identityShowTimer);
+    if (demoState.identityHideTimer) clearTimeout(demoState.identityHideTimer);
+    const restoreRiff = demoState.restoreRiff;
+    demoState = null;
+    hideIdentity();
+    // Exit fullscreen
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      const ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if (ex) try { ex.call(document); } catch(e) {}
+    }
+    document.body.classList.remove('showcase');
+    fitSize();
+    // Resume the riff if it was playing before demo took over the audio
+    if (restoreRiff && !isRiffPlaying()) toggleRiff();
+  }
+
+  document.getElementById('dmo').addEventListener('click', () => {
+    if (demoState) stopDemo(); else startDemo();
+  });
+
+  // ===== inertia (pan momentum) — only active in showcase mode =====
+  let inertiaRAF = null;
+  let inertiaVx = 0, inertiaVy = 0;     // world units / second
+  let lastMoveT = 0, lastMoveDx = 0, lastMoveDy = 0;
+
+  function stopInertia() {
+    if (inertiaRAF) { cancelAnimationFrame(inertiaRAF); inertiaRAF = null; }
+    inertiaVx = inertiaVy = 0;
+  }
+  function startInertia() {
+    // Only in showcase. Skip tiny flicks.
+    if (!document.body.classList.contains('showcase')) return;
+    if (Math.abs(inertiaVx) < 1 && Math.abs(inertiaVy) < 1) return;
+    let lastT = performance.now();
+    function step(now) {
+      const dt = Math.min(0.05, (now - lastT) / 1000);
+      lastT = now;
+      camera.x += inertiaVx * dt;
+      camera.y += inertiaVy * dt;
+      const decay = Math.exp(-dt * 1.4);
+      inertiaVx *= decay;
+      inertiaVy *= decay;
+      requestRender();
+      if (Math.abs(inertiaVx) > 0.4 || Math.abs(inertiaVy) > 0.4) {
+        inertiaRAF = requestAnimationFrame(step);
+      } else {
+        inertiaRAF = null;
+        inertiaVx = inertiaVy = 0;
+      }
+    }
+    inertiaRAF = requestAnimationFrame(step);
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    const k = e.key.toLowerCase();
+    if (k === 'escape') {
+      if (demoState) { e.preventDefault(); stopDemo(); return; }
+      if (document.body.classList.contains('immersive') ||
+          document.body.classList.contains('showcase')) {
+        e.preventDefault();
+        document.body.classList.remove('immersive', 'showcase');
+        stopInertia(); stopZoomAnim();
+        fitSize();
+      }
+      return;
+    }
+    // Any other key while demo is running exits demo
+    if (demoState) { e.preventDefault(); stopDemo(); return; }
+    if (k === 'h' || k === 'f') { e.preventDefault(); toggleImmersive(); }
+    else if (k === 's') { e.preventDefault(); toggleShowcase(); }
+    else if (k === 'd') { e.preventDefault(); startDemo(); }
+    else if (k === '+' || k === '=') {
+      camera.zoom = Math.min(500, camera.zoom * 1.2); requestRender();
+    } else if (k === '-' || k === '_') {
+      camera.zoom = Math.max(0.1, camera.zoom / 1.2); requestRender();
+    } else if (k === ',' || k === '<') {
+      shrinkStar();
+    } else if (k === '.' || k === '>') {
+      growStar();
+    } else if (k === 'c') {
+      cycleScheme(1);
+    }
+  });
+  setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>S</kbd> · showcase &nbsp;·&nbsp; <kbd>C</kbd> · barvy', 2800), 700);
+
+  function boot() {
+    readThemeColors();
+    fitSize();
+    setTimeout(() => {
+      normalise();
+      regenerateStar();
+      document.getElementById('loading').style.display = 'none';
+      render();
+    }, 40);
+  }
+
+  // ===== spatial grid: bucket tiles by world cell for O(visible) cull at high zoom =====
+  const STAR_GRID_CELL = 6;       // world units per cell
+  let starGrid = null;            // Map<cellKey, Tile[]>
+  // Actual grid extent — used to clamp viewport-derived cell ranges so we
+  // never iterate empty cells outside the star at extreme zoom-out.
+  let starGridMinX = 0, starGridMaxX = 0, starGridMinY = 0, starGridMaxY = 0;
+
+  function buildStarGrid() {
+    if (!starTiles || !starTiles.length) {
+      starGrid = null;
+      starGridMinX = starGridMaxX = starGridMinY = starGridMaxY = 0;
+      return;
+    }
+    starGrid = new Map();
+    let mnX = Infinity, mxX = -Infinity, mnY = Infinity, mxY = -Infinity;
+    for (let i = 0; i < starTiles.length; i++) {
+      const t = starTiles[i];
+      const gx = Math.floor(t.cx / STAR_GRID_CELL);
+      const gy = Math.floor(t.cy / STAR_GRID_CELL);
+      if (gx < mnX) mnX = gx; if (gx > mxX) mxX = gx;
+      if (gy < mnY) mnY = gy; if (gy > mxY) mxY = gy;
+      const key = gx * 100003 + gy;   // 100003 prime > max grid extent
+      let bucket = starGrid.get(key);
+      if (!bucket) { bucket = []; starGrid.set(key, bucket); }
+      bucket.push(t);
+    }
+    starGridMinX = mnX; starGridMaxX = mxX;
+    starGridMinY = mnY; starGridMaxY = mxY;
+  }
+
+  function regenerateStar() {
+    // Drop tiles outside new bounds to keep memory bounded
+    cache.clear();
+    const t0 = performance.now();
+    starTiles = tilesInRect(
+      -MAX_PATCH_HALF, MAX_PATCH_HALF,
+      -MAX_PATCH_HALF, MAX_PATCH_HALF, 2
+    );
+    // Pre-compute centers — used per-frame in cull check + fast path
+    for (let i = 0; i < starTiles.length; i++) {
+      const t = starTiles[i]; const c = t.corners;
+      t.cx = (c[0][0] + c[2][0]) * 0.5;
+      t.cy = (c[0][1] + c[2][1]) * 0.5;
+    }
+    buildStarGrid();
+    const ms = (performance.now() - t0) | 0;
+    console.log('star · ' + starTiles.length + ' tiles · ' + ms + ' ms · ' +
+                (starGrid ? starGrid.size : 0) + ' grid cells');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>
