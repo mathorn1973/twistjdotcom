@@ -1,0 +1,10 @@
+*.jam
+!storyteller/model/*.jam
+!jam/mj.jam
+!jam/dj.jam
+*.bak*
+backup_*/
+jam_backup_*/
+*.backup_*
+node_modules/
+.DS_Store
