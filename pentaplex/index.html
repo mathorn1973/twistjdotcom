@@ -1240,14 +1240,17 @@
 
   // TWIST-J identities shown as full-screen presentation cards during demo.
   // Same set + order as the main twistj.com page — keeps the narrative.
+  // Closing card is the golden decadic — the full 10-element multiplicative
+  // structure {ζ⁵} × {1, φ} that the seven identities have been describing.
   const TWIST_J_IDENTITIES = [
-    { label: 'axiom',   eq: 'J = 1 + j²',                       coords: '= (1, 0, 1, 0)'   },
-    { label: 'polar',   eq: 'J = (1/φ) · e<sup>i · 2π/5</sup>', coords: ''                  },
-    { label: 'inverse', eq: 'J⁻¹ = −j − j²',                    coords: '= (0, −1, −1, 0)' },
-    { label: 'golden',  eq: 'φ = −j² − j³',                     coords: '= (0, 0, −1, −1)' },
-    { label: 'bridge',  eq: 'J · φ = j',                        coords: ''                  },
-    { label: 'cubic',   eq: '(J − 1)³ = j',                     coords: ''                  },
-    { label: 'quintic', eq: 'J⁵ = φ⁻⁵',                         coords: ''                  }
+    { label: 'axiom',          eq: 'J = 1 + j²',                       coords: '= (1, 0, 1, 0)'   },
+    { label: 'polar',          eq: 'J = (1/φ) · e<sup>i · 2π/5</sup>', coords: ''                  },
+    { label: 'inverse',        eq: 'J⁻¹ = −j − j²',                    coords: '= (0, −1, −1, 0)' },
+    { label: 'golden',         eq: 'φ = −j² − j³',                     coords: '= (0, 0, −1, −1)' },
+    { label: 'bridge',         eq: 'J · φ = j',                        coords: ''                  },
+    { label: 'cubic',          eq: '(J − 1)³ = j',                     coords: ''                  },
+    { label: 'quintic',        eq: 'J⁵ = φ⁻⁵',                         coords: ''                  },
+    { label: 'golden decadic', eq: '{1, j, j², j³, j⁴} × {1, φ}',      coords: ''                  }
   ];
   const IDENTITY_VISIBLE_MS = 4500;       // how long each card stays
   const IDENTITY_PERIOD_MIN = 10000;      // min ms between appearances
