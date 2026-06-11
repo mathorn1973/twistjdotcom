@@ -607,7 +607,8 @@
   // 1) kardioida a period-2 bulva: vnitřek poznáme bez jediné iterace,
   // 2) Brentova detekce periody: orbita, která se opakuje, je vnitřek
   //    a smyčka končí hned, ne až na stropu m,
-  // 3) (a+b)² drží tři násobení na krok.
+  // 3) klasická struktura smyčky: b první (ze starého a), žádná dočasná
+  //    proměnná, zdvojení je sčítání a test úniku čte udržované T zadarmo.
   // SHADERS se serializují, jeden zdroj pravdy pro barvy.
   const workerSrc =
     'const SHADERS={' +
@@ -629,11 +630,11 @@
     '          (x + 1) * (x + 1) + yy <= 0.0625) {' +
     '        i = m;' +
     '      } else {' +
-    '        let a = 0, b = 0, A = 0, B = 0, ee = 0;' +
+    '        let a = 0, b = 0, A = 0, B = 0, T = 0;' +
     '        let ca = 0, cb = 0, chk = 8;' +
-    '        while (A + B < 4 && i < m) {' +
-    '          a = A - B + x; b = ee - A - B + y;' +
-    '          A = a * a; B = b * b; ee = (a + b) * (a + b);' +
+    '        while (T < 4 && i < m) {' +
+    '          b = (a + a) * b + y; a = A - B + x;' +
+    '          A = a * a; B = b * b; T = A + B;' +
     '          i++;' +
     '          if (Math.abs(a - ca) < 1e-13 && Math.abs(b - cb) < 1e-13) { i = m; break; }' +
     '          if (i === chk) { ca = a; cb = b; chk *= 2; }' +
