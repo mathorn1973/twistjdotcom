@@ -829,14 +829,28 @@
     { x: -0.15920,   y: 1.03275,   minS: 6e-4, name: 'anténa' },
     { x: -0.7269,    y: 0.1889,    minS: 5e-4, name: 'dvojitá spirála' }
   ];
-  const D_GAP = 3, D_IN = 22, D_HOLD = 6, D_OUT = 14;   // sekundy fází
+  // Prohlídka jedné zastávky jako úseky: průlet se zastaveními,
+  // na každé pauze se jednou vykreslí detailní snímek v plném rozlišení.
+  // f = podíl hloubky v ln škále (0 přehled, 1 dno zastávky).
+  const DEMO_LEGS = [
+    { type: 'pan',  dur: 3 },
+    { type: 'zoom', dur: 9,  from: 0,    to: 0.45 },
+    { type: 'hold', dur: 4,  at: 0.45 },
+    { type: 'zoom', dur: 8,  from: 0.45, to: 0.8 },
+    { type: 'hold', dur: 4,  at: 0.8 },
+    { type: 'zoom', dur: 6,  from: 0.8,  to: 1 },
+    { type: 'hold', dur: 8,  at: 1 },
+    { type: 'zoom', dur: 7,  from: 1,    to: 0.5 },
+    { type: 'hold', dur: 3,  at: 0.5 },
+    { type: 'zoom', dur: 8,  from: 0.5,  to: 0 }
+  ];
+  const DEMO_TOTAL = DEMO_LEGS.reduce((a, l) => a + l.dur, 0);
 
   function demoStep(now) {
     if (!demoState) return;
     const st = demoState;
     let t = (now - st.t0) / 1000;
-    const total = D_GAP + D_IN + D_HOLD + D_OUT;
-    if (t >= total) {
+    if (t >= DEMO_TOTAL) {
       st.prev = DEMO_STOPS[st.stopIdx];
       st.stopIdx = (st.stopIdx + 1) % DEMO_STOPS.length;
       st.t0 = now; t = 0;
@@ -844,27 +858,33 @@
     }
     const cur = DEMO_STOPS[st.stopIdx];
     const sm = u => u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u);
+
+    // najdi aktuální úsek prohlídky
+    let legIdx = 0, tAcc = 0;
+    while (legIdx < DEMO_LEGS.length - 1 && t >= tAcc + DEMO_LEGS[legIdx].dur) {
+      tAcc += DEMO_LEGS[legIdx].dur; legIdx++;
+    }
+    const leg = DEMO_LEGS[legIdx], u = (t - tAcc) / leg.dur;
+
     let f = 0, cxT = cur.x, cyT = cur.y;
-    if (t < D_GAP) {
-      const u = sm(t / D_GAP), pv = st.prev;
-      cxT = pv.x + (cur.x - pv.x) * u;
-      cyT = pv.y + (cur.y - pv.y) * u;
-    } else if (t < D_GAP + D_IN) {
-      f = sm((t - D_GAP) / D_IN);
-    } else if (t < D_GAP + D_IN + D_HOLD) {
-      f = 1;
+    if (leg.type === 'pan') {
+      const w = sm(u), pv = st.prev;
+      cxT = pv.x + (cur.x - pv.x) * w;
+      cyT = pv.y + (cur.y - pv.y) * w;
+    } else if (leg.type === 'zoom') {
+      f = leg.from + (leg.to - leg.from) * sm(u);
     } else {
-      f = sm(1 - (t - D_GAP - D_IN - D_HOLD) / D_OUT);
+      f = leg.at;
     }
     const ln3 = Math.log(3);
     view.scale = Math.exp(ln3 + (Math.log(cur.minS) - ln3) * f);
     view.cx = cxT; view.cy = cyT;
 
-    const inHold = t >= D_GAP + D_IN && t < D_GAP + D_IN + D_HOLD;
-    if (inHold) {
-      if (!st.holdRendered) { render(0.9); st.holdRendered = true; }
+    if (leg.type === 'hold') {
+      // přestávka: jednou vykresli detail v plném rozlišení, pak stůj
+      if (st.holdLeg !== legIdx) { render(1); st.holdLeg = legIdx; }
     } else {
-      st.holdRendered = false;
+      st.holdLeg = -1;
       render(st.rs);
       if (lastDt > 60) st.rs = Math.max(0.1, st.rs * 0.9);
       else if (lastDt < 30) st.rs = Math.min(0.7, st.rs * 1.08);
@@ -891,7 +911,7 @@
       prev: { x: home.cx, y: home.cy },
       t0: performance.now(),
       rs: 0.45,
-      holdRendered: false,
+      holdLeg: -1,
       raf: 0
     };
     demoState.raf = requestAnimationFrame(demoStep);
