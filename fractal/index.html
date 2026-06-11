@@ -636,6 +636,7 @@
     g.imageSmoothingEnabled = rs < 1;
     g.clearRect(0, 0, W, H);
     g.drawImage(buf, 0, 0, rw, rh, 0, 0, W, H);
+    bufView = { cx, cy, scale, k: ky };
     lastDt = performance.now() - t0;
     if (!firstRenderDone) {
       firstRenderDone = true;
@@ -657,18 +658,44 @@
     document.getElementById('cnt').textContent = Math.round(lastDt) + ' ms';
   }
 
-  // ===== plánování: interaktivní hrubý snímek + tiché doostření =====
-  let queued = false, interRS = 0.4, refineT = null;
+  // ===== mezibuffer: reprojekce posledního snímku do nového pohledu =====
+  let bufView = null;                 // pohled, ve kterém je buf spočítaný
+
+  function edgeColor() {              // barva exteriéru schématu (t = 0)
+    const D = [0, 0, 0, 0];
+    SHADERS[currentScheme](0, 1, D, 0);
+    return 'rgb(' + (D[0]|0) + ',' + (D[1]|0) + ',' + (D[2]|0) + ')';
+  }
+
+  function blit() {
+    if (!bufView) return;
+    const kv = view.scale * (H / W);
+    const dx = (bufView.cx - bufView.scale/2 - (view.cx - view.scale/2)) / view.scale * W;
+    const dy = (bufView.cy - bufView.k/2     - (view.cy - kv/2))         / kv * H;
+    const dw = bufView.scale / view.scale * W;
+    const dh = bufView.k / kv * H;
+    g.imageSmoothingEnabled = true;
+    g.fillStyle = edgeColor();
+    g.fillRect(0, 0, W, H);
+    g.drawImage(buf, dx, dy, dw, dh);
+  }
+
+  // ===== plánování: blit hned, hrubý přepočet omezeným tempem, doostření v klidu =====
+  let queued = false, interRS = 0.4, refineT = null, lastRenderAt = 0;
   function requestRender(interactive) {
     if (queued) return; queued = true;
     requestAnimationFrame(() => {
       queued = false;
-      render(interactive ? interRS : 1);
-      if (interactive) {
+      if (!interactive) { render(1); return; }
+      blit();                              // okamžitá odezva z posledního snímku
+      const now = performance.now();
+      if (now - lastRenderAt > 110) {      // přepočet nejvýš ~9x za sekundu
+        render(interRS);
+        lastRenderAt = now;
         if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
         else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
-        scheduleRefine();
       }
+      scheduleRefine();
     });
   }
   function scheduleRefine() {
@@ -736,7 +763,7 @@
     if (!drag) return;
     const [mx, my] = pos(e);
     const dx = mx - drag.mx, dy = my - drag.my;
-    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    g.fillStyle = edgeColor(); g.fillRect(0, 0, W, H);
     g.drawImage(buf, dx, dy, W, H);
   });
 
@@ -885,9 +912,13 @@
       if (st.holdLeg !== legIdx) { render(1); st.holdLeg = legIdx; }
     } else {
       st.holdLeg = -1;
-      render(st.rs);
-      if (lastDt > 60) st.rs = Math.max(0.1, st.rs * 0.9);
-      else if (lastDt < 30) st.rs = Math.min(0.7, st.rs * 1.08);
+      if (now - st.lastR > 90) {
+        render(st.rs); st.lastR = now;
+        if (lastDt > 60) st.rs = Math.max(0.1, st.rs * 0.9);
+        else if (lastDt < 30) st.rs = Math.min(0.7, st.rs * 1.08);
+      } else {
+        blit();                       // mezi přepočty jede hladká reprojekce
+      }
     }
     st.raf = requestAnimationFrame(demoStep);
   }
@@ -912,6 +943,7 @@
       t0: performance.now(),
       rs: 0.45,
       holdLeg: -1,
+      lastR: 0,
       raf: 0
     };
     demoState.raf = requestAnimationFrame(demoStep);
