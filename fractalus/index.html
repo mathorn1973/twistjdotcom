@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Fractalus · 3D Flight — twistj.com</title>
+<meta name="description" content="Fractalus — fly over the infinite Mandelbrot boundary in 3D. Escape time is altitude: z ↦ z² + c, time is a counter. Part of TWIST-J.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script>
+  // Apply saved theme as early as possible to avoid FOUC.
+  (function(){ var t = localStorage.getItem('twistj-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── Theme: light (parchment) ── */
+  :root {
+    --bg: #F0EDE6;
+    --canvas-bg: #FAF7F1;
+    --text: #1A1A1A;
+    --muted: #5C4A2E;
+    --accent: #B8860B;
+    --accent-hover: #8B6914;
+    --rule: rgba(26, 26, 26, 0.18);
+    --rule-soft: rgba(26, 26, 26, 0.06);
+    --accent-glow: rgba(184, 134, 11, 0.08);
+    --btn-bg: rgba(250, 247, 241, 0.92);
+    --btn-border: rgba(26, 26, 26, 0.3);
+    --toast-bg: rgba(26, 26, 26, 0.85);
+    --toast-text: #FAF7F1;
+    --toast-kbd-bg: rgba(184, 134, 11, 0.4);
+    --toast-kbd-border: rgba(250, 247, 241, 0.3);
+    --canvas-stroke: #1A1A1A;
+    --panel-bg: rgba(250, 247, 241, 0.95);
+    --panel-border: rgba(26, 26, 26, 0.18);
+    --slider-track: rgba(26, 26, 26, 0.22);
+    --select-bg: rgba(243, 240, 234, 0.9);
+    --select-text: #5C4A2E;
+  }
+  /* ── Theme: dark (matches main twistj.com palette) ── */
+  [data-theme="dark"] {
+    --bg: #1c1915;
+    --canvas-bg: #252118;
+    --text: #d4cfc6;
+    --muted: #9a9488;
+    --accent: #b08050;
+    --accent-hover: #c89066;
+    --rule: rgba(212, 207, 198, 0.16);
+    --rule-soft: rgba(212, 207, 198, 0.04);
+    --accent-glow: rgba(176, 128, 80, 0.10);
+    --btn-bg: rgba(37, 33, 24, 0.92);
+    --btn-border: rgba(212, 207, 198, 0.3);
+    --toast-bg: rgba(212, 207, 198, 0.92);
+    --toast-text: #1c1915;
+    --toast-kbd-bg: rgba(176, 128, 80, 0.4);
+    --toast-kbd-border: rgba(28, 25, 21, 0.3);
+    --canvas-stroke: #d4cfc6;
+    --panel-bg: rgba(28, 25, 21, 0.95);
+    --panel-border: rgba(212, 207, 198, 0.18);
+    --slider-track: rgba(212, 207, 198, 0.22);
+    --select-bg: rgba(37, 33, 24, 0.9);
+    --select-text: #9a9488;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+      --bg: #1c1915;
+      --canvas-bg: #252118;
+      --text: #d4cfc6;
+      --muted: #9a9488;
+      --accent: #b08050;
+      --accent-hover: #c89066;
+      --rule: rgba(212, 207, 198, 0.16);
+      --rule-soft: rgba(212, 207, 198, 0.04);
+      --accent-glow: rgba(176, 128, 80, 0.10);
+      --btn-bg: rgba(37, 33, 24, 0.92);
+      --btn-border: rgba(212, 207, 198, 0.3);
+      --toast-bg: rgba(212, 207, 198, 0.92);
+      --toast-text: #1c1915;
+      --toast-kbd-bg: rgba(176, 128, 80, 0.4);
+      --toast-kbd-border: rgba(28, 25, 21, 0.3);
+      --canvas-stroke: #d4cfc6;
+      --panel-bg: rgba(28, 25, 21, 0.95);
+      --panel-border: rgba(212, 207, 198, 0.18);
+      --slider-track: rgba(212, 207, 198, 0.22);
+      --select-bg: rgba(37, 33, 24, 0.9);
+      --select-text: #9a9488;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', 'Garamond', 'Hoefler Text', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+  .app { max-width: 1200px; margin: 0 auto; padding: 44px 24px 24px; }
+  header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    gap: 12px; flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Cinzel', 'Trajan Pro', 'Optima', serif;
+    font-size: 22px; font-weight: 500; letter-spacing: 0.16em;
+    margin: 0; text-transform: uppercase;
+  }
+  .subtitle {
+    font-style: italic; font-size: 14px; margin: 4px 0 0;
+    color: var(--muted); letter-spacing: 0.02em;
+  }
+  .info {
+    font-size: 11px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    color: var(--muted); text-align: right; font-variant-numeric: tabular-nums;
+    line-height: 1.55; letter-spacing: 0.02em;
+  }
+  .info b { color: var(--text); font-weight: 500; }
+  .canvas-wrap {
+    position: relative; background: var(--canvas-bg); border-radius: 1px;
+    box-shadow: 0 1px 2px var(--rule-soft), 0 4px 28px var(--accent-glow);
+    overflow: hidden; user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  canvas.dragging { cursor: grabbing; }
+  .loading {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-style: italic; font-size: 15px;
+    color: var(--muted); letter-spacing: 0.04em; background: var(--canvas-bg); z-index: 5;
+  }
+  .controls {
+    position: absolute; right: 14px; bottom: 14px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .controls button {
+    width: 36px; height: 36px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 0; padding: 0;
+    font-family: 'Cinzel', serif; font-size: 18px; line-height: 1;
+  }
+  .controls button:hover { background: var(--accent); color: var(--canvas-bg); }
+  .controls button:active { background: var(--accent-hover); }
+  #ssm, #slg { font-size: 13px; letter-spacing: -0.05em; }
+  footer {
+    margin-top: 14px; font-size: 13px; font-style: italic;
+    color: var(--muted); line-height: 1.5; letter-spacing: 0.01em;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer .count {
+    color: var(--text); font-style: normal; font-family: ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.04em;
+  }
+
+  /* back-link to main page (standard twistj.com pattern) */
+  .back-link {
+    position: fixed; top: 14px; left: 16px;
+    color: var(--muted);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    text-decoration: none; opacity: 0.65;
+    transition: color 0.2s, opacity 0.2s;
+    z-index: 50;
+  }
+  .back-link:hover { color: var(--accent); opacity: 1; }
+
+  /* theme toggle (matches storyteller pattern, smaller) */
+  .theme-toggle {
+    position: fixed; top: 12px; right: 14px;
+    width: 32px; height: 32px; padding: 0;
+    border: 1px solid var(--btn-border); border-radius: 50%;
+    background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 50;
+    transition: all 0.2s ease; opacity: 0.6;
+  }
+  .theme-toggle:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* ── Audio player (matches main page pattern) ── */
+  .audio-toggle {
+    position: fixed; top: 12px; right: 54px;
+    width: 32px; height: 32px;
+    border: 1px solid transparent; border-radius: 50%;
+    background: transparent; color: var(--muted);
+    opacity: 0.6; font-size: 1.05rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 50;
+    transition: all 0.3s ease; user-select: none;
+  }
+  .audio-toggle:hover { opacity: 1; color: var(--accent); }
+  .audio-toggle.playing {
+    opacity: 1; color: var(--accent);
+    border-color: var(--accent); background: var(--panel-bg);
+  }
+  .audio-panel {
+    position: fixed; top: 92px; right: 14px;
+    background: var(--panel-bg); border: 1px solid var(--panel-border);
+    border-radius: 8px; padding: 0.9rem 1.1rem;
+    z-index: 50;
+    display: flex; flex-direction: column; gap: 0.6rem;
+    min-width: 180px;
+    opacity: 0; transform: translateY(-8px); pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .audio-panel.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .audio-panel label {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 0.82rem; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: lowercase;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .audio-panel label span.val {
+    color: var(--text); font-size: 0.78rem;
+    min-width: 2.2rem; text-align: right;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  .audio-panel input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 90px; height: 3px;
+    background: var(--slider-track); border-radius: 2px;
+    outline: none; cursor: pointer;
+  }
+  .audio-panel input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .audio-panel input[type="range"]::-moz-range-thumb {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: none; cursor: pointer;
+  }
+  .audio-panel select {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 0.82rem; letter-spacing: 0.08em;
+    background: var(--select-bg); color: var(--select-text);
+    border: 1px solid var(--panel-border); border-radius: 4px;
+    padding: 3px 6px; cursor: pointer; outline: none;
+  }
+  .audio-panel select:focus { border-color: var(--accent); }
+  .audio-chevron {
+    position: fixed; top: 56px; right: 54px;
+    width: 32px; height: 24px;
+    text-align: center; font-size: 1.4rem; line-height: 24px;
+    color: var(--accent); opacity: 0;
+    cursor: pointer; z-index: 51;
+    transition: all 0.3s ease; user-select: none; pointer-events: none;
+  }
+  .audio-chevron.show { opacity: 0.7; pointer-events: auto; }
+  .audio-chevron.show:hover { opacity: 1; }
+  .audio-chevron.open { transform: rotate(180deg); }
+
+  @media (max-width: 600px) {
+    .app { padding: 40px 12px 16px; }
+    h1 { font-size: 18px; letter-spacing: 0.12em; }
+    .subtitle { font-size: 13px; }
+    .info { font-size: 10px; }
+    .back-link { top: 10px; left: 12px; }
+    .theme-toggle { top: 8px; right: 10px; width: 28px; height: 28px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    .audio-toggle { top: 8px; right: 44px; width: 28px; height: 28px; font-size: 0.95rem; }
+    .audio-chevron { top: 44px; right: 44px; width: 28px; }
+    .audio-panel { top: 76px; right: 10px; min-width: 160px; padding: 0.7rem 0.9rem; }
+  }
+
+  /* immersive: hide all UI chrome, canvas fills viewport */
+  body.immersive { background: var(--canvas-bg); overflow: hidden; }
+  body.immersive .app { max-width: none; padding: 0; height: 100vh; }
+  body.immersive header,
+  body.immersive footer,
+  body.immersive .controls,
+  body.immersive .loading,
+  body.immersive .back-link,
+  body.immersive .theme-toggle,
+  body.immersive .audio-toggle,
+  body.immersive .audio-panel,
+  body.immersive .audio-chevron { display: none !important; }
+  body.immersive .canvas-wrap {
+    position: fixed; inset: 0; box-shadow: none; border-radius: 0;
+    width: 100vw !important; height: 100vh !important;
+  }
+
+  /* showcase: same as immersive + hides cursor + has inertia */
+  body.showcase { background: var(--canvas-bg); overflow: hidden; }
+  body.showcase .app { max-width: none; padding: 0; height: 100vh; }
+  body.showcase header,
+  body.showcase footer,
+  body.showcase .controls,
+  body.showcase .loading,
+  body.showcase .back-link,
+  body.showcase .theme-toggle,
+  body.showcase .audio-toggle,
+  body.showcase .audio-panel,
+  body.showcase .audio-chevron { display: none !important; }
+  body.showcase .canvas-wrap {
+    position: fixed; inset: 0; box-shadow: none; border-radius: 0;
+    width: 100vw !important; height: 100vh !important;
+  }
+  body.showcase canvas,
+  body.showcase canvas.dragging { cursor: none !important; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%);
+    background: var(--toast-bg); color: var(--toast-text);
+    padding: 10px 18px; font-size: 13px; letter-spacing: 0.04em;
+    font-family: 'EB Garamond', serif;
+    border-radius: 2px; pointer-events: none;
+    opacity: 0; transition: opacity 0.4s;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .toast kbd {
+    display: inline-block; padding: 1px 6px;
+    background: var(--toast-kbd-bg);
+    border: 1px solid var(--toast-kbd-border);
+    border-radius: 2px; font-family: 'Cinzel', serif;
+    font-size: 11px; margin: 0 2px;
+  }
+
+  /* ── Demo identity overlay: full-screen presentation cards ── */
+  .demo-overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .demo-overlay.show { opacity: 1; }
+  /* Radial vignette in page bg color — dims the Penrose pattern behind
+     the text without fully hiding the periphery. Two stacked gradients:
+     a deeper inner one for readability, a soft outer one for blend. */
+  .demo-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 35% at center, var(--bg) 0%, transparent 100%),
+      radial-gradient(ellipse at center, var(--bg) 0%, transparent 70%);
+    opacity: 0.75;
+  }
+  .demo-overlay-content {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 0 6vw;
+    transform: translateY(28px) scale(0.96);
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .demo-overlay.show .demo-overlay-content {
+    transform: translateY(0) scale(1);
+  }
+  .demo-overlay-label {
+    font-family: 'Cinzel', 'Trajan Pro', 'Optima', serif;
+    font-size: clamp(13px, 1.9vw, 22px);
+    font-weight: 400;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-left: 0.5em;  /* offset trailing letter-spacing */
+    margin-bottom: clamp(22px, 4vh, 48px);
+    text-shadow: 0 0 30px var(--accent-glow);
+  }
+  .demo-overlay-eq {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(38px, 7.5vw, 104px);
+    letter-spacing: 0.005em;
+    color: var(--text);
+    line-height: 1.18;
+    /* Soft halo in the page bg color so the text reads cleanly against
+       busy tile patterns, in both light and dark themes. */
+    text-shadow:
+      0 0 14px var(--bg),
+      0 0 28px var(--bg),
+      0 2px 6px var(--bg);
+  }
+  .demo-overlay-eq sup {
+    font-size: 0.55em;
+    vertical-align: super;
+    line-height: 0;
+  }
+  .demo-overlay-coords {
+    display: inline-block;
+    margin-left: 0.5em;
+    color: var(--muted);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-style: normal;
+    font-size: 0.42em;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    opacity: 0.85;
+  }
+  @media (max-width: 600px) {
+    .demo-overlay-label { letter-spacing: 0.35em; }
+    .demo-overlay-eq { font-size: clamp(28px, 9vw, 56px); }
+  }
+</style>
+</head>
+<body>
+<a href="/" class="back-link">&#8592; twistj.com</a>
+<div class="audio-toggle" id="audioToggle" title="Toggle audio">&#x1f507;</div>
+<div class="audio-panel" id="audioPanel">
+  <label>volume <input type="range" id="audioVol" min="0" max="100" value="50"> <span class="val" id="audioVolVal">50</span></label>
+  <label>speed <input type="range" id="audioSpeed" min="0" max="100" value="51" step="1"> <span class="val" id="audioSpeedVal">10</span></label>
+  <label>riff
+    <select id="audioRiff">
+      <option value="calm">calm</option>
+      <option value="drift" selected>drift</option>
+      <option value="pulse">pulse</option>
+      <option value="storm">storm</option>
+      <option value="layers">layers</option>
+      <option value="weave">weave</option>
+    </select>
+  </label>
+</div>
+<div class="audio-chevron" id="audioChevron" title="Toggle controls">&#x25BE;</div>
+<button class="theme-toggle" id="themeToggle" title="Toggle theme: auto / light / dark" aria-label="Toggle theme">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+</button>
+<script>
+(function() {
+  const modes = ['auto', 'light', 'dark'];
+  const icons = {
+    auto:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M12 7a5 5 0 0 1 0 10z" fill="currentColor" opacity="0.4"/></svg>',
+    light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>',
+    dark:  '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>'
+  };
+  const titles = { auto: 'Theme: auto (follows system)', light: 'Theme: light', dark: 'Theme: dark' };
+  let current = localStorage.getItem('twistj-theme') || 'auto';
+  const btn = document.getElementById('themeToggle');
+  function apply(mode) {
+    current = mode;
+    localStorage.setItem('twistj-theme', mode);
+    if (mode === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', mode);
+    btn.innerHTML = icons[mode];
+    btn.title = titles[mode];
+    window.dispatchEvent(new CustomEvent('twistj-theme-changed'));
+  }
+  btn.addEventListener('click', function() { apply(modes[(modes.indexOf(current) + 1) % modes.length]); });
+  apply(current);
+  // React to system theme changes when in 'auto' mode
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      if (current === 'auto') window.dispatchEvent(new CustomEvent('twistj-theme-changed'));
+    });
+  }
+})();
+</script>
+<div class="app">
+  <header>
+    <div>
+      <h1>Fractalus · 3D Flight</h1>
+      <p class="subtitle">let nad nekonečnou hranicí &nbsp;·&nbsp; únikový čas je nadmořská výška</p>
+    </div>
+    <div class="info">
+      zoom · <b id="z">×1.0</b><br>
+      c · <b id="cc">−0.75 + 0.05i</b><br>
+      výška · <b id="al">30</b> &nbsp; m · <b id="mi">300</b>
+    </div>
+  </header>
+  <div class="canvas-wrap" id="wrap">
+    <div class="loading" id="loading">Stavím hory z únikových časů…</div>
+    <canvas id="cv"></canvas>
+    <div class="controls">
+      <button id="thp" title="tah víc (A)">▲</button>
+      <button id="thm" title="tah míň (Z)">▼</button>
+      <button id="rst" title="výchozí (R)">↺</button>
+      <button id="clr" title="schéma barev (C)">◐</button>
+      <button id="dmo" title="autopilot (D)">▶</button>
+      <button id="fsb" title="celá obrazovka (F)">⛶</button>
+      <button id="shr" title="sdílet odkaz (S)">⤴</button>
+      <button id="hid" title="skrýt UI (H)">◉</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <footer>
+    <span>šipky · let &nbsp;·&nbsp; <kbd>A/Z</kbd> · tah &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · autopilot &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen</span>
+    <span class="count" id="cnt">…</span>
+  </footer>
+</div>
+
+<!-- Schumann riff audio engine (shared with /jam/) -->
+<script src="audio.js"></script>
+<script>
+(()=>{
+  const RIFF_PRESETS={
+    calm:{tempo:5,reverb:0.95,breath:0.9,silence:0.7,wander:false,seed:0,vTM:[1,1,1,1,1]},
+    drift:{tempo:10,reverb:0.85,breath:0.75,silence:0.55,wander:false,seed:0,vTM:[1,1,1,1,1]},
+    pulse:{tempo:15,reverb:0.6,breath:0.45,silence:0.30,wander:false,seed:500,vTM:[1,1,1,1,1]},
+    storm:{tempo:25,reverb:0.4,breath:0.2,silence:0.10,wander:true,seed:1000,vTM:[1,1,1,1,1]},
+    layers:{tempo:10,reverb:0.93,breath:0.5,silence:0.08,wander:false,seed:200,vTM:[1,2/3,3/2,2,1/2]},
+    weave:{tempo:12,reverb:0.7,breath:0.35,silence:0.15,wander:true,seed:777,vTM:[1,5/3,3/5,4/3,3/4]}
+  };
+  const engine=TwistJ({tempo:10,reverb:0.85,breath:0.75,silence:0.55,wander:false});
+  let playing=false;
+  const btn=document.getElementById('audioToggle'),panel=document.getElementById('audioPanel');
+  const volS=document.getElementById('audioVol'),volV=document.getElementById('audioVolVal');
+  const spdS=document.getElementById('audioSpeed'),spdV=document.getElementById('audioSpeedVal');
+  const riffS=document.getElementById('audioRiff'),chev=document.getElementById('audioChevron');
+  let panelOpen=false;
+  function s2b(v){return Math.round(0.5*Math.pow(360,v/100)*10)/10;}
+  function b2s(b){return Math.round(100*Math.log(b/0.5)/Math.log(360));}
+  function preset(n){const p=RIFF_PRESETS[n];if(!p)return;spdS.value=b2s(p.tempo);spdV.textContent=p.tempo;engine.forceAllVoices(n==='layers'||n==='weave');engine.set({reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,tempo:p.tempo,vTM:p.vTM||[1,1,1,1,1]});if(playing){engine.stop();engine.forceAllVoices(n==='layers'||n==='weave');engine.start(p.seed);}}
+  btn.addEventListener('click',()=>{
+    if(!playing){playing=true;const rk=riffS.value;const p=RIFF_PRESETS[rk];engine.forceAllVoices(rk==='layers'||rk==='weave');engine.set({tempo:s2b(spdS.value),reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,vTM:p.vTM||[1,1,1,1,1]});engine.start(p.seed);if(engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);btn.textContent='\u{1f50a}';btn.classList.add('playing');chev.classList.add('show');panel.classList.add('visible');chev.classList.add('open');panelOpen=true;}
+    else{playing=false;engine.stop();btn.textContent='\u{1f507}';btn.classList.remove('playing');panel.classList.remove('visible');chev.classList.remove('show','open');panelOpen=false;}
+  });
+  chev.addEventListener('click',()=>{panelOpen=!panelOpen;panel.classList.toggle('visible',panelOpen);chev.classList.toggle('open',panelOpen);});
+  volS.addEventListener('input',()=>{volV.textContent=volS.value;if(playing&&engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);});
+  spdS.addEventListener('input',()=>{const b=s2b(spdS.value);spdV.textContent=b<10?b.toFixed(1):Math.round(b);engine.setTempo(b);});
+  riffS.addEventListener('change',()=>{preset(riffS.value);});
+})();
+</script>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ===== schémata: stejné vzorce jako /fractal, tady jako 1D palety =====
+const ATOL_STOPS = [
+  [0.00, 243, 235, 213], [0.16, 138, 217, 201], [0.34, 24, 158, 170],
+  [0.50, 235, 171, 122], [0.66, 18, 121, 148], [0.84, 233, 130, 105],
+  [1.00, 13, 54, 102]
+];
+const ATOL = new Array(768);
+for (let k = 0; k < 256; k++) {
+  const t = k / 255;
+  let j = 0;
+  while (j < ATOL_STOPS.length - 2 && t > ATOL_STOPS[j + 1][0]) j++;
+  const A = ATOL_STOPS[j], B = ATOL_STOPS[j + 1];
+  const u = (t - A[0]) / (B[0] - A[0]);
+  for (let c = 0; c < 3; c++)
+    ATOL[3 * k + c] = Math.round(A[c + 1] + (B[c + 1] - A[c + 1]) * u);
+}
+const SHADERS = {
+  sepie:    (t, s, D, q) => { const v = 230 - 130*t, o = -90*t*t;
+    D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
+  priroda:  (t, s, D, q) => { const w = 14*t;
+    D[q]   = (170-120*t+45*Math.sin(w+4.5))*s;
+    D[q+1] = (205-110*t+45*Math.sin(w+0.6))*s;
+    D[q+2] = (150-130*t+35*Math.sin(w+2.5))*s; },
+  atol:     (t, s, D, q) => { const k = 3 * Math.min(255, (t * 255) | 0);
+    D[q] = ATOL[k]; D[q+1] = ATOL[k+1]; D[q+2] = ATOL[k+2]; },
+  strakata: (t, s, D, q) => { const w = 22*t;
+    D[q]   = (150+95*Math.sin(w+1.0))*s;
+    D[q+1] = (140+95*Math.sin(w+2.6))*s;
+    D[q+2] = (130+105*Math.sin(w+4.2))*s; },
+  psycho:   (t, s, D, q) => { const w = 50*t;
+    D[q]   = (128+127*Math.sin(w))*s;
+    D[q+1] = (128+127*Math.sin(w+2.094))*s;
+    D[q+2] = (128+127*Math.sin(w+4.188))*s; },
+  pulnoc:   (t, s, D, q) => { const u = t*t;
+    D[q] = (16+230*u)*s; D[q+1] = (20+150*u)*s; D[q+2] = (46+40*t)*s; }
+};
+const SCHEMES = ['sepie', 'priroda', 'atol', 'strakata', 'psycho', 'pulnoc'];
+const SCHEME_NAMES = {
+  sepie: 'sépie · chiaroscuro', priroda: 'příroda · les a hlína',
+  atol: 'atol · laguna a korál', strakata: 'strakatá · zlato, měděnka, lazur',
+  psycho: 'psychedelická · spektrum', pulnoc: 'půlnoc'
+};
+let currentScheme = 'sepie';
+
+function shadeRGB(name, t) {
+  const s = 1 - t**6, D = [0, 0, 0, 0];
+  SHADERS[name](t, s, D, 0);
+  return [Math.max(0, Math.min(255, D[0])),
+          Math.max(0, Math.min(255, D[1])),
+          Math.max(0, Math.min(255, D[2]))];
+}
+function paletteTexture(name) {
+  const d = new Uint8Array(256 * 4);
+  for (let k = 0; k < 256; k++) {
+    const [r, g, b] = shadeRGB(name, k / 255);
+    d[4*k] = r; d[4*k+1] = g; d[4*k+2] = b; d[4*k+3] = 255;
+  }
+  const tex = new THREE.DataTexture(d, 256, 1);
+  tex.needsUpdate = true;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = THREE.LinearFilter;
+  return tex;
+}
+const PALETTES = {};
+SCHEMES.forEach(n => PALETTES[n] = paletteTexture(n));
+
+// ===== svět =====
+// render rovina XZ = komplexní rovina přes kotvu a zoom:
+// plane = anchor + render / Z. Výška = HMAX * t^PEXP, t = ν/m.
+const CS = 40;                 // hrana chunku v render jednotkách
+const N = 64;                  // buněk na hranu
+const RING = 3;                // poloměr načtené mřížky chunků
+const HMAX = 15, PEXP = 2.6;   // profil hor: pláně nízko, hřebeny u hranice
+const anchor = { x: -0.75, y: 0.05 };
+let Z = 60;                    // zoom světa, roste při sestupu
+let gen = 0;                   // generace chunků (rebase je zneplatní)
+
+function mFor() {
+  return Math.max(90, Math.min(900, Math.round(90 + 45 * Math.log2(Z))));
+}
+
+// ===== worker pool: pole hladkých únikových časů pro chunk =====
+// jádro jako ve /fractal: kardioida, bulva, Brent, klasická smyčka;
+// navíc velký únikový poloměr a ν = i + 1 − log2(log2|z|) pro hladké svahy
+const workerSrc =
+  'onmessage = e => {' +
+  '  const { gen, key, n, x0, y0, step, m } = e.data;' +
+  '  const out = new Float32Array((n + 1) * (n + 1));' +
+  '  const LB = Math.log(2);' +
+  '  for (let gy = 0; gy <= n; gy++) {' +
+  '    const y = y0 + gy * step, yy = y * y;' +
+  '    for (let gx = 0; gx <= n; gx++) {' +
+  '      const x = x0 + gx * step;' +
+  '      let t;' +
+  '      const xq = x - 0.25, c2 = xq * xq + yy;' +
+  '      if (c2 * (c2 + xq) <= 0.25 * yy ||' +
+  '          (x + 1) * (x + 1) + yy <= 0.0625) { t = 1; }' +
+  '      else {' +
+  '        let a = 0, b = 0, A = 0, B = 0, T = 0, i = 0;' +
+  '        let ca = 0, cb = 0, chk = 8, inside = false;' +
+  '        while (T < 1e6 && i < m) {' +
+  '          b = (a + a) * b + y; a = A - B + x;' +
+  '          A = a * a; B = b * b; T = A + B;' +
+  '          i++;' +
+  '          if (Math.abs(a - ca) < 1e-13 && Math.abs(b - cb) < 1e-13) { inside = true; break; }' +
+  '          if (i === chk) { ca = a; cb = b; chk *= 2; }' +
+  '        }' +
+  '        if (inside || i >= m) t = 1;' +
+  '        else {' +
+  '          const nu = i + 1 - Math.log(Math.log(T) / (2 * LB)) / LB;' +
+  '          t = Math.min(1, Math.max(0, nu / m));' +
+  '        }' +
+  '      }' +
+  '      out[gy * (n + 1) + gx] = t;' +
+  '    }' +
+  '  }' +
+  '  postMessage({ gen, key, buf: out.buffer }, [out.buffer]);' +
+  '};';
+const wUrl = URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' }));
+const NW = Math.min(8, Math.max(2, (navigator.hardwareConcurrency || 4) - 1));
+const idle = [], jobs = [];
+const pendingKeys = new Set();
+function pump() {
+  while (idle.length && jobs.length) idle.pop().postMessage(jobs.shift());
+}
+for (let i = 0; i < NW; i++) {
+  const w = new Worker(wUrl);
+  w.onmessage = ev => { onField(ev.data); idle.push(w); pump(); };
+  idle.push(w);
+}
+
+// ===== three.js scéna =====
+const cv = document.getElementById('cv');
+const wrap = document.getElementById('wrap');
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(62, 4 / 3, 0.1, CS * (RING + 2));
+const terrain = new THREE.Group();
+scene.add(terrain);
+const sun = new THREE.DirectionalLight(0xffffff, 2.6);
+sun.position.set(0.6, 1, 0.35);
+scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444433, 0.9));
+const material = new THREE.MeshLambertMaterial({ map: PALETTES[currentScheme] });
+
+function applySchemeLook() {
+  material.map = PALETTES[currentScheme];
+  material.needsUpdate = true;
+  const [r, g, b] = shadeRGB(currentScheme, 0.03);
+  const sky = new THREE.Color(r / 255, g / 255, b / 255);
+  scene.background = sky;
+  scene.fog = new THREE.Fog(sky, CS * 1.1, CS * (RING + 0.7));
+}
+applySchemeLook();
+
+// ===== chunky =====
+const chunks = new Map();      // 'i,j' -> mesh (userData.field)
+function requestChunk(i, j) {
+  const key = i + ',' + j;
+  if (chunks.has(key) || pendingKeys.has(key)) return;
+  pendingKeys.add(key);
+  jobs.push({ gen, key, n: N,
+    x0: anchor.x + (i * CS) / Z,
+    y0: anchor.y + (j * CS) / Z,
+    step: (CS / N) / Z, m: mFor() });
+  pump();
+}
+function onField(d) {
+  pendingKeys.delete(d.key);
+  if (d.gen !== gen) return;                  // pozůstatek před rebasem
+  const field = new Float32Array(d.buf);
+  const [i, j] = d.key.split(',').map(Number);
+  const geo = new THREE.PlaneGeometry(CS, CS, N, N);
+  geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position, uv = geo.attributes.uv;
+  for (let k = 0; k < pos.count; k++) {
+    const gx = Math.round((pos.getX(k) + CS / 2) / CS * N);
+    const gz = Math.round((pos.getZ(k) + CS / 2) / CS * N);
+    const tv = field[gz * (N + 1) + gx];
+    pos.setY(k, HMAX * Math.pow(tv, PEXP));
+    uv.setXY(k, tv, 0.5);                     // barva = paleta podle t
+  }
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, material);
+  mesh.position.set((i + 0.5) * CS, 0, (j + 0.5) * CS);
+  mesh.userData = { key: d.key, field };
+  terrain.add(mesh);
+  chunks.set(d.key, mesh);
+  if (!firstRenderDone) {
+    firstRenderDone = true;
+    const l = document.getElementById('loading');
+    if (l) l.style.display = 'none';
+  }
+}
+function ensureChunks() {
+  const ci = Math.floor(ship.x / CS), cj = Math.floor(ship.z / CS);
+  for (let dj = -RING; dj <= RING; dj++)
+    for (let di = -RING; di <= RING; di++)
+      requestChunk(ci + di, cj + dj);
+  for (const [key, mesh] of chunks) {
+    const [i, j] = key.split(',').map(Number);
+    if (Math.abs(i - ci) > RING + 1 || Math.abs(j - cj) > RING + 1) {
+      terrain.remove(mesh);
+      mesh.geometry.dispose();
+      chunks.delete(key);
+    }
+  }
+}
+function clearChunks() {
+  for (const [, mesh] of chunks) { terrain.remove(mesh); mesh.geometry.dispose(); }
+  chunks.clear();
+  pendingKeys.clear();
+  jobs.length = 0;
+}
+function sampleHeight(x, z) {
+  const i = Math.floor(x / CS), j = Math.floor(z / CS);
+  const mesh = chunks.get(i + ',' + j);
+  if (!mesh) return 0;
+  const f = mesh.userData.field;
+  let gx = (x - i * CS) / CS * N, gz = (z - j * CS) / CS * N;
+  gx = Math.max(0, Math.min(N - 1e-6, gx));
+  gz = Math.max(0, Math.min(N - 1e-6, gz));
+  const x0 = gx | 0, z0 = gz | 0, fx = gx - x0, fz = gz - z0;
+  const r = z0 * (N + 1) + x0;
+  const t = f[r] * (1-fx) * (1-fz) + f[r+1] * fx * (1-fz) +
+            f[r+N+1] * (1-fx) * fz + f[r+N+2] * fx * fz;
+  return HMAX * Math.pow(t, PEXP);
+}
+
+// ===== loď a let =====
+const ship = new THREE.Vector3(0, 26, 0);
+let heading = 0, pitch = 0, roll = 0, speed = 14;
+const keys = new Set();
+let firstRenderDone = false;
+
+// rebase: sestup pod práh zdvojnásobí zoom světa kolem lodi a
+// terén se přegeneruje jemněji. Stejné hory, nové detaily, donekonečna
+// (do hranice double kolem 1e-13).
+function rebase(factor) {
+  const cellPlane = (CS / N) / (Z * factor);
+  if (factor > 1 && cellPlane < 1.5e-13) return;        // dno přesnosti
+  if (factor < 1 && Z * factor < 30) return;            // strop nadhledu
+  anchor.x += ship.x / Z;
+  anchor.y += ship.z / Z;
+  Z *= factor;
+  ship.x = 0; ship.z = 0;
+  gen++;
+  clearChunks();
+  ensureChunks();
+}
+
+// ===== toast =====
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(html, ms) {
+  if (!toastEl) return;
+  toastEl.innerHTML = html;
+  toastEl.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms || 1800);
+}
+
+// ===== velikost, immersive, fullscreen =====
+function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+function enterFS() {
+  const el = document.documentElement;
+  const r = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (r) try { r.call(el).catch(() => {}); } catch (e) {}
+}
+function exitFS() {
+  const x = document.exitFullscreen || document.webkitExitFullscreen;
+  if (fsEl() && x) try { x.call(document).catch(() => {}); } catch (e) {}
+}
+function fitSize() {
+  const full = document.body.classList.contains('immersive') ||
+               document.body.classList.contains('showcase');
+  let bw, bh;
+  if (full) { bw = window.innerWidth; bh = window.innerHeight; wrap.style.height = ''; }
+  else { bw = wrap.clientWidth || 800; bh = Math.round(bw * 3 / 4); wrap.style.height = bh + 'px'; }
+  renderer.setSize(bw, bh, false);
+  cv.style.width = '100%'; cv.style.height = '100%';
+  camera.aspect = bw / bh;
+  camera.updateProjectionMatrix();
+}
+function toggleImmersive() {
+  document.body.classList.remove('showcase');
+  document.body.classList.toggle('immersive');
+  fitSize();
+}
+function toggleFullscreen() {
+  if (fsEl()) exitFS();
+  else {
+    document.body.classList.remove('showcase');
+    document.body.classList.add('immersive');
+    enterFS(); fitSize();
+  }
+}
+['fullscreenchange', 'webkitfullscreenchange'].forEach(ev =>
+  document.addEventListener(ev, () => {
+    if (!fsEl()) {
+      if (demoState) stopDemo();
+      else document.body.classList.remove('immersive', 'showcase');
+    }
+    fitSize();
+  }));
+
+// ===== autopilot (demo) =====
+function isRiffPlaying() {
+  const b = document.getElementById('audioToggle');
+  return !!(b && b.classList.contains('playing'));
+}
+function toggleRiff() {
+  const b = document.getElementById('audioToggle');
+  if (b) b.click();
+}
+let demoState = null;
+function startDemo() {
+  if (demoState) return;
+  enterFS();
+  document.body.classList.remove('immersive');
+  document.body.classList.add('showcase');
+  fitSize();
+  const audioStarted = !isRiffPlaying();
+  if (audioStarted) toggleRiff();
+  demoState = { t0: performance.now(), audioStarted, schemeT: 0 };
+}
+function stopDemo() {
+  if (!demoState) return;
+  const audioStarted = demoState.audioStarted;
+  demoState = null;
+  document.body.classList.remove('showcase', 'immersive');
+  exitFS();
+  fitSize();
+  if (audioStarted && isRiffPlaying()) toggleRiff();
+  syncHash();
+}
+function toggleDemo() { if (demoState) stopDemo(); else startDemo(); }
+
+// ===== schéma =====
+function cycleScheme() {
+  currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
+  applySchemeLook();
+  showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2200);
+  syncHash();
+}
+
+// ===== sdílení stavu (vzor /fractal) =====
+let wantAudio = false;
+function planePos() {
+  return { x: anchor.x + ship.x / Z, y: anchor.y + ship.z / Z };
+}
+function encodeState() {
+  const p = new URLSearchParams();
+  const pp = planePos();
+  p.set('x', String(pp.x));
+  p.set('y', String(pp.y));
+  p.set('z', String(Number(Z.toPrecision(6))));
+  p.set('hd', String(Number(heading.toFixed(3))));
+  p.set('al', String(Math.round(ship.y)));
+  if (currentScheme !== 'sepie') p.set('c', currentScheme);
+  if (isRiffPlaying()) p.set('a', '1');
+  const r = document.getElementById('audioRiff');
+  if (r && r.value !== 'drift') p.set('r', r.value);
+  const v = document.getElementById('audioVol');
+  if (v && v.value !== '50') p.set('v', v.value);
+  const sp = document.getElementById('audioSpeed');
+  if (sp && sp.value !== '51') p.set('p', sp.value);
+  return p.toString();
+}
+function applyHash() {
+  const h = location.hash.slice(1);
+  if (!h) return false;
+  const p = new URLSearchParams(h);
+  const fx = parseFloat(p.get('x')), fy = parseFloat(p.get('y'));
+  const fz = parseFloat(p.get('z'));
+  if (isFinite(fx)) anchor.x = fx;
+  if (isFinite(fy)) anchor.y = fy;
+  if (isFinite(fz)) Z = Math.max(30, fz);
+  ship.x = 0; ship.z = 0;
+  const fh = parseFloat(p.get('hd'));
+  if (isFinite(fh)) heading = fh;
+  const fa = parseFloat(p.get('al'));
+  if (isFinite(fa)) ship.y = Math.max(2, Math.min(120, fa));
+  const c = p.get('c');
+  if (c && SHADERS[c]) { currentScheme = c; applySchemeLook(); }
+  const r = p.get('r'), rs = document.getElementById('audioRiff');
+  if (r && rs && [...rs.options].some(o => o.value === r)) {
+    rs.value = r;
+    rs.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  for (const [k, id] of [['v', 'audioVol'], ['p', 'audioSpeed']]) {
+    const val = p.get(k), el = document.getElementById(id);
+    if (val !== null && el) {
+      el.value = Math.max(+el.min, Math.min(+el.max, +val));
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+  if (p.get('a') === '1') wantAudio = true;
+  return true;
+}
+let hashT = null;
+function syncHash() {
+  if (hashT) clearTimeout(hashT);
+  hashT = setTimeout(() => {
+    if (demoState) return;
+    try { history.replaceState(null, '', '#' + encodeState()); } catch (e) {}
+  }, 900);
+}
+function shareURL() {
+  const url = location.origin + location.pathname + '#' + encodeState();
+  try { history.replaceState(null, '', '#' + encodeState()); } catch (e) {}
+  const ok = () => showToast('odkaz zkopírován', 1800);
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    let done = false;
+    try { done = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    if (done) ok(); else prompt('Zkopíruj odkaz:', url);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(url).then(ok).catch(fallback);
+  else fallback();
+}
+function armAudioStart() {
+  const go = () => {
+    if (wantAudio && !isRiffPlaying()) toggleRiff();
+    wantAudio = false;
+    ['pointerdown', 'keydown', 'wheel'].forEach(ev =>
+      window.removeEventListener(ev, go, true));
+  };
+  ['pointerdown', 'keydown', 'wheel'].forEach(ev =>
+    window.addEventListener(ev, go, true));
+}
+
+// ===== ovládání =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (demoState) { e.preventDefault(); stopDemo(); return; }
+    if (document.body.classList.contains('immersive') ||
+        document.body.classList.contains('showcase')) {
+      document.body.classList.remove('immersive', 'showcase');
+      fitSize();
+    }
+    return;
+  }
+  const k = e.key.toLowerCase();
+  if (k === 'd') { e.preventDefault(); toggleDemo(); return; }
+  if (demoState) { e.preventDefault(); stopDemo(); return; }
+  if (k.startsWith('arrow')) { e.preventDefault(); keys.add(k); return; }
+  if (k === 'a' || k === 'w') speed = Math.min(40, speed + 2);
+  else if (k === 'z') speed = Math.max(4, speed - 2);
+  else if (k === 'c') cycleScheme();
+  else if (k === 'f') toggleFullscreen();
+  else if (k === 'h') toggleImmersive();
+  else if (k === 's') shareURL();
+  else if (k === 'r') {
+    anchor.x = -0.75; anchor.y = 0.05; Z = 60;
+    ship.set(0, 26, 0); heading = 0; pitch = 0; roll = 0; speed = 14;
+    gen++; clearChunks(); ensureChunks(); syncHash();
+  }
+});
+document.addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  if (k.startsWith('arrow')) keys.delete(k);
+});
+document.getElementById('thp').addEventListener('click', () => { speed = Math.min(40, speed + 2); });
+document.getElementById('thm').addEventListener('click', () => { speed = Math.max(4, speed - 2); });
+document.getElementById('rst').addEventListener('click', () => {
+  anchor.x = -0.75; anchor.y = 0.05; Z = 60;
+  ship.set(0, 26, 0); heading = 0; pitch = 0; roll = 0; speed = 14;
+  gen++; clearChunks(); ensureChunks(); syncHash();
+});
+document.getElementById('clr').addEventListener('click', cycleScheme);
+document.getElementById('dmo').addEventListener('click', toggleDemo);
+document.getElementById('fsb').addEventListener('click', toggleFullscreen);
+document.getElementById('shr').addEventListener('click', shareURL);
+document.getElementById('hid').addEventListener('click', toggleImmersive);
+['audioVol', 'audioSpeed', 'audioRiff'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', syncHash);
+});
+const at = document.getElementById('audioToggle');
+if (at) at.addEventListener('click', syncHash);
+window.addEventListener('hashchange', () => {
+  if (applyHash()) { gen++; clearChunks(); ensureChunks(); }
+});
+
+// ===== HUD =====
+let lastHud = 0, frames = 0, fps = 0, lastFpsT = 0;
+function updateHud(now, agl) {
+  frames++;
+  if (now - lastFpsT > 1000) { fps = frames; frames = 0; lastFpsT = now; }
+  if (now - lastHud < 250) return;
+  lastHud = now;
+  const pp = planePos();
+  const cell = (CS / N) / Z;
+  const dg = Math.max(3, Math.min(14, Math.ceil(-Math.log10(cell))));
+  document.getElementById('z').textContent = '\u00d7' + (Z / 60).toPrecision(3);
+  document.getElementById('cc').innerHTML =
+    pp.x.toFixed(dg) + (pp.y < 0 ? ' \u2212 ' : ' + ') + Math.abs(pp.y).toFixed(dg) + 'i';
+  document.getElementById('al').textContent = Math.max(0, agl).toFixed(0);
+  document.getElementById('mi').textContent = mFor();
+  document.getElementById('cnt').textContent = fps + ' fps \u00b7 ' + chunks.size + ' chunk\u016f';
+}
+
+// ===== hlavní smyčka =====
+let lastT = performance.now(), rebaseCooldown = 0, lastChunkCheck = 0;
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000);
+  lastT = now;
+  const tt = now / 1000;
+
+  if (demoState) {
+    // autopilot: pomalé bloudění podél hranice, výška drží terén
+    heading += (0.10 * Math.sin(tt * 0.07) + 0.05 * Math.sin(tt * 0.023)) * dt * 6;
+    speed = 16;
+    const h0 = sampleHeight(ship.x, ship.z);
+    const targetY = h0 + 15 + 5 * Math.sin(tt * 0.11);
+    ship.y += (targetY - ship.y) * Math.min(1, dt * 1.1);
+    pitch = Math.max(-0.4, Math.min(0.4, (targetY - ship.y) * 0.05));
+    roll = Math.sin(tt * 0.07) * 0.25;
+    if (now - demoState.schemeT > 45000) {
+      demoState.schemeT = now;
+      currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
+      applySchemeLook();
+    }
+  } else {
+    const turn = (keys.has('arrowleft') ? 1 : 0) - (keys.has('arrowright') ? 1 : 0);
+    const pit = (keys.has('arrowup') ? 1 : 0) - (keys.has('arrowdown') ? 1 : 0);
+    roll += (turn * 0.55 - roll) * Math.min(1, dt * 4);
+    pitch += (pit * 0.5 - pitch) * Math.min(1, dt * 3);
+    heading += roll * dt * 1.4;
+    ship.y += Math.sin(pitch) * speed * dt;
+  }
+
+  ship.x -= Math.sin(heading) * Math.cos(pitch) * speed * dt;
+  ship.z -= Math.cos(heading) * Math.cos(pitch) * speed * dt;
+
+  const h = sampleHeight(ship.x, ship.z);
+  if (ship.y < h + 1.6) ship.y = h + 1.6;     // měkká kolize
+  ship.y = Math.min(ship.y, h + 130);
+  const agl = ship.y - h;
+
+  // sestup pod práh: svět se přiblíží a hory se rozvinou do nových hor
+  rebaseCooldown -= dt;
+  if (rebaseCooldown <= 0) {
+    if (agl < 6.5) { rebase(2); rebaseCooldown = 2; }
+    else if (agl > HMAX * 5.5) { rebase(0.5); rebaseCooldown = 2; }
+  }
+
+  if (now - lastChunkCheck > 350) { lastChunkCheck = now; ensureChunks(); }
+
+  camera.position.copy(ship);
+  camera.rotation.set(0, 0, 0);
+  camera.rotateY(heading);
+  camera.rotateX(pitch * 0.8);
+  camera.rotateZ(-roll * 0.5);
+
+  renderer.render(scene, camera);
+  updateHud(now, agl);
+  requestAnimationFrame(loop);
+}
+
+// ===== start =====
+window.addEventListener('resize', () => { fitSize(); });
+applyHash();
+fitSize();
+ensureChunks();
+if (wantAudio) {
+  armAudioStart();
+  setTimeout(() => showToast('zvuk ze sdíleného odkazu se spustí prvním dotykem', 3200), 700);
+} else {
+  setTimeout(() => showToast('\u0161ipky \u00b7 let &nbsp;\u00b7&nbsp; <kbd>A/Z</kbd> \u00b7 tah &nbsp;\u00b7&nbsp; <kbd>D</kbd> \u00b7 autopilot', 3000), 700);
+}
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>
