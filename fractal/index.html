@@ -602,49 +602,80 @@
   let lastDt = 40;
   let lastM = 120;
 
-  function render(rs) {
-    const t0 = performance.now();
-    const os = 1.2;                     // overscan: počítá se kousek za okraj
+  // Jádro běží ve web workeru: hlavní vlákno nikdy neblokuje, scroll
+  // jede přes blit a čerstvé snímky chodí asynchronně i během gesta.
+  // SHADERS se do workeru serializují, jeden zdroj pravdy pro barvy.
+  const workerSrc =
+    'const SHADERS={' +
+    Object.entries(SHADERS).map(([k, f]) => k + ':' + f.toString()).join(',') +
+    '};' +
+    'onmessage = e => {' +
+    '  const { id, rw, rh, x0, y0, sc, ky, m, scheme } = e.data;' +
+    '  const t0 = performance.now();' +
+    '  const D = new Uint8ClampedArray(rw * rh * 4);' +
+    '  const shade = SHADERS[scheme];' +
+    '  for (let py = 0; py < rh; py++) {' +
+    '    const y = y0 + (py + .5) * ky / rh;' +
+    '    let q = 4 * py * rw;' +
+    '    for (let px = 0; px < rw; px++, q += 4) {' +
+    '      const x = x0 + (px + .5) * sc / rw;' +
+    '      let a = 0, b = 0, A = 0, B = 0, ee = 0, i = 0;' +
+    '      while (A + B < 4 && i < m) {' +
+    '        a = A - B + x; b = ee - A - B + y;' +
+    '        A = a * a; B = b * b; ee = (a + b) * (a + b);' +
+    '        i++;' +
+    '      }' +
+    '      const t = i / m, ss = 1 - t**6;' +
+    '      shade(t, ss, D, q);' +
+    '      D[q + 3] = 255;' +
+    '    }' +
+    '  }' +
+    '  postMessage({ id, rw, rh, dt: performance.now() - t0, pix: D.buffer }, [D.buffer]);' +
+    '};';
+  const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' })));
+
+  let inFlight = null;          // metadata běžící úlohy
+  let wanted = 0;               // rs další úlohy po dokončení, 0 = nic
+  let jobSeq = 0;
+
+  function render(rs) {         // asynchronně zadej úlohu workeru
+    if (inFlight) { wanted = Math.max(wanted, rs); return; }
+    const os = 1.2;             // overscan: počítá se kousek za okraj
     const rw = Math.max(64, Math.round(W * rs * os));
     const rh = Math.max(48, Math.round(H * rs * os));
-    buf.width = rw; buf.height = rh;
-    const img = bg.createImageData(rw, rh);
-    const D = img.data;
     const { cx, cy, scale } = view;
     const m = demoState ? Math.min(mFor(scale), 650) : mFor(scale);
-    lastM = m;
-    const shade = SHADERS[currentScheme];
-    const sc = scale * os;
-    const ky = sc * (H / W);
-    const x0 = cx - sc / 2, y0 = cy - ky / 2;
-    for (let py = 0; py < rh; py++) {
-      const y = y0 + (py + .5) * ky / rh;
-      let q = 4 * py * rw;
-      for (let px = 0; px < rw; px++, q += 4) {
-        const x = x0 + (px + .5) * sc / rw;
-        let a = 0, b = 0, A = 0, B = 0, e = 0, i = 0;
-        while (A + B < 4 && i < m) {
-          a = A - B + x;        // Re(z²+c) = a² − b² + x
-          b = e - A - B + y;    // Im(z²+c) = 2ab + y = (a+b)² − a² − b² + y
-          A = a * a; B = b * b; e = (a + b) * (a + b);
-          i++;
-        }
-        const t = i / m, s = 1 - t**6;
-        shade(t, s, D, q);
-        D[q + 3] = 255;
-      }
-    }
-    bg.putImageData(img, 0, 0);
-    bufView = { cx, cy, scale: sc, k: ky, rw };
-    blit();                             // prezentace přes společnou reprojekci
-    lastDt = performance.now() - t0;
+    const sc = scale * os, ky = sc * (H / W);
+    inFlight = { id: ++jobSeq, cx, cy, sc, ky, rw, m };
+    worker.postMessage({ id: inFlight.id, rw, rh,
+      x0: cx - sc / 2, y0: cy - ky / 2, sc, ky, m, scheme: currentScheme });
+  }
+
+  worker.onmessage = e => {
+    const { id, rw, rh, dt, pix } = e.data;
+    if (!inFlight || inFlight.id !== id) { inFlight = null; return; }
+    const meta = inFlight; inFlight = null;
+    buf.width = rw; buf.height = rh;
+    bg.putImageData(new ImageData(new Uint8ClampedArray(pix), rw, rh), 0, 0);
+    bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw };
+    lastDt = dt; lastM = meta.m;
+    blit();
     if (!firstRenderDone) {
       firstRenderDone = true;
       const l = document.getElementById('loading');
       if (l) l.style.display = 'none';
     }
     updateInfo();
-  }
+    // adaptace rozlišení podle skutečného času výpočtu ve workeru
+    if (demoState) {
+      if (dt > 60) demoState.rs = Math.max(0.1, demoState.rs * 0.9);
+      else if (dt < 30) demoState.rs = Math.min(0.7, demoState.rs * 1.08);
+    } else {
+      if (dt > 80) interRS = Math.max(0.12, interRS * 0.85);
+      else if (dt < 30) interRS = Math.min(1, interRS * 1.1);
+    }
+    if (wanted) { const r = wanted; wanted = 0; render(r); }
+  };
 
   function updateInfo() {
     const zoom = 3 / view.scale;
@@ -695,31 +726,20 @@
     g.drawImage(buf, dx, dy, dw, dh);
   }
 
-  // ===== plánování: za gesta jen náhled (blit), kreslí se až v klidu =====
-  let queued = false, interRS = 0.4, refineT = null, interT = null;
+  // ===== plánování: blit každý snímek, výpočty asynchronně ve workeru =====
+  let queued = false, interRS = 0.4, refineT = null;
   function requestRender(interactive) {
-    if (!interactive) {
-      if (queued) return; queued = true;
-      requestAnimationFrame(() => { queued = false; render(1); });
-      return;
-    }
-    // za běhu gesta žádný přepočet, jen plynulá reprojekce náhledu
+    if (!interactive) { render(1); return; }
     if (!queued) {
       queued = true;
       requestAnimationFrame(() => { queued = false; blit(); });
     }
-    // přepočet startuje až po krátkém klidu, doostření na plno hned za ním
-    if (interT) clearTimeout(interT);
-    interT = setTimeout(() => {
-      render(interRS);
-      if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
-      else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
-      scheduleRefine();
-    }, 130);
+    render(interRS);            // in-flight fronta workeru drží tempo sama
+    scheduleRefine();
   }
   function scheduleRefine() {
     if (refineT) clearTimeout(refineT);
-    refineT = setTimeout(() => { if (!demoState && !drag) render(1); }, 220);
+    refineT = setTimeout(() => { if (!demoState) render(1); }, 200);
   }
 
   // ===== interakce =====
@@ -922,17 +942,13 @@
     view.cx = cxT; view.cy = cyT;
 
     if (leg.type === 'hold') {
-      // přestávka: jednou vykresli detail v plném rozlišení, pak stůj
+      // přestávka: jednou zadej detail v plném rozlišení, blit ho ukáže
       if (st.holdLeg !== legIdx) { render(1); st.holdLeg = legIdx; }
+      blit();
     } else {
       st.holdLeg = -1;
-      if (now - st.lastR > 90 && st.rs > blitQuality() * 1.3) {
-        render(st.rs); st.lastR = now;
-        if (lastDt > 60) st.rs = Math.max(0.1, st.rs * 0.9);
-        else if (lastDt < 30) st.rs = Math.min(0.7, st.rs * 1.08);
-      } else {
-        blit();                       // mezi přepočty jede hladká reprojekce
-      }
+      if (st.rs > blitQuality() * 1.3) render(st.rs);
+      blit();                         // pohyb jede vždy přes reprojekci
     }
     st.raf = requestAnimationFrame(demoStep);
   }
@@ -957,7 +973,6 @@
       t0: performance.now(),
       rs: 0.45,
       holdLeg: -1,
-      lastR: 0,
       raf: 0
     };
     demoState.raf = requestAnimationFrame(demoStep);
