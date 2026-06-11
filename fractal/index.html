@@ -604,8 +604,9 @@
 
   function render(rs) {
     const t0 = performance.now();
-    const rw = Math.max(64, Math.round(W * rs));
-    const rh = Math.max(48, Math.round(H * rs));
+    const os = 1.2;                     // overscan: počítá se kousek za okraj
+    const rw = Math.max(64, Math.round(W * rs * os));
+    const rh = Math.max(48, Math.round(H * rs * os));
     buf.width = rw; buf.height = rh;
     const img = bg.createImageData(rw, rh);
     const D = img.data;
@@ -613,13 +614,14 @@
     const m = demoState ? Math.min(mFor(scale), 650) : mFor(scale);
     lastM = m;
     const shade = SHADERS[currentScheme];
-    const ky = scale * (H / W);
-    const x0 = cx - scale / 2, y0 = cy - ky / 2;
+    const sc = scale * os;
+    const ky = sc * (H / W);
+    const x0 = cx - sc / 2, y0 = cy - ky / 2;
     for (let py = 0; py < rh; py++) {
       const y = y0 + (py + .5) * ky / rh;
       let q = 4 * py * rw;
       for (let px = 0; px < rw; px++, q += 4) {
-        const x = x0 + (px + .5) * scale / rw;
+        const x = x0 + (px + .5) * sc / rw;
         let a = 0, b = 0, A = 0, B = 0, e = 0, i = 0;
         while (A + B < 4 && i < m) {
           a = A - B + x;        // Re(z²+c) = a² − b² + x
@@ -633,10 +635,8 @@
       }
     }
     bg.putImageData(img, 0, 0);
-    g.imageSmoothingEnabled = rs < 1;
-    g.clearRect(0, 0, W, H);
-    g.drawImage(buf, 0, 0, rw, rh, 0, 0, W, H);
-    bufView = { cx, cy, scale, k: ky, rw };
+    bufView = { cx, cy, scale: sc, k: ky, rw };
+    blit();                             // prezentace přes společnou reprojekci
     lastDt = performance.now() - t0;
     if (!firstRenderDone) {
       firstRenderDone = true;
@@ -695,23 +695,27 @@
     g.drawImage(buf, dx, dy, dw, dh);
   }
 
-  // ===== plánování: blit hned, hrubý přepočet omezeným tempem, doostření v klidu =====
-  let queued = false, interRS = 0.4, refineT = null, lastRenderAt = 0;
+  // ===== plánování: za gesta jen náhled (blit), kreslí se až v klidu =====
+  let queued = false, interRS = 0.4, refineT = null, interT = null;
   function requestRender(interactive) {
-    if (queued) return; queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      if (!interactive) { render(1); return; }
-      blit();                              // okamžitá odezva z posledního snímku
-      const now = performance.now();
-      if (now - lastRenderAt > 110) {      // přepočet nejvýš ~9x za sekundu
-        render(interRS);
-        lastRenderAt = now;
-        if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
-        else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
-      }
+    if (!interactive) {
+      if (queued) return; queued = true;
+      requestAnimationFrame(() => { queued = false; render(1); });
+      return;
+    }
+    // za běhu gesta žádný přepočet, jen plynulá reprojekce náhledu
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(() => { queued = false; blit(); });
+    }
+    // přepočet startuje až po krátkém klidu, doostření na plno hned za ním
+    if (interT) clearTimeout(interT);
+    interT = setTimeout(() => {
+      render(interRS);
+      if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
+      else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
       scheduleRefine();
-    });
+    }, 130);
   }
   function scheduleRefine() {
     if (refineT) clearTimeout(refineT);
@@ -778,8 +782,9 @@
     if (!drag) return;
     const [mx, my] = pos(e);
     const dx = mx - drag.mx, dy = my - drag.my;
-    g.fillStyle = edgeColor(); g.fillRect(0, 0, W, H);
-    g.drawImage(buf, dx, dy, W, H);
+    view.cx = drag.cx - dx / W * view.scale;
+    view.cy = drag.cy - dy / H * view.scale * (H / W);
+    requestRender(true);
   });
 
   function endPointer(e) {
@@ -787,14 +792,8 @@
     ptrs.delete(e.pointerId);
     if (ptrs.size < 2) pinchPrev = null;
     if (drag && ptrs.size === 0) {
-      const [mx, my] = pos(e);
-      const dx = mx - drag.mx, dy = my - drag.my;
-      if (Math.hypot(dx, dy) > 2) {
-        view.cx = drag.cx - dx / W * view.scale;
-        view.cy = drag.cy - dy / H * view.scale * (H / W);
-        requestRender(true);
-      } else { render(1); }
       drag = null; cv.classList.remove('dragging');
+      requestRender(true);
     }
   }
   cv.addEventListener('pointerup', endPointer);
