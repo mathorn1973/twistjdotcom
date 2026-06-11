@@ -602,43 +602,64 @@
   let lastDt = 40;
   let lastM = 120;
 
-  // Jádro běží ve web workeru: hlavní vlákno nikdy neblokuje, scroll
-  // jede přes blit a čerstvé snímky chodí asynchronně i během gesta.
-  // SHADERS se do workeru serializují, jeden zdroj pravdy pro barvy.
+  // Jádro běží v bazénu web workerů: snímek se dělí na vodorovné pásy
+  // přes všechna jádra, hlavní vlákno nikdy neblokuje. Uvnitř tři triky:
+  // 1) kardioida a period-2 bulva: vnitřek poznáme bez jediné iterace,
+  // 2) Brentova detekce periody: orbita, která se opakuje, je vnitřek
+  //    a smyčka končí hned, ne až na stropu m,
+  // 3) (a+b)² drží tři násobení na krok.
+  // SHADERS se serializují, jeden zdroj pravdy pro barvy.
   const workerSrc =
     'const SHADERS={' +
     Object.entries(SHADERS).map(([k, f]) => k + ':' + f.toString()).join(',') +
     '};' +
     'onmessage = e => {' +
-    '  const { id, rw, rh, x0, y0, sc, ky, m, scheme } = e.data;' +
-    '  const t0 = performance.now();' +
-    '  const D = new Uint8ClampedArray(rw * rh * 4);' +
+    '  const { id, band, rw, rows, row0, rhT, x0, y0, sc, ky, m, scheme } = e.data;' +
+    '  const D = new Uint8ClampedArray(rw * rows * 4);' +
     '  const shade = SHADERS[scheme];' +
-    '  for (let py = 0; py < rh; py++) {' +
-    '    const y = y0 + (py + .5) * ky / rh;' +
-    '    let q = 4 * py * rw;' +
+    '  for (let r = 0; r < rows; r++) {' +
+    '    const y = y0 + (row0 + r + .5) * ky / rhT;' +
+    '    const yy = y * y;' +
+    '    let q = 4 * r * rw;' +
     '    for (let px = 0; px < rw; px++, q += 4) {' +
     '      const x = x0 + (px + .5) * sc / rw;' +
-    '      let a = 0, b = 0, A = 0, B = 0, ee = 0, i = 0;' +
-    '      while (A + B < 4 && i < m) {' +
-    '        a = A - B + x; b = ee - A - B + y;' +
-    '        A = a * a; B = b * b; ee = (a + b) * (a + b);' +
-    '        i++;' +
+    '      let i = 0;' +
+    '      const xq = x - 0.25, c2 = xq * xq + yy;' +
+    '      if (c2 * (c2 + xq) <= 0.25 * yy ||' +
+    '          (x + 1) * (x + 1) + yy <= 0.0625) {' +
+    '        i = m;' +
+    '      } else {' +
+    '        let a = 0, b = 0, A = 0, B = 0, ee = 0;' +
+    '        let ca = 0, cb = 0, chk = 8;' +
+    '        while (A + B < 4 && i < m) {' +
+    '          a = A - B + x; b = ee - A - B + y;' +
+    '          A = a * a; B = b * b; ee = (a + b) * (a + b);' +
+    '          i++;' +
+    '          if (Math.abs(a - ca) < 1e-13 && Math.abs(b - cb) < 1e-13) { i = m; break; }' +
+    '          if (i === chk) { ca = a; cb = b; chk *= 2; }' +
+    '        }' +
     '      }' +
     '      const t = i / m, ss = 1 - t**6;' +
     '      shade(t, ss, D, q);' +
     '      D[q + 3] = 255;' +
     '    }' +
     '  }' +
-    '  postMessage({ id, rw, rh, dt: performance.now() - t0, pix: D.buffer }, [D.buffer]);' +
+    '  postMessage({ id, band, row0, rows, rw, pix: D.buffer }, [D.buffer]);' +
     '};';
-  const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' })));
+  const wUrl = URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' }));
+  const NW = Math.min(8, Math.max(2, (navigator.hardwareConcurrency || 4) - 1));
+  const pool = [];
+  for (let wi = 0; wi < NW; wi++) {
+    const w = new Worker(wUrl);
+    w.onmessage = onBand;
+    pool.push(w);
+  }
 
-  let inFlight = null;          // metadata běžící úlohy
+  let inFlight = null;          // { id, ..., parts, left, t0 }
   let wanted = 0;               // rs další úlohy po dokončení, 0 = nic
   let jobSeq = 0;
 
-  function render(rs) {         // asynchronně zadej úlohu workeru
+  function render(rs) {         // asynchronně rozdej pásy bazénu
     if (inFlight) { wanted = Math.max(wanted, rs); return; }
     const os = 1.2;             // overscan: počítá se kousek za okraj
     const rw = Math.max(64, Math.round(W * rs * os));
@@ -646,19 +667,32 @@
     const { cx, cy, scale } = view;
     const m = demoState ? Math.min(mFor(scale), 650) : mFor(scale);
     const sc = scale * os, ky = sc * (H / W);
-    inFlight = { id: ++jobSeq, cx, cy, sc, ky, rw, m };
-    worker.postMessage({ id: inFlight.id, rw, rh,
-      x0: cx - sc / 2, y0: cy - ky / 2, sc, ky, m, scheme: currentScheme });
+    const x0 = cx - sc / 2, y0 = cy - ky / 2;
+    const id = ++jobSeq;
+    inFlight = { id, cx, cy, sc, ky, rw, rh, m,
+                 parts: [], left: NW, t0: performance.now() };
+    const bandRows = Math.ceil(rh / NW);
+    for (let b = 0; b < NW; b++) {
+      const row0 = b * bandRows;
+      const rows = Math.min(bandRows, rh - row0);
+      if (rows <= 0) { inFlight.left--; continue; }
+      pool[b].postMessage({ id, band: b, rw, rows, row0, rhT: rh,
+                            x0, y0, sc, ky, m, scheme: currentScheme });
+    }
   }
 
-  worker.onmessage = e => {
-    const { id, rw, rh, dt, pix } = e.data;
-    if (!inFlight || inFlight.id !== id) { inFlight = null; return; }
+  function onBand(e) {
+    const { id, row0, rows, rw, pix } = e.data;
+    if (!inFlight || inFlight.id !== id) return;
+    inFlight.parts.push({ row0, rows, pix });
+    if (--inFlight.left > 0) return;
+    // všechny pásy doletěly: slož snímek
     const meta = inFlight; inFlight = null;
-    buf.width = rw; buf.height = rh;
-    bg.putImageData(new ImageData(new Uint8ClampedArray(pix), rw, rh), 0, 0);
-    bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw };
-    lastDt = dt; lastM = meta.m;
+    buf.width = meta.rw; buf.height = meta.rh;
+    for (const p of meta.parts)
+      bg.putImageData(new ImageData(new Uint8ClampedArray(p.pix), meta.rw, p.rows), 0, p.row0);
+    bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw: meta.rw };
+    lastDt = performance.now() - meta.t0; lastM = meta.m;
     blit();
     if (!firstRenderDone) {
       firstRenderDone = true;
@@ -666,16 +700,16 @@
       if (l) l.style.display = 'none';
     }
     updateInfo();
-    // adaptace rozlišení podle skutečného času výpočtu ve workeru
+    // adaptace rozlišení podle skutečného času snímku
     if (demoState) {
-      if (dt > 60) demoState.rs = Math.max(0.1, demoState.rs * 0.9);
-      else if (dt < 30) demoState.rs = Math.min(0.7, demoState.rs * 1.08);
+      if (lastDt > 60) demoState.rs = Math.max(0.1, demoState.rs * 0.9);
+      else if (lastDt < 30) demoState.rs = Math.min(1, demoState.rs * 1.08);
     } else {
-      if (dt > 80) interRS = Math.max(0.12, interRS * 0.85);
-      else if (dt < 30) interRS = Math.min(1, interRS * 1.1);
+      if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
+      else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
     }
     if (wanted) { const r = wanted; wanted = 0; render(r); }
-  };
+  }
 
   function updateInfo() {
     const zoom = 3 / view.scale;
