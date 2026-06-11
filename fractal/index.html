@@ -636,7 +636,7 @@
     g.imageSmoothingEnabled = rs < 1;
     g.clearRect(0, 0, W, H);
     g.drawImage(buf, 0, 0, rw, rh, 0, 0, W, H);
-    bufView = { cx, cy, scale, k: ky };
+    bufView = { cx, cy, scale, k: ky, rw };
     lastDt = performance.now() - t0;
     if (!firstRenderDone) {
       firstRenderDone = true;
@@ -667,6 +667,21 @@
     return 'rgb(' + (D[0]|0) + ',' + (D[1]|0) + ',' + (D[2]|0) + ')';
   }
 
+  // Efektivní rozlišení reprojekce: kolik z plného rozlišení by blit dal.
+  // 0 znamená, že buf nepokrývá celý aktuální pohled (zoom out, posun),
+  // pak se musí přepočítat vždy, jinak by okraje zůstaly prázdné.
+  function blitQuality() {
+    if (!bufView) return 0;
+    const kv = view.scale * (H / W);
+    const covered =
+      bufView.cx - bufView.scale/2 <= view.cx - view.scale/2 &&
+      bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
+      bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
+      bufView.cy + bufView.k/2     >= view.cy + kv/2;
+    if (!covered) return 0;
+    return (bufView.rw / bufView.scale) * (view.scale / W);
+  }
+
   function blit() {
     if (!bufView) return;
     const kv = view.scale * (H / W);
@@ -689,7 +704,9 @@
       if (!interactive) { render(1); return; }
       blit();                              // okamžitá odezva z posledního snímku
       const now = performance.now();
-      if (now - lastRenderAt > 110) {      // přepočet nejvýš ~9x za sekundu
+      // při zoom in drží zvětšený jemný snímek, dokud je ostřejší
+      // než hrubý přepočet; doostření v klidu ho pak vymění za plný
+      if (now - lastRenderAt > 110 && interRS > blitQuality() * 1.3) {
         render(interRS);
         lastRenderAt = now;
         if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
@@ -912,7 +929,7 @@
       if (st.holdLeg !== legIdx) { render(1); st.holdLeg = legIdx; }
     } else {
       st.holdLeg = -1;
-      if (now - st.lastR > 90) {
+      if (now - st.lastR > 90 && st.rs > blitQuality() * 1.3) {
         render(st.rs); st.lastR = now;
         if (lastDt > 60) st.rs = Math.max(0.1, st.rs * 0.9);
         else if (lastDt < 30) st.rs = Math.min(0.7, st.rs * 1.08);
