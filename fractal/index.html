@@ -484,12 +484,13 @@
       <button id="clr"  title="schéma barev (C)">◐</button>
       <button id="dmo"  title="demo (D)">▶</button>
       <button id="fsb"  title="celá obrazovka (F)">⛶</button>
+      <button id="shr"  title="sdílet odkaz (S)">⤴</button>
       <button id="hid"  title="skrýt UI (H)">◉</button>
     </div>
   </div>
   <div class="toast" id="toast"></div>
   <footer>
-    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>H</kbd> · UI</span>
+    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>H</kbd> · UI &nbsp;·&nbsp; <kbd>S</kbd> · share</span>
     <span class="count" id="cnt">…</span>
   </footer>
 </div>
@@ -814,6 +815,7 @@
   function scheduleRefine() {
     if (refineT) clearTimeout(refineT);
     refineT = setTimeout(() => { if (!demoState) render(1); }, 200);
+    syncHash();
   }
 
   // ===== interakce =====
@@ -1063,6 +1065,7 @@
     fitSize();
     render(1);
     if (audioStarted && isRiffPlaying()) toggleRiff();
+    syncHash();
   }
   function toggleDemo() { if (demoState) stopDemo(); else startDemo(); }
 
@@ -1070,8 +1073,103 @@
   function cycleScheme() {
     currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
     showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2200);
-    if (!demoState) render(1);
+    if (!demoState) { render(1); syncHash(); }
   }
+
+  // ===== sdílení stavu v adrese (vzor /evo) =====
+  // hash nese přesnou polohu, zoom, detail, schéma a nastavení playeru
+  let wantAudio = false;
+  function encodeState() {
+    const p = new URLSearchParams();
+    p.set('x', String(view.cx));            // String() = nejkratší přesný zápis
+    p.set('y', String(view.cy));
+    p.set('s', String(Number(view.scale.toPrecision(6))));
+    if (boost) p.set('b', String(boost));
+    if (currentScheme !== 'sepie') p.set('c', currentScheme);
+    if (isRiffPlaying()) p.set('a', '1');
+    const r = document.getElementById('audioRiff');
+    if (r && r.value !== 'drift') p.set('r', r.value);
+    const v = document.getElementById('audioVol');
+    if (v && v.value !== '50') p.set('v', v.value);
+    const sp = document.getElementById('audioSpeed');
+    if (sp && sp.value !== '51') p.set('p', sp.value);
+    return p.toString();
+  }
+  function applyHash() {
+    const h = location.hash.slice(1);
+    if (!h) return false;
+    const p = new URLSearchParams(h);
+    let any = false;
+    const fx = parseFloat(p.get('x')), fy = parseFloat(p.get('y')), fs = parseFloat(p.get('s'));
+    if (isFinite(fx)) { view.cx = fx; any = true; }
+    if (isFinite(fy)) { view.cy = fy; any = true; }
+    if (isFinite(fs)) { view.scale = clampScale(fs); any = true; }
+    const fb = parseInt(p.get('b'), 10);
+    if (isFinite(fb)) boost = fb;
+    const c = p.get('c');
+    if (c && SHADERS[c]) currentScheme = c;
+    const r = p.get('r'), rs = document.getElementById('audioRiff');
+    if (r && rs && [...rs.options].some(o => o.value === r)) {
+      rs.value = r;
+      rs.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    for (const [k, id] of [['v', 'audioVol'], ['p', 'audioSpeed']]) {
+      const val = p.get(k), el = document.getElementById(id);
+      if (val !== null && el) {
+        el.value = Math.max(+el.min, Math.min(+el.max, +val));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+    if (p.get('a') === '1') wantAudio = true;
+    return any;
+  }
+  let hashT = null;
+  function syncHash() {                     // tiché zrcadlení stavu do adresy
+    if (hashT) clearTimeout(hashT);
+    hashT = setTimeout(() => {
+      if (demoState) return;
+      try { history.replaceState(null, '', '#' + encodeState()); } catch (e) {}
+    }, 800);
+  }
+  function shareURL() {
+    const url = location.origin + location.pathname + '#' + encodeState();
+    try { history.replaceState(null, '', '#' + encodeState()); } catch (e) {}
+    const ok = () => showToast('odkaz zkopírován', 1800);
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      let done = false;
+      try { done = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      if (done) ok(); else prompt('Zkopíruj odkaz:', url);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(url).then(ok).catch(fallback);
+    else fallback();
+  }
+  // zvuk ze sdíleného odkazu: prohlížeč chce gesto, spustí ho první dotyk
+  function armAudioStart() {
+    const go = () => {
+      if (wantAudio && !isRiffPlaying()) toggleRiff();
+      wantAudio = false;
+      ['pointerdown', 'keydown', 'wheel'].forEach(ev =>
+        window.removeEventListener(ev, go, true));
+    };
+    ['pointerdown', 'keydown', 'wheel'].forEach(ev =>
+      window.addEventListener(ev, go, true));
+  }
+  window.addEventListener('hashchange', () => {
+    if (applyHash()) requestRender(true);
+  });
+  ['audioVol', 'audioSpeed', 'audioRiff'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', syncHash);
+  });
+  const at = document.getElementById('audioToggle');
+  if (at) at.addEventListener('click', syncHash);
 
   // ===== tlačítka =====
   document.getElementById('zin').addEventListener('click',  () => zoomAt(W/2, H/2, 0.6));
@@ -1083,6 +1181,7 @@
   document.getElementById('dmo').addEventListener('click',  toggleDemo);
   document.getElementById('fsb').addEventListener('click',  toggleFullscreen);
   document.getElementById('hid').addEventListener('click',  toggleImmersive);
+  document.getElementById('shr').addEventListener('click',  shareURL);
 
   // ===== klávesnice =====
   document.addEventListener('keydown', e => {
@@ -1105,6 +1204,7 @@
     else if (k === 'f') toggleFullscreen();
     else if (k === 'h') toggleImmersive();
     else if (k === 'r') { Object.assign(view, home); boost = 0; requestRender(true); }
+    else if (k === 's') shareURL();
   });
 
   // ===== start =====
@@ -1113,8 +1213,14 @@
     if (resizeT) clearTimeout(resizeT);
     resizeT = setTimeout(fitSize, 120);
   });
+  applyHash();
   fitSize();
-  setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen', 2800), 700);
+  if (wantAudio) {
+    armAudioStart();
+    setTimeout(() => showToast('zvuk ze sdíleného odkazu se spustí prvním dotykem', 3200), 700);
+  } else {
+    setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>S</kbd> · share', 2800), 700);
+  }
 })();
 </script>
 </body>
