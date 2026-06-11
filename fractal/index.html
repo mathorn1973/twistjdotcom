@@ -494,13 +494,6 @@
   </footer>
 </div>
 
-<!-- Demo identity overlay (visible only during demo mode) -->
-<div class="demo-overlay" id="demoOverlay" aria-hidden="true">
-  <div class="demo-overlay-content">
-    <div class="demo-overlay-label" id="demoOverlayLabel"></div>
-    <div class="demo-overlay-eq" id="demoOverlayEq"></div>
-  </div>
-</div>
 <!-- Schumann riff audio engine (shared with /jam/) -->
 <script src="audio.js"></script>
 <script>
@@ -524,7 +517,7 @@
   function b2s(b){return Math.round(100*Math.log(b/0.5)/Math.log(360));}
   function preset(n){const p=RIFF_PRESETS[n];if(!p)return;spdS.value=b2s(p.tempo);spdV.textContent=p.tempo;engine.forceAllVoices(n==='layers'||n==='weave');engine.set({reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,tempo:p.tempo,vTM:p.vTM||[1,1,1,1,1]});if(playing){engine.stop();engine.forceAllVoices(n==='layers'||n==='weave');engine.start(p.seed);}}
   btn.addEventListener('click',()=>{
-    if(!playing){playing=true;const ks=Object.keys(RIFF_PRESETS),rk=ks[Math.floor(Math.random()*ks.length)];riffS.value=rk;const p=RIFF_PRESETS[rk];engine.forceAllVoices(rk==='layers'||rk==='weave');engine.set({tempo:s2b(spdS.value),reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,vTM:p.vTM||[1,1,1,1,1]});engine.start(p.seed);if(engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);btn.textContent='\u{1f50a}';btn.classList.add('playing');chev.classList.add('show');panel.classList.add('visible');chev.classList.add('open');panelOpen=true;}
+    if(!playing){playing=true;const rk=riffS.value;const p=RIFF_PRESETS[rk];engine.forceAllVoices(rk==='layers'||rk==='weave');engine.set({tempo:s2b(spdS.value),reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,vTM:p.vTM||[1,1,1,1,1]});engine.start(p.seed);if(engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);btn.textContent='\u{1f50a}';btn.classList.add('playing');chev.classList.add('show');panel.classList.add('visible');chev.classList.add('open');panelOpen=true;}
     else{playing=false;engine.stop();btn.textContent='\u{1f507}';btn.classList.remove('playing');panel.classList.remove('visible');chev.classList.remove('show','open');panelOpen=false;}
   });
   chev.addEventListener('click',()=>{panelOpen=!panelOpen;panel.classList.toggle('visible',panelOpen);chev.classList.toggle('open',panelOpen);});
@@ -551,23 +544,29 @@
 
   // ===== schémata barev =====
   // každé dostane t = i/m a stín s = 1 - t^6 (stáhne tělo do černé)
-  const SCHEMES = ['sepie', 'strakata', 'priroda', 'inkoust', 'pulnoc'];
+  const SCHEMES = ['sepie', 'priroda', 'strakata', 'psycho', 'pulnoc'];
   const SCHEME_NAMES = {
-    sepie:    'sépie · chiaroscuro',
-    strakata: 'strakatá · zlato a lazur',
-    priroda:  'příroda · pastel',
-    inkoust:  'inkoust',
-    pulnoc:   'půlnoc'
+    sepie:   'sépie · chiaroscuro',
+    priroda: 'příroda · les a hlína',
+    strakata:'strakatá · zlato, měděnka, lazur',
+    psycho:  'psychedelická · spektrum',
+    pulnoc:  'půlnoc'
   };
   const SHADERS = {
     sepie:    (t, s, D, q) => { const v = 230 - 130*t, o = -90*t*t;
       D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
-    strakata: (t, s, D, q) => { const v = 230 - 130*t, o = t*90*Math.sin(t*30);
-      D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
-    priroda:  (t, s, D, q) => {
-      D[q] = (238-88*t)*s; D[q+1] = (228-133*t)*s; D[q+2] = (205-145*t)*s; },
-    inkoust:  (t, s, D, q) => { const v = 236 - 212*t;
-      D[q] = v*s; D[q+1] = (v*.97-3)*s; D[q+2] = (v*.92-6)*s; },
+    priroda:  (t, s, D, q) => { const w = 14*t;
+      D[q]   = (170-120*t+45*Math.sin(w+4.5))*s;
+      D[q+1] = (205-110*t+45*Math.sin(w+0.6))*s;
+      D[q+2] = (150-130*t+35*Math.sin(w+2.5))*s; },
+    strakata: (t, s, D, q) => { const w = 22*t;
+      D[q]   = (150+95*Math.sin(w+1.0))*s;
+      D[q+1] = (140+95*Math.sin(w+2.6))*s;
+      D[q+2] = (130+105*Math.sin(w+4.2))*s; },
+    psycho:   (t, s, D, q) => { const w = 50*t;
+      D[q]   = (128+127*Math.sin(w))*s;
+      D[q+1] = (128+127*Math.sin(w+2.094))*s;
+      D[q+2] = (128+127*Math.sin(w+4.188))*s; },
     pulnoc:   (t, s, D, q) => { const u = t*t;
       D[q] = (16+230*u)*s; D[q+1] = (20+150*u)*s; D[q+2] = (46+40*t)*s; }
   };
@@ -806,135 +805,10 @@
       }
       fitSize();
     }));
-  function startAmbientAudio() {
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx) return null;
-    let ctx;
-    try { ctx = new Ctx(); } catch(e) { return null; }
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-
-    // Master with slow fade-in
-    const master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
-    master.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 3);
-
-    // Lowpass for warmth — base 1100 Hz, modulated by long-term LFO below
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass'; filter.frequency.value = 1100; filter.Q.value = 0.5;
-    filter.connect(master);
-
-    // Delay feedback for ambient bloom
-    const delay = ctx.createDelay(2);
-    delay.delayTime.value = 0.62;
-    const fb = ctx.createGain(); fb.gain.value = 0.48;
-    delay.connect(fb).connect(delay);
-    delay.connect(filter);
-
-    // ===== Long-term modulation: minute-scale evolution layer =====
-    // Three slow LFOs at non-commensurate periods (170s, 210s, 290s) so
-    // the combined modulation never exactly repeats. Subtle by design —
-    // listener feels evolution without recognizing the source.
-
-    // (1) Filter cutoff sweep: spectrum slowly opens (bright) and closes (dark)
-    const filterLFO = ctx.createOscillator();
-    filterLFO.type = 'sine'; filterLFO.frequency.value = 1 / 170;
-    const filterLFOG = ctx.createGain(); filterLFOG.gain.value = 480;
-    filterLFO.connect(filterLFOG).connect(filter.frequency);
-    filterLFO.start();
-
-    // (2) Delay time drift: spatial bloom depth slowly morphs
-    const delayLFO = ctx.createOscillator();
-    delayLFO.type = 'sine'; delayLFO.frequency.value = 1 / 210;
-    const delayLFOG = ctx.createGain(); delayLFOG.gain.value = 0.18;
-    delayLFO.connect(delayLFOG).connect(delay.delayTime);
-    delayLFO.start();
-
-    // (3) Master volume long-period swell (subtle)
-    const volLFO = ctx.createOscillator();
-    volLFO.type = 'sine'; volLFO.frequency.value = 1 / 290;
-    const volLFOG = ctx.createGain(); volLFOG.gain.value = 0.018;
-    volLFO.connect(volLFOG).connect(master.gain);
-    volLFO.start();
-
-    // A minor pentatonic over base 110 Hz — matches Penrose 5-fold symmetry
-    const baseFreqs = [55, 110, 130.81, 146.83, 164.81, 196.00, 220, 261.63];
-    const oscs = [];
-    for (let i = 0; i < baseFreqs.length; i++) {
-      const f = baseFreqs[i];
-      const osc = ctx.createOscillator();
-      osc.type = (i === 0) ? 'triangle' : 'sine';
-      osc.frequency.value = f;
-      const g = ctx.createGain(); g.gain.value = 0;
-      // Fast LFO on volume — voice breathing (seconds)
-      const lfo = ctx.createOscillator();
-      lfo.type = 'sine'; lfo.frequency.value = 0.04 + Math.random() * 0.08;
-      const lfoG = ctx.createGain(); lfoG.gain.value = 0.06;
-      lfo.connect(lfoG).connect(g.gain);
-      // DC offset to keep gain mostly positive; quieter for higher voices
-      const dc = ctx.createConstantSource();
-      dc.offset.value = 0.10 / Math.sqrt(i + 1);
-      dc.connect(g.gain);
-      // Per-voice slow detune — each voice swims at unique non-commensurate
-      // period 90–270s. Creates beating patterns and shifting harmonic
-      // relationships at minute scale; barely perceptible per-cycle but
-      // builds genuine long-term evolution.
-      const slowDetune = ctx.createOscillator();
-      slowDetune.type = 'sine';
-      slowDetune.frequency.value = 1 / (90 + i * 22 + Math.random() * 30);
-      const slowDetuneG = ctx.createGain(); slowDetuneG.gain.value = 7;
-      slowDetune.connect(slowDetuneG).connect(osc.detune);
-      slowDetune.start();
-      osc.connect(g);
-      g.connect(filter); g.connect(delay);
-      osc.start(); lfo.start(); dc.start();
-      oscs.push({ osc, lfo, dc, slowDetune });
-    }
-
-    return {
-      stop: () => {
-        const now = ctx.currentTime;
-        master.gain.cancelScheduledValues(now);
-        master.gain.setValueAtTime(master.gain.value, now);
-        master.gain.linearRampToValueAtTime(0, now + 1.5);
-        setTimeout(() => {
-          [filterLFO, delayLFO, volLFO].forEach(o => { try { o.stop(); } catch(e){} });
-          oscs.forEach(o => { try { o.osc.stop(); o.lfo.stop(); o.dc.stop(); o.slowDetune.stop(); } catch(e){} });
-          ctx.close().catch(() => {});
-        }, 1700);
-      }
-    };
-  }
 
   // ===== demo: fullscreen + ambientní dron + auto kamera po zastávkách =====
   let demoState = null;
 
-  // TWIST-J identities shown as full-screen presentation cards during demo.
-  // Same set + order as the main twistj.com page, keeps the narrative.
-  const TWIST_J_IDENTITIES = [
-    { label: 'axiom',          eq: 'J = 1 + j²',                       coords: '= (1, 0, 1, 0)'   },
-    { label: 'polar',          eq: 'J = e<sup>i · 2π/5</sup> / φ',     coords: ''                  },
-    { label: 'inverse',        eq: 'J⁻¹ = −j − j²',                    coords: '= (0, −1, −1, 0)' },
-    { label: 'golden',         eq: 'φ = −j² − j³',                     coords: '= (0, 0, −1, −1)' },
-    { label: 'bridge',         eq: 'J · φ = j',                        coords: ''                  },
-    { label: 'cubic',          eq: '(J − 1)³ = j',                     coords: ''                  },
-    { label: 'quintic',        eq: 'J⁵ = φ⁻⁵',                         coords: ''                  },
-    { label: 'golden decadic', eq: '{1, j, j², j³, j⁴} × {1, φ}',      coords: ''                  }
-  ];
-  const IDENTITY_VISIBLE_MS = 4500;
-  const IDENTITY_PERIOD_MIN = 10000;
-  const IDENTITY_PERIOD_MAX = 20000;
-
-  function showIdentity(idx) {
-    const id = TWIST_J_IDENTITIES[idx];
-    document.getElementById('demoOverlayLabel').textContent = id.label;
-    document.getElementById('demoOverlayEq').innerHTML = id.eq +
-      (id.coords ? '<span class="demo-overlay-coords">' + id.coords + '</span>' : '');
-    document.getElementById('demoOverlay').classList.add('show');
-  }
-  function hideIdentity() {
-    document.getElementById('demoOverlay').classList.remove('show');
-  }
 
   // Riff-player state helpers: gating zvuku v demu řídí stav riff přehrávače.
   function isRiffPlaying() {
@@ -967,8 +841,6 @@
       st.stopIdx = (st.stopIdx + 1) % DEMO_STOPS.length;
       st.t0 = now; t = 0;
       currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
-      showToast(DEMO_STOPS[st.stopIdx].name + ' &nbsp;·&nbsp; ' +
-        SCHEME_NAMES[currentScheme], 2600);
     }
     const cur = DEMO_STOPS[st.stopIdx];
     const sm = u => u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u);
@@ -1007,59 +879,35 @@
     document.body.classList.add('showcase');
     fitSize();
 
-    // Gating zvuku: riff toggle na stránce je hlavní vypínač. Když hrál,
-    // demo ho nahradí vlastním ambientním dronem a po konci ho vrátí.
-    const audioWanted = isRiffPlaying();
-    if (audioWanted) toggleRiff();
-    const audio = audioWanted ? startAmbientAudio() : null;
+    // Zvuk v demu je defaultně zapnutý: hraje hlavní riff engine
+    // (preset zvolený v přehrávači, default drift). Když už hrál,
+    // necháme ho; když ne, zapneme a po konci dema zase vypneme.
+    const audioStarted = !isRiffPlaying();
+    if (audioStarted) toggleRiff();
 
     demoState = {
-      audio,
-      restoreRiff: audioWanted,
+      audioStarted,
       stopIdx: 0,
       prev: { x: home.cx, y: home.cy },
       t0: performance.now(),
       rs: 0.45,
       holdRendered: false,
-      raf: 0,
-      identityIdx: 0,
-      identityShowTimer: null,
-      identityHideTimer: null
+      raf: 0
     };
     demoState.raf = requestAnimationFrame(demoStep);
-    showToast('demo · <kbd>Esc</kbd> ven' +
-      (audioWanted ? '' : ' &nbsp;·&nbsp; bez zvuku'), 2500);
-
-    function cycleIdentity() {
-      if (!demoState) return;
-      showIdentity(demoState.identityIdx);
-      demoState.identityIdx =
-        (demoState.identityIdx + 1) % TWIST_J_IDENTITIES.length;
-      demoState.identityHideTimer = setTimeout(() => {
-        if (demoState) hideIdentity();
-      }, IDENTITY_VISIBLE_MS);
-      const period = IDENTITY_PERIOD_MIN +
-        Math.random() * (IDENTITY_PERIOD_MAX - IDENTITY_PERIOD_MIN);
-      demoState.identityShowTimer = setTimeout(cycleIdentity, period);
-    }
-    demoState.identityShowTimer = setTimeout(cycleIdentity, 4000 + Math.random() * 2000);
   }
 
   function stopDemo() {
     if (!demoState) return;
     cancelAnimationFrame(demoState.raf);
-    if (demoState.audio) demoState.audio.stop();
-    if (demoState.identityShowTimer) clearTimeout(demoState.identityShowTimer);
-    if (demoState.identityHideTimer) clearTimeout(demoState.identityHideTimer);
-    const restoreRiff = demoState.restoreRiff;
+    const audioStarted = demoState.audioStarted;
     demoState = null;
-    hideIdentity();
     document.body.classList.remove('showcase', 'immersive');
     exitFS();
     Object.assign(view, home);
     fitSize();
     render(1);
-    if (restoreRiff) toggleRiff();
+    if (audioStarted && isRiffPlaying()) toggleRiff();
   }
   function toggleDemo() { if (demoState) stopDemo(); else startDemo(); }
 
