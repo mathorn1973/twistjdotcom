@@ -544,17 +544,42 @@
 
   // ===== schémata barev =====
   // každé dostane t = i/m a stín s = 1 - t^6 (stáhne tělo do černé)
-  const SCHEMES = ['sepie', 'priroda', 'strakata', 'psycho', 'pulnoc'];
+  const SCHEMES = ['sepie', 'priroda', 'atol', 'strakata', 'psycho', 'pulnoc'];
   const SCHEME_NAMES = {
     sepie:   'sépie · chiaroscuro',
     priroda: 'příroda · les a hlína',
+    atol:    'atol · laguna a korál',
     strakata:'strakatá · zlato, měděnka, lazur',
     psycho:  'psychedelická · spektrum',
     pulnoc:  'půlnoc'
   };
+  // Paleta atolu: pevné barevné zastávky, mezi nimi lineární přechod.
+  // Vnitřek (t = 1) není černý, končí v hlubinné mořské modři.
+  const ATOL_STOPS = [
+    [0.00, 243, 235, 213],   // korálový písek
+    [0.16, 138, 217, 201],   // mělčina
+    [0.34,  24, 158, 170],   // tyrkys laguny
+    [0.50, 235, 171, 122],   // korálová lavice
+    [0.66,  18, 121, 148],   // reef
+    [0.84, 233, 130, 105],   // korál
+    [1.00,  13,  54, 102]    // hlubina
+  ];
+  const ATOL = new Array(768);
+  for (let k = 0; k < 256; k++) {
+    const t = k / 255;
+    let j = 0;
+    while (j < ATOL_STOPS.length - 2 && t > ATOL_STOPS[j + 1][0]) j++;
+    const A = ATOL_STOPS[j], B = ATOL_STOPS[j + 1];
+    const u = (t - A[0]) / (B[0] - A[0]);
+    for (let c = 0; c < 3; c++)
+      ATOL[3 * k + c] = Math.round(A[c + 1] + (B[c + 1] - A[c + 1]) * u);
+  }
+
   const SHADERS = {
     sepie:    (t, s, D, q) => { const v = 230 - 130*t, o = -90*t*t;
       D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
+    atol:     (t, s, D, q) => { const k = 3 * Math.min(255, (t * 255) | 0);
+      D[q] = ATOL[k]; D[q+1] = ATOL[k+1]; D[q+2] = ATOL[k+2]; },
     priroda:  (t, s, D, q) => { const w = 14*t;
       D[q]   = (170-120*t+45*Math.sin(w+4.5))*s;
       D[q+1] = (205-110*t+45*Math.sin(w+0.6))*s;
@@ -611,6 +636,7 @@
   //    proměnná, zdvojení je sčítání a test úniku čte udržované T zadarmo.
   // SHADERS se serializují, jeden zdroj pravdy pro barvy.
   const workerSrc =
+    'const ATOL=[' + ATOL.join(',') + '];' +
     'const SHADERS={' +
     Object.entries(SHADERS).map(([k, f]) => k + ':' + f.toString()).join(',') +
     '};' +
@@ -662,7 +688,7 @@
 
   function render(rs) {         // asynchronně rozdej pásy bazénu
     if (inFlight) { wanted = Math.max(wanted, rs); return; }
-    const os = 1.2;             // overscan: počítá se kousek za okraj
+    const os = 1.35;            // overscan kryje i celý tik kolečka ven (1.25)
     const rw = Math.max(64, Math.round(W * rs * os));
     const rh = Math.max(48, Math.round(H * rs * os));
     const { cx, cy, scale } = view;
