@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mandelbrot · Fractal Explorer — twistj.com</title>
+<meta name="description" content="Fractal Explorer — Mandelbrot set as escape-time counting: z ↦ z² + c, time is a counter. Part of TWIST-J.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script>
+  // Apply saved theme as early as possible to avoid FOUC.
+  (function(){ var t = localStorage.getItem('twistj-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── Theme: light (parchment) ── */
+  :root {
+    --bg: #F0EDE6;
+    --canvas-bg: #FAF7F1;
+    --text: #1A1A1A;
+    --muted: #5C4A2E;
+    --accent: #B8860B;
+    --accent-hover: #8B6914;
+    --rule: rgba(26, 26, 26, 0.18);
+    --rule-soft: rgba(26, 26, 26, 0.06);
+    --accent-glow: rgba(184, 134, 11, 0.08);
+    --btn-bg: rgba(250, 247, 241, 0.92);
+    --btn-border: rgba(26, 26, 26, 0.3);
+    --toast-bg: rgba(26, 26, 26, 0.85);
+    --toast-text: #FAF7F1;
+    --toast-kbd-bg: rgba(184, 134, 11, 0.4);
+    --toast-kbd-border: rgba(250, 247, 241, 0.3);
+    --canvas-stroke: #1A1A1A;
+    --panel-bg: rgba(250, 247, 241, 0.95);
+    --panel-border: rgba(26, 26, 26, 0.18);
+    --slider-track: rgba(26, 26, 26, 0.22);
+    --select-bg: rgba(243, 240, 234, 0.9);
+    --select-text: #5C4A2E;
+  }
+  /* ── Theme: dark (matches main twistj.com palette) ── */
+  [data-theme="dark"] {
+    --bg: #1c1915;
+    --canvas-bg: #252118;
+    --text: #d4cfc6;
+    --muted: #9a9488;
+    --accent: #b08050;
+    --accent-hover: #c89066;
+    --rule: rgba(212, 207, 198, 0.16);
+    --rule-soft: rgba(212, 207, 198, 0.04);
+    --accent-glow: rgba(176, 128, 80, 0.10);
+    --btn-bg: rgba(37, 33, 24, 0.92);
+    --btn-border: rgba(212, 207, 198, 0.3);
+    --toast-bg: rgba(212, 207, 198, 0.92);
+    --toast-text: #1c1915;
+    --toast-kbd-bg: rgba(176, 128, 80, 0.4);
+    --toast-kbd-border: rgba(28, 25, 21, 0.3);
+    --canvas-stroke: #d4cfc6;
+    --panel-bg: rgba(28, 25, 21, 0.95);
+    --panel-border: rgba(212, 207, 198, 0.18);
+    --slider-track: rgba(212, 207, 198, 0.22);
+    --select-bg: rgba(37, 33, 24, 0.9);
+    --select-text: #9a9488;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+      --bg: #1c1915;
+      --canvas-bg: #252118;
+      --text: #d4cfc6;
+      --muted: #9a9488;
+      --accent: #b08050;
+      --accent-hover: #c89066;
+      --rule: rgba(212, 207, 198, 0.16);
+      --rule-soft: rgba(212, 207, 198, 0.04);
+      --accent-glow: rgba(176, 128, 80, 0.10);
+      --btn-bg: rgba(37, 33, 24, 0.92);
+      --btn-border: rgba(212, 207, 198, 0.3);
+      --toast-bg: rgba(212, 207, 198, 0.92);
+      --toast-text: #1c1915;
+      --toast-kbd-bg: rgba(176, 128, 80, 0.4);
+      --toast-kbd-border: rgba(28, 25, 21, 0.3);
+      --canvas-stroke: #d4cfc6;
+      --panel-bg: rgba(28, 25, 21, 0.95);
+      --panel-border: rgba(212, 207, 198, 0.18);
+      --slider-track: rgba(212, 207, 198, 0.22);
+      --select-bg: rgba(37, 33, 24, 0.9);
+      --select-text: #9a9488;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', 'Garamond', 'Hoefler Text', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+  .app { max-width: 1200px; margin: 0 auto; padding: 44px 24px 24px; }
+  header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    gap: 12px; flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Cinzel', 'Trajan Pro', 'Optima', serif;
+    font-size: 22px; font-weight: 500; letter-spacing: 0.16em;
+    margin: 0; text-transform: uppercase;
+  }
+  .subtitle {
+    font-style: italic; font-size: 14px; margin: 4px 0 0;
+    color: var(--muted); letter-spacing: 0.02em;
+  }
+  .info {
+    font-size: 11px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    color: var(--muted); text-align: right; font-variant-numeric: tabular-nums;
+    line-height: 1.55; letter-spacing: 0.02em;
+  }
+  .info b { color: var(--text); font-weight: 500; }
+  .canvas-wrap {
+    position: relative; background: var(--canvas-bg); border-radius: 1px;
+    box-shadow: 0 1px 2px var(--rule-soft), 0 4px 28px var(--accent-glow);
+    overflow: hidden; user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  canvas.dragging { cursor: grabbing; }
+  .loading {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-style: italic; font-size: 15px;
+    color: var(--muted); letter-spacing: 0.04em; background: var(--canvas-bg); z-index: 5;
+  }
+  .controls {
+    position: absolute; right: 14px; bottom: 14px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .controls button {
+    width: 36px; height: 36px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 0; padding: 0;
+    font-family: 'Cinzel', serif; font-size: 18px; line-height: 1;
+  }
+  .controls button:hover { background: var(--accent); color: var(--canvas-bg); }
+  .controls button:active { background: var(--accent-hover); }
+  #ssm, #slg { font-size: 13px; letter-spacing: -0.05em; }
+  footer {
+    margin-top: 14px; font-size: 13px; font-style: italic;
+    color: var(--muted); line-height: 1.5; letter-spacing: 0.01em;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer .count {
+    color: var(--text); font-style: normal; font-family: ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.04em;
+  }
+
+  /* back-link to main page (standard twistj.com pattern) */
+  .back-link {
+    position: fixed; top: 14px; left: 16px;
+    color: var(--muted);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    text-decoration: none; opacity: 0.65;
+    transition: color 0.2s, opacity 0.2s;
+    z-index: 50;
+  }
+  .back-link:hover { color: var(--accent); opacity: 1; }
+
+  /* theme toggle (matches storyteller pattern, smaller) */
+  .theme-toggle {
+    position: fixed; top: 12px; right: 14px;
+    width: 32px; height: 32px; padding: 0;
+    border: 1px solid var(--btn-border); border-radius: 50%;
+    background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 50;
+    transition: all 0.2s ease; opacity: 0.6;
+  }
+  .theme-toggle:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* ── Audio player (matches main page pattern) ── */
+  .audio-toggle {
+    position: fixed; top: 12px; right: 54px;
+    width: 32px; height: 32px;
+    border: 1px solid transparent; border-radius: 50%;
+    background: transparent; color: var(--muted);
+    opacity: 0.6; font-size: 1.05rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 50;
+    transition: all 0.3s ease; user-select: none;
+  }
+  .audio-toggle:hover { opacity: 1; color: var(--accent); }
+  .audio-toggle.playing {
+    opacity: 1; color: var(--accent);
+    border-color: var(--accent); background: var(--panel-bg);
+  }
+  .audio-panel {
+    position: fixed; top: 92px; right: 14px;
+    background: var(--panel-bg); border: 1px solid var(--panel-border);
+    border-radius: 8px; padding: 0.9rem 1.1rem;
+    z-index: 50;
+    display: flex; flex-direction: column; gap: 0.6rem;
+    min-width: 180px;
+    opacity: 0; transform: translateY(-8px); pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .audio-panel.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .audio-panel label {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 0.82rem; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: lowercase;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .audio-panel label span.val {
+    color: var(--text); font-size: 0.78rem;
+    min-width: 2.2rem; text-align: right;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  .audio-panel input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 90px; height: 3px;
+    background: var(--slider-track); border-radius: 2px;
+    outline: none; cursor: pointer;
+  }
+  .audio-panel input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .audio-panel input[type="range"]::-moz-range-thumb {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: none; cursor: pointer;
+  }
+  .audio-panel select {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 0.82rem; letter-spacing: 0.08em;
+    background: var(--select-bg); color: var(--select-text);
+    border: 1px solid var(--panel-border); border-radius: 4px;
+    padding: 3px 6px; cursor: pointer; outline: none;
+  }
+  .audio-panel select:focus { border-color: var(--accent); }
+  .audio-chevron {
+    position: fixed; top: 56px; right: 54px;
+    width: 32px; height: 24px;
+    text-align: center; font-size: 1.4rem; line-height: 24px;
+    color: var(--accent); opacity: 0;
+    cursor: pointer; z-index: 51;
+    transition: all 0.3s ease; user-select: none; pointer-events: none;
+  }
+  .audio-chevron.show { opacity: 0.7; pointer-events: auto; }
+  .audio-chevron.show:hover { opacity: 1; }
+  .audio-chevron.open { transform: rotate(180deg); }
+
+  @media (max-width: 600px) {
+    .app { padding: 40px 12px 16px; }
+    h1 { font-size: 18px; letter-spacing: 0.12em; }
+    .subtitle { font-size: 13px; }
+    .info { font-size: 10px; }
+    .back-link { top: 10px; left: 12px; }
+    .theme-toggle { top: 8px; right: 10px; width: 28px; height: 28px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    .audio-toggle { top: 8px; right: 44px; width: 28px; height: 28px; font-size: 0.95rem; }
+    .audio-chevron { top: 44px; right: 44px; width: 28px; }
+    .audio-panel { top: 76px; right: 10px; min-width: 160px; padding: 0.7rem 0.9rem; }
+  }
+
+  /* immersive: hide all UI chrome, canvas fills viewport */
+  body.immersive { background: var(--canvas-bg); overflow: hidden; }
+  body.immersive .app { max-width: none; padding: 0; height: 100vh; }
+  body.immersive header,
+  body.immersive footer,
+  body.immersive .controls,
+  body.immersive .loading,
+  body.immersive .back-link,
+  body.immersive .theme-toggle,
+  body.immersive .audio-toggle,
+  body.immersive .audio-panel,
+  body.immersive .audio-chevron { display: none !important; }
+  body.immersive .canvas-wrap {
+    position: fixed; inset: 0; box-shadow: none; border-radius: 0;
+    width: 100vw !important; height: 100vh !important;
+  }
+
+  /* showcase: same as immersive + hides cursor + has inertia */
+  body.showcase { background: var(--canvas-bg); overflow: hidden; }
+  body.showcase .app { max-width: none; padding: 0; height: 100vh; }
+  body.showcase header,
+  body.showcase footer,
+  body.showcase .controls,
+  body.showcase .loading,
+  body.showcase .back-link,
+  body.showcase .theme-toggle,
+  body.showcase .audio-toggle,
+  body.showcase .audio-panel,
+  body.showcase .audio-chevron { display: none !important; }
+  body.showcase .canvas-wrap {
+    position: fixed; inset: 0; box-shadow: none; border-radius: 0;
+    width: 100vw !important; height: 100vh !important;
+  }
+  body.showcase canvas,
+  body.showcase canvas.dragging { cursor: none !important; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%);
+    background: var(--toast-bg); color: var(--toast-text);
+    padding: 10px 18px; font-size: 13px; letter-spacing: 0.04em;
+    font-family: 'EB Garamond', serif;
+    border-radius: 2px; pointer-events: none;
+    opacity: 0; transition: opacity 0.4s;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .toast kbd {
+    display: inline-block; padding: 1px 6px;
+    background: var(--toast-kbd-bg);
+    border: 1px solid var(--toast-kbd-border);
+    border-radius: 2px; font-family: 'Cinzel', serif;
+    font-size: 11px; margin: 0 2px;
+  }
+
+  /* ── Demo identity overlay: full-screen presentation cards ── */
+  .demo-overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .demo-overlay.show { opacity: 1; }
+  /* Radial vignette in page bg color — dims the Penrose pattern behind
+     the text without fully hiding the periphery. Two stacked gradients:
+     a deeper inner one for readability, a soft outer one for blend. */
+  .demo-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 35% at center, var(--bg) 0%, transparent 100%),
+      radial-gradient(ellipse at center, var(--bg) 0%, transparent 70%);
+    opacity: 0.75;
+  }
+  .demo-overlay-content {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 0 6vw;
+    transform: translateY(28px) scale(0.96);
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .demo-overlay.show .demo-overlay-content {
+    transform: translateY(0) scale(1);
+  }
+  .demo-overlay-label {
+    font-family: 'Cinzel', 'Trajan Pro', 'Optima', serif;
+    font-size: clamp(13px, 1.9vw, 22px);
+    font-weight: 400;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-left: 0.5em;  /* offset trailing letter-spacing */
+    margin-bottom: clamp(22px, 4vh, 48px);
+    text-shadow: 0 0 30px var(--accent-glow);
+  }
+  .demo-overlay-eq {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(38px, 7.5vw, 104px);
+    letter-spacing: 0.005em;
+    color: var(--text);
+    line-height: 1.18;
+    /* Soft halo in the page bg color so the text reads cleanly against
+       busy tile patterns, in both light and dark themes. */
+    text-shadow:
+      0 0 14px var(--bg),
+      0 0 28px var(--bg),
+      0 2px 6px var(--bg);
+  }
+  .demo-overlay-eq sup {
+    font-size: 0.55em;
+    vertical-align: super;
+    line-height: 0;
+  }
+  .demo-overlay-coords {
+    display: inline-block;
+    margin-left: 0.5em;
+    color: var(--muted);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-style: normal;
+    font-size: 0.42em;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    opacity: 0.85;
+  }
+  @media (max-width: 600px) {
+    .demo-overlay-label { letter-spacing: 0.35em; }
+    .demo-overlay-eq { font-size: clamp(28px, 9vw, 56px); }
+  }
+</style>
+</head>
+<body>
+<a href="/" class="back-link">&#8592; twistj.com</a>
+<div class="audio-toggle" id="audioToggle" title="Toggle audio">&#x1f507;</div>
+<div class="audio-panel" id="audioPanel">
+  <label>volume <input type="range" id="audioVol" min="0" max="100" value="50"> <span class="val" id="audioVolVal">50</span></label>
+  <label>speed <input type="range" id="audioSpeed" min="0" max="100" value="51" step="1"> <span class="val" id="audioSpeedVal">10</span></label>
+  <label>riff
+    <select id="audioRiff">
+      <option value="calm">calm</option>
+      <option value="drift" selected>drift</option>
+      <option value="pulse">pulse</option>
+      <option value="storm">storm</option>
+      <option value="layers">layers</option>
+      <option value="weave">weave</option>
+    </select>
+  </label>
+</div>
+<div class="audio-chevron" id="audioChevron" title="Toggle controls">&#x25BE;</div>
+<button class="theme-toggle" id="themeToggle" title="Toggle theme: auto / light / dark" aria-label="Toggle theme">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+</button>
+<script>
+(function() {
+  const modes = ['auto', 'light', 'dark'];
+  const icons = {
+    auto:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M12 7a5 5 0 0 1 0 10z" fill="currentColor" opacity="0.4"/></svg>',
+    light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>',
+    dark:  '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>'
+  };
+  const titles = { auto: 'Theme: auto (follows system)', light: 'Theme: light', dark: 'Theme: dark' };
+  let current = localStorage.getItem('twistj-theme') || 'auto';
+  const btn = document.getElementById('themeToggle');
+  function apply(mode) {
+    current = mode;
+    localStorage.setItem('twistj-theme', mode);
+    if (mode === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', mode);
+    btn.innerHTML = icons[mode];
+    btn.title = titles[mode];
+    window.dispatchEvent(new CustomEvent('twistj-theme-changed'));
+  }
+  btn.addEventListener('click', function() { apply(modes[(modes.indexOf(current) + 1) % modes.length]); });
+  apply(current);
+  // React to system theme changes when in 'auto' mode
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      if (current === 'auto') window.dispatchEvent(new CustomEvent('twistj-theme-changed'));
+    });
+  }
+})();
+</script>
+<div class="app">
+  <header>
+    <div>
+      <h1>Mandelbrot · Fractal</h1>
+      <p class="subtitle">z ↦ z² + c &nbsp;·&nbsp; čas je počítadlo úniku</p>
+    </div>
+    <div class="info">
+      zoom · <b id="z">×1.0</b><br>
+      m · <b id="mi">120</b><br>
+      c · <b id="cc">−0.75 + 0.00i</b>
+    </div>
+  </header>
+  <div class="canvas-wrap" id="wrap">
+    <div class="loading" id="loading">Počítám časy úniku…</div>
+    <canvas id="cv"></canvas>
+    <div class="controls">
+      <button id="zin"  title="přiblížit (+)">+</button>
+      <button id="zout" title="oddálit (−)">−</button>
+      <button id="mup"  title="víc detailu (m)">⊕</button>
+      <button id="mdn"  title="míň detailu, rychleji">⊖</button>
+      <button id="rst"  title="výchozí (R)">↺</button>
+      <button id="clr"  title="schéma barev (C)">◐</button>
+      <button id="dmo"  title="demo (D)">▶</button>
+      <button id="fsb"  title="celá obrazovka (F)">⛶</button>
+      <button id="hid"  title="skrýt UI (H)">◉</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <footer>
+    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>H</kbd> · UI</span>
+    <span class="count" id="cnt">…</span>
+  </footer>
+</div>
+
+<!-- Demo identity overlay (visible only during demo mode) -->
+<div class="demo-overlay" id="demoOverlay" aria-hidden="true">
+  <div class="demo-overlay-content">
+    <div class="demo-overlay-label" id="demoOverlayLabel"></div>
+    <div class="demo-overlay-eq" id="demoOverlayEq"></div>
+  </div>
+</div>
+<!-- Schumann riff audio engine (shared with /jam/) -->
+<script src="audio.js"></script>
+<script>
+(()=>{
+  const RIFF_PRESETS={
+    calm:{tempo:5,reverb:0.95,breath:0.9,silence:0.7,wander:false,seed:0,vTM:[1,1,1,1,1]},
+    drift:{tempo:10,reverb:0.85,breath:0.75,silence:0.55,wander:false,seed:0,vTM:[1,1,1,1,1]},
+    pulse:{tempo:15,reverb:0.6,breath:0.45,silence:0.30,wander:false,seed:500,vTM:[1,1,1,1,1]},
+    storm:{tempo:25,reverb:0.4,breath:0.2,silence:0.10,wander:true,seed:1000,vTM:[1,1,1,1,1]},
+    layers:{tempo:10,reverb:0.93,breath:0.5,silence:0.08,wander:false,seed:200,vTM:[1,2/3,3/2,2,1/2]},
+    weave:{tempo:12,reverb:0.7,breath:0.35,silence:0.15,wander:true,seed:777,vTM:[1,5/3,3/5,4/3,3/4]}
+  };
+  const engine=TwistJ({tempo:10,reverb:0.85,breath:0.75,silence:0.55,wander:false});
+  let playing=false;
+  const btn=document.getElementById('audioToggle'),panel=document.getElementById('audioPanel');
+  const volS=document.getElementById('audioVol'),volV=document.getElementById('audioVolVal');
+  const spdS=document.getElementById('audioSpeed'),spdV=document.getElementById('audioSpeedVal');
+  const riffS=document.getElementById('audioRiff'),chev=document.getElementById('audioChevron');
+  let panelOpen=false;
+  function s2b(v){return Math.round(0.5*Math.pow(360,v/100)*10)/10;}
+  function b2s(b){return Math.round(100*Math.log(b/0.5)/Math.log(360));}
+  function preset(n){const p=RIFF_PRESETS[n];if(!p)return;spdS.value=b2s(p.tempo);spdV.textContent=p.tempo;engine.forceAllVoices(n==='layers'||n==='weave');engine.set({reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,tempo:p.tempo,vTM:p.vTM||[1,1,1,1,1]});if(playing){engine.stop();engine.forceAllVoices(n==='layers'||n==='weave');engine.start(p.seed);}}
+  btn.addEventListener('click',()=>{
+    if(!playing){playing=true;const ks=Object.keys(RIFF_PRESETS),rk=ks[Math.floor(Math.random()*ks.length)];riffS.value=rk;const p=RIFF_PRESETS[rk];engine.forceAllVoices(rk==='layers'||rk==='weave');engine.set({tempo:s2b(spdS.value),reverb:p.reverb,breath:p.breath,silence:p.silence,wander:p.wander,vTM:p.vTM||[1,1,1,1,1]});engine.start(p.seed);if(engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);btn.textContent='\u{1f50a}';btn.classList.add('playing');chev.classList.add('show');panel.classList.add('visible');chev.classList.add('open');panelOpen=true;}
+    else{playing=false;engine.stop();btn.textContent='\u{1f507}';btn.classList.remove('playing');panel.classList.remove('visible');chev.classList.remove('show','open');panelOpen=false;}
+  });
+  chev.addEventListener('click',()=>{panelOpen=!panelOpen;panel.classList.toggle('visible',panelOpen);chev.classList.toggle('open',panelOpen);});
+  volS.addEventListener('input',()=>{volV.textContent=volS.value;if(playing&&engine._master)engine._master.gain.setTargetAtTime((volS.value/100)*0.7,engine._ax.currentTime,0.05);});
+  spdS.addEventListener('input',()=>{const b=s2b(spdS.value);spdV.textContent=b<10?b.toFixed(1):Math.round(b);engine.setTempo(b);});
+  riffS.addEventListener('change',()=>{preset(riffS.value);});
+})();
+</script>
+
+<script>
+(() => {
+  // ===== stav pohledu =====
+  const home = { cx: -0.75, cy: 0, scale: 3 };
+  const view = { ...home };
+  let boost = 0;                       // ruční doladění detailu nad automatiku
+  const SCALE_MIN = 3e-13;             // hranice přesnosti double
+  const SCALE_MAX = 6;
+
+  // m roste plynule s hloubkou zoomu (logaritmicky)
+  function mFor(scale) {
+    return Math.max(60, Math.min(4000,
+      Math.round(120 + 55 * Math.log2(3 / scale)) + boost));
+  }
+
+  // ===== schémata barev =====
+  // každé dostane t = i/m a stín s = 1 - t^6 (stáhne tělo do černé)
+  const SCHEMES = ['sepie', 'strakata', 'priroda', 'inkoust', 'pulnoc'];
+  const SCHEME_NAMES = {
+    sepie:    'sépie · chiaroscuro',
+    strakata: 'strakatá · zlato a lazur',
+    priroda:  'příroda · pastel',
+    inkoust:  'inkoust',
+    pulnoc:   'půlnoc'
+  };
+  const SHADERS = {
+    sepie:    (t, s, D, q) => { const v = 230 - 130*t, o = -90*t*t;
+      D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
+    strakata: (t, s, D, q) => { const v = 230 - 130*t, o = t*90*Math.sin(t*30);
+      D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
+    priroda:  (t, s, D, q) => {
+      D[q] = (238-88*t)*s; D[q+1] = (228-133*t)*s; D[q+2] = (205-145*t)*s; },
+    inkoust:  (t, s, D, q) => { const v = 236 - 212*t;
+      D[q] = v*s; D[q+1] = (v*.97-3)*s; D[q+2] = (v*.92-6)*s; },
+    pulnoc:   (t, s, D, q) => { const u = t*t;
+      D[q] = (16+230*u)*s; D[q+1] = (20+150*u)*s; D[q+2] = (46+40*t)*s; }
+  };
+  let currentScheme = 'sepie';
+
+  // ===== plátno =====
+  const cv = document.getElementById('cv');
+  const wrap = document.getElementById('wrap');
+  const g = cv.getContext('2d');
+  const buf = document.createElement('canvas');   // mezikrok pro adaptivní rozlišení
+  const bg = buf.getContext('2d');
+  let W = 800, H = 600;
+  let firstRenderDone = false;
+
+  function fitSize() {
+    const fullViewport = document.body.classList.contains('immersive') ||
+                         document.body.classList.contains('showcase');
+    let bw, bh;
+    if (fullViewport) { bw = window.innerWidth; bh = window.innerHeight; wrap.style.height = ''; }
+    else {
+      bw = wrap.clientWidth || 800;
+      bh = Math.round(bw * 3 / 4);
+      wrap.style.height = bh + 'px';
+    }
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.min(1920, Math.round(bw * dpr));
+    H = Math.max(48, Math.round(W * bh / bw));
+    cv.width = W; cv.height = H;
+    requestRender(true);
+  }
+
+  // ===== render: z -> z² + c, tři násobení na krok přes (a+b)² =====
+  let lastDt = 40;
+  let lastM = 120;
+
+  function render(rs) {
+    const t0 = performance.now();
+    const rw = Math.max(64, Math.round(W * rs));
+    const rh = Math.max(48, Math.round(H * rs));
+    buf.width = rw; buf.height = rh;
+    const img = bg.createImageData(rw, rh);
+    const D = img.data;
+    const { cx, cy, scale } = view;
+    const m = demoState ? Math.min(mFor(scale), 650) : mFor(scale);
+    lastM = m;
+    const shade = SHADERS[currentScheme];
+    const ky = scale * (H / W);
+    const x0 = cx - scale / 2, y0 = cy - ky / 2;
+    for (let py = 0; py < rh; py++) {
+      const y = y0 + (py + .5) * ky / rh;
+      let q = 4 * py * rw;
+      for (let px = 0; px < rw; px++, q += 4) {
+        const x = x0 + (px + .5) * scale / rw;
+        let a = 0, b = 0, A = 0, B = 0, e = 0, i = 0;
+        while (A + B < 4 && i < m) {
+          a = A - B + x;        // Re(z²+c) = a² − b² + x
+          b = e - A - B + y;    // Im(z²+c) = 2ab + y = (a+b)² − a² − b² + y
+          A = a * a; B = b * b; e = (a + b) * (a + b);
+          i++;
+        }
+        const t = i / m, s = 1 - t**6;
+        shade(t, s, D, q);
+        D[q + 3] = 255;
+      }
+    }
+    bg.putImageData(img, 0, 0);
+    g.imageSmoothingEnabled = rs < 1;
+    g.clearRect(0, 0, W, H);
+    g.drawImage(buf, 0, 0, rw, rh, 0, 0, W, H);
+    lastDt = performance.now() - t0;
+    if (!firstRenderDone) {
+      firstRenderDone = true;
+      const l = document.getElementById('loading');
+      if (l) l.style.display = 'none';
+    }
+    updateInfo();
+  }
+
+  function updateInfo() {
+    const zoom = 3 / view.scale;
+    document.getElementById('z').textContent =
+      '×' + (zoom < 1000 ? zoom.toPrecision(3) : zoom.toExponential(2));
+    document.getElementById('mi').textContent = lastM;
+    const dg = Math.max(3, Math.min(14, Math.ceil(-Math.log10(view.scale)) + 3));
+    document.getElementById('cc').innerHTML =
+      view.cx.toFixed(dg) + (view.cy < 0 ? ' − ' : ' + ') +
+      Math.abs(view.cy).toFixed(dg) + 'i';
+    document.getElementById('cnt').textContent = Math.round(lastDt) + ' ms';
+  }
+
+  // ===== plánování: interaktivní hrubý snímek + tiché doostření =====
+  let queued = false, interRS = 0.4, refineT = null;
+  function requestRender(interactive) {
+    if (queued) return; queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      render(interactive ? interRS : 1);
+      if (interactive) {
+        if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
+        else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
+        scheduleRefine();
+      }
+    });
+  }
+  function scheduleRefine() {
+    if (refineT) clearTimeout(refineT);
+    refineT = setTimeout(() => { if (!demoState && !drag) render(1); }, 220);
+  }
+
+  // ===== interakce =====
+  function clampScale(s) { return Math.max(SCALE_MIN, Math.min(SCALE_MAX, s)); }
+  function pos(e) {
+    const r = cv.getBoundingClientRect();
+    return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
+  }
+  function zoomAt(mx, my, f) {
+    const k1 = view.scale * (H / W);
+    const ux = view.cx + (mx / W - .5) * view.scale;
+    const uy = view.cy + (my / H - .5) * k1;
+    view.scale = clampScale(view.scale * f);
+    const k2 = view.scale * (H / W);
+    view.cx = ux - (mx / W - .5) * view.scale;
+    view.cy = uy - (my / H - .5) * k2;
+    requestRender(true);
+  }
+
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (demoState) { stopDemo(); return; }
+    const [mx, my] = pos(e);
+    zoomAt(mx, my, e.deltaY < 0 ? 0.8 : 1.25);
+  }, { passive: false });
+
+  cv.addEventListener('dblclick', e => {
+    if (demoState) { stopDemo(); return; }
+    const [mx, my] = pos(e);
+    zoomAt(mx, my, 0.5);
+  });
+
+  // drag = posun (náhled posouvá hotový snímek, přepočet po puštění); 2 prsty = pinch
+  let drag = null;
+  const ptrs = new Map();
+  let pinchPrev = null;
+
+  cv.addEventListener('pointerdown', e => {
+    if (demoState) { stopDemo(); return; }
+    cv.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, pos(e));
+    if (ptrs.size === 1) {
+      const [mx, my] = pos(e);
+      drag = { mx, my, cx: view.cx, cy: view.cy };
+      cv.classList.add('dragging');
+    } else { drag = null; pinchPrev = null; }
+  });
+
+  cv.addEventListener('pointermove', e => {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId, pos(e));
+    if (ptrs.size === 2) {
+      const [p1, p2] = [...ptrs.values()];
+      const d = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
+      const mid = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
+      if (pinchPrev) zoomAt(mid[0], mid[1], pinchPrev / d);
+      pinchPrev = d;
+      return;
+    }
+    if (!drag) return;
+    const [mx, my] = pos(e);
+    const dx = mx - drag.mx, dy = my - drag.my;
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    g.drawImage(buf, dx, dy, W, H);
+  });
+
+  function endPointer(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (ptrs.size < 2) pinchPrev = null;
+    if (drag && ptrs.size === 0) {
+      const [mx, my] = pos(e);
+      const dx = mx - drag.mx, dy = my - drag.my;
+      if (Math.hypot(dx, dy) > 2) {
+        view.cx = drag.cx - dx / W * view.scale;
+        view.cy = drag.cy - dy / H * view.scale * (H / W);
+        requestRender(true);
+      } else { render(1); }
+      drag = null; cv.classList.remove('dragging');
+    }
+  }
+  cv.addEventListener('pointerup', endPointer);
+  cv.addEventListener('pointercancel', endPointer);
+
+  // ===== toast =====
+  const toastEl = document.getElementById('toast');
+  let toastTimer = null;
+  function showToast(html, ms) {
+    if (!toastEl) return;
+    toastEl.innerHTML = html;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms || 1800);
+  }
+
+  // ===== immersive (H) a fullscreen (F) =====
+  function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function enterFS() {
+    const el = document.documentElement;
+    const r = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (r) try { r.call(el).catch(() => {}); } catch (e) {}
+  }
+  function exitFS() {
+    const x = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fsEl() && x) try { x.call(document).catch(() => {}); } catch (e) {}
+  }
+  function toggleImmersive() {
+    document.body.classList.remove('showcase');
+    const was = document.body.classList.contains('immersive');
+    document.body.classList.toggle('immersive');
+    fitSize();
+    if (!was) showToast('<kbd>H</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+  }
+  function toggleFullscreen() {
+    if (fsEl()) { exitFS(); }
+    else {
+      document.body.classList.remove('showcase');
+      document.body.classList.add('immersive');
+      enterFS();
+      fitSize();
+      showToast('<kbd>F</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+    }
+  }
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev =>
+    document.addEventListener(ev, () => {
+      if (!fsEl()) {
+        if (demoState) { stopDemo(); }
+        else { document.body.classList.remove('immersive', 'showcase'); }
+      }
+      fitSize();
+    }));
+  function startAmbientAudio() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    let ctx;
+    try { ctx = new Ctx(); } catch(e) { return null; }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+    // Master with slow fade-in
+    const master = ctx.createGain();
+    master.gain.value = 0;
+    master.connect(ctx.destination);
+    master.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 3);
+
+    // Lowpass for warmth — base 1100 Hz, modulated by long-term LFO below
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 1100; filter.Q.value = 0.5;
+    filter.connect(master);
+
+    // Delay feedback for ambient bloom
+    const delay = ctx.createDelay(2);
+    delay.delayTime.value = 0.62;
+    const fb = ctx.createGain(); fb.gain.value = 0.48;
+    delay.connect(fb).connect(delay);
+    delay.connect(filter);
+
+    // ===== Long-term modulation: minute-scale evolution layer =====
+    // Three slow LFOs at non-commensurate periods (170s, 210s, 290s) so
+    // the combined modulation never exactly repeats. Subtle by design —
+    // listener feels evolution without recognizing the source.
+
+    // (1) Filter cutoff sweep: spectrum slowly opens (bright) and closes (dark)
+    const filterLFO = ctx.createOscillator();
+    filterLFO.type = 'sine'; filterLFO.frequency.value = 1 / 170;
+    const filterLFOG = ctx.createGain(); filterLFOG.gain.value = 480;
+    filterLFO.connect(filterLFOG).connect(filter.frequency);
+    filterLFO.start();
+
+    // (2) Delay time drift: spatial bloom depth slowly morphs
+    const delayLFO = ctx.createOscillator();
+    delayLFO.type = 'sine'; delayLFO.frequency.value = 1 / 210;
+    const delayLFOG = ctx.createGain(); delayLFOG.gain.value = 0.18;
+    delayLFO.connect(delayLFOG).connect(delay.delayTime);
+    delayLFO.start();
+
+    // (3) Master volume long-period swell (subtle)
+    const volLFO = ctx.createOscillator();
+    volLFO.type = 'sine'; volLFO.frequency.value = 1 / 290;
+    const volLFOG = ctx.createGain(); volLFOG.gain.value = 0.018;
+    volLFO.connect(volLFOG).connect(master.gain);
+    volLFO.start();
+
+    // A minor pentatonic over base 110 Hz — matches Penrose 5-fold symmetry
+    const baseFreqs = [55, 110, 130.81, 146.83, 164.81, 196.00, 220, 261.63];
+    const oscs = [];
+    for (let i = 0; i < baseFreqs.length; i++) {
+      const f = baseFreqs[i];
+      const osc = ctx.createOscillator();
+      osc.type = (i === 0) ? 'triangle' : 'sine';
+      osc.frequency.value = f;
+      const g = ctx.createGain(); g.gain.value = 0;
+      // Fast LFO on volume — voice breathing (seconds)
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine'; lfo.frequency.value = 0.04 + Math.random() * 0.08;
+      const lfoG = ctx.createGain(); lfoG.gain.value = 0.06;
+      lfo.connect(lfoG).connect(g.gain);
+      // DC offset to keep gain mostly positive; quieter for higher voices
+      const dc = ctx.createConstantSource();
+      dc.offset.value = 0.10 / Math.sqrt(i + 1);
+      dc.connect(g.gain);
+      // Per-voice slow detune — each voice swims at unique non-commensurate
+      // period 90–270s. Creates beating patterns and shifting harmonic
+      // relationships at minute scale; barely perceptible per-cycle but
+      // builds genuine long-term evolution.
+      const slowDetune = ctx.createOscillator();
+      slowDetune.type = 'sine';
+      slowDetune.frequency.value = 1 / (90 + i * 22 + Math.random() * 30);
+      const slowDetuneG = ctx.createGain(); slowDetuneG.gain.value = 7;
+      slowDetune.connect(slowDetuneG).connect(osc.detune);
+      slowDetune.start();
+      osc.connect(g);
+      g.connect(filter); g.connect(delay);
+      osc.start(); lfo.start(); dc.start();
+      oscs.push({ osc, lfo, dc, slowDetune });
+    }
+
+    return {
+      stop: () => {
+        const now = ctx.currentTime;
+        master.gain.cancelScheduledValues(now);
+        master.gain.setValueAtTime(master.gain.value, now);
+        master.gain.linearRampToValueAtTime(0, now + 1.5);
+        setTimeout(() => {
+          [filterLFO, delayLFO, volLFO].forEach(o => { try { o.stop(); } catch(e){} });
+          oscs.forEach(o => { try { o.osc.stop(); o.lfo.stop(); o.dc.stop(); o.slowDetune.stop(); } catch(e){} });
+          ctx.close().catch(() => {});
+        }, 1700);
+      }
+    };
+  }
+
+  // ===== demo: fullscreen + ambientní dron + auto kamera po zastávkách =====
+  let demoState = null;
+
+  // TWIST-J identities shown as full-screen presentation cards during demo.
+  // Same set + order as the main twistj.com page, keeps the narrative.
+  const TWIST_J_IDENTITIES = [
+    { label: 'axiom',          eq: 'J = 1 + j²',                       coords: '= (1, 0, 1, 0)'   },
+    { label: 'polar',          eq: 'J = e<sup>i · 2π/5</sup> / φ',     coords: ''                  },
+    { label: 'inverse',        eq: 'J⁻¹ = −j − j²',                    coords: '= (0, −1, −1, 0)' },
+    { label: 'golden',         eq: 'φ = −j² − j³',                     coords: '= (0, 0, −1, −1)' },
+    { label: 'bridge',         eq: 'J · φ = j',                        coords: ''                  },
+    { label: 'cubic',          eq: '(J − 1)³ = j',                     coords: ''                  },
+    { label: 'quintic',        eq: 'J⁵ = φ⁻⁵',                         coords: ''                  },
+    { label: 'golden decadic', eq: '{1, j, j², j³, j⁴} × {1, φ}',      coords: ''                  }
+  ];
+  const IDENTITY_VISIBLE_MS = 4500;
+  const IDENTITY_PERIOD_MIN = 10000;
+  const IDENTITY_PERIOD_MAX = 20000;
+
+  function showIdentity(idx) {
+    const id = TWIST_J_IDENTITIES[idx];
+    document.getElementById('demoOverlayLabel').textContent = id.label;
+    document.getElementById('demoOverlayEq').innerHTML = id.eq +
+      (id.coords ? '<span class="demo-overlay-coords">' + id.coords + '</span>' : '');
+    document.getElementById('demoOverlay').classList.add('show');
+  }
+  function hideIdentity() {
+    document.getElementById('demoOverlay').classList.remove('show');
+  }
+
+  // Riff-player state helpers: gating zvuku v demu řídí stav riff přehrávače.
+  function isRiffPlaying() {
+    const b = document.getElementById('audioToggle');
+    return !!(b && b.classList.contains('playing'));
+  }
+  function toggleRiff() {
+    const b = document.getElementById('audioToggle');
+    if (b) b.click();
+  }
+
+  // Zastávky prohlídky: pojmenovaná místa hranice, hloubka v bezpečí double.
+  const DEMO_STOPS = [
+    { x: -0.74548,   y: 0.11669,   minS: 4e-4, name: 'údolí mořských koníků' },
+    { x:  0.28443,   y: 0.01273,   minS: 5e-4, name: 'sloní údolí' },
+    { x: -1.7687773, y: 0.0017384, minS: 3e-4, name: 'mini Mandelbrot' },
+    { x: -0.7436439, y: 0.1318259, minS: 2e-4, name: 'Misiurewiczova spirála' },
+    { x: -0.15920,   y: 1.03275,   minS: 6e-4, name: 'anténa' },
+    { x: -0.7269,    y: 0.1889,    minS: 5e-4, name: 'dvojitá spirála' }
+  ];
+  const D_GAP = 3, D_IN = 22, D_HOLD = 6, D_OUT = 14;   // sekundy fází
+
+  function demoStep(now) {
+    if (!demoState) return;
+    const st = demoState;
+    let t = (now - st.t0) / 1000;
+    const total = D_GAP + D_IN + D_HOLD + D_OUT;
+    if (t >= total) {
+      st.prev = DEMO_STOPS[st.stopIdx];
+      st.stopIdx = (st.stopIdx + 1) % DEMO_STOPS.length;
+      st.t0 = now; t = 0;
+      currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
+      showToast(DEMO_STOPS[st.stopIdx].name + ' &nbsp;·&nbsp; ' +
+        SCHEME_NAMES[currentScheme], 2600);
+    }
+    const cur = DEMO_STOPS[st.stopIdx];
+    const sm = u => u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u);
+    let f = 0, cxT = cur.x, cyT = cur.y;
+    if (t < D_GAP) {
+      const u = sm(t / D_GAP), pv = st.prev;
+      cxT = pv.x + (cur.x - pv.x) * u;
+      cyT = pv.y + (cur.y - pv.y) * u;
+    } else if (t < D_GAP + D_IN) {
+      f = sm((t - D_GAP) / D_IN);
+    } else if (t < D_GAP + D_IN + D_HOLD) {
+      f = 1;
+    } else {
+      f = sm(1 - (t - D_GAP - D_IN - D_HOLD) / D_OUT);
+    }
+    const ln3 = Math.log(3);
+    view.scale = Math.exp(ln3 + (Math.log(cur.minS) - ln3) * f);
+    view.cx = cxT; view.cy = cyT;
+
+    const inHold = t >= D_GAP + D_IN && t < D_GAP + D_IN + D_HOLD;
+    if (inHold) {
+      if (!st.holdRendered) { render(0.9); st.holdRendered = true; }
+    } else {
+      st.holdRendered = false;
+      render(st.rs);
+      if (lastDt > 60) st.rs = Math.max(0.1, st.rs * 0.9);
+      else if (lastDt < 30) st.rs = Math.min(0.7, st.rs * 1.08);
+    }
+    st.raf = requestAnimationFrame(demoStep);
+  }
+
+  function startDemo() {
+    if (demoState) return;
+    enterFS();
+    document.body.classList.remove('immersive');
+    document.body.classList.add('showcase');
+    fitSize();
+
+    // Gating zvuku: riff toggle na stránce je hlavní vypínač. Když hrál,
+    // demo ho nahradí vlastním ambientním dronem a po konci ho vrátí.
+    const audioWanted = isRiffPlaying();
+    if (audioWanted) toggleRiff();
+    const audio = audioWanted ? startAmbientAudio() : null;
+
+    demoState = {
+      audio,
+      restoreRiff: audioWanted,
+      stopIdx: 0,
+      prev: { x: home.cx, y: home.cy },
+      t0: performance.now(),
+      rs: 0.45,
+      holdRendered: false,
+      raf: 0,
+      identityIdx: 0,
+      identityShowTimer: null,
+      identityHideTimer: null
+    };
+    demoState.raf = requestAnimationFrame(demoStep);
+    showToast('demo · <kbd>Esc</kbd> ven' +
+      (audioWanted ? '' : ' &nbsp;·&nbsp; bez zvuku'), 2500);
+
+    function cycleIdentity() {
+      if (!demoState) return;
+      showIdentity(demoState.identityIdx);
+      demoState.identityIdx =
+        (demoState.identityIdx + 1) % TWIST_J_IDENTITIES.length;
+      demoState.identityHideTimer = setTimeout(() => {
+        if (demoState) hideIdentity();
+      }, IDENTITY_VISIBLE_MS);
+      const period = IDENTITY_PERIOD_MIN +
+        Math.random() * (IDENTITY_PERIOD_MAX - IDENTITY_PERIOD_MIN);
+      demoState.identityShowTimer = setTimeout(cycleIdentity, period);
+    }
+    demoState.identityShowTimer = setTimeout(cycleIdentity, 4000 + Math.random() * 2000);
+  }
+
+  function stopDemo() {
+    if (!demoState) return;
+    cancelAnimationFrame(demoState.raf);
+    if (demoState.audio) demoState.audio.stop();
+    if (demoState.identityShowTimer) clearTimeout(demoState.identityShowTimer);
+    if (demoState.identityHideTimer) clearTimeout(demoState.identityHideTimer);
+    const restoreRiff = demoState.restoreRiff;
+    demoState = null;
+    hideIdentity();
+    document.body.classList.remove('showcase', 'immersive');
+    exitFS();
+    Object.assign(view, home);
+    fitSize();
+    render(1);
+    if (restoreRiff) toggleRiff();
+  }
+  function toggleDemo() { if (demoState) stopDemo(); else startDemo(); }
+
+  // ===== schéma barev =====
+  function cycleScheme() {
+    currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
+    showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2200);
+    if (!demoState) render(1);
+  }
+
+  // ===== tlačítka =====
+  document.getElementById('zin').addEventListener('click',  () => zoomAt(W/2, H/2, 0.6));
+  document.getElementById('zout').addEventListener('click', () => zoomAt(W/2, H/2, 1/0.6));
+  document.getElementById('mup').addEventListener('click',  () => { boost += 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
+  document.getElementById('mdn').addEventListener('click',  () => { boost -= 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
+  document.getElementById('rst').addEventListener('click',  () => { Object.assign(view, home); boost = 0; requestRender(true); });
+  document.getElementById('clr').addEventListener('click',  cycleScheme);
+  document.getElementById('dmo').addEventListener('click',  toggleDemo);
+  document.getElementById('fsb').addEventListener('click',  toggleFullscreen);
+  document.getElementById('hid').addEventListener('click',  toggleImmersive);
+
+  // ===== klávesnice =====
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (demoState) { e.preventDefault(); stopDemo(); return; }
+      if (document.body.classList.contains('immersive') ||
+          document.body.classList.contains('showcase')) {
+        document.body.classList.remove('immersive', 'showcase');
+        fitSize();
+      }
+      return;
+    }
+    const k = e.key.toLowerCase();
+    if (k === 'd') { e.preventDefault(); toggleDemo(); return; }
+    // jakákoli další klávesa za běhu dema demo ukončí
+    if (demoState) { e.preventDefault(); stopDemo(); return; }
+    if (k === '+' || k === '=') zoomAt(W/2, H/2, 0.6);
+    else if (k === '-') zoomAt(W/2, H/2, 1/0.6);
+    else if (k === 'c') cycleScheme();
+    else if (k === 'f') toggleFullscreen();
+    else if (k === 'h') toggleImmersive();
+    else if (k === 'r') { Object.assign(view, home); boost = 0; requestRender(true); }
+  });
+
+  // ===== start =====
+  let resizeT = null;
+  window.addEventListener('resize', () => {
+    if (resizeT) clearTimeout(resizeT);
+    resizeT = setTimeout(fitSize, 120);
+  });
+  fitSize();
+  setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen', 2800), 700);
+})();
+</script>
+</body>
+</html>
