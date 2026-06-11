@@ -704,9 +704,7 @@
       if (!interactive) { render(1); return; }
       blit();                              // okamžitá odezva z posledního snímku
       const now = performance.now();
-      // při zoom in drží zvětšený jemný snímek, dokud je ostřejší
-      // než hrubý přepočet; doostření v klidu ho pak vymění za plný
-      if (now - lastRenderAt > 110 && interRS > blitQuality() * 1.3) {
+      if (now - lastRenderAt > 110) {      // přepočet nejvýš ~9x za sekundu
         render(interRS);
         lastRenderAt = now;
         if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
