@@ -603,6 +603,9 @@
   const g = cv.getContext('2d');
   const buf = document.createElement('canvas');   // mezikrok pro adaptivní rozlišení
   const bg = buf.getContext('2d');
+  const anchor = document.createElement('canvas'); // kotva: poslední přehledový snímek
+  const an = anchor.getContext('2d');
+  let anchorView = null, anchorScheme = '';
   let W = 800, H = 600;
   let firstRenderDone = false;
 
@@ -696,7 +699,7 @@
     const sc = scale * os, ky = sc * (H / W);
     const x0 = cx - sc / 2, y0 = cy - ky / 2;
     const id = ++jobSeq;
-    inFlight = { id, cx, cy, sc, ky, rw, rh, m,
+    inFlight = { id, cx, cy, sc, ky, rw, rh, m, scheme: currentScheme,
                  parts: [], left: NW, t0: performance.now() };
     const bandRows = Math.ceil(rh / NW);
     for (let b = 0; b < NW; b++) {
@@ -719,6 +722,12 @@
     for (const p of meta.parts)
       bg.putImageData(new ImageData(new Uint8ClampedArray(p.pix), meta.rw, p.rows), 0, p.row0);
     bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw: meta.rw };
+    if (meta.sc > 3.9) {              // přehledový snímek: kotva pro okraje
+      anchor.width = buf.width; anchor.height = buf.height;
+      an.drawImage(buf, 0, 0);
+      anchorView = { ...bufView };
+      anchorScheme = meta.scheme;
+    }
     lastDt = performance.now() - meta.t0; lastM = meta.m;
     blit();
     if (!firstRenderDone) {
@@ -774,17 +783,21 @@
     return (bufView.rw / bufView.scale) * (view.scale / W);
   }
 
+  function project(img, v) {        // reprojekce snímku do aktuálního pohledu
+    const kv = view.scale * (H / W);
+    const dx = (v.cx - v.scale/2 - (view.cx - view.scale/2)) / view.scale * W;
+    const dy = (v.cy - v.k/2     - (view.cy - kv/2))         / kv * H;
+    g.drawImage(img, dx, dy, v.scale / view.scale * W, v.k / kv * H);
+  }
   function blit() {
     if (!bufView) return;
-    const kv = view.scale * (H / W);
-    const dx = (bufView.cx - bufView.scale/2 - (view.cx - view.scale/2)) / view.scale * W;
-    const dy = (bufView.cy - bufView.k/2     - (view.cy - kv/2))         / kv * H;
-    const dw = bufView.scale / view.scale * W;
-    const dh = bufView.k / kv * H;
     g.imageSmoothingEnabled = true;
     g.fillStyle = edgeColor();
     g.fillRect(0, 0, W, H);
-    g.drawImage(buf, dx, dy, dw, dh);
+    // kotva pod aktuálním snímkem: odkryté okraje ukážou hrubý fraktál,
+    // ne prázdnou barvu; při krytém pohledu je neviditelná
+    if (anchorView && anchorScheme === currentScheme) project(anchor, anchorView);
+    project(buf, bufView);
   }
 
   // ===== plánování: blit každý snímek, výpočty asynchronně ve workeru =====
