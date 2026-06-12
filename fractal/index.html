@@ -604,9 +604,11 @@
   const g = cv.getContext('2d');
   const buf = document.createElement('canvas');   // mezikrok pro adaptivní rozlišení
   const bg = buf.getContext('2d');
-  const anchor = document.createElement('canvas'); // kotva: poslední přehledový snímek
-  const an = anchor.getContext('2d');
-  let anchorView = null, anchorScheme = '';
+  const anchors = {};       // schéma -> { canvas, view }: přehledové kotvy okrajů
+  function anchorFor(sch) {
+    if (!anchors[sch]) anchors[sch] = { canvas: document.createElement('canvas'), view: null };
+    return anchors[sch];
+  }
   let W = 800, H = 600;
   let firstRenderDone = false;
 
@@ -686,6 +688,33 @@
     pool.push(w);
   }
 
+  // chybějící kotvu schématu tiše dopočítá vyhrazený worker,
+  // aby zoom out měl kryté okraje hned po přepnutí barev v hloubce
+  const anchorWorker = new Worker(wUrl);
+  let anchorJob = null;
+  anchorWorker.onmessage = e => {
+    const { rw, rows, pix } = e.data;
+    if (!anchorJob) return;
+    const A = anchorFor(anchorJob.scheme);
+    A.canvas.width = rw; A.canvas.height = rows;
+    A.canvas.getContext('2d').putImageData(
+      new ImageData(new Uint8ClampedArray(pix), rw, rows), 0, 0);
+    A.view = anchorJob.view;
+    anchorJob = null;
+    blit();
+  };
+  function ensureAnchor() {
+    const sch = currentScheme;
+    if ((anchors[sch] && anchors[sch].view) ||
+        (anchorJob && anchorJob.scheme === sch)) return;
+    const os = 1.35, scale = 3, cx = -0.75, cy = 0;
+    const sc = scale * os, ky = sc * (H / W);
+    const rw = 512, rh = Math.max(48, Math.round(rw * H / W));
+    anchorJob = { scheme: sch, view: { cx, cy, scale: sc, k: ky, rw } };
+    anchorWorker.postMessage({ id: -1, band: 0, rw, rows: rh, row0: 0, rhT: rh,
+      x0: cx - sc / 2, y0: cy - ky / 2, sc, ky, m: 160, scheme: sch });
+  }
+
   let inFlight = null;          // { id, ..., parts, left, t0 }
   let wanted = 0;               // rs další úlohy po dokončení, 0 = nic
   let jobSeq = 0;
@@ -719,18 +748,32 @@
     if (--inFlight.left > 0) return;
     // všechny pásy doletěly: slož snímek
     const meta = inFlight; inFlight = null;
-    buf.width = meta.rw; buf.height = meta.rh;
-    for (const p of meta.parts)
-      bg.putImageData(new ImageData(new Uint8ClampedArray(p.pix), meta.rw, p.rows), 0, p.row0);
-    bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw: meta.rw };
-    if (meta.sc > 3.9) {              // přehledový snímek: kotva pro okraje
-      anchor.width = buf.width; anchor.height = buf.height;
-      an.drawImage(buf, 0, 0);
-      anchorView = { ...bufView };
-      anchorScheme = meta.scheme;
+    // monotónnost kvality: dolet, který by zobrazený obraz zhrubil,
+    // se zahodí, dokud starý snímek aktuální pohled stále kryje.
+    // To zabíjí pulzování ostrý/hrubý/ostrý při plynulém zoomu.
+    const kv = view.scale * (H / W);
+    const covered = bufView &&
+      bufView.cx - bufView.scale/2 <= view.cx - view.scale/2 &&
+      bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
+      bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
+      bufView.cy + bufView.k/2     >= view.cy + kv/2;
+    const accept = !covered || meta.scheme !== bufScheme ||
+      meta.rw / meta.sc >= (bufView.rw / bufView.scale) * 0.98;
+    if (accept) {
+      buf.width = meta.rw; buf.height = meta.rh;
+      for (const p of meta.parts)
+        bg.putImageData(new ImageData(new Uint8ClampedArray(p.pix), meta.rw, p.rows), 0, p.row0);
+      bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw: meta.rw };
+      bufScheme = meta.scheme;
+      if (meta.sc > 3.9) {            // přehledový snímek: kotva pro okraje
+        const A = anchorFor(meta.scheme);
+        A.canvas.width = buf.width; A.canvas.height = buf.height;
+        A.canvas.getContext('2d').drawImage(buf, 0, 0);
+        A.view = { ...bufView };
+      }
+      blit();
     }
     lastDt = performance.now() - meta.t0; lastM = meta.m;
-    blit();
     if (!firstRenderDone) {
       firstRenderDone = true;
       const l = document.getElementById('loading');
@@ -739,11 +782,11 @@
     updateInfo();
     // adaptace rozlišení podle skutečného času snímku
     if (demoState) {
-      if (lastDt > 60) demoState.rs = Math.max(0.1, demoState.rs * 0.9);
-      else if (lastDt < 30) demoState.rs = Math.min(1, demoState.rs * 1.08);
+      if (lastDt > 75) demoState.rs = Math.max(0.1, demoState.rs * 0.92);
+      else if (lastDt < 35) demoState.rs = Math.min(1, demoState.rs * 1.05);
     } else {
-      if (lastDt > 80) interRS = Math.max(0.12, interRS * 0.85);
-      else if (lastDt < 30) interRS = Math.min(1, interRS * 1.1);
+      if (lastDt > 100) interRS = Math.max(0.12, interRS * 0.9);
+      else if (lastDt < 40) interRS = Math.min(1, interRS * 1.06);
     }
     if (wanted) { const r = wanted; wanted = 0; render(r); }
   }
@@ -762,6 +805,7 @@
 
   // ===== mezibuffer: reprojekce posledního snímku do nového pohledu =====
   let bufView = null;                 // pohled, ve kterém je buf spočítaný
+  let bufScheme = '';                 // schéma toho snímku
 
   function edgeColor() {              // barva exteriéru schématu (t = 0)
     const D = [0, 0, 0, 0];
@@ -797,7 +841,8 @@
     g.fillRect(0, 0, W, H);
     // kotva pod aktuálním snímkem: odkryté okraje ukážou hrubý fraktál,
     // ne prázdnou barvu; při krytém pohledu je neviditelná
-    if (anchorView && anchorScheme === currentScheme) project(anchor, anchorView);
+    const A = anchors[currentScheme];
+    if (A && A.view) project(A.canvas, A.view);
     project(buf, bufView);
   }
 
@@ -992,6 +1037,7 @@
       st.stopIdx = (st.stopIdx + 1) % DEMO_STOPS.length;
       st.t0 = now; t = 0;
       currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
+      ensureAnchor();
     }
     const cur = DEMO_STOPS[st.stopIdx];
     const sm = u => u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u);
@@ -1073,6 +1119,7 @@
   function cycleScheme() {
     currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
     showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2200);
+    ensureAnchor();
     if (!demoState) { render(1); syncHash(); }
   }
 
@@ -1215,6 +1262,7 @@
   });
   applyHash();
   fitSize();
+  ensureAnchor();
   if (wantAudio) {
     armAudioStart();
     setTimeout(() => showToast('zvuk ze sdíleného odkazu se spustí prvním dotykem', 3200), 700);
