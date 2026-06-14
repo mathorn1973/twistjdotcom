@@ -152,6 +152,24 @@
   }
   .controls button:hover { background: var(--accent); color: var(--canvas-bg); }
   .controls button:active { background: var(--accent-hover); }
+  .controls button.on { background: var(--accent); color: var(--canvas-bg); }
+  .juliabar {
+    position: absolute; left: 14px; bottom: 14px;
+    display: none; flex-direction: column; gap: 6px;
+    background: var(--btn-bg); border: 1px solid var(--btn-border);
+    padding: 10px 12px; font-size: 13px; color: var(--text);
+    letter-spacing: 0.01em; max-width: 200px;
+  }
+  .juliabar.show { display: flex; }
+  .juliabar label { display: flex; align-items: center; gap: 8px; }
+  .juliabar input {
+    flex: 1; width: 100%; min-width: 0;
+    background: var(--canvas-bg); border: 1px solid var(--btn-border);
+    color: var(--text); padding: 4px 6px; font-family: inherit; font-size: 13px;
+  }
+  .juliabar input:focus { outline: 1px solid var(--accent); }
+  .juliabar .jhint { font-style: italic; color: var(--muted); font-size: 11px; }
+  body.immersive .juliabar, body.showcase .juliabar { display: none !important; }
   #ssm, #slg { font-size: 13px; letter-spacing: -0.05em; }
   footer {
     margin-top: 14px; font-size: 13px; font-style: italic;
@@ -485,7 +503,13 @@
       <button id="dmo"  title="demo (D)">▶</button>
       <button id="fsb"  title="celá obrazovka (F)">⛶</button>
       <button id="shr"  title="sdílet odkaz (S)">⤴</button>
+      <button id="jul"  title="Julia / Mandelbrot (J)">✦</button>
       <button id="hid"  title="skrýt UI (H)">◉</button>
+    </div>
+    <div class="juliabar" id="juliabar">
+      <label>c<sub>Re</sub> <input type="text" id="jRe" inputmode="decimal" value="-0.8" spellcheck="false"></label>
+      <label>c<sub>Im</sub> <input type="text" id="jIm" inputmode="decimal" value="0.156" spellcheck="false"></label>
+      <span class="jhint">počáteční c &nbsp;·&nbsp; pixel = z₀</span>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -532,6 +556,8 @@
 (() => {
   // ===== stav pohledu =====
   const home = { cx: -0.75, cy: 0, scale: 3 };
+  // Julia: pevné c laditelné zvlášť Re/Im. Vypnuto = klasický Mandelbrot.
+  const julia = { on: false, cx: -0.8, cy: 0.156 };
   const view = { ...home };
   let boost = 0;                       // ruční doladění detailu nad automatiku
   const SCALE_MIN = 3e-13;             // hranice přesnosti double
@@ -605,9 +631,11 @@
   const buf = document.createElement('canvas');   // mezikrok pro adaptivní rozlišení
   const bg = buf.getContext('2d');
   const anchors = {};       // schéma -> { canvas, view }: přehledové kotvy okrajů
+  function anchorKey(sch) { return (julia.on ? 'J:' : 'M:') + sch; }
   function anchorFor(sch) {
-    if (!anchors[sch]) anchors[sch] = { canvas: document.createElement('canvas'), view: null };
-    return anchors[sch];
+    const key = anchorKey(sch);
+    if (!anchors[key]) anchors[key] = { canvas: document.createElement('canvas'), view: null };
+    return anchors[key];
   }
   let W = 800, H = 600;
   let firstRenderDone = false;
@@ -647,7 +675,7 @@
     Object.entries(SHADERS).map(([k, f]) => k + ':' + f.toString()).join(',') +
     '};' +
     'onmessage = e => {' +
-    '  const { id, band, rw, rows, row0, rhT, x0, y0, sc, ky, m, scheme } = e.data;' +
+    '  const { id, band, rw, rows, row0, rhT, x0, y0, sc, ky, m, scheme, jul, jx, jy } = e.data;' +
     '  const D = new Uint8ClampedArray(rw * rows * 4);' +
     '  const shade = SHADERS[scheme];' +
     '  for (let r = 0; r < rows; r++) {' +
@@ -657,15 +685,19 @@
     '    for (let px = 0; px < rw; px++, q += 4) {' +
     '      const x = x0 + (px + .5) * sc / rw;' +
     '      let i = 0;' +
-    '      const xq = x - 0.25, c2 = xq * xq + yy;' +
-    '      if (c2 * (c2 + xq) <= 0.25 * yy ||' +
-    '          (x + 1) * (x + 1) + yy <= 0.0625) {' +
-    '        i = m;' +
-    '      } else {' +
-    '        let a = 0, b = 0, A = 0, B = 0, T = 0;' +
-    '        let ca = 0, cb = 0, chk = 8;' +
+    '      let a, b, cx_, cy_;' +
+    '      if (jul) { a = x; b = y; cx_ = jx; cy_ = jy; }' +
+    '      else {' +
+    '        const xq = x - 0.25, c2 = xq * xq + yy;' +
+    '        if (c2 * (c2 + xq) <= 0.25 * yy ||' +
+    '            (x + 1) * (x + 1) + yy <= 0.0625) { i = m; }' +
+    '        a = 0; b = 0; cx_ = x; cy_ = y;' +
+    '      }' +
+    '      if (i < m) {' +
+    '        let A = a * a, B = b * b, T = A + B;' +
+    '        let ca = a, cb = b, chk = 8;' +
     '        while (T < 4 && i < m) {' +
-    '          b = (a + a) * b + y; a = A - B + x;' +
+    '          b = (a + a) * b + cy_; a = A - B + cx_;' +
     '          A = a * a; B = b * b; T = A + B;' +
     '          i++;' +
     '          if (Math.abs(a - ca) < 1e-13 && Math.abs(b - cb) < 1e-13) { i = m; break; }' +
@@ -705,14 +737,17 @@
   };
   function ensureAnchor() {
     const sch = currentScheme;
-    if ((anchors[sch] && anchors[sch].view) ||
-        (anchorJob && anchorJob.scheme === sch)) return;
-    const os = 1.35, scale = 3, cx = -0.75, cy = 0;
+    const ak = anchorFor(sch);
+    if (ak.view || (anchorJob && anchorJob.scheme === sch && anchorJob.jul === julia.on)) return;
+    const os = 1.35, scale = 3;
+    const cx = julia.on ? 0 : -0.75, cy = 0;
     const sc = scale * os, ky = sc * (H / W);
     const rw = 512, rh = Math.max(48, Math.round(rw * H / W));
-    anchorJob = { scheme: sch, view: { cx, cy, scale: sc, k: ky, rw } };
+    anchorJob = { scheme: sch, jul: julia.on, view: { cx, cy, scale: sc, k: ky, rw } };
     anchorWorker.postMessage({ id: -1, band: 0, rw, rows: rh, row0: 0, rhT: rh,
-      x0: cx - sc / 2, y0: cy - ky / 2, sc, ky, m: 160, scheme: sch });
+      x0: cx - sc / 2, y0: cy - ky / 2, sc, ky, m: 160, scheme: sch,
+      jul: julia.on, jx: julia.cx, jy: julia.cy });
+    if (julia.on) anchorJob.jul = true;
   }
 
   let inFlight = null;          // { id, ..., parts, left, t0 }
@@ -737,7 +772,8 @@
       const rows = Math.min(bandRows, rh - row0);
       if (rows <= 0) { inFlight.left--; continue; }
       pool[b].postMessage({ id, band: b, rw, rows, row0, rhT: rh,
-                            x0, y0, sc, ky, m, scheme: currentScheme });
+                            x0, y0, sc, ky, m, scheme: currentScheme,
+                            jul: julia.on, jx: julia.cx, jy: julia.cy });
     }
   }
 
@@ -797,9 +833,14 @@
       '×' + (zoom < 1000 ? zoom.toPrecision(3) : zoom.toExponential(2));
     document.getElementById('mi').textContent = lastM;
     const dg = Math.max(3, Math.min(14, Math.ceil(-Math.log10(view.scale)) + 3));
-    document.getElementById('cc').innerHTML =
-      view.cx.toFixed(dg) + (view.cy < 0 ? ' − ' : ' + ') +
-      Math.abs(view.cy).toFixed(dg) + 'i';
+    if (julia.on) {
+      document.getElementById('cc').innerHTML =
+        'c ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i';
+    } else {
+      document.getElementById('cc').innerHTML =
+        view.cx.toFixed(dg) + (view.cy < 0 ? ' − ' : ' + ') +
+        Math.abs(view.cy).toFixed(dg) + 'i';
+    }
     document.getElementById('cnt').textContent = Math.round(lastDt) + ' ms';
   }
 
@@ -841,7 +882,7 @@
     g.fillRect(0, 0, W, H);
     // kotva pod aktuálním snímkem: odkryté okraje ukážou hrubý fraktál,
     // ne prázdnou barvu; při krytém pohledu je neviditelná
-    const A = anchors[currentScheme];
+    const A = anchors[anchorKey(currentScheme)];
     if (A && A.view) project(A.canvas, A.view);
     project(buf, bufView);
   }
@@ -1132,6 +1173,11 @@
     p.set('y', String(view.cy));
     p.set('s', String(Number(view.scale.toPrecision(6))));
     if (boost) p.set('b', String(boost));
+    if (julia.on) {                         // počáteční c, jen v Julia režimu
+      p.set('j', '1');
+      p.set('jr', String(julia.cx));
+      p.set('ji', String(julia.cy));
+    }
     if (currentScheme !== 'sepie') p.set('c', currentScheme);
     if (isRiffPlaying()) p.set('a', '1');
     const r = document.getElementById('audioRiff');
@@ -1153,6 +1199,11 @@
     if (isFinite(fs)) { view.scale = clampScale(fs); any = true; }
     const fb = parseInt(p.get('b'), 10);
     if (isFinite(fb)) boost = fb;
+    // počáteční c: zpětně kompatibilní, bez klíče j zůstává Mandelbrot
+    const jr = parseFloat(p.get('jr')), ji = parseFloat(p.get('ji'));
+    if (isFinite(jr)) julia.cx = jr;
+    if (isFinite(ji)) julia.cy = ji;
+    julia.on = p.get('j') === '1';
     const c = p.get('c');
     if (c && SHADERS[c]) currentScheme = c;
     const r = p.get('r'), rs = document.getElementById('audioRiff');
@@ -1218,12 +1269,55 @@
   const at = document.getElementById('audioToggle');
   if (at) at.addEventListener('click', syncHash);
 
+  // ===== Julia: pevné c, pixel je z0 =====
+  const JULIA_HOME = { cx: 0, cy: 0, scale: 3 };   // Julia množina sedí kolem 0
+  function homeView() { return julia.on ? JULIA_HOME : home; }
+  function fmtNum(v) {                              // krátký, ale přesný zápis
+    const s = String(v);
+    return s.length > 12 ? Number(v.toPrecision(8)).toString() : s;
+  }
+  function refreshJuliaInputs() {
+    const re = document.getElementById('jRe'), im = document.getElementById('jIm');
+    if (re) re.value = fmtNum(julia.cx);
+    if (im) im.value = fmtNum(julia.cy);
+  }
+  function setJulia(on, keepView) {
+    const was = julia.on;
+    julia.on = on;
+    document.getElementById('jul').classList.toggle('on', on);
+    document.getElementById('juliabar').classList.toggle('show', on);
+    if (was !== on && !keepView) { Object.assign(view, homeView()); boost = 0; }
+    ensureAnchor();
+    requestRender(true);
+    syncHash();
+  }
+  function toggleJulia() {
+    setJulia(!julia.on);
+    showToast(julia.on
+      ? 'Julia · c = ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i'
+      : 'Mandelbrot', 2200);
+  }
+  function commitJuliaInput() {
+    const re = parseFloat(document.getElementById('jRe').value.replace(',', '.'));
+    const im = parseFloat(document.getElementById('jIm').value.replace(',', '.'));
+    if (isFinite(re)) julia.cx = re;
+    if (isFinite(im)) julia.cy = im;
+    if (!julia.on) setJulia(true);
+    else { ensureAnchor(); requestRender(true); syncHash(); }
+  }
+  ['jRe', 'jIm'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('change', commitJuliaInput);
+    el.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); el.blur(); commitJuliaInput(); } });
+  });
+  document.getElementById('jul').addEventListener('click', toggleJulia);
+
   // ===== tlačítka =====
   document.getElementById('zin').addEventListener('click',  () => zoomAt(W/2, H/2, 0.6));
   document.getElementById('zout').addEventListener('click', () => zoomAt(W/2, H/2, 1/0.6));
   document.getElementById('mup').addEventListener('click',  () => { boost += 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
   document.getElementById('mdn').addEventListener('click',  () => { boost -= 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
-  document.getElementById('rst').addEventListener('click',  () => { Object.assign(view, home); boost = 0; requestRender(true); });
+  document.getElementById('rst').addEventListener('click',  () => { Object.assign(view, homeView()); boost = 0; requestRender(true); });
   document.getElementById('clr').addEventListener('click',  cycleScheme);
   document.getElementById('dmo').addEventListener('click',  toggleDemo);
   document.getElementById('fsb').addEventListener('click',  toggleFullscreen);
@@ -1232,6 +1326,11 @@
 
   // ===== klávesnice =====
   document.addEventListener('keydown', e => {
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+      if (e.key === 'Escape') e.target.blur();
+      return;                               // psaní do polí neřídí explorer
+    }
     if (e.key === 'Escape') {
       if (demoState) { e.preventDefault(); stopDemo(); return; }
       if (document.body.classList.contains('immersive') ||
@@ -1250,8 +1349,9 @@
     else if (k === 'c') cycleScheme();
     else if (k === 'f') toggleFullscreen();
     else if (k === 'h') toggleImmersive();
-    else if (k === 'r') { Object.assign(view, home); boost = 0; requestRender(true); }
+    else if (k === 'r') { Object.assign(view, homeView()); boost = 0; requestRender(true); }
     else if (k === 's') shareURL();
+    else if (k === 'j') toggleJulia();
   });
 
   // ===== start =====
@@ -1261,6 +1361,9 @@
     resizeT = setTimeout(fitSize, 120);
   });
   applyHash();
+  refreshJuliaInputs();
+  document.getElementById('jul').classList.toggle('on', julia.on);
+  document.getElementById('juliabar').classList.toggle('show', julia.on);
   fitSize();
   ensureAnchor();
   if (wantAudio) {
