@@ -169,6 +169,10 @@
   }
   .juliabar input:focus { outline: 1px solid var(--accent); }
   .juliabar .jhint { font-style: italic; color: var(--muted); font-size: 11px; }
+  .juliabar .jslider {
+    width: 100%; margin: -2px 0 2px; height: 16px; cursor: pointer;
+    accent-color: var(--accent); background: transparent;
+  }
   body.immersive .juliabar, body.showcase .juliabar { display: none !important; }
   #ssm, #slg { font-size: 13px; letter-spacing: -0.05em; }
   footer {
@@ -503,13 +507,15 @@
       <button id="dmo"  title="demo (D)">▶</button>
       <button id="fsb"  title="celá obrazovka (F)">⛶</button>
       <button id="shr"  title="sdílet odkaz (S)">⤴</button>
-      <button id="jul"  title="Julia / Mandelbrot (J)">✦</button>
+      <button id="jul"  title="Mandelbrot / Julia / split (J)">✦</button>
       <button id="hid"  title="skrýt UI (H)">◉</button>
     </div>
     <div class="juliabar" id="juliabar">
       <label>c<sub>Re</sub> <input type="text" id="jRe" inputmode="decimal" value="-0.8" spellcheck="false"></label>
+      <input type="range" id="jReS" class="jslider" min="-2" max="1" step="0.0005" value="-0.8">
       <label>c<sub>Im</sub> <input type="text" id="jIm" inputmode="decimal" value="0.156" spellcheck="false"></label>
-      <span class="jhint">počáteční c &nbsp;·&nbsp; pixel = z₀</span>
+      <input type="range" id="jImS" class="jslider" min="-1.5" max="1.5" step="0.0005" value="0.156">
+      <span class="jhint" id="jhint">počáteční c &nbsp;·&nbsp; pixel = z₀</span>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -557,7 +563,10 @@
   // ===== stav pohledu =====
   const home = { cx: -0.75, cy: 0, scale: 3 };
   // Julia: pevné c laditelné zvlášť Re/Im. Vypnuto = klasický Mandelbrot.
-  const julia = { on: false, cx: -0.8, cy: 0.156 };
+  // tři režimy na jednom přepínači: mandel -> julia -> split -> mandel.
+  // julia.on = celé plátno počítá Julia jádro (jen v režimu 'julia');
+  // split má vlastní cestu (vlevo Mandelbrot, vpravo Julia).
+  const julia = { mode: 'mandel', on: false, cx: -0.8, cy: 0.156 };
   const view = { ...home };
   let boost = 0;                       // ruční doladění detailu nad automatiku
   const SCALE_MIN = 3e-13;             // hranice přesnosti double
@@ -654,7 +663,8 @@
     W = Math.min(1920, Math.round(bw * dpr));
     H = Math.max(48, Math.round(W * bh / bw));
     cv.width = W; cv.height = H;
-    requestRender(true);
+    if (julia.mode === 'split') { renderSplitMandel(); renderSplitJulia(); }
+    else requestRender(true);
   }
 
   // ===== render: z -> z² + c, tři násobení na krok přes (a+b)² =====
@@ -675,7 +685,7 @@
     Object.entries(SHADERS).map(([k, f]) => k + ':' + f.toString()).join(',') +
     '};' +
     'onmessage = e => {' +
-    '  const { id, band, rw, rows, row0, rhT, x0, y0, sc, ky, m, scheme, jul, jx, jy } = e.data;' +
+    '  const { id, band, which, rw, rows, row0, rhT, x0, y0, sc, ky, m, scheme, jul, jx, jy } = e.data;' +
     '  const D = new Uint8ClampedArray(rw * rows * 4);' +
     '  const shade = SHADERS[scheme];' +
     '  for (let r = 0; r < rows; r++) {' +
@@ -709,7 +719,7 @@
     '      D[q + 3] = 255;' +
     '    }' +
     '  }' +
-    '  postMessage({ id, band, row0, rows, rw, pix: D.buffer }, [D.buffer]);' +
+    '  postMessage({ id, band, which, row0, rows, rw, pix: D.buffer }, [D.buffer]);' +
     '};';
   const wUrl = URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' }));
   const NW = Math.min(8, Math.max(2, (navigator.hardwareConcurrency || 4) - 1));
@@ -755,6 +765,7 @@
   let jobSeq = 0;
 
   function render(rs) {         // asynchronně rozdej pásy bazénu
+    if (julia.mode === 'split') return;     // split renderuje vlastní cestou
     if (inFlight) { wanted = Math.max(wanted, rs); return; }
     const os = 1.35;            // overscan kryje i celý tik kolečka ven (1.25)
     const rw = Math.max(64, Math.round(W * rs * os));
@@ -890,6 +901,10 @@
   // ===== plánování: blit každý snímek, výpočty asynchronně ve workeru =====
   let queued = false, interRS = 0.4, refineT = null;
   function requestRender(interactive) {
+    if (julia.mode === 'split') {
+      if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; drawSplit(); }); }
+      return;
+    }
     if (!interactive) { render(1); return; }
     if (!queued) {
       queued = true;
@@ -924,12 +939,14 @@
   cv.addEventListener('wheel', e => {
     e.preventDefault();
     if (demoState) { stopDemo(); return; }
+    if (julia.mode === 'split') return;
     const [mx, my] = pos(e);
     zoomAt(mx, my, e.deltaY < 0 ? 0.8 : 1.25);
   }, { passive: false });
 
   cv.addEventListener('dblclick', e => {
     if (demoState) { stopDemo(); return; }
+    if (julia.mode === 'split') return;
     const [mx, my] = pos(e);
     zoomAt(mx, my, 0.5);
   });
@@ -941,6 +958,12 @@
 
   cv.addEventListener('pointerdown', e => {
     if (demoState) { stopDemo(); return; }
+    if (julia.mode === 'split') {
+      cv.setPointerCapture(e.pointerId);
+      splitDragging = true;
+      const [mx, my] = pos(e); splitPick(mx, my);
+      return;
+    }
     cv.setPointerCapture(e.pointerId);
     ptrs.set(e.pointerId, pos(e));
     if (ptrs.size === 1) {
@@ -951,6 +974,10 @@
   });
 
   cv.addEventListener('pointermove', e => {
+    if (julia.mode === 'split') {
+      if (splitDragging) { const [mx, my] = pos(e); splitPick(mx, my); }
+      return;
+    }
     if (!ptrs.has(e.pointerId)) return;
     ptrs.set(e.pointerId, pos(e));
     if (ptrs.size === 2) {
@@ -970,6 +997,7 @@
   });
 
   function endPointer(e) {
+    if (splitDragging) { splitDragging = false; try { cv.releasePointerCapture(e.pointerId); } catch (_) {} return; }
     if (!ptrs.has(e.pointerId)) return;
     ptrs.delete(e.pointerId);
     if (ptrs.size < 2) pinchPrev = null;
@@ -1161,7 +1189,8 @@
     currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
     showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2200);
     ensureAnchor();
-    if (!demoState) { render(1); syncHash(); }
+    if (julia.mode === 'split') { renderSplitMandel(); renderSplitJulia(); syncHash(); }
+    else if (!demoState) { render(1); syncHash(); }
   }
 
   // ===== sdílení stavu v adrese (vzor /evo) =====
@@ -1173,8 +1202,8 @@
     p.set('y', String(view.cy));
     p.set('s', String(Number(view.scale.toPrecision(6))));
     if (boost) p.set('b', String(boost));
-    if (julia.on) {                         // počáteční c, jen v Julia režimu
-      p.set('j', '1');
+    if (julia.mode !== 'mandel') {           // počáteční c, jen v Julia/split
+      p.set('j', julia.mode === 'split' ? '2' : '1');
       p.set('jr', String(julia.cx));
       p.set('ji', String(julia.cy));
     }
@@ -1203,7 +1232,9 @@
     const jr = parseFloat(p.get('jr')), ji = parseFloat(p.get('ji'));
     if (isFinite(jr)) julia.cx = jr;
     if (isFinite(ji)) julia.cy = ji;
-    julia.on = p.get('j') === '1';
+    const jm = p.get('j');
+    julia.mode = jm === '2' ? 'split' : jm === '1' ? 'julia' : 'mandel';
+    julia.on = (julia.mode === 'julia');
     const c = p.get('c');
     if (c && SHADERS[c]) currentScheme = c;
     const r = p.get('r'), rs = document.getElementById('audioRiff');
@@ -1260,7 +1291,10 @@
       window.addEventListener(ev, go, true));
   }
   window.addEventListener('hashchange', () => {
-    if (applyHash()) requestRender(true);
+    applyHash();
+    refreshJuliaInputs(); applyModeUI();
+    if (julia.mode === 'split') enterSplit();
+    else { ensureAnchor(); requestRender(true); }
   });
   ['audioVol', 'audioSpeed', 'audioRiff'].forEach(id => {
     const el = document.getElementById(id);
@@ -1269,55 +1303,180 @@
   const at = document.getElementById('audioToggle');
   if (at) at.addEventListener('click', syncHash);
 
-  // ===== Julia: pevné c, pixel je z0 =====
+  // ===== Julia a split: pevné c, pixel je z0 =====
   const JULIA_HOME = { cx: 0, cy: 0, scale: 3 };   // Julia množina sedí kolem 0
   function homeView() { return julia.on ? JULIA_HOME : home; }
   function fmtNum(v) {                              // krátký, ale přesný zápis
-    const s = String(v);
-    return s.length > 12 ? Number(v.toPrecision(8)).toString() : s;
+    const t = String(v);
+    return t.length > 12 ? Number(v.toPrecision(8)).toString() : t;
   }
+  const jReEl = document.getElementById('jRe'), jImEl = document.getElementById('jIm');
+  const jReS = document.getElementById('jReS'), jImS = document.getElementById('jImS');
   function refreshJuliaInputs() {
-    const re = document.getElementById('jRe'), im = document.getElementById('jIm');
-    if (re) re.value = fmtNum(julia.cx);
-    if (im) im.value = fmtNum(julia.cy);
+    jReEl.value = fmtNum(julia.cx); jImEl.value = fmtNum(julia.cy);
+    jReS.value = Math.max(+jReS.min, Math.min(+jReS.max, julia.cx));
+    jImS.value = Math.max(+jImS.min, Math.min(+jImS.max, julia.cy));
   }
-  function setJulia(on, keepView) {
-    const was = julia.on;
-    julia.on = on;
-    document.getElementById('jul').classList.toggle('on', on);
-    document.getElementById('juliabar').classList.toggle('show', on);
-    if (was !== on && !keepView) { Object.assign(view, homeView()); boost = 0; }
-    ensureAnchor();
-    requestRender(true);
-    syncHash();
-  }
-  function toggleJulia() {
-    setJulia(!julia.on);
-    showToast(julia.on
-      ? 'Julia · c = ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i'
-      : 'Mandelbrot', 2200);
-  }
-  function commitJuliaInput() {
-    const re = parseFloat(document.getElementById('jRe').value.replace(',', '.'));
-    const im = parseFloat(document.getElementById('jIm').value.replace(',', '.'));
+
+  // jediné místo pro změnu c: srovná widgety a spustí správnou cestu renderu
+  function setC(re, im) {
     if (isFinite(re)) julia.cx = re;
     if (isFinite(im)) julia.cy = im;
-    if (!julia.on) setJulia(true);
-    else { ensureAnchor(); requestRender(true); syncHash(); }
+    refreshJuliaInputs();
+    if (julia.mode === 'split') { renderSplitJulia(); drawSplit(); }
+    else if (julia.mode === 'julia') { ensureAnchor(); requestRender(true); }
+    syncHash();
   }
-  ['jRe', 'jIm'].forEach(id => {
-    const el = document.getElementById(id);
-    el.addEventListener('change', commitJuliaInput);
-    el.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); el.blur(); commitJuliaInput(); } });
-  });
-  document.getElementById('jul').addEventListener('click', toggleJulia);
+
+  // přepínač cykluje tři režimy: mandel -> julia -> split
+  const MODES = ['mandel', 'julia', 'split'];
+  const MODE_TOAST = {
+    mandel: () => 'Mandelbrot',
+    julia: () => 'Julia · c = ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i',
+    split: () => 'split · vlevo Mandelbrot, vpravo Julia'
+  };
+  function applyModeUI() {
+    julia.on = (julia.mode === 'julia');
+    document.getElementById('jul').classList.toggle('on', julia.mode !== 'mandel');
+    document.getElementById('juliabar').classList.toggle('show', julia.mode !== 'mandel');
+    const hint = document.getElementById('jhint');
+    if (hint) hint.innerHTML = julia.mode === 'split'
+      ? 'klikni vlevo · vyber c' : 'počáteční c &nbsp;·&nbsp; pixel = z₀';
+    cv.style.cursor = julia.mode === 'split' ? 'crosshair' : '';
+  }
+  function setMode(mode, keepView) {
+    const prev = julia.mode;
+    julia.mode = mode;
+    applyModeUI();
+    if (mode === 'split') { enterSplit(); }
+    else {
+      if (prev !== mode && !keepView) { Object.assign(view, homeView()); boost = 0; }
+      ensureAnchor();
+      requestRender(true);
+    }
+    syncHash();
+  }
+  function cycleMode() {
+    setMode(MODES[(MODES.indexOf(julia.mode) + 1) % MODES.length]);
+    showToast(MODE_TOAST[julia.mode](), 2200);
+  }
+  function doReset() {
+    if (julia.mode === 'split') { setC(-0.8, 0.156); return; }
+    Object.assign(view, homeView()); boost = 0; requestRender(true);
+  }
+
+  // pole i slidery jdou přes setC
+  function commitFields() {
+    setC(parseFloat(jReEl.value.replace(',', '.')), parseFloat(jImEl.value.replace(',', '.')));
+  }
+  jReEl.addEventListener('change', commitFields);
+  jImEl.addEventListener('change', commitFields);
+  [jReEl, jImEl].forEach(el =>
+    el.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); el.blur(); } }));
+  jReS.addEventListener('input', () => setC(parseFloat(jReS.value), julia.cy));
+  jImS.addEventListener('input', () => setC(julia.cx, parseFloat(jImS.value)));
+  document.getElementById('jul').addEventListener('click', cycleMode);
+
+  // ===== split: vlevo Mandelbrot (s bodem c), vpravo Julia pro toto c =====
+  const splitMC = document.createElement('canvas');   // levý pás (cache, c ho nemění)
+  const splitJC = document.createElement('canvas');   // pravý pás (přepočet při změně c)
+  let splitMView = null, splitJView = null;
+  let splitMReady = false, splitJReady = false;
+  const splitWorker = new Worker(wUrl);
+  let splitInFlight = null, splitWantJ = false, splitDragging = false;
+
+  function fitView(cx, cy, halfW, halfH, pw, ph) {     // vejde box do panelu
+    const aspect = pw / ph;
+    const scaleW = Math.max(2 * halfW, 2 * halfH * aspect) * 1.06;
+    return { cx, cy, scale: scaleW, k: scaleW * ph / pw };
+  }
+  function paneDims() {
+    const pw = Math.floor(W / 2);
+    return { pw, ph: H, rpw: W - pw };
+  }
+  function splitRender(which) {
+    const d = paneDims();
+    const pw = which === 'M' ? d.pw : d.rpw;
+    const v = which === 'M'
+      ? (splitMView = fitView(-0.5, 0, 1.6, 1.2, pw, d.ph))
+      : (splitJView = fitView(0, 0, 1.55, 1.55, pw, d.ph));
+    const rw = Math.max(64, Math.min(pw, 640));
+    const rh = Math.max(48, Math.round(rw * d.ph / pw));
+    splitWorker.postMessage({ id: 'S', which, rw, rows: rh, row0: 0, rhT: rh,
+      x0: v.cx - v.scale / 2, y0: v.cy - v.k / 2, sc: v.scale, ky: v.k,
+      m: 220, scheme: currentScheme,
+      jul: which === 'J', jx: julia.cx, jy: julia.cy });
+  }
+  function renderSplitMandel() { splitMReady = false; splitRender('M'); }
+  function renderSplitJulia() {
+    if (splitInFlight === 'J') { splitWantJ = true; return; }
+    splitInFlight = 'J'; splitRender('J');
+  }
+  function enterSplit() { renderSplitMandel(); renderSplitJulia(); }
+  splitWorker.onmessage = e => {
+    const { which, rw, rows, pix } = e.data;
+    const c = which === 'M' ? splitMC : splitJC;
+    c.width = rw; c.height = rows;
+    c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(pix), rw, rows), 0, 0);
+    if (which === 'M') splitMReady = true;
+    else { splitJReady = true; splitInFlight = null; }
+    if (julia.mode === 'split') drawSplit();
+    if (!firstRenderDone) {
+      firstRenderDone = true;
+      const l = document.getElementById('loading'); if (l) l.style.display = 'none';
+    }
+    if (which === 'J' && splitWantJ) { splitWantJ = false; renderSplitJulia(); }
+  };
+  function drawSplit() {
+    if (julia.mode !== 'split') return;
+    const d = paneDims();
+    g.imageSmoothingEnabled = true;
+    g.fillStyle = edgeColor(); g.fillRect(0, 0, W, H);
+    if (splitMReady) g.drawImage(splitMC, 0, 0, d.pw, d.ph);
+    if (splitJReady) g.drawImage(splitJC, d.pw, 0, d.rpw, d.ph);
+    g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(d.pw - 1, 0, 2, H);
+    g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(d.pw, 0, 1, H);
+    if (splitMView) {                                  // bod c na levém panelu
+      const sh = splitMView.k;
+      const mx = (julia.cx - (splitMView.cx - splitMView.scale / 2)) / splitMView.scale * d.pw;
+      const my = (julia.cy - (splitMView.cy - sh / 2)) / sh * d.ph;
+      g.lineWidth = 3; g.strokeStyle = 'rgba(0,0,0,0.85)';
+      g.beginPath(); g.arc(mx, my, 7, 0, Math.PI * 2); g.stroke();
+      g.beginPath(); g.moveTo(mx - 12, my); g.lineTo(mx + 12, my);
+      g.moveTo(mx, my - 12); g.lineTo(mx, my + 12); g.stroke();
+      g.lineWidth = 1.6; g.strokeStyle = '#fff';
+      g.beginPath(); g.arc(mx, my, 7, 0, Math.PI * 2); g.stroke();
+      g.beginPath(); g.moveTo(mx - 12, my); g.lineTo(mx + 12, my);
+      g.moveTo(mx, my - 12); g.lineTo(mx, my + 12); g.stroke();
+    }
+    g.font = '600 13px Cinzel, serif'; g.textBaseline = 'top';
+    g.fillStyle = 'rgba(0,0,0,0.7)';
+    g.fillText('Mandelbrot', 11, 11); g.fillText('Julia', d.pw + 11, 11);
+    g.fillStyle = '#fff';
+    g.fillText('Mandelbrot', 10, 10); g.fillText('Julia', d.pw + 10, 10);
+    updateInfoSplit();
+  }
+  function updateInfoSplit() {
+    document.getElementById('z').textContent = 'split';
+    document.getElementById('mi').textContent = '220';
+    document.getElementById('cc').innerHTML =
+      'c ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i';
+  }
+  function splitPick(mx, my) {                          // klik vlevo -> vyber c
+    const d = paneDims();
+    if (!splitMView || mx >= d.pw) return;
+    const sh = splitMView.k;
+    const cx = splitMView.cx - splitMView.scale / 2 + (mx / d.pw) * splitMView.scale;
+    const cy = splitMView.cy - sh / 2 + (my / d.ph) * sh;
+    setC(cx, cy);
+  }
 
   // ===== tlačítka =====
   document.getElementById('zin').addEventListener('click',  () => zoomAt(W/2, H/2, 0.6));
   document.getElementById('zout').addEventListener('click', () => zoomAt(W/2, H/2, 1/0.6));
   document.getElementById('mup').addEventListener('click',  () => { boost += 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
   document.getElementById('mdn').addEventListener('click',  () => { boost -= 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
-  document.getElementById('rst').addEventListener('click',  () => { Object.assign(view, homeView()); boost = 0; requestRender(true); });
+  document.getElementById('rst').addEventListener('click',  doReset);
   document.getElementById('clr').addEventListener('click',  cycleScheme);
   document.getElementById('dmo').addEventListener('click',  toggleDemo);
   document.getElementById('fsb').addEventListener('click',  toggleFullscreen);
@@ -1349,9 +1508,9 @@
     else if (k === 'c') cycleScheme();
     else if (k === 'f') toggleFullscreen();
     else if (k === 'h') toggleImmersive();
-    else if (k === 'r') { Object.assign(view, homeView()); boost = 0; requestRender(true); }
+    else if (k === 'r') doReset();
     else if (k === 's') shareURL();
-    else if (k === 'j') toggleJulia();
+    else if (k === 'j') cycleMode();
   });
 
   // ===== start =====
@@ -1362,9 +1521,8 @@
   });
   applyHash();
   refreshJuliaInputs();
-  document.getElementById('jul').classList.toggle('on', julia.on);
-  document.getElementById('juliabar').classList.toggle('show', julia.on);
-  fitSize();
+  applyModeUI();
+  fitSize();                 // ve split spustí oba panely, jinak normální render
   ensureAnchor();
   if (wantAudio) {
     armAudioStart();
