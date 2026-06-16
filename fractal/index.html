@@ -1105,7 +1105,8 @@
   // zvětšení posledního snímku nepřekročí malou mez. Ostrost tím drží
   // nahoře (nikdy hrubo), pauzy zůstanou ostré a tempo se samo
   // přizpůsobí rychlosti rendereru: mělce plynule, hluboko o něco pomaleji.
-  const DEMO_MAG = 1.25;            // dovolené zvětšení starého snímku
+  const DEMO_TARGET = 1.12;         // do téhle ostrosti jede plnou rychlostí
+  const DEMO_CAP = 1.45;            // u téhle se zoom spojitě zastaví (ne skok)
 
   function demoStep(now) {
     if (!demoState) return;
@@ -1126,8 +1127,15 @@
       const screenDensity = W / view.scale;              // px obrazovky na jednotku
       mag = screenDensity / nativeDensity;               // >1 = zvětšeno (měkčí)
     }
-    if (covered && mag <= DEMO_MAG) st.vt += dtWall;   // dost ostré: pokračuj
-    // jinak čas stojí a čeká se, až doletí ostřejší snímek v plném rozlišení
+    // tempo se spojitě škrtí podle ostrosti: dokud je snímek ostrý, plná
+    // rychlost; jak zvětšení roste k mezi, zoom plynule zvolní (nikdy tvrdě
+    // nezamrzne, jen v hloubce jede pomaleji), takže pohyb neškube
+    let sf = 0;
+    if (covered) {
+      if (mag <= DEMO_TARGET) sf = 1;
+      else if (mag < DEMO_CAP) sf = (DEMO_CAP - mag) / (DEMO_CAP - DEMO_TARGET);
+    }
+    st.vt += dtWall * sf;
 
     let t = st.vt;
     if (t >= DEMO_TOTAL) {
