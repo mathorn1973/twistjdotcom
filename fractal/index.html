@@ -804,8 +804,11 @@
       bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
       bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
       bufView.cy + bufView.k/2     >= view.cy + kv/2;
+    // přísně nezhoršující: nahraď zobrazený snímek jen ostřejším nebo
+    // stejně ostrým, nikdy hrubším (dokud pohled kryje); to dorovnává
+    // poslední drobné probliknutí při plynulém přibližování
     const accept = !covered || meta.scheme !== bufScheme ||
-      meta.rw / meta.sc >= (bufView.rw / bufView.scale) * 0.98;
+      meta.rw / meta.sc >= bufView.rw / bufView.scale;
     if (accept) {
       buf.width = meta.rw; buf.height = meta.rh;
       for (const p of meta.parts)
@@ -832,8 +835,8 @@
       if (lastDt > 75) demoState.rs = Math.max(0.1, demoState.rs * 0.92);
       else if (lastDt < 35) demoState.rs = Math.min(1, demoState.rs * 1.05);
     } else {
-      if (lastDt > 100) interRS = Math.max(0.12, interRS * 0.9);
-      else if (lastDt < 40) interRS = Math.min(1, interRS * 1.06);
+      if (lastDt > 110) interRS = Math.max(0.18, interRS * 0.92);
+      else if (lastDt < 45) interRS = Math.min(1, interRS * 1.05);
     }
     if (wanted) { const r = wanted; wanted = 0; render(r); }
   }
@@ -899,7 +902,7 @@
   }
 
   // ===== plánování: blit každý snímek, výpočty asynchronně ve workeru =====
-  let queued = false, interRS = 0.4, refineT = null;
+  let queued = false, interRS = 0.5, refineT = null;
   function requestRender(interactive) {
     if (julia.mode === 'split') {
       if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; drawSplit(); }); }
