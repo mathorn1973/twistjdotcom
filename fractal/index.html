@@ -807,9 +807,7 @@
     // přísně nezhoršující: nahraď zobrazený snímek jen ostřejším nebo
     // stejně ostrým, nikdy hrubším (dokud pohled kryje); to dorovnává
     // poslední drobné probliknutí při plynulém přibližování
-    // v demu se každý snímek počítá v přesném pohledu, tak ho vždy přijmi;
-    // jinak přísně nezhoršující (nahraď jen ostřejším/stejným, ne hrubším)
-    const accept = demoState || !covered || meta.scheme !== bufScheme ||
+    const accept = !covered || meta.scheme !== bufScheme ||
       meta.rw / meta.sc >= bufView.rw / bufView.scale;
     if (accept) {
       buf.width = meta.rw; buf.height = meta.rh;
@@ -834,21 +832,13 @@
     updateInfo();
     // adaptace rozlišení podle skutečného času snímku
     if (demoState) {
-      if (demoState.pendingMotion) {        // pauzy (plné rozlišení) rs neřídí
-        if (lastDt > 95) demoState.rs = Math.max(0.25, demoState.rs * 0.9);
-        else if (lastDt < 55) demoState.rs = Math.min(1, demoState.rs * 1.06);
-      }
+      if (lastDt > 75) demoState.rs = Math.max(0.1, demoState.rs * 0.92);
+      else if (lastDt < 35) demoState.rs = Math.min(1, demoState.rs * 1.05);
     } else {
       if (lastDt > 110) interRS = Math.max(0.18, interRS * 0.92);
       else if (lastDt < 45) interRS = Math.min(1, interRS * 1.05);
     }
-    // demo svázané se snímky: po dokončení pohybového snímku posuň fázi
-    // a vyžádej další; ostrost tím nikdy nekolísá (žádné zvětšování starého)
-    if (demoState && demoState.pendingMotion) {
-      demoState.pendingMotion = false;
-      demoAdvance(lastDt / 1000);
-      demoRenderNext();
-    } else if (wanted) { const r = wanted; wanted = 0; render(r); }
+    if (wanted) { const r = wanted; wanted = 0; render(r); }
   }
 
   function updateInfo() {
@@ -1110,16 +1100,50 @@
   ];
   const DEMO_TOTAL = DEMO_LEGS.reduce((a, l) => a + l.dur, 0);
 
-  const DEMO_SPEED = 1;             // násobič tempa (1 = jako navržené časy)
+  // Demo pohání virtuální čas, ale posune ho jen když je zobrazený snímek
+  // dost ostrý: render vždy počítá plné rozlišení a čas čeká, dokud
+  // zvětšení posledního snímku nepřekročí malou mez. Ostrost tím drží
+  // nahoře (nikdy hrubo), pauzy zůstanou ostré a tempo se samo
+  // přizpůsobí rychlosti rendereru: mělce plynule, hluboko o něco pomaleji.
+  const DEMO_MAG = 1.25;            // dovolené zvětšení starého snímku
 
-  function demoSetView(phase) {     // nastaví view podle fáze, vrátí úsek
-    const st = demoState, cur = DEMO_STOPS[st.stopIdx];
+  function demoStep(now) {
+    if (!demoState) return;
+    const st = demoState;
+    const dtWall = st.last ? Math.min(0.05, (now - st.last) / 1000) : 0;
+    st.last = now;
+
+    // jak ostrý je teď zobrazený snímek vůči aktuálnímu pohledu
+    let mag = Infinity, covered = false;
+    if (bufView) {
+      const kv = view.scale * (H / W);
+      covered =
+        bufView.cx - bufView.scale/2 <= view.cx - view.scale/2 &&
+        bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
+        bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
+        bufView.cy + bufView.k/2     >= view.cy + kv/2;
+      mag = Math.max(bufView.scale / view.scale, view.scale / bufView.scale);
+    }
+    if (covered && mag <= DEMO_MAG) st.vt += dtWall;   // dost ostré: pokračuj
+    // jinak čas stojí a čeká se, až doletí ostřejší snímek v plném rozlišení
+
+    let t = st.vt;
+    if (t >= DEMO_TOTAL) {
+      st.prev = DEMO_STOPS[st.stopIdx];
+      st.stopIdx = (st.stopIdx + 1) % DEMO_STOPS.length;
+      st.vt = 0; t = 0;
+      currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
+      ensureAnchor();
+    }
+    const cur = DEMO_STOPS[st.stopIdx];
     const sm = u => u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u);
+
     let legIdx = 0, tAcc = 0;
-    while (legIdx < DEMO_LEGS.length - 1 && phase >= tAcc + DEMO_LEGS[legIdx].dur) {
+    while (legIdx < DEMO_LEGS.length - 1 && t >= tAcc + DEMO_LEGS[legIdx].dur) {
       tAcc += DEMO_LEGS[legIdx].dur; legIdx++;
     }
-    const leg = DEMO_LEGS[legIdx], u = (phase - tAcc) / leg.dur;
+    const leg = DEMO_LEGS[legIdx], u = (t - tAcc) / leg.dur;
+
     let f = 0, cxT = cur.x, cyT = cur.y;
     if (leg.type === 'pan') {
       const w = sm(u), pv = st.prev;
@@ -1127,41 +1151,16 @@
       cyT = pv.y + (cur.y - pv.y) * w;
     } else if (leg.type === 'zoom') {
       f = leg.from + (leg.to - leg.from) * sm(u);
-    } else { f = leg.at; }
+    } else {
+      f = leg.at;
+    }
     const ln3 = Math.log(3);
     view.scale = Math.exp(ln3 + (Math.log(cur.minS) - ln3) * f);
     view.cx = cxT; view.cy = cyT;
-    return { type: leg.type, idx: legIdx };
-  }
 
-  function demoAdvance(dt) {        // posun fáze, na konci další zastávka
-    const st = demoState; if (!st) return;
-    st.phase += Math.min(0.15, dt) * DEMO_SPEED;
-    if (st.phase >= DEMO_TOTAL) {
-      st.prev = DEMO_STOPS[st.stopIdx];
-      st.stopIdx = (st.stopIdx + 1) % DEMO_STOPS.length;
-      st.phase = 0;
-      currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
-      ensureAnchor();
-    }
-  }
-
-  // Demo je svázané se snímky: každý zobrazený snímek se počítá v přesném
-  // pohledu (žádné zvětšování starého snímku), takže ostrost nekolísá.
-  // Fázi posouvá dokončený pohybový snímek (v onBand), pauzu pak časovač.
-  function demoRenderNext() {
-    const st = demoState; if (!st) return;
-    if (st.holdTimer) { clearTimeout(st.holdTimer); st.holdTimer = 0; }
-    const leg = demoSetView(st.phase);
-    if (leg.type === 'hold') {
-      st.pendingMotion = false;
-      if (st.holdRendered !== leg.idx) { render(1); st.holdRendered = leg.idx; }
-      st.holdTimer = setTimeout(() => { demoAdvance(0.05); demoRenderNext(); }, 50);
-    } else {
-      st.holdRendered = -1;
-      st.pendingMotion = true;
-      render(st.rs);               // dokončení v onBand posune fázi a zavolá zas
-    }
+    render(1);                       // vždy plné rozlišení, samo se škrtí
+    blit();
+    st.raf = requestAnimationFrame(demoStep);
   }
 
   function startDemo() {
@@ -1181,19 +1180,17 @@
       audioStarted,
       stopIdx: 0,
       prev: { x: home.cx, y: home.cy },
-      phase: 0,
-      rs: 0.5,
-      holdRendered: -1,
-      holdTimer: 0,
-      pendingMotion: false
+      vt: 0,
+      last: 0,
+      rs: 1,
+      raf: 0
     };
-    inFlight = null; wanted = 0;     // zahoď snímek rozjetý z fitSize()
-    demoRenderNext();
+    demoState.raf = requestAnimationFrame(demoStep);
   }
 
   function stopDemo() {
     if (!demoState) return;
-    if (demoState.holdTimer) clearTimeout(demoState.holdTimer);
+    cancelAnimationFrame(demoState.raf);
     const audioStarted = demoState.audioStarted;
     demoState = null;
     document.body.classList.remove('showcase', 'immersive');
