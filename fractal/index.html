@@ -1122,7 +1122,9 @@
         bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
         bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
         bufView.cy + bufView.k/2     >= view.cy + kv/2;
-      mag = Math.max(bufView.scale / view.scale, view.scale / bufView.scale);
+      const nativeDensity = bufView.rw / bufView.scale;  // spočtené px na jednotku
+      const screenDensity = W / view.scale;              // px obrazovky na jednotku
+      mag = screenDensity / nativeDensity;               // >1 = zvětšeno (měkčí)
     }
     if (covered && mag <= DEMO_MAG) st.vt += dtWall;   // dost ostré: pokračuj
     // jinak čas stojí a čeká se, až doletí ostřejší snímek v plném rozlišení
