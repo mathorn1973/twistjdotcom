@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWIST-J Manifest</title>
+    <meta name="description" content="TWIST-J Manifest: jeden krok J = 1 + ζ₅², jeden axiom, mapa odpovědnosti. Celá čísla a poměry, žádný volný parametr, předpovědi a otevřené zdi.">
+    <meta name="author" content="A. M. Thorn">
+    <meta property="og:title" content="TWIST-J Manifest">
+    <meta property="og:description" content="Jeden krok. Jeden axiom. Mapa odpovědnosti. Žádný volný parametr.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://twistj.com/manifest/">
+    <meta property="og:locale" content="cs_CZ">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f1eb; --text: #2a2520; --text-bright: #1a1714;
+            --accent: #8b4513; --muted: #7a7570; --dim: #999;
+            --rule: #d4cfc7; --eq-bg: #f3f0ea; --silver: #6b6560;
+            --link: #6b6560; --link-hover: #8b4513;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1c1915; --text: #b8b3a8; --text-bright: #d4cfc6;
+                --accent: #b08050; --muted: #7a7268; --dim: #605850;
+                --rule: #38332c; --eq-bg: #252118; --silver: #9a9488;
+                --link: #9a9488; --link-hover: #b08050;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.22rem; font-weight: 400; line-height: 1.62;
+        }
+        .page { max-width: 43em; margin: 0 auto; padding: 4rem 1.4rem 3rem; }
+        .eyebrow {
+            font-size: .82rem; letter-spacing: .34em; text-transform: uppercase;
+            color: var(--accent); text-align: center;
+        }
+        h1 {
+            font-weight: 500; font-size: 2.7rem; text-align: center;
+            color: var(--text-bright); margin: .4rem 0 .6rem;
+        }
+        .byline { text-align: center; color: var(--muted); font-size: 1.02rem; font-style: italic; }
+        .konvence {
+            margin: 2.2rem 0 0; color: var(--muted); font-size: 1rem;
+            border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+            padding: .9rem 0; text-align: center;
+        }
+        .hero-eq {
+            text-align: center; font-size: 1.85rem; font-weight: 500;
+            color: var(--text-bright); margin: 3rem 0 .4rem; letter-spacing: .01em;
+        }
+        h2 {
+            font-weight: 500; font-size: 1.5rem; color: var(--text-bright);
+            margin: 3rem 0 .8rem; border-bottom: 1px solid var(--rule); padding-bottom: .3rem;
+        }
+        h2 .n { color: var(--accent); font-weight: 400; margin-right: .55em; }
+        p { margin: 0 0 1rem; }
+        .eq {
+            background: var(--eq-bg); border-left: 2px solid var(--accent);
+            padding: .8rem 1.1rem; margin: 1.1rem 0; font-size: 1.16rem;
+            color: var(--text-bright);
+        }
+        .eq.center { text-align: center; border-left: none;
+            border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+            background: transparent; font-size: 1.3rem; }
+        .eq .line { display: block; margin: .15rem 0; }
+        .tag {
+            color: var(--accent); font-size: .78em; letter-spacing: .05em;
+            font-style: normal; white-space: nowrap; margin-left: .6em;
+        }
+        .note { color: var(--dim); font-size: .85em; }
+        table.num { border-collapse: collapse; margin: 1.1rem auto; font-size: 1.12rem; }
+        table.num td { padding: .18rem 1.1rem .18rem 0; color: var(--text-bright); }
+        table.num td:last-child { padding-right: 0; }
+        sub, sup { line-height: 0; }
+        .final {
+            text-align: center; font-size: 1.5rem; font-style: italic;
+            color: var(--text-bright); margin: 2.4rem 0 0;
+        }
+        .footer {
+            margin-top: 4rem; padding-top: 1.2rem; border-top: 1px solid var(--rule);
+            text-align: center; color: var(--muted); font-size: 1rem;
+        }
+        .footer a { color: var(--link); text-decoration: none; border-bottom: 1px dotted var(--rule); }
+        .footer a:hover { color: var(--link-hover); }
+        .dot { margin: 0 .6em; color: var(--dim); }
+        a { color: var(--link); }
+        a:hover { color: var(--link-hover); }
+        @media (max-width: 560px) {
+            body { font-size: 1.1rem; }
+            h1 { font-size: 2.15rem; }
+            .hero-eq { font-size: 1.45rem; }
+            table.num { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="eyebrow">TWIST-J</div>
+    <h1>Manifest</h1>
+    <div class="byline">A. M. Thorn (Marek Španěl) · 1. července 2026 · verze 2, český originál</div>
+
+    <p class="konvence">Pomlčky nepoužíváme; spojovník zůstává ve vlastních názvech a technických zápisech.
+    Desetinná čísla jen s odůvodněním; naměřené hodnoty odůvodněny jsou. Celá čísla a poměry primárně.
+    Co nejde spočítat v celých číslech, není fyzika.</p>
+
+    <h2><span class="n">1</span>Krok</h2>
+    <p>TWIST-J nezačíná prostorem, časem ani polem. Začíná jediným počitatelným děním: krokem, který se
+    neopakuje přímo, ale vrací se pootočený. Základní krok volíme jako nejmenší pětinový krok nesoucí zlatý řez:</p>
+    <div class="hero-eq">J = 1 + ζ<sub>5</sub><sup>2</sup> = φ<sup>−1</sup> · e<sup>2πi/5</sup> <span class="tag">[definice]</span></div>
+    <p style="text-align:center; color:var(--muted); font-style:italic; margin-top:.2rem;">Následující řádky už jsou totožnost:</p>
+    <div class="eq">
+        <span class="line">1 − J &nbsp;=&nbsp; −ζ<sub>5</sub><sup>2</sup> &nbsp;=&nbsp; e<sup>−iπ/5</sup> <span class="note">(jednotkový modul, hlavní větev)</span></span>
+        <span class="line">Li<sub>1</sub>(J) &nbsp;=&nbsp; −log(1 − J) &nbsp;=&nbsp; iπ/5</span>
+        <span class="line">π &nbsp;=&nbsp; −5i · Li<sub>1</sub>(J) <span class="tag">[totožnost]</span></span>
+    </div>
+    <p>Odtud φ není ozdoba, ale velikost kroku. A π není předem daný kruh, nýbrž stopa větve.
+    Toto není obraz; je to výpočet na čtyři řádky, který si každý ověří.</p>
+    <p>Zbytek teorie smí dělat jen jedno: ukázat, že fyzika je čitelný důsledek tohoto uzavřeného
+    celočíselného kroku.</p>
+
+    <h2><span class="n">2</span>Axiom</h2>
+    <div class="eq center">A0. Realita je uzavřené celočíselné J-Cayleyovo plenum. <span class="tag">[axiom]</span></div>
+    <p>Uzavřené: celek nemá vnějšek, součet energie je nulový jako věta, ne jako přání, a čas vzniká uvnitř
+    jako korelace s počítadlem. Celočíselné: co nejde spočítat v celých číslech, není fyzika. J-Cayleyovo:
+    celá algebra je generovaná jediným krokem J. Plenum: žádné vakuum; médium je plné a klid je rovnováha.</p>
+    <p>Každé další tvrzení v tomto rámci je označeno jako definice, axiom, totožnost, věta, výpočet,
+    měřený fakt, předpověď, domněnka, nebo otevřená zeď. Neříkáme „věř“. Předkládáme mapu odpovědnosti.</p>
+
+    <h2><span class="n">3</span>Sloveso</h2>
+    <p>J není konstanta. J je sloveso: to, co se děje. Technicky: přepisovací pravidlo, generátor kroku,
+    endomorfismus stavu. <span class="tag">[definice]</span> Konstanty φ a π jsou jeho stíny, ne jeho předpoklady.</p>
+
+    <h2><span class="n">4</span>Čas a prostor</h2>
+    <p>Čas je počítadlo. Nic víc: 2-adický odometr, který tiká uvnitř celku. <span class="tag">[definice čtení]</span></p>
+    <p>Prostor je komutátor. Vezmi dva kroky: nejdřív a, pak c, anebo nejdřív c, pak a. Kde na pořadí lokálně
+    nezáleží, čteme rovinnost. Kde záleží, zůstane zbytek [T<sub>a</sub>, T<sub>c</sub>] a ten zbytek čteme jako
+    křivost; vzdálenost je míra toho, oč se dvě pořadí liší.
+    <span class="tag">[věta v algebře; fyzikální čtení: odvození v Kánonu]</span></p>
+
+    <h2><span class="n">5</span>Dvě projekce</h2>
+    <p>Komplexní krok má velikost a úhel. Velikost čte gravitace. Úhel čte elektromagnetismus. Dvě síly
+    nejsou dvě podstaty; jsou to dvě projekce jednoho J.
+    <span class="tag">[programové čtení; odvození v Kánonu]</span></p>
+
+    <h2><span class="n">6</span>Dvě místa</h2>
+    <p>Prvočíslo 5 píše: geometrie, gravitace, zlatý řez, rozvětvené místo. Prvočíslo 2 čte: kvadratická
+    viditelnost, spin jako půlení úhlu, ζ<sub>8</sub> na hranici F<sub>25</sub>. Potkávají se jen nad Q.
+    To znamená: 5-adické psaní a 2-adické čtení se neslučují v jednom místě; společným jazykem je pouze
+    racionální kostra.</p>
+    <p>Bornovo pravidlo je norma viditelnosti: pravděpodobnost je tato kvadratická norma, ne základní látka,
+    a odmocnina fáze je půlení úhlu spinu, ne inverze pravděpodobnosti. Kvantová mechanika není přidaná
+    vrstva; je to způsob, jak se celočíselný zápis stává viditelným.
+    <span class="tag">[věty; jádro zapečetěno ověřovači zamčenými otiskem SHA-256 na dvou architekturách, aarch64 a x86_64]</span></p>
+
+    <h2><span class="n">7</span>Hmota</h2>
+    <p>Hmota je to, co dekodér přečte jako stabilní. Atraktorem zde myslíme konečnou stabilní třídu pevně
+    daného přepisovacího pravidla po ztotožnění symetrií rámce; stavový prostor, mapa i rozklad jsou uvedeny
+    v Kánonu. V tomto pevném rámci vychází</p>
+    <div class="eq center">313 atraktorů = 125 + 125 + 62 + 1 <span class="tag">[výpočet]</span></div>
+    <p>Číslo 313 není počet hledaný podle částic; je to počet stabilních tříd pevně daného dekodéru.</p>
+
+    <h2><span class="n">8</span>Ikosaedr a E8</h2>
+    <p>Grupa kroku je binární ikosaedrická grupa 2I = SL(2,5). Její reprezentace přes McKayovu korespondenci
+    obnovují afinní Dynkinův diagram Ẽ<sub>8</sub>. <span class="tag">[věta, klasická]</span>
+    Vestavění kalibrační struktury na této mřížce je samostatná konstrukce, provedená exaktně nad Q(√5),
+    bez volného parametru, s ověřovači zamčenými otiskem. <span class="tag">[výpočet + odvození]</span></p>
+
+    <h2><span class="n">9</span>Čísla</h2>
+    <p>Bez voličů. Žádný parametr k ladění.</p>
+    <p><strong>Konstanta jemné struktury.</strong> α<sup>−1</sup> je odvozeno z J s relativní odchylkou pod
+    jednu miliardtinu vůči měřené hodnotě CODATA 137.035999177.
+    <span class="tag">[odvození s ověřovačem; srovnání s měřeným faktem]</span></p>
+    <p><strong>Poměr hmotnosti protonu a elektronu.</strong></p>
+    <table class="num">
+        <tr><td>6π<sup>5</sup> (1 + α<sup>2</sup>/3)</td><td>= 1836.150700637</td><td><span class="tag">[výpočet]</span></td></tr>
+        <tr><td>CODATA</td><td>= 1836.152673426</td><td><span class="tag">[měřený fakt]</span></td></tr>
+        <tr><td>relativní rozdíl</td><td>= 1.074 ppm</td><td></td></tr>
+    </table>
+    <p>Uvádíme obojí. Zbytek na úrovni ppm je fakt k vysvětlení, ne úspěch k oslavě.
+    <span class="tag">[odvození; koeficient uzamčen, původ zbytku otevřen]</span></p>
+    <p><strong>Temná energie.</strong></p>
+    <div class="eq">
+        <span class="line">w = −1 + 1/(d·p), &nbsp; d = 3 prostorové směry, &nbsp; p = 5, &nbsp; d·p = 15</span>
+        <span class="line">w = −14/15, &nbsp; konstantní <span class="tag">[předpověď]</span></span>
+    </div>
+    <p>v přesně vymezeném režimu homogenního pozadí. DESI dnes v datech vidí náznak časově proměnného w(z);
+    pětileté pozorování skončilo v dubnu 2026 a finální analýzy budou soudit. Pokud data vynutí w(z) tam,
+    kde TWIST-J říká konstantu, teorie padá.</p>
+    <p><strong>Elektroslabý úhel.</strong> Slovníková hodnota poměru vazeb 3/10 stojí; její odvození z akce
+    je otevřená zeď. MOLLER v Jefferson Lab, paritně narušený Møllerův rozptyl, změří slabý náboj elektronu.
+    Je to soudce, kterého jsme si objednali, ne rozsudek, který už padl.
+    <span class="tag">[předpověď + otevřená zeď]</span></p>
+
+    <h2><span class="n">10</span>Zeď</h2>
+    <p>Jmenujeme vlastní zeď nahlas: archimédovské místo, spojitý kruh 2π. Za ní leží dynamika kalibračních
+    polí, uvěznění barev (confinement) a plná akce kosmologie. Je to jedna fronta, ne dvě. Buď ji prorazíme
+    z celých čísel, nebo tam teorie skončí. <span class="tag">[otevřená zeď]</span></p>
+
+    <h2><span class="n">11</span>Protokol</h2>
+    <p>Žádné shrnutí není silnější než jeho štítek. Falzifikace je prvotřídní výsledek a archivuje se se
+    stejnou péčí jako důkaz. Každý rozhodný výpočet má přesné zadání, otisk SHA-256 a běh na dvou
+    architekturách. Krása má přitáhnout; štítky, kód a možnost popravy mají udržet.</p>
+
+    <h2><span class="n">12</span>Věta na konec</h2>
+    <p class="final">Svět je to, co zbude, když se počítání pootočí a uzavře.</p>
+
+    <div class="footer">
+        <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
+        <span class="dot">·</span>
+        <a href="/" style="font-style:italic">J = 1 + j²</a>
+        <span class="dot">·</span>
+        <a href="/">twistj.com</a>
+    </div>
+
+</div>
+</body>
+</html>
