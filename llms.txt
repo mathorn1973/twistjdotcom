@@ -9,6 +9,10 @@ Reading: Time is a counter. Space is a commutator. J is the verb; φ and π are 
 
 Status discipline: every claim carries a label, T / D / C / H / O / F / LOCK, ordered T-LOCK > T > D > C > H > O > F. No summary is stronger than its committed source. Falsification is registered as first-class progress. Exact rational and algebraic arithmetic throughout: ratios, not decimals, unless a decimal is justified by measurement.
 
+## Kernel
+
+The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j³), multiplication by J = 1 + j² is the matrix rows [1 0 -1 1; 0 1 -1 0; 1 0 0 0; 0 1 -1 1], entries in {-1, 0, 1}, det 1, trace 3, characteristic polynomial x⁴ - 3x³ + 4x² - 2x + 1. One step of the dynamics is (a, b, c, d) to (a-c+d, b-c, a, b-c+d): 4 additions, zero multiplications, exact integer arithmetic, zero drift. The 3+1+0 decomposition reads: three commuting directions, one counter, zero remainder; the decoder D = D_clock then D_geom then D_matter is acyclic (T-LOCK). Machine-readable kernel facts are embedded in the homepage DOM as JSON at id twistj-agent-card.
+
 ## Canon
 
 The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
