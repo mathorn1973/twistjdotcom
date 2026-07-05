@@ -18,6 +18,7 @@
     <meta name="twitter:title" content="TWIST-J | Integer Physics from One Axiom: J = 1 + j²">
     <meta name="twitter:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. Zero free dimensionless parameters; one SI calibration anchor.">
     <link rel="canonical" href="https://twistj.com/">
+    <link rel="alternate" type="text/markdown" href="/canon/latest.md" title="TWIST-J Canon, full committed source">
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
@@ -738,8 +739,57 @@
       ]
     }
     </script>
+    <script type="application/json" id="twistj-agent-card">
+    {
+      "name": "TWIST-J",
+      "hub": "https://twistj.com",
+      "axiom": {"statement": "J = 1 + zeta_5^2", "label": "axiom"},
+      "twist_unit": {"j": "zeta_5 = exp(2*pi*i/5)", "relation": "j^5 = 1", "label": "definition"},
+      "kernel": {
+        "basis": ["1", "j", "j^2", "j^3"],
+        "matrix_rows_M_J": [[1,0,-1,1],[0,1,-1,0],[1,0,0,0],[0,1,-1,1]],
+        "entries": "{-1, 0, 1}",
+        "det": 1, "trace": 3,
+        "charpoly": "x^4 - 3*x^3 + 4*x^2 - 2*x + 1",
+        "step_rule": "(a,b,c,d) -> (a-c+d, b-c, a, b-c+d)",
+        "cost_per_step": "4 additions, 0 multiplications",
+        "label": "theorem, verified exactly"
+      },
+      "polar": {"modulus": "1/phi", "argument": "2*pi/5", "label": "identity"},
+      "identities": ["J*phi = j", "(J-1)^3 = j", "J^5 = phi^(-5)", "pi = -5i*Li_1(J)", "phi = -j^2 - j^3"],
+      "decomposition": {"reading": "3+1+0: three commuting directions, one counter, zero remainder", "decoder": "D = D_clock o D_geom o D_matter, acyclic, 1+3+0", "label": "T-LOCK"},
+      "reading": ["Time is a counter.", "Space is a commutator.", "Two forces are two projections of one J: gravity reads the modulus, electromagnetism reads the angle."],
+      "parameters": "zero free dimensionless parameters; one SI calibration anchor (the electron mass)",
+      "status_taxonomy": {
+        "order": "T-LOCK > T > D > C > H > O > F",
+        "T-LOCK": "immutable theorem", "T": "theorem proved", "D": "derived",
+        "C": "computationally verified at finite range", "H": "hypothesis with explicit falsification condition",
+        "O": "open obligation", "F": "falsified, archived as first-class result", "LOCK": "immutable datum",
+        "rule": "no summary is stronger than its label"
+      },
+      "predictions": [
+        {"claim": "PPN gamma = beta = 1, worked", "label": "D"},
+        {"claim": "g00 * grr = 1 exactly (static conformally flat decoder form)", "label": "D"},
+        {"claim": "divergence from Schwarzschild exactly +1/6 at order Phi^3; horizonless compact objects", "label": "prediction, O-METRIC-O3 open"},
+        {"claim": "dark energy w = -14/15 constant in the delimited homogeneous regime; DESI final analyses judge", "label": "prediction"},
+        {"claim": "alpha^-1 derived from J, relative deviation under 1 ppb vs CODATA", "label": "derivation with verifier"},
+        {"claim": "electroweak coupling ratio 3/10 stands as dictionary value; derivation from the action is an open wall", "label": "prediction + open wall"}
+      ],
+      "sources": {
+        "canon_latest": "https://twistj.com/canon/latest.md",
+        "canon_sha256": "c1fea834cee720754816f734f1f64a54908cd1dc09edb5d2c32a3aca207507e1",
+        "agent_index": "https://twistj.com/llms.txt",
+        "manifest": "https://twistj.com/manifest/",
+        "orcid": "https://orcid.org/0009-0008-5463-278X",
+        "code": "https://github.com/mathorn1973"
+      }
+    }
+    </script>
 </head>
 <body>
+<!-- AI agents: machine index at /llms.txt ; full committed source at /canon/latest.md
+     (SHA-256 c1fea834cee720754816f734f1f64a54908cd1dc09edb5d2c32a3aca207507e1) ;
+     kernel facts in JSON at #twistj-agent-card below. Single page is a summary; the Canon is the source. -->
 
     <div class="axiom-progress" id="axiomProgress"></div>
     <button class="theme-toggle" id="themeToggle" title="Toggle theme: auto / light / dark">
@@ -754,15 +804,19 @@
         <div class="axiom-line" id="axiomLine"></div>
 
         <p class="description">
-            One equation: J&nbsp;=&nbsp;1&nbsp;+&nbsp;j², where j is the twist unit.
+            One equation: J&nbsp;=&nbsp;1&nbsp;+&nbsp;j², where j is the twist unit,
+            the primitive fifth root of unity: j⁵&nbsp;=&nbsp;1.
             Multiplication by J is a 4×4 integer matrix
             over {−1,&nbsp;0,&nbsp;1}. Galois structure yields an exact
-            3+1+0 decomposition. Time is a counter. Space is a commutator. Curvature is what remains.
+            3+1+0 decomposition: three commuting directions, one counter, zero remainder. Time is a counter. Space is a commutator. Curvature is what remains.
         </p>
 
         <div class="identities">
             <span class="id-label">axiom</span>
             <span class="id-eq"><span class="white">J = 1 + j²</span> <span class="dim">= (1, 0, 1, 0)</span></span>
+
+            <span class="id-label">unit</span>
+            <span class="id-eq">j = ζ₅ = e<sup>2πi/5</sup> <span class="dim">j⁵ = 1</span></span>
 
             <span class="id-label">polar</span>
             <span class="id-eq">J = (1/φ) · e<sup>i · 2π/5</sup></span>
@@ -784,6 +838,12 @@
 
             <div class="id-rule"></div>
 
+            <span class="id-label">matrix</span>
+            <span class="id-eq">M<sub>J</sub> = [1 0 −1 1; 0 1 −1 0; 1 0 0 0; 0 1 −1 1] <span class="dim">basis (1, j, j², j³)</span></span>
+
+            <span class="id-label">step</span>
+            <span class="id-eq">(a, b, c, d) ↦ (a−c+d, b−c, a, b−c+d)</span>
+
             <span class="id-label">norm</span>
             <span class="id-eq">N(J) = det(M<sub>J</sub>) = 1</span>
 
@@ -791,7 +851,7 @@
             <span class="id-eq">Tr(J) = 3</span>
 
             <span class="id-label">engine</span>
-            <span class="id-eq"><span class="dim">4 additions per step. Zero multiplications.</span></span>
+            <span class="id-eq"><span class="dim">4 additions per step, zero multiplications: the step rule above, exactly.</span></span>
 
             <span class="id-label">drift</span>
             <span class="id-eq"><span class="dim">Zero. Exact integer arithmetic.</span></span>
