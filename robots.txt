@@ -2,8 +2,14 @@ User-agent: *
 Allow: /
 Sitemap: https://twistj.com/sitemap.xml
 
-# AI training crawlers — allow indexing, content is public research
+# Agent index: https://twistj.com/llms.txt
+# Canon source: https://twistj.com/canon/latest.md
+
+# AI crawlers: allowed. This is public research; it wants to be read by machines.
 User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: Google-Extended
@@ -16,6 +22,15 @@ User-agent: anthropic-ai
 Allow: /
 
 User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
 Allow: /
 
 User-agent: Bytespider

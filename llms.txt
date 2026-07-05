@@ -1,0 +1,42 @@
+# TWIST-J
+
+> TWIST-J derives physics from one axiom: J = 1 + j², where j is the twist unit, a primitive fifth root of unity. Multiplication by J is a 4x4 integer matrix over {-1, 0, 1}. Galois structure yields an exact 3+1+0 decomposition. Zero free dimensionless parameters; one SI calibration anchor (the electron mass). The algebra is proved. The physics is falsifiable.
+
+Author: A. M. Thorn. ORCID: https://orcid.org/0009-0008-5463-278X
+Hub: https://twistj.com
+
+Reading: Time is a counter. Space is a commutator. J is the verb; φ and π are projections of J. If it cannot be calculated in integers, it is not physics. Plenum, not vacuum.
+
+Status discipline: every claim carries a label, T / D / C / H / O / F / LOCK, ordered T-LOCK > T > D > C > H > O > F. No summary is stronger than its committed source. Falsification is registered as first-class progress. Exact rational and algebraic arithmetic throughout: ratios, not decimals, unless a decimal is justified by measurement.
+
+## Canon
+
+The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
+
+- [Canon latest (currently v158, 3 July 2026)](https://twistj.com/canon/latest.md): always points at the current head
+- [Canon v158 frozen](https://twistj.com/canon/v158.md): SHA-256 03da39a8b2d9367603e27d688c56fe1dd73e66eb885a40fec33673f6f93fd488
+
+## Papers
+
+Full registry of works: https://orcid.org/0009-0008-5463-278X
+
+- [Twist Numbers and Four-Dimensional Integer J Algebra](https://doi.org/10.5281/zenodo.19056597): the foundation
+- [Twisted Units, Celestial Symmetries and Entropic Motion](https://doi.org/10.5281/zenodo.18311965): adelic computations, dilogarithmic identities, hyperbolic dynamics in Q(ζ5)
+- [The Hyperbolic Automorphism J: A Golden Ratio Unit in Z[ζ5]](https://doi.org/10.5281/zenodo.18523754)
+- [Time from a single algebraic datum: the Page-Wootters mechanism over Z[j]](https://doi.org/10.5281/zenodo.19313537)
+- [Dense cyclotomic subgroups of the Lorentz group and the Collins-Perez-Sudarsky obstruction](https://doi.org/10.5281/zenodo.20029795)
+- [The Broken Symmetry is an Integer Fraction: 3:5:5 trace partition and the 3/13 electroweak mixing skeleton](https://doi.org/10.5281/zenodo.20141133)
+
+## Site
+
+- [Home](https://twistj.com/): the axiom, the identities, the prediction
+- [Live demo](https://twistj.com/evo/): interactive kernel dynamics
+- [Pentaplex](https://twistj.com/pentaplex/): Penrose tilings, Galois projection ζ to ζ²
+- [Manifest](https://twistj.com/manifest/): the gate and the court protocol, in Czech
+- [Code](https://github.com/mathorn1973): verify it yourself
+
+## Optional
+
+- [Storyteller](https://twistj.com/storyteller/)
+- [Fractal](https://twistj.com/fractal/)
+- [Fractalus](https://twistj.com/fractalus/)
