@@ -14,7 +14,7 @@ Status discipline: every claim carries a label, T / D / C / H / O / F / LOCK, or
 The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
 
 - [Canon latest (currently v158, 3 July 2026)](https://twistj.com/canon/latest.md): always points at the current head
-- [Canon v158 frozen](https://twistj.com/canon/v158.md): SHA-256 03da39a8b2d9367603e27d688c56fe1dd73e66eb885a40fec33673f6f93fd488
+- [Canon v158 frozen](https://twistj.com/canon/v158.md): SHA-256 c1fea834cee720754816f734f1f64a54908cd1dc09edb5d2c32a3aca207507e1
 
 ## Papers
 

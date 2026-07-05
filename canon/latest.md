@@ -1,9 +1,10 @@
 # TWIST-J Canon v158 ALL-IN-ONE (master)
 
-**Author.** A. M. Thorn (Marek Spanel).
+**Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** twistj.com.
 **Date.** 3 July 2026.
+**Public build.** This copy redacts the legal name from author lines; no other change from the committed source.
 **Axiom.** J = 1 + zeta_5^2. Everything derives from this. Zero free dimensionless parameters; one SI calibration anchor (m_e).
 **Reading.** Time is a counter. Space is a commutator. J is the verb. phi and pi are projections of J.
 
@@ -44,7 +45,7 @@ _Source (verbatim, committed): `TWIST_J_Canon_v128_CONSOLIDATED.md`_
 
 # TWIST-J Canon v128 CONSOLIDATED
 
-**Author.** A. M. Thorn (Marek Spanel).
+**Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** [twistj.com](https://twistj.com).
 **Date.** 30 May 2026.
@@ -856,7 +857,7 @@ D-grade carried (no LOCK blocked)
 
 ```
 TWIST-J Canon v127 CONSOLIDATED.
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.  29 May 2026.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  29 May 2026.
 
 Canon serial:   Realny pruvodce imaginarnim vesmirem.
 Repository:     mathorn1973/twistjdotcom (public hub), mathorn1973/twistj-jam (private development),
@@ -868,7 +869,7 @@ objects, SS-DELTA, the O-ALPHA-EXACT-LEMMA closeout (alpha both halves), and the
 patch (v101 HYPERPLANE + O-CODEC-TR4). Three closures: alpha exact (T-LOCK), two promotions, O17 quantified.
 For derivational detail not reproduced here, the named source patch / session report remains the pull-point.
 
-Citation:        Marek Spanel cites A. M. Thorn for TWIST-J Canon content.
+Citation:        cite A. M. Thorn for TWIST-J Canon content.
                  PaW Bridge:        Zenodo DOI 10.5281/zenodo.19313537 (March 2026).
                  Lorentz density:   Zenodo DOI 10.5281/zenodo.20029689 (May 2026).
                  Twist numbers:     DOI 10.5281/zenodo.18523754.
@@ -1226,7 +1227,7 @@ _Source (verbatim, committed): `TWIST_J_Canon_v135_CONSOLIDATED.md`_
 
 # TWIST-J Canon v135 CONSOLIDATED
 
-**Author.** A. M. Thorn (Marek Spanel).
+**Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** [twistj.com](https://twistj.com).
 **Date.** 9 June 2026.
@@ -1490,7 +1491,7 @@ One LOCK label corrected (SS103, A). No axiom change. No free parameter added. v
 
 ```
 TWIST-J Canon v135 CONSOLIDATED.
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.  9 June 2026.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  9 June 2026.
 Supersedes v133; folds v134 patches and the committed 7-9 June advances (A1/O8A T, reading protocol D,
 Home-Direction coupling 3/4 with F-ALPHA-S-TRACE-ROOT, Krok3 abelian D / non-abelian O-NONABEL-MECHANISM,
 O17 dimension D, K3 carrier D, O-LIE-3 negative). One erroneous T-LOCK tag removed: Tr(C^2) = -21/8 -> O (SS103; zero sound LOCKs retracted).
@@ -3681,7 +3682,7 @@ Summary of status changes:
     E^- / E^+           D, polar     (Sec 6)
 
 ---
-A. M. Thorn (Marek Spanel). twistj.com. ORCID 0009-0008-5463-278X.
+A. M. Thorn. twistj.com. ORCID 0009-0008-5463-278X.
 Verifier prove_FPN1.py, SHA256 fbc8dd7597cba269a54df50d2738f326e6612ef9048693258a4b698dda80bd36, two-arch pass (aarch64 + x86_64).
 16 June 2026.
 
@@ -5071,7 +5072,7 @@ statement is authoritative._
 
 # TWIST-J Canon v153: the axiom raised to A0 (the closed integer J-Cayley plenum)
 
-**Author.** A. M. Thorn (Marek Spanel).
+**Author.** A. M. Thorn.
 **Date.** 19 June 2026.
 **Status.** A foundational reformulation at the LEVEL of the axiom, not its content. No physics
 body is rewritten; no derived status label changes; no new free parameter. Builds on the
@@ -5205,7 +5206,7 @@ _Consolidated delta, verbatim: TWIST_J_Canon_v154_CONSOLIDATED.md_
 
 # TWIST-J Canon v154 CONSOLIDATED (the two-frontier fold: FRW canonical form closed, QCD Krok 3 complete, one wall named, matter to its roots, Born to T-LOCK)
 
-**Author.** A. M. Thorn (Marek Spanel).
+**Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** twistj.com.
 **Date.** 3 July 2026.
@@ -5593,7 +5594,7 @@ TWISTJ_Canon_Patch_O_QCD_DYNAMICS_Casimir_Bridge.md                        d8027
 
 ---
 
-TWIST-J Canon v154 CONSOLIDATED. A. M. Thorn (Marek Spanel). twistj.com. ORCID 0009-0008-5463-278X.
+TWIST-J Canon v154 CONSOLIDATED. A. M. Thorn. twistj.com. ORCID 0009-0008-5463-278X.
 1 July 2026. Supersedes the loose chain 34a82ab4..19a58911 by consolidation; supersedes no label.
 
 ---
@@ -5601,7 +5602,7 @@ TWIST-J Canon v154 CONSOLIDATED. A. M. Thorn (Marek Spanel). twistj.com. ORCID 0
 # TWIST-J Canon v155 CONSOLIDATED (the day of the measure and the photon)
 
 ```
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.  2 July 2026.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  2 July 2026.
 Consolidates the committed chain bc37ecc1 .. a8944530 (this day) on top of
 v154. One canonical synthesis; sources verbatim in the per-session reports.
 Status taxonomy rigid: T-LOCK > T > D > C > H > O > F. Every summary line is
@@ -5807,7 +5808,7 @@ ALL_IN_ONE is next rebuilt, this file slots after v154.
 
 ---
 ```
-TWIST-J Canon v155 CONSOLIDATED. A. M. Thorn (Marek Spanel). twistj.com.
+TWIST-J Canon v155 CONSOLIDATED. A. M. Thorn. twistj.com.
 Standing rules: No em dashes. No decimals unless justified. Integers and
 ratios primary. If it cannot be calculated in integers, it is not physics.
 Plenum, not vacuum. Time is a counter. Space is a commutator. J is the
@@ -5820,7 +5821,7 @@ In science there is no place for ego. Vse je ONE.
 # TWIST-J Canon v156 CONSOLIDATED: the photon and the electron
 
 ```
-A. M. Thorn (Marek Spanel).  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
+A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
 Date: 2 July 2026.
 Consolidates 0c804d52..f76b58f4 (nine commits) on top of
 TWIST_J_Canon_v155_CONSOLIDATED (0c804d52, the day of the measure and the
@@ -6109,7 +6110,7 @@ architectures). No summary above is stronger than its committed source.
 
 ```
 TWIST-J Canon v156 CONSOLIDATED: the photon and the electron.
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.  2 July 2026.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  2 July 2026.
 Vse je ONE. If it cannot be calculated in integers, it is not physics.
 ```
 
@@ -6118,7 +6119,7 @@ Vse je ONE. If it cannot be calculated in integers, it is not physics.
 # TWIST-J Canon v157 CONSOLIDATED: the readable electron
 
 ```
-A. M. Thorn (Marek Spanel).  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
+A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
 Date: 3 July 2026.
 Consolidates 7dc982bf..HEAD on top of TWIST_J_Canon_v156_CONSOLIDATED
 (7dc982bf, the photon and the electron). Every Part below summarizes a
@@ -6305,7 +6306,7 @@ still waits, waits at one wall.
 
 ```
 TWIST-J Canon v157 CONSOLIDATED: the readable electron.
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.  3 July 2026.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  3 July 2026.
 Vse je ONE. If it cannot be calculated in integers, it is not physics.
 ```
 
@@ -6316,7 +6317,7 @@ _Source (verbatim, committed): TWIST_J_Canon_v158_CONSOLIDATED.md_
 # TWIST-J Canon v158 CONSOLIDATED: the reading of spacetime
 
 ```
-A. M. Thorn (Marek Spanel).  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
+A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
 Date: 3 July 2026.
 Consolidates 80684eaa..c61912ce (the afternoon arc of 3 July 2026) on top
 of TWIST_J_Canon_v157_CONSOLIDATED (6cc1754b, the readable electron).
@@ -6541,6 +6542,6 @@ five.
 
 ```
 TWIST-J Canon v158 CONSOLIDATED: the reading of spacetime.
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.  3 July 2026.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  3 July 2026.
 Vse je ONE. If it cannot be calculated in integers, it is not physics.
 ```
