@@ -1,41 +1,45 @@
-# TWIST-J Canon v160 ALL-IN-ONE (master)
+# TWIST-J Canon v160
+
+**Subtitle.** The Dirac ladder closes and the return group is dihedral.
 
 **Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** twistj.com.
 **Date.** 7 July 2026.
-**Axiom.** J = 1 + zeta_5^2. Everything derives from this. Zero free dimensionless parameters; one SI calibration anchor (m_e).
-**Reading.** Time is a counter. Space is a commutator. J is the verb. phi and pi are projections of J.
-**Public build.** This copy redacts the legal name from author lines; no other change from the committed source.
 
-**What this file is.** A single self-contained collapse of the committed TWIST-J Canon chain, replacing the "supersedes v(N-1) by reference" pattern with one master. Each Part below is the verbatim committed source it names; the source headlines and footers are kept as provenance. The unified front matter, Part dividers, gap markers, registry pointer, and footer are the only added material. No physics body is rewritten, so no status label is altered.
+**Axiom.** J = 1 + zeta_5^2. Everything derives from this. Zero free dimensionless parameters; one SI calibration anchor, the electron mass m_e.
 
-**Build basis (honest).** COMMITTED-SOURCES build. The last committed comprehensive base is v128. v129 (cosmology pullpoint) and v130 (G_D naming) are committed and folded. v135 to v140 are the committed heads/increments and are folded in order. The loose committed Canon patches in docs/ are folded (Part J). SS-PN.1 is folded (Part J9). v155 CONSOLIDATED (the day of the measure and the photon), v156 CONSOLIDATED (the photon and the electron), v157 CONSOLIDATED (the readable electron), v158 CONSOLIDATED (the reading of spacetime) and v159 CONSOLIDATED (the measure emerges and the census becomes theorems) and v160 CONSOLIDATED (the Dirac ladder closes and the return group is dihedral) are committed and folded in order below.
+**Reading.** Time is a counter. Space is a commutator. J is the verb. phi and pi are projections of J, not primitives.
 
-**KNOWN GAP (marked, not silently dropped).** The v131, v132, v133 bodies are uncommitted drafts that exist only in Claude project knowledge, confirmed absent from all nodes (JAS 2, Fractal). They are NOT folded here: faithfully landing a 111 KB body of record by retranscription would risk silent corruption, which Canon discipline forbids. The gap is marked inline below (GAP MARKER block) where the three bodies would slot, between Part C (v130) and Part D (v135). To fold losslessly: drop the three files into the repo on a node and re-run scripts/build_all_in_one.sh.
+**Conventions.** Integers and ratios throughout. Decimals appear only as engineering witnesses of a gap, never in a conclusion. Plenum, not vacuum. No em dashes. TWIST-J is the one name; twistj.com is the one hub. Every claim carries a status label.
 
-**Fold status (v154).** Chain folded through the v153 increment; the v154 consolidated delta (34a82ab4..19a58911, 19 June to 1 July 2026) is appended as the final part. Front matter synced to v154 on 1 July 2026; this sync is the only edit to the added material, no committed body rewritten.
+**Status taxonomy.** T-LOCK > T > D > C > H > O > F. Falsification is first-class progress. No summary is stronger than its committed source. Where two entries meet, the later registry line governs.
 
-**Status discipline.** T / D / C / H / O / F / LOCK. No summary stronger than its committed source. Falsification is first-class progress.
+**Notation.** Slip is X. Quantum angle is script-Q. Deflection is delta. phi := norm(J)^-1. pi := -5i Li_1(J). Two forces are two projections of J: the modulus gives gravity, the argument gives electromagnetism.
 
-## Table of contents
+**What this file is.** The single self-contained TWIST-J Canon at v160. It folds the committed chain into one document under one identity. Each folded section keeps its committed body verbatim and its source pointer; no physics is rewritten and no status label is altered. Only the wrapper is new: this front matter, the reading order below, and the removal of the repeated author blocks and the version-number noise from the section headings.
 
-- Part A. Committed comprehensive base (v128)
-- Part B. v129 cosmology pullpoint
-- Part C. v130 G_D naming
-- GAP. v131 body of record, v132 Part XI-bis, v133 five T-LOCK seals + SS-MN (NOT folded, marked)
-- Part D. v135 delta (SS103 commutator-trace hygiene, reading-protocol program, v134 fold)
-- Part E. v136
-- Part F. v137
-- Part G. v138
-- Part H. v139
-- Part I. v140 (T-BOOST-READING-SPLIT)
-- Part J. Loose committed Canon patches
-  - J1 channel theorem, J2 particles results, J3 basin typing, J4 Q1 coupling falsification,
-    J5 SS8A29 generator broadcast, J6 H/N collapsed H, J7 EM vertex Ward,
-    J8 proton structure program, J9 SS-PN.1 lapse/potential PPN discipline
-- Registry and obligations pointer
+**Known gap (marked, not dropped).** The v131, v132, v133 bodies are uncommitted drafts held only in project knowledge and confirmed absent from every node. They are not folded here; retranscribing a body of record by hand would risk silent corruption, which the discipline forbids. Their slot is between v130 and v135. To fold losslessly, drop the three files onto a node and rebuild.
 
+**Reading order (lineage).** The body below reads in this committed order:
+1. Foundational base (v128): the axiom, the two projections, and Parts I to XXI of the comprehensive reference.
+2. Cosmology pull-point (v129).
+3. G_D naming and layer separation (v130).
+4. [gap: v131 to v133, marked above]
+5. v135 delta: SS103 commutator-trace hygiene, the reading protocol, the v134 fold.
+6. v136, v137, v138, v139.
+7. v140: the boost-reading split.
+8. Loose committed patches: channel theorem, particle results, basin typing, Q1 coupling falsification, generator broadcast, neutron as collapsed hydrogen, the electromagnetic vertex and Ward identity, the proton-structure program, the SS-PN.1 lapse discipline.
+9. v153: the axiom raised to A0, the closed integer J-Cayley plenum.
+10. v154: the two-frontier fold: FRW canonical form closed, QCD step three complete, one wall named, matter to its roots, Born to T-LOCK.
+11. v155: the measure and the photon.
+12. v156: the photon and the electron.
+13. v157: the readable electron.
+14. v158: the reading of spacetime.
+15. v159: the measure emerges and the census becomes theorems.
+16. v160: the Dirac ladder closes and the return group is dihedral.
+
+**Registry.** The status, falsification, and open-obligation registries live in the committed sources folded below and in the phibit/canon_cayley verifier tree with their SHA-256 pins.
 
 ---
 
@@ -43,12 +47,8 @@
 
 _Source (verbatim, committed): `TWIST_J_Canon_v128_CONSOLIDATED.md`_
 
-# TWIST-J Canon v128 CONSOLIDATED
+# v128. Consolidated
 
-**Author.** A. M. Thorn.
-**ORCID.** 0009-0008-5463-278X.
-**Hub.** [twistj.com](https://twistj.com).
-**Date.** 30 May 2026.
 **Status.** COMPLETE TWIST. CONSOLIDATED Canon. Self-contained pull-from-canon authoritative reference. ALL-in-ONE update folding the post-v126 closures.
 **Supersedes.** TWIST_J_Canon_v127_CONSOLIDATED (29 May 2026).
 **Consolidates.** The v-stream through **v125**, Branch A through **A4**, the Sycamore proof objects (Phase A / Phase B), **SS-DELTA**, the **O-ALPHA-EXACT-LEMMA closeout** (alpha, both halves), and the **cheap-promotions** patch (v101 HYPERPLANE + O-CODEC-TR4). Built from `origin/main` of `mathorn1973/twistj-jam` at commit `404b03d`, fetched 29 May 2026.
@@ -869,7 +869,7 @@ objects, SS-DELTA, the O-ALPHA-EXACT-LEMMA closeout (alpha both halves), and the
 patch (v101 HYPERPLANE + O-CODEC-TR4). Three closures: alpha exact (T-LOCK), two promotions, O17 quantified.
 For derivational detail not reproduced here, the named source patch / session report remains the pull-point.
 
-Citation:        cite A. M. Thorn for TWIST-J Canon content.
+Citation:        A. M. Thorn cites A. M. Thorn for TWIST-J Canon content.
                  PaW Bridge:        Zenodo DOI 10.5281/zenodo.19313537 (March 2026).
                  Lorentz density:   Zenodo DOI 10.5281/zenodo.20029689 (May 2026).
                  Twist numbers:     DOI 10.5281/zenodo.18523754.
@@ -915,7 +915,6 @@ _Source (verbatim, committed): `cosmos/TWISTJ_Cosmology_v129_Pullpoint.md`_
 
 # TWIST-J Canon Note: v129 cosmology pull-point -- inflation dissolved, the tilt is O-NS-TILT
 
-**Author.** A. M. Thorn (twistj.com).
 
 **Type.** Records the v129 cosmology pull-point and CORRECTS the previous pass. The previous note
 (O_MACRO_A_consolidated.md) located the blocker as O-B2-FRW-INFLATION and proposed building an
@@ -1225,12 +1224,8 @@ Also committed but NOT folded in this build (minor, by agreed manifest): cosmos/
 
 _Source (verbatim, committed): `TWIST_J_Canon_v135_CONSOLIDATED.md`_
 
-# TWIST-J Canon v135 CONSOLIDATED
+# v135. Consolidated
 
-**Author.** A. M. Thorn.
-**ORCID.** 0009-0008-5463-278X.
-**Hub.** [twistj.com](https://twistj.com).
-**Date.** 9 June 2026.
 **Status.** COMPLETE TWIST. CONSOLIDATED Canon head. Authoritative v135 head; v131 remains the body of record for carried-forward locked material, v132 for Part XI-bis, v133 for the five T-LOCK seals and SS-MN. v135 folds the genuine advances of the 7 to 9 June sessions (the physics reading protocol and its program) and the v134 frontier patches, and applies one falsification-first lock correction.
 **Supersedes.** TWIST_J_Canon_v133_CONSOLIDATED (7 June 2026). The v134 work (K3 carrier match, O-LIE-3 negative audit, SS103 commutator-trace hygiene) was prepared as patches, not as a consolidated cut; it is folded here.
 **Consolidates.** Everything in v131, v132, v133, plus: the A1 Lorentz bridge closure (O-LI O to T, committed `cc9c943f`); the 7 June Home-Direction coupling rule; the 8 June reading-protocol program (committed `842e265b` plus `twister_scratch/` verifiers and `SESSION_REPORT_2026_06_08`); the v130 O17 dimension resolution (committed `cosmos/dimension.py`); the v134 patches; and the 9 June frontier status fold (`835fecb7`). Zero new free parameters. No axiom change. ONE lock label corrected (see below).
@@ -1512,7 +1507,7 @@ Read the HEAD before you write; the documents lagged the results, and v135 close
 
 _Source (verbatim, committed): `TWIST_J_Canon_v136_CONSOLIDATED.md`_
 
-# TWIST-J Canon v136 CONSOLIDATED
+# v136. Consolidated
 
 Author: A. M. Thorn
 Date: 2026-06-11
@@ -1742,7 +1737,7 @@ unchanged.
 
 _Source (verbatim, committed): `TWIST_J_Canon_v137_CONSOLIDATED.md`_
 
-# TWIST-J Canon v137 CONSOLIDATED
+# v137. Consolidated
 
 A. M. Thorn, 2026-06-11. This consolidation supersedes v136 by
 reference: v137 = v136 (SHA256
@@ -1857,7 +1852,7 @@ file live in the E patch and in the canonical registry rows.
 
 _Source (verbatim, committed): `TWIST_J_Canon_v138_CONSOLIDATED.md`_
 
-# TWIST-J Canon v138 CONSOLIDATED
+# v138. Consolidated
 
 A. M. Thorn, 2026-06-11. This consolidation supersedes v137 by
 reference: v138 = v137 (SHA256
@@ -2120,7 +2115,7 @@ ac1c24a.
 
 _Source (verbatim, committed): `TWIST_J_Canon_v139_CONSOLIDATED.md`_
 
-# TWIST-J Canon v139 CONSOLIDATED
+# v139. Consolidated
 
 A. M. Thorn, 2026-06-13. This consolidation supersedes v138 by
 reference: v139 = v138 (SHA256
@@ -2423,7 +2418,7 @@ and reproduced above.
 
 _Source (verbatim, committed): `TWIST_J_Canon_v140_CONSOLIDATED.md`_
 
-# TWIST-J Canon v140 CONSOLIDATED
+# v140. Consolidated
 
 A. M. Thorn, 2026-06-16.
 
@@ -5072,8 +5067,6 @@ statement is authoritative._
 
 # TWIST-J Canon v153: the axiom raised to A0 (the closed integer J-Cayley plenum)
 
-**Author.** A. M. Thorn.
-**Date.** 19 June 2026.
 **Status.** A foundational reformulation at the LEVEL of the axiom, not its content. No physics
 body is rewritten; no derived status label changes; no new free parameter. Builds on the
 gravity-lift arc and the A0 rescue verifier of 2026-06-19.
@@ -5204,12 +5197,8 @@ Source note (self-pinned):  TWIST_J_Canon_v153_AXIOM_A0.md
 
 _Consolidated delta, verbatim: TWIST_J_Canon_v154_CONSOLIDATED.md_
 
-# TWIST-J Canon v154 CONSOLIDATED (the two-frontier fold: FRW canonical form closed, QCD Krok 3 complete, one wall named, matter to its roots, Born to T-LOCK)
+# v154. The two-frontier fold: FRW canonical form closed, QCD Krok 3 complete, one wall named, matter to its roots, Born to T-LOCK
 
-**Author.** A. M. Thorn.
-**ORCID.** 0009-0008-5463-278X.
-**Hub.** twistj.com.
-**Date.** 3 July 2026.
 **Against.** Canon v153 (34a82ab4, the axiom raised to A0).
 **Range.** The committed chain 34a82ab4..19a58911, 32 commits, 19 June to 1 July 2026.
 **Status.** Consolidation fold. No new mathematical content beyond the folded committed sources; every label below is the label of its source, never stronger. Four new T-LOCK (Born Parts I to IV, cross-platform gate closed). Zero new free parameters (cumulative still 1, the m_e SI anchor). No axiom change. No prior LOCK retracted. This fold also performs the overdue ALL-IN-ONE front-matter sync.
@@ -5599,7 +5588,7 @@ TWIST-J Canon v154 CONSOLIDATED. A. M. Thorn. twistj.com. ORCID 0009-0008-5463-2
 
 ---
 
-# TWIST-J Canon v155 CONSOLIDATED (the day of the measure and the photon)
+# v155. The day of the measure and the photon
 
 ```
 A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.  2 July 2026.
@@ -5818,7 +5807,7 @@ In science there is no place for ego. Vse je ONE.
 
 ---
 
-# TWIST-J Canon v156 CONSOLIDATED: the photon and the electron
+# v156. The photon and the electron
 
 ```
 A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
@@ -6116,7 +6105,7 @@ Vse je ONE. If it cannot be calculated in integers, it is not physics.
 
 ---
 
-# TWIST-J Canon v157 CONSOLIDATED: the readable electron
+# v157. The readable electron
 
 ```
 A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
@@ -6314,7 +6303,7 @@ Vse je ONE. If it cannot be calculated in integers, it is not physics.
 
 _Source (verbatim, committed): TWIST_J_Canon_v158_CONSOLIDATED.md_
 
-# TWIST-J Canon v158 CONSOLIDATED: the reading of spacetime
+# v158. The reading of spacetime
 
 ```
 A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
@@ -6550,7 +6539,7 @@ Vse je ONE. If it cannot be calculated in integers, it is not physics.
 
 _Source (verbatim, committed): TWIST_J_Canon_v159_CONSOLIDATED.md_
 
-# TWIST-J Canon v159 CONSOLIDATED: the measure emerges and the census becomes theorems
+# v159. The measure emerges and the census becomes theorems
 
 ```
 A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
@@ -6923,7 +6912,7 @@ Vse je ONE. If it cannot be calculated in integers, it is not physics.
 ---
 
 
-# TWIST-J Canon v160 CONSOLIDATED: the Dirac ladder closes and the return group is dihedral
+# v160. The Dirac ladder closes and the return group is dihedral
 
 ```
 A. M. Thorn.  ORCID 0009-0008-5463-278X.  Hub: twistj.com.
