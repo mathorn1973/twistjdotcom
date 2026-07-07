@@ -8,9 +8,27 @@
   </url>
   <url>
     <loc>https://twistj.com/canon/</loc>
-    <lastmod>2026-07-05</lastmod>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://twistj.com/canon/latest.md</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://twistj.com/canon/v161.md</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://twistj.com/llms.txt</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://twistj.com/evo/</loc>
