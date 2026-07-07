@@ -17,7 +17,8 @@ The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j�
 
 The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
 
-- [Canon latest (currently v158, 3 July 2026)](https://twistj.com/canon/latest.md): always points at the current head
+- [Canon latest (currently v160, 7 July 2026)](https://twistj.com/canon/latest.md): always points at the current head
+- [Canon v160 frozen](https://twistj.com/canon/v160.md): SHA-256 0f0f0814fc1481d5374d2ffff3b55f8099eff32ba2304b64c98463dadceb26aa
 - [Canon v158 frozen](https://twistj.com/canon/v158.md): SHA-256 c1fea834cee720754816f734f1f64a54908cd1dc09edb5d2c32a3aca207507e1
 
 ## Papers
