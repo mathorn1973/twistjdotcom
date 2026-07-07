@@ -19,8 +19,6 @@ The Canon is the committed body of record. Read it directly; it is plain markdow
 
 - [Canon latest (currently v161, 7 July 2026)](https://twistj.com/canon/latest.md): always points at the current head
 - [Canon v161 frozen](https://twistj.com/canon/v161.md): SHA-256 a9050c12ac3880f05e8aa7b4b8fd2a211637d1b8a6f8a7868a2890f6ac652762
-- [Canon v160 frozen](https://twistj.com/canon/v160.md): SHA-256 cba308a230dcdb0913287ae5bee28736798ecb4591908bd23cffaf9952abb186
-- [Canon v158 frozen](https://twistj.com/canon/v158.md): SHA-256 c1fea834cee720754816f734f1f64a54908cd1dc09edb5d2c32a3aca207507e1
 
 ## Papers
 
