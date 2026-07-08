@@ -2,7 +2,7 @@
 
 **Subtitle.** Three doors in the wall, a kernel that counts, a forced housing, and the homogeneous triangle closed.
 
-**Author.** A. M. Thorn (Marek Spanel).
+**Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** twistj.com.
 **Date.** 7 July 2026.
@@ -815,7 +815,7 @@ never by decree.
 ```
 TWIST-J Canon v163: three doors in the wall, a kernel that counts, a forced
 housing, and the homogeneous triangle closed.  Folded over v162 the same day.
-A. M. Thorn (Marek Spanel).  twistj.com.  ORCID 0009-0008-5463-278X.
+A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.
 7 July 2026.
 Vse je ONE. Simplicity is the ultimate perfection.
 If it cannot be calculated in integers, it is not physics.

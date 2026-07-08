@@ -17,10 +17,10 @@ The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j�
 
 The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
 
-- [Canon latest (currently v163, 7 July 2026)](https://twistj.com/canon/latest.md): always points at the current head, SHA-256 84dbcd8ef6aa80654a15a9e930d80b666e2bbf78881e18b4ce6372fc6307ed42
-- [Canon v164 patch, the twist quadratic (values canonical, orbit boundary)](https://twistj.com/canon/v164.md): SHA-256 548c5ca94a8f412e0f8f1d88b1f427f5d755e414bdc9a693e5b2ba70159766d6
-- [Canon v163 frozen](https://twistj.com/canon/v163.md): SHA-256 84dbcd8ef6aa80654a15a9e930d80b666e2bbf78881e18b4ce6372fc6307ed42
-- [Canon v162 frozen](https://twistj.com/canon/v162.md): SHA-256 75c2b0dda199621af260758118c528788a68a2003203d084d75d42ea9e6b8295
+- [Canon latest (currently v163, 7 July 2026)](https://twistj.com/canon/latest.md): always points at the current head, SHA-256 4ac077eb15c309f1b2c6ccf566c310eb00f00e70cf76940634a8c292d0e352eb
+- [Canon v164 patch, the twist quadratic (values canonical, orbit boundary)](https://twistj.com/canon/v164.md): SHA-256 56db32c713e61c11fc82f4f76fe4acb4ddb2b3fc3b6f31a20f87438406e75a3d
+- [Canon v163 frozen](https://twistj.com/canon/v163.md): SHA-256 4ac077eb15c309f1b2c6ccf566c310eb00f00e70cf76940634a8c292d0e352eb
+- [Canon v162 frozen](https://twistj.com/canon/v162.md): SHA-256 023f583fbfd185730b39f2308ddaf3f9902d65e86444c7ef3ffd82df7ce74ddf
 - [Canon v161 frozen](https://twistj.com/canon/v161.md): SHA-256 a9050c12ac3880f05e8aa7b4b8fd2a211637d1b8a6f8a7868a2890f6ac652762
 
 ## Papers
