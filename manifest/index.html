@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TWIST-J Manifest</title>
-    <meta name="description" content="TWIST-J Manifest: one axiom J = 1 + ζ₅². There is no vacuum, only the plenum; its density is 1/6 and its face is T = 2i(1 − J). The fine structure constant is the electromagnetic reading of the plenum, derived with zero free parameters. Integers and ratios, a map of responsibility.">
+    <meta name="description" content="TWIST-J Manifest: a finite rule, unbounded becoming. The whole universe, matter, both forces, space and time, from one step J = 1 + ζ₅², computed in integers, with zero free parameters.">
     <meta name="author" content="A. M. Thorn">
     <meta property="og:title" content="TWIST-J Manifest">
-    <meta property="og:description" content="One axiom. No vacuum, only the plenum. Alpha is its electromagnetic reading, with zero free parameters.">
+    <meta property="og:description" content="A finite rule, unbounded becoming. That is TWIST-J in a nutshell.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://twistj.com/manifest/">
     <meta property="og:locale" content="en_US">
@@ -23,15 +23,13 @@
         :root {
             --bg: #f4f1eb; --text: #2a2520; --text-bright: #1a1714;
             --accent: #8b4513; --muted: #7a7570; --dim: #999;
-            --rule: #d4cfc7; --eq-bg: #f3f0ea; --silver: #6b6560;
-            --link: #6b6560; --link-hover: #8b4513;
+            --rule: #d4cfc7; --link: #6b6560; --link-hover: #8b4513;
         }
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #1c1915; --text: #b8b3a8; --text-bright: #d4cfc6;
                 --accent: #b08050; --muted: #7a7268; --dim: #605850;
-                --rule: #38332c; --eq-bg: #252118; --silver: #9a9488;
-                --link: #9a9488; --link-hover: #b08050;
+                --rule: #38332c; --link: #9a9488; --link-hover: #b08050;
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,7 +38,7 @@
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-size: 1.22rem; font-weight: 400; line-height: 1.62;
         }
-        .page { max-width: 43em; margin: 0 auto; padding: 4rem 1.4rem 3rem; }
+        .page { max-width: 40em; margin: 0 auto; padding: 4rem 1.4rem 3rem; }
         .eyebrow {
             font-size: .82rem; letter-spacing: .34em; text-transform: uppercase;
             color: var(--accent); text-align: center;
@@ -51,254 +49,96 @@
         }
         .byline { text-align: center; color: var(--muted); font-size: 1.02rem; font-style: italic; }
         .motto {
-            margin: 2.2rem 0 0; color: var(--muted); font-size: 1rem;
-            border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
-            padding: .9rem 0; text-align: center;
+            text-align: center; font-size: 1.45rem; font-weight: 500;
+            color: var(--text-bright); margin: 2.4rem 0 .8rem;
         }
-        .hero-eq {
-            text-align: center; font-size: 1.85rem; font-weight: 500;
-            color: var(--text-bright); margin: 3rem 0 .4rem; letter-spacing: .01em;
-        }
+        .lede { text-align: center; font-style: italic; color: var(--muted); margin-bottom: 2.6rem; }
         h2 {
-            font-weight: 500; font-size: 1.5rem; color: var(--text-bright);
-            margin: 3rem 0 .8rem; border-bottom: 1px solid var(--rule); padding-bottom: .3rem;
+            font-weight: 500; font-size: .92rem; letter-spacing: .22em;
+            text-transform: uppercase; color: var(--accent);
+            margin: 2.2rem 0 .6rem; padding-top: 1.4rem;
+            border-top: 1px solid var(--rule);
         }
-        h2 .n { color: var(--accent); font-weight: 400; margin-right: .55em; }
-        p { margin: 0 0 1rem; }
-        .eq {
-            background: var(--eq-bg); border-left: 2px solid var(--accent);
-            padding: .8rem 1.1rem; margin: 1.1rem 0; font-size: 1.16rem;
-            color: var(--text-bright);
-        }
-        .eq.center { text-align: center; border-left: none;
-            border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
-            background: transparent; font-size: 1.3rem; }
-        .eq .line { display: block; margin: .15rem 0; }
-        .tag {
-            color: var(--accent); font-size: .78em; letter-spacing: .05em;
-            font-style: normal; white-space: nowrap; margin-left: .6em;
-        }
-        .note { color: var(--dim); font-size: .85em; }
-        .ov { text-decoration: overline; }
-        table.num { border-collapse: collapse; margin: 1.1rem auto; font-size: 1.12rem; }
-        table.num td { padding: .18rem 1.1rem .18rem 0; color: var(--text-bright); }
-        table.num td:last-child { padding-right: 0; }
-        sub, sup { line-height: 0; }
-        .final {
-            text-align: center; font-size: 1.5rem; font-style: italic;
-            color: var(--text-bright); margin: 2.4rem 0 0;
-        }
-        .footer {
-            margin-top: 4rem; padding-top: 1.2rem; border-top: 1px solid var(--rule);
+        p { margin-bottom: 1rem; }
+        .foot {
+            margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
             text-align: center; color: var(--muted); font-size: 1rem;
         }
-        .footer a { color: var(--link); text-decoration: none; border-bottom: 1px dotted var(--rule); }
-        .footer a:hover { color: var(--link-hover); }
-        .dot { margin: 0 .6em; color: var(--dim); }
-        a { color: var(--link); }
-        a:hover { color: var(--link-hover); }
-        @media (max-width: 560px) {
-            body { font-size: 1.1rem; }
-            h1 { font-size: 2.15rem; }
-            .hero-eq { font-size: 1.45rem; }
-            table.num { font-size: 1rem; }
-        }
+        a { color: var(--link); text-decoration: none; border-bottom: 1px solid var(--rule); }
+        a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
     </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "TWIST-J Manifest",
+      "author": { "@type": "Person", "name": "A. M. Thorn" },
+      "url": "https://twistj.com/manifest/",
+      "description": "A finite rule, unbounded becoming. The whole universe, matter, both forces, space and time, from one step J = 1 + \u03b6\u2085\u00b2, computed in integers, with zero free parameters."
+    }
+    </script>
 </head>
 <body>
-<div class="page">
+    <div class="page">
+        <div class="eyebrow">TWIST-J</div>
+        <h1>Manifest</h1>
+        <div class="byline">A. M. Thorn</div>
 
-    <div class="eyebrow">TWIST-J</div>
-    <h1>Manifest</h1>
-    <div class="byline">A. M. Thorn · 8 July 2026 · version 5, English</div>
+        <div class="motto">A finite rule, unbounded becoming.<br>That is TWIST-J in a nutshell.</div>
+        <p class="lede">One sentence longer: the whole universe, matter, both forces, space and time,
+        flows from a single step, J&nbsp;=&nbsp;1&nbsp;+&nbsp;&zeta;&#8325;&sup2;, computed entirely in
+        integers, with not a single free parameter.</p>
 
-    <p class="motto">Simplicity is the ultimate perfection.<br>
-    If it cannot be calculated in integers, it is not physics.<br>
-    A decimal is earned by measurement; unearned, it blurs the truth.<br>
-    Truth is not rude. Truth is just true.</p>
+        <h2>For the layperson</h2>
+        <p>Picture a coin standing on its edge. Outwardly silent, balanced. Inside, it counts;
+        one step, repeated over and over. Out of that repetition the golden ratio and pi climb out
+        on their own; nothing is plugged in, they simply appear. The space around you is not a stage,
+        and the time you live through is not a river; both are just this counting, read from inside.
+        And what people call empty space is not empty: it is the plenum, a full, counting substance.
+        The universe is not a thing. It is a verb.</p>
 
-    <h2><span class="n">1</span>The Step</h2>
-    <p>TWIST-J does not begin with space, time, or a field. It begins with a single countable event:
-    a step that does not repeat directly but returns rotated. The elementary step is the smallest
-    fifth-turn step that carries the golden ratio:</p>
-    <div class="hero-eq">J = 1 + ζ<sub>5</sub><sup>2</sup> = φ<sup>−1</sup> · e<sup>2πi/5</sup> <span class="tag">[definition]</span></div>
-    <p style="text-align:center; color:var(--muted); font-style:italic; margin-top:.2rem;">The following lines are already identity:</p>
-    <div class="eq">
-        <span class="line">1 − J &nbsp;=&nbsp; −ζ<sub>5</sub><sup>2</sup> &nbsp;=&nbsp; e<sup>−iπ/5</sup> <span class="note">(unit modulus, principal branch)</span></span>
-        <span class="line">Li<sub>1</sub>(J) &nbsp;=&nbsp; −log(1 − J) &nbsp;=&nbsp; iπ/5</span>
-        <span class="line">π &nbsp;=&nbsp; −5i · Li<sub>1</sub>(J) <span class="tag">[identity]</span></span>
+        <h2>For the physicist, for the scientist</h2>
+        <p>TWIST-J has no free dimensional parameter; the single calibration for all of physics is
+        the electron mass, and that only for the sake of units. Gravity and electromagnetism are two
+        projections of one J, the modulus and the argument. The strongest piece is the fine structure
+        constant, derived purely from J; it agrees with the measured value to a tenth of a billionth,
+        it was never aimed there, it simply fell out of the computation. The proton to electron mass
+        ratio, 6&pi;&#8309; with a small correction, differs from measurement by one part in a
+        million, and that remainder is admitted, not celebrated. Dark energy carries a fixed
+        prediction, w&nbsp;=&nbsp;&minus;14/15, now standing trial before the DESI data. And the
+        discipline is falsification: the exponential metric was refuted by the ringdown of
+        gravitational wave GW250114, and out of that refutation grew, the same day, a closed
+        gravitational wave sector; the one derivation still owed, O-TT-GAUGE-DERIVATION, stands
+        with its falsifier armed.</p>
+
+        <h2>For the mathematician</h2>
+        <p>The foundation of TWIST-J is the cyclotomic field Q(&zeta;&#8325;). Multiplication by the
+        generator J is a four by four integer matrix with entries only &minus;1, 0, 1, determinant
+        one, trace three. The step group is the binary icosahedral 2I&nbsp;=&nbsp;SL(2,5), and through
+        the McKay correspondence it leads to the affine Dynkin diagram &Etilde;&#8328;. The
+        classification of stable classes gives exactly 313 attractors (125&nbsp;+&nbsp;125&nbsp;+&nbsp;62&nbsp;+&nbsp;1).
+        Every claim carries an explicit status, definition, axiom, identity, theorem, computation,
+        open wall, and no summary is stronger than its own label.</p>
+
+        <h2>For the programmer, for the engineer</h2>
+        <p>In practice TWIST-J is a machine of four additions per step and zero multiplications; no
+        drift, just exact integer arithmetic, verified bit by bit on two different architectures,
+        with a SHA-256 hash over every result. A by-product, JAM, is a small language model built to
+        test whether the J-algebra helps as a computational layer. Almost everything failed; a linear
+        transform placed before a learned layer is absorbed into it without remainder. Two things
+        survived, the D<sub>J</sub> motor and the BinDJ positional encoding. Inference runs in INT4.</p>
+
+        <h2>For the philosopher</h2>
+        <p>The axiom reads: reality is the closed integer J-plenum, with no outer boundary, no outer
+        clock, only an inner reading. The total energy sums to zero, not as a wish but as a theorem.
+        Time is a counter, space is a commutator, curvature is what remains. The central principle:
+        if it cannot be calculated in integers, it is not physics. It is at once a claim about the
+        nature of the world and about the method of knowing it; a map of responsibility, not a
+        request for faith.</p>
+
+        <div class="foot">
+            <a href="/canon/">the Canon</a> &middot; <a href="/">twistj.com</a>
+        </div>
     </div>
-    <p>So φ is not decoration; it is the size of the step. And π is not a circle assumed in advance;
-    it is the trace of a branch. This is not a picture. It is a four-line computation anyone can verify.</p>
-    <p>J is not a constant. J is a verb: the thing that happens. Technically, a rewriting rule,
-    a step generator, an endomorphism of state. <span class="tag">[definition]</span>
-    The constants φ and π are its shadows, not its assumptions.</p>
-    <p>The rest of the theory is allowed to do one thing only: show that physics is the readable
-    consequence of this closed integer step.</p>
-
-    <h2><span class="n">2</span>The Axiom</h2>
-    <div class="eq center">A0. Reality is a closed integer J-Cayley plenum. <span class="tag">[axiom]</span></div>
-    <p>Closed: the whole has no outside, the energy sum is zero as a theorem, not as a wish, and time
-    arises inside as correlation with a counter. Integer: if it cannot be calculated in integers, it is
-    not physics. J-Cayley: the entire algebra is generated by the single step J. Plenum: no vacuum;
-    the medium is full and rest is equilibrium.</p>
-    <p>Every further claim in this frame is labeled definition, axiom, identity, theorem, computation,
-    measured fact, prediction, conjecture, or open wall. We do not say believe. We hand over a map of
-    responsibility.</p>
-
-    <h2><span class="n">3</span>There Is No Vacuum</h2>
-    <p>What physics calls empty space, TWIST-J calls by its older and better name: the plenum, the
-    full. It is not a container waiting for matter; it is matter in its ground state, the substance
-    whose counting is everything else. The plenum is not the stage of the universe. The plenum is the
-    universe. The axiom already names it. <span class="tag">[definition; the axiom names it]</span></p>
-    <p>The plenum is not featureless. Its density is ρ = 1/6, exact, counted from the pair statistics
-    of the binary driver, fitted to nothing; the same statistics force the dark matter ratio 5 : 1 as
-    a theorem, not an observation to be explained away. <span class="tag">[theorems]</span></p>
-    <p>And the plenum has a face: one complex number.</p>
-    <div class="eq">
-        <span class="line">T &nbsp;=&nbsp; s + iφ &nbsp;=&nbsp; 2i (1 − J), &nbsp; |T| = 2 <span class="tag">[theorem]</span></span>
-        <span class="line">s &nbsp;=&nbsp; |1 − ζ<sub>5</sub>| <span class="note">(the ramified chord: stiffness)</span> &nbsp;·&nbsp; φ &nbsp;=&nbsp; (J<span class="ov">J</span>)<sup>−1/2</sup> <span class="note">(the golden modulus)</span></span>
-    </div>
-    <p>Read it off the axiom in one move: the slip 1 − J is a pure unit phase; double it, turn it
-    left, and you hold the plenum point, modulus two, angle three twentieths of the full turn. The
-    Thorn triangle s<sup>2</sup> + φ<sup>2</sup> = 4 is not a picture of the plenum. It is the plenum
-    in the archimedean cut: the modulus |T|<sup>2</sup> = 4 written out in its two legs.
-    <span class="tag">[theorem]</span></p>
-
-    <h2><span class="n">4</span>Time and Space</h2>
-    <p>Time is a counter. Nothing more: a 2-adic odometer ticking inside the whole. <span class="tag">[reading definition]</span></p>
-    <p>Space is a commutator. Take two steps: first a then c, or first c then a. Where the order does
-    not matter locally, we read flatness. Where it matters, a remainder [T<sub>a</sub>, T<sub>c</sub>]
-    survives, and that remainder we read as curvature; distance is the measure of how much the two
-    orders differ.
-    <span class="tag">[theorem in the algebra; the physical reading is derived in the Canon]</span></p>
-    <p>Motion is counting. One substrate boost carries rapidity ln φ; n steps are Fibonacci and
-    Lucas numbers; the mass shell is the classical identity L<sub>n</sub><sup>2</sup> − 5F<sub>n</sub><sup>2</sup> = 4(−1)<sup>n</sup>;
-    Einstein velocity addition is integer addition of counts; and the light cone is an asymptote
-    guarded by an integer identity, not a wall. Sealed at the highest label after 734 exact checks
-    ran byte-identical on two architectures.
-    <span class="tag">[theorems, sealed 7 July 2026]</span></p>
-
-    <h2><span class="n">5</span>Two Projections</h2>
-    <p>A complex step has a modulus and an angle. Gravity reads the modulus. Electromagnetism reads the
-    angle. The two forces are not two substances; they are two projections of one J.
-    <span class="tag">[program reading; derivation in the Canon]</span></p>
-    <p>On the modulus side the homogeneous cosmology is now a theorem triangle: the constraint,
-    the acceleration equation, and conservation force one another two ways from one action, and the
-    locked plenum dilutes as a<sup>−1/p</sup>.
-    <span class="tag">[theorem, conditional on the recorded action reading]</span></p>
-
-    <h2><span class="n">6</span>Two Places</h2>
-    <p>The prime 5 writes: geometry, gravity, the golden ratio, the ramified place. The prime 2 reads:
-    quadratic visibility, spin as angle halving, ζ<sub>8</sub> on the boundary of F<sub>25</sub>.
-    They meet only over Q. That means 5-adic writing and 2-adic reading never merge at one place;
-    the common language is the rational skeleton alone.</p>
-    <p>The Born rule is the norm of visibility: probability is this quadratic norm, not a primitive
-    substance, and the square root of a phase is the halving of a spin angle, not the inversion of a
-    probability. Quantum mechanics is not an added layer; it is how the integer record becomes visible.
-    <span class="tag">[theorems; the core sealed by verifiers pinned with SHA-256 on two architectures, aarch64 and x86_64]</span></p>
-
-    <h2><span class="n">7</span>Matter</h2>
-    <p>Matter is what the decoder reads as stable. By attractor we mean a finite stable class of a
-    fixed rewriting rule after the frame symmetries are identified; the state space, the map, and the
-    decomposition are given in the Canon. In that fixed frame the count is</p>
-    <div class="eq center">313 attractors = 5<sup>3</sup> + 5<sup>3</sup> + 62 + 1 <span class="tag">[computation]</span></div>
-    <p>313 is not a number hunted to match particles. It is the count of stable classes of one fixed
-    decoder.</p>
-    <p>And the housing of matter is not a choice: the color carrier is forced to the fundamental
-    triplet ker(Tr), and the weak doublet is the unique pseudo-real carrier of 2I with its symplectic
-    pairing. The two pairings of matter are different in kind by theorem: color pairs particle with
-    antiparticle; the weak force pairs up with down inside one module.
-    <span class="tag">[theorems]</span></p>
-
-    <h2><span class="n">8</span>The Icosahedron and E8</h2>
-    <p>The step group is the binary icosahedral group 2I = SL(2,5). Its representations, through the
-    McKay correspondence, recover the affine Dynkin diagram Ẽ<sub>8</sub>. <span class="tag">[theorem, classical]</span>
-    Embedding the gauge structure on this lattice is a separate construction, carried out exactly over
-    Q(√5), with no free parameter, with hash-pinned verifiers. <span class="tag">[computation + derivation]</span></p>
-
-    <h2><span class="n">9</span>Alpha, the Queen</h2>
-    <p>If the plenum is real, it must answer when asked. The most precise question physics has ever
-    asked of empty space is electromagnetic, and the answer is alpha, the fine structure constant.</p>
-    <div class="eq center">α &nbsp;=&nbsp; 5S / ((8π)<sup>2</sup> √s) <span class="tag">[derivation]</span></div>
-    <p>Read the formula as a sentence. The slip X = 1/(2<sup>5</sup>π<sup>2</sup>φ<sup>4</sup>) is one
-    quantum angle per geometric volume of the plenum. Capital S = (1 + X/5)<sup>−5</sup> is not a small
-    correction term; it is the five-gate transmittance of the plenum, the survival of that slip through
-    five gates. And √s is the stiffness, the real ramified chord. So alpha reads both legs of the
-    stone: the real leg as stiffness, the imaginary leg as transmittance. Alpha is the electromagnetic
-    reading of the plenum. <span class="tag">[derivation over theorems]</span></p>
-    <p>And because J is the verb, the Queen closes into the axiom alone:</p>
-    <div class="eq">
-        <span class="line">α<sup>−1</sup> &nbsp;=&nbsp; (2<sup>6</sup>π<sup>2</sup>/5) · (1 + J<span class="ov">J</span>)<sup>1/4</sup> · (1 + (J<span class="ov">J</span>)<sup>2</sup>/(2<sup>5</sup>·5·π<sup>2</sup>))<sup>5</sup></span>
-        <span class="line">α<sup>−1</sup> &nbsp;=&nbsp; 2<sup>6</sup>·5 · Li<sub>1</sub>(J) Li<sub>1</sub>(<span class="ov">J</span>) · (1 + J<span class="ov">J</span>)<sup>1/4</sup> · (1 + (J<span class="ov">J</span>)<sup>2</sup>/(2<sup>5</sup>·5<sup>3</sup>·Li<sub>1</sub>(J) Li<sub>1</sub>(<span class="ov">J</span>)))<sup>5</sup></span>
-    </div>
-    <p>Every coefficient is written as the prime power it is; nothing enters but 2, 5, J, and
-    Li<sub>1</sub>(J). Textbooks already read alpha as an impedance ratio, Z<sub>0</sub>/(2R<sub>K</sub>),
-    the vacuum against the quantum of resistance; TWIST-J adds the missing noun. The vacuum is the
-    plenum, and both impedances are readings of one stone.
-    <span class="tag">[derivation; the SI reading is standard]</span></p>
-    <p>Witness, proving nothing: α<sup>−1</sup> reads 137.035999190 against the measured
-    137.035999177(21), one tenth of a part per billion, inside the experimental bar, with zero free
-    parameters. The number was not aimed at. It was read.
-    <span class="tag">[derivation with verifier; comparison with a measured fact]</span></p>
-
-    <h2><span class="n">10</span>The Numbers</h2>
-    <p>No knobs. Nothing to tune.</p>
-    <p><strong>Proton to electron mass ratio.</strong></p>
-    <table class="num">
-        <tr><td>6π<sup>5</sup> (1 + α<sup>2</sup>/3)</td><td>= 1836.150700637</td><td><span class="tag">[computation]</span></td></tr>
-        <tr><td>CODATA</td><td>= 1836.152673426</td><td><span class="tag">[measured fact]</span></td></tr>
-        <tr><td>relative difference</td><td>= 1.074 ppm</td><td></td></tr>
-    </table>
-    <p>We state both. The ppm-level residual is a fact to explain, not a success to celebrate.
-    <span class="tag">[derivation; coefficient locked, origin of the residual open]</span></p>
-    <p><strong>Dark energy.</strong></p>
-    <div class="eq">
-        <span class="line">w = −1 + 1/(d·p), &nbsp; d = 3 spatial directions, &nbsp; p = 5, &nbsp; d·p = 15</span>
-        <span class="line">w = −14/15, &nbsp; constant <span class="tag">[prediction]</span></span>
-    </div>
-    <p>in a precisely delimited homogeneous background regime. DESI currently sees a hint of a
-    time-varying w(z); the five-year run ended in April 2026 and the final analyses will judge.
-    If the data force w(z) where TWIST-J says constant, the theory falls. The same locked w gives,
-    exactly: the density dilutes as a<sup>−1/p</sup> and the deceleration parameter is q = −9/10.
-    <span class="tag">[computation]</span></p>
-    <p><strong>The measure counts.</strong> The dual of the gauge-measure cell is the integer law
-    72 ν̂(m) = p·A(m) − A(0), with A = (18, 5, 4, 4, 5): the sevens and twos per 72 are counts of
-    ordered tick pairs. <span class="tag">[theorem]</span></p>
-    <p><strong>Electroweak angle.</strong> The dictionary value of the coupling ratio, 3/10, stands;
-    its derivation from the action is an open wall. MOLLER at Jefferson Lab, parity-violating Møller
-    scattering, will measure the weak charge of the electron. It is the judge we ordered, not a
-    verdict already delivered.
-    <span class="tag">[prediction + open wall]</span></p>
-
-    <h2><span class="n">11</span>The Wall</h2>
-    <p>We name our own wall out loud: the archimedean place, the continuous circle 2π. The wall has
-    a normal form: one obstruction, three named doors. The Q-substrate door: the
-    direction of the plenum is closed; two small residues carry names. The measure door: the abelian
-    face is closed and the crossing functional counts in integers; the nonabelian lift remains. The
-    2π U(1) door: the universal one-loop integral, shared with QED. At this door the Λ<sub>QCD</sub>
-    gate is registered at its honest ceiling: a bare seed 6π<sup>5</sup>·exp(−8π/(33 − 2n<sub>f</sub>))·m<sub>e</sub>
-    with a matched threshold chain, a live falsifier, and its tension measured and published, not
-    hidden. Either we walk through the named doors from the integers, or the theory ends there.
-    <span class="tag">[open wall, with named doors]</span></p>
-
-    <h2><span class="n">12</span>The Protocol</h2>
-    <p>No summary is stronger than its label. A falsification is a first-class result, archived with
-    the same care as a proof. Every decisive computation has an
-    exact statement, a SHA-256 pin, and a run on two architectures. Beauty may attract; labels, code,
-    and the standing possibility of execution are what hold.</p>
-
-    <h2><span class="n">13</span>The Closing Sentence</h2>
-    <p class="final">The world is what remains when counting turns and closes.</p>
-
-    <div class="footer">
-        <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
-        <span class="dot">·</span>
-        <a href="/" style="font-style:italic">J = 1 + j²</a>
-        <span class="dot">·</span>
-        <a href="/">twistj.com</a>
-    </div>
-
-</div>
 </body>
 </html>
