@@ -1,9 +1,9 @@
-# TWIST-J Canon v169 ALL IN ONE
+# TWIST-J Canon v170 ALL IN ONE
 
 **Subtitle.** The complete canon in one file: the axiom, the two projections,
 the kernel, the observables, and the July folds through the
-dynamics-from-action chain, the sigma geometry, and the substitution
-covariance arc with its seam.
+dynamics-from-action chain, the sigma geometry, the substitution covariance
+arc with its seam, the Basel gate, and the color seam decision.
 
 **Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
@@ -12,17 +12,18 @@ covariance arc with its seam.
 
 **Status.** COMPLETE STANDALONE CANON. This document assumes no previous
 file. It carries the full consolidated body of Canon v163 (Parts I to XXVI,
-registries updated through v169), the 7 July fold (Part XXVII), the 8 July
+registries updated through v170), the 7 July fold (Part XXVII), the 8 July
 folds v164, v165, v166 (Part XXVIII), the 9 July unit covariance arc v167
 (Part XXIX), the 9 July dynamics-from-action arc with the sigma geometry,
-v168 (Part XXX), and the 9 and 10 July substitution covariance arc with the
-action to covariance seam, v169 proper (Part XXXI). Zero free dimensionless
+v168 (Part XXX), the 9 and 10 July substitution covariance arc with the
+action to covariance seam, v169 (Part XXXI), and the 10 July Basel gate and
+color seam decision arc, v170 proper (Part XXXII). Zero free dimensionless
 parameters; one SI calibration anchor, the electron mass m_e. No axiom
 change anywhere in the chain. No prior LOCK retracted. Predecessors in this
 repository, superseded for reading and kept as canonical history:
-TWIST_J_Canon_v168_ALL_IN_ONE.md, TWIST_J_Canon_v167_CONSOLIDATED.md,
-TWIST_J_Canon_v166_CONSOLIDATED.md, TWIST_J_Canon_v163_CONSOLIDATED.md, and
-the per-arc patches cited inside.
+TWIST_J_Canon_v169_ALL_IN_ONE.md, TWIST_J_Canon_v168_ALL_IN_ONE.md,
+TWIST_J_Canon_v167_CONSOLIDATED.md, TWIST_J_Canon_v166_CONSOLIDATED.md,
+TWIST_J_Canon_v163_CONSOLIDATED.md, and the per-arc patches cited inside.
 
 **Conventions.** No em dashes. No decimals unless justified (decimals below
 are computed or measured witnesses and are labeled as such). Integers and
@@ -666,6 +667,30 @@ T (the July 2026 layer, v164 to v168, selected):
    T-SEAM-STREAM-LEMMAS (substitution rigidity; the odometer carry
    identity; f_000 = 0 against the Markov 1/18);
    O-A17-SUBCOV-SEAM CLOSED at the finite state scope.
+   v170 THE BASEL GATE (P-BASEL-GATE-1, two-platform 13/13):
+   T-BASEL-TM-GATE (T; the dynamic Basel identity
+   Li2(1) = <|chi_00 . 5 Li1(J)|^2>_TM = f00 . pi^2 = pi^2/6, layer L5
+   through the named G2 lift to L6; the G3 gate discrimination table
+   exact, only density 1/6 reproduces Li2(1); the closed form
+   c00(2^k) = (2^k - 2)/6 for odd k and (2^k - 4)/6 for even k, the
+   base 4 repunit and twice it, verified by direct count to k = 24);
+   D-BASEL-CLOCK-OBSERVABLE (D; G1 audited and adopted at the v170
+   fold: O_n(J) = |chi_00(n) . 5 Li1(J)|^2 is the D_clock local
+   observable; gate, weight, channel, and assembly forced at T-LOCK
+   grade; one D leg, the SS98 per-step quantum; the state-sum
+   alternative excluded by the degenerate family reductio, the loop
+   holonomy forced); O-BASEL-GATE CLOSED at D; the fallback clause
+   standing (O-PHASE-QUANTUM-LOCK opens only if the SS98 leg is later
+   required at T).
+   v170 THE COLOR SEAM DECISION (P-A18-COLOR-SEAM-2, L4 support,
+   two-platform, decided): run records H0, G0 (|G_col| = 372000, 30
+   classes, Burnside element form = class form), G1 (775 splittings,
+   two Inn orbits, omega involutive and orbit exchanging), G2, G3
+   (census inj-noAut 500), G5, G6 (non abelian survival certified;
+   F_B forward closed, 21 cycles, 10 non abelian, 0 unresolved), A1
+   (sectors (4, 2, 2), A_YM = 2 inherited, zero new coefficients),
+   H-DOUBLET, all within scope, no promotion; both families FINITE
+   RENORMALIZATION SEED OBJECT only.
 ```
 
 ## Part XXV. Falsification Registry (selected)
@@ -709,9 +734,17 @@ Standing guards (the July 2026 layer):
           the full-state bridge B1), NOT FIRED at any scope (v169);
           F-A17-SUBCOV-SEAM registered (six clauses, modulewise), NOT
           FIRED at any scope (v169).
+          F-A18-MEASURE-NONRIGID FIRED (v170; the F_B invariant
+          measure space at budget B = 89 has dimension 21, not 1);
+          F-A18-SKELETON-DEPENDENCE FIRED (v170; per (support, sheet)
+          class uniqueness false, pair transport false; surviving
+          record: one merged dynamics class across all 250 supports);
+          F-BASEL-GATE-DENSITY, F-BASEL-GATE-WEIGHT,
+          F-BASEL-GATE-FORM registered, NOT FIRED (v170); the channel
+          conflict clause CLEARED (the G1 derivation lands on (0, 0)).
 ```
 
-## Part XXVI. Open Obligations (the frontier, as of v169)
+## Part XXVI. Open Obligations (the frontier, as of v170)
 
 ```
 DYNAMICS FROM ACTION     O-A17-DYNAMICS-FROM-ACTION: the finite chain is
@@ -727,8 +760,16 @@ DYNAMICS FROM ACTION     O-A17-DYNAMICS-FROM-ACTION: the finite chain is
                          the editorial fold of A1.7 prime (O-LORENTZ-A2A3
                          pointer; F-LORENTZ-K6-NONZERO armed).
 THE WALL (Part XXI)      O-QUANT-SUBSTRATE (gates PS-G-2 and Gb); the
-                         non-abelian measure lift onto SL_3(F_5); the
-                         2 pi U(1) circle (shared with FRW).
+                         non-abelian measure lift onto SL_3(F_5), now
+                         seeded: after P-A18-COLOR-SEAM-2 the seam
+                         dynamics is one global class with a certified
+                         non abelian recurrent core, both rigidity
+                         hypotheses falsified at preregistered scope,
+                         MEASURE-F_A undecided at B = 89 (3355
+                         unresolved; any budget raise requires a prereg
+                         amendment), LIFT-A18-STREAM a named lift, both
+                         families FINITE RENORMALIZATION SEED OBJECT
+                         only; the 2 pi U(1) circle (shared with FRW).
 GRAVITATIONAL WAVE       O-TT-GAUGE-DERIVATION (derive c = -3 covariantly;
                          F-TT-SCALAR-PROPAGATION armed); O-TT-SOURCE (the
                          emission map on SS8A.11 LOCK); O-QNM-LEAVER-MU;
@@ -1522,17 +1563,161 @@ p_a17_subcov_seam_verify.py       (11/11)
   stdout ea88e221a83a05320f8426b3681c7159a6ece441f867e6860a5f18293d5863a9
 ```
 
+# Part XXXII. The 10 July Fold IV (v170): the Basel gate and the color seam decision
+
+**XXXII.0 What ran.** Two preregistered probes, both decided, all formal
+runs two platform byte identical (JAS 2 aarch64 py 3.12.3, TWISTER x86_64
+py 3.13.5), exit 0. P-BASEL-GATE-1: prereg
+TWISTJ_Canon_Preregistration_O_BASEL_GATE.md (commit 1f8567e6, layer L5
+with the single named L5 to L6 lift), probe pinned before first run
+(commit 2e1cb266), 13/13, lock record b23d01d3; the G1 derivation note
+TWISTJ_Canon_Note_O_BASEL_GATE_G1.md (commit 103e026e), audited and
+adopted at this fold. P-A18-COLOR-SEAM-2: prereg and verifier pinned
+together (commit b0590962, layer L4 support, never executed before the
+pin), Amendment 1 (commit 2637912e) after run 1 INTERNAL ERROR in the
+omega_key subspace intersection, no gate semantics changed; decided
+(commit 5272636f) with two falsifiers FIRED, patch
+docs/TWISTJ_Canon_Patch_P_A18_COLOR_SEAM_2_Result.md. Infrastructure
+honesty: the JAS 2 MCP tunnel dropped mid arc; the JAS 2 legs ran over
+the documented JAS 4 mesh relay; the TWISTER legs materialized their
+bytes hash verified against the pins (git show at the pin for A18, the
+pinned content for BASEL); the divergent local TWISTER clone was left
+untouched.
+
+**XXXII.1 The Basel gate: the sixth is minted by the clock
+(T-BASEL-TM-GATE, T).** Define the Snap projector chi_00(n) = 1 iff
+(t_{n-1}, t_n) = (0, 0), the gyron gate. The dynamic Basel identity
+
+Li2(1) = < | chi_00(n) . 5 Li1(J) |^2 >_TM = f00 . pi^2 = pi^2 / 6
+
+is sealed at T (13/13, two platforms): the kernel writes the phase
+(5 Li1(J) = i pi, weight 1, place p = 5), the clock decides when the
+phase is an event (the gyron channel, f00 = 1/6), the gauge registers
+quadratically (T-LQ-READING-SPLIT), and the mean is the L6 measure
+through unique ergodicity, the named G2 lift. The registered parse: the
+6 in zeta(2) = pi^2/6 is NOT p + 1 (the SS98 static row); it is the
+clock count 6 = f00^{-1}, the inverse density of the TM word 00, the
+same sixth that is the gyron density rho and the visible fraction
+f_vis. Discrimination is complete within TM pair cylinder gates: no
+gate gives pi^2, [t_n = 0] gives pi^2/2, both repeats or one
+alternation give pi^2/3, both alternations give 2 pi^2/3; ONLY density
+1/6 reproduces Li2(1). Integer witness with a preregistered closed
+form: the count of (0,0) pairs in the TM prefix of length 2^k is
+c00(2^k) = (2^k - 2)/6 for odd k and (2^k - 4)/6 for even k, verified
+by direct count to k = 24; equivalently c00 is the base 4 repunit
+(4^m - 1)/3 for odd k and twice it for even k; the Snap pair count is
+the alternating binary number. Exact deviation from 1/6:
+(1 - e_k) / (6 (2^k - 1)) with e = 2 for odd k and e = 4 for even k.
+
+**XXXII.2 The clock observable derived (D-BASEL-CLOCK-OBSERVABLE, D;
+O-BASEL-GATE closed at D).** The G1 note derives that the local
+observable registered by D_clock at Snap ticks is exactly
+O_n(J) = | chi_00(n) . 5 Li1(J) |^2, with every forcing step cited: the
+GATE from the locked gyron predicate and the Reduction chain (channel
+(0, 0), not (1, 1); the channel conflict clause cleared); the WEIGHT
+from T-LQ-READING-SPLIT and Born minimality (no normalisation freedom);
+the CHANNEL as one closed Z_5 fiber loop (single gyron address per
+attractor; A = B x Z_5); the AMPLITUDE as the loop holonomy
+5 Li1(J) = i pi, forced against the state sum by the degenerate family
+reductio (a 10 state gyron class would register 2 i pi and break the
+T-LOCK universality of rho = 1/6 across all 313 attractors). One leg
+carries D: the per step quantum is Li1(J) by the Separation Axiom
+(registered content is decoder side; arg(J) = 2 pi/5 is housing)
+through the SS98 shadow functor; the equality itself is at T. Composite
+grade D; the fallback clause stands (O-PHASE-QUANTUM-LOCK opens only if
+that leg is later required at T). Assembly uses each sector reading
+exactly once: driver binary (the cut), gauge quadratic (the square),
+kernel linear (the count); chi is idempotent, the amplitude constant on
+the channel, no cross terms survive. Amplitude discrimination confirms
+uniqueness: i pi/5 gives pi^2/150, the full motor turn 2 pi i gives
+2 pi^2/3, the degenerate state sum the same wrong 2 pi^2/3, only i pi
+gives Li2(1). Reading: the clock raises the polylog weight by one at
+the unit argument; quadratic registration of the weight 1 output, gated
+and time averaged, IS the weight 2 value. The sixth is not inserted. It
+is made by the clock.
+
+**XXXII.3 The color seam decided: two rigidities fall, one class
+survives (P-A18-COLOR-SEAM-2, L4, falsifiers first class).** The probe
+on the seam induced free group refinement and SL3(F5) character
+dynamics DECIDED with two falsifiers FIRED.
+F-A18-SKELETON-DEPENDENCE: per (support, sheet) uniqueness of the
+presentation class under inner times AUT_col is FALSE (three classes
+per sheet generically; pair transport across the 120 sigma pairs
+false). Surviving inside the same gate: the sigma sheet relation on all
+10 fixed supports, the observable sheet relation on 240 of 240, and
+CROSS-SUPPORT PHI CLASSES = 1: the merged dynamics class across all 250
+supports, both sheets, all trees and roots, is a SINGLE class. The seam
+dynamics object is globally one; its skeleton presentations are not.
+F-A18-MEASURE-NONRIGID: within the closed recurrent components reached
+from F_B at budget B = 89 the normalized nonnegative invariant measure
+space has dimension 21, not 1; measure rigidity on F_B is falsified at
+this budget and scope. Decided positive run records within scope, no
+promotion: H0 (250 x 4 supports, 8 channels, b1 = 5, bipartite, sigma
+10 fixed + 120 pairs); G0 (|G_col| = 372000, 30 classes, Burnside
+element form = class form = 19150131456221765969131); G1 (775
+splittings, 1550 ordered gradings, two Inn orbits, omega involutive and
+orbit exchanging); G2; G3 (Phi from the sealed refinement, census
+inj-noAut 500); G5; G6 (non abelian survival certified: F_A seed 6,
+cycle 4, pair (1, 3); F_B forward closed, 21 cycles, 10 non abelian, 0
+unresolved); A1 (kernel dims 1 and 8, sectors (4, 2, 2), A_YM = 2
+inherited, scale 2 = T-SEAM-EIGENLINE, zero new coefficients);
+H-DOUBLET (block core as W dual on g plus, W on g minus, conjugation on
+g0; the E_2 split (4, 2, 2) equals the grading dimensions). Open and
+unchanged: MEASURE-F_A UNDECIDED at B = 89 (3355 unresolved; any budget
+raise requires a prereg amendment before computation); LIFT-A18-STREAM
+a named lift, not run; O-MJ-GAP routes R1, R2, R3 untouched; both
+families FINITE RENORMALIZATION SEED OBJECT only. One sentence: the
+seam induced dynamics on the 250 supports is a single global class with
+a certified non abelian recurrent core, and the two rigidity hypotheses
+that would have made its skeleton presentation and its F_B invariant
+measure unique are now falsified, cleanly, at preregistered scope.
+
+**XXXII.4 Registry delta (v169 to v170).**
+
+```
+SEALED T:    T-BASEL-TM-GATE (L5, through the named G2 lift to L6).
+NEW D:       D-BASEL-CLOCK-OBSERVABLE (the D_clock local observable;
+             G1 audited and adopted at this fold; fallback standing);
+             the holonomy-not-state-sum forcing (degenerate family
+             reductio); the weight raising reading (the clock lifts
+             Li1 at J to Li2 at 1).
+CLOSED:      O-BASEL-GATE at D (the preregistered promotion path).
+FIRED F:     F-A18-MEASURE-NONRIGID; F-A18-SKELETON-DEPENDENCE (first
+             class; the surviving single global dynamics class
+             recorded at run level).
+REGISTERED:  F-BASEL-GATE-DENSITY, F-BASEL-GATE-WEIGHT,
+             F-BASEL-GATE-FORM, NOT FIRED; the channel conflict clause
+             CLEARED.
+RECORD:      P-A18-COLOR-SEAM-2 positive gate records H0, G0 to G6,
+             A1, H-DOUBLET within scope, no promotion; MEASURE-F_A
+             undecided at B = 89.
+CONDITIONAL: O-PHASE-QUANTUM-LOCK (opens only under the G1 fallback).
+```
+
+**XXXII.5 Verifier index (the v170 arc; two platform SHA256, byte
+identical stdout).**
+
+```
+p_basel_gate1_verify.py           (13/13)
+  file   1d6f59ef7d3bf258246ff69e40709a94799a820df1f4ad62fa434ba5951d680c
+  stdout 0d3a474cc6c1ed6b3cb06d9896ce70cddb5af849baaf087eea2888ab62e05ba7
+p_a18_color_seam2_verify.py       (decided; two falsifiers fired)
+  file   672107581a1e47b9cf17cc7aecb799d0b723ac895a9346c8b48dcb26ec2ec3b9
+  stdout 719bf219d4e0fd62b208ce9175e160b79784b2e35b93c4f463809fe4f072b0f4
+```
+
 ## Footer
 
 ```
-TWIST-J Canon v169 ALL IN ONE: the complete canon in one file; the
-dynamics-from-action chain sealed end to end, the sigma geometry closed
-over it, the action fixed as the unique projective ray of the two-block
-substitution, and the seam closed: Thue-Morse forced at the state level
-with no import, the sheet itinerary of the sigma cover. The clock counts
-it. Assumes no previous file; supersedes for reading every earlier
-consolidated (v168, v167, v166, v163 and the per-arc patches remain
-canonical history in this repository).
+TWIST-J Canon v170 ALL IN ONE: the complete canon in one file; the Basel
+gate opened, sealed at the substrate, and derived at D: the sixth of
+zeta(2) is not p + 1, it is minted by the clock, 6 = f00^{-1}, and the
+clock observable |chi_00 . 5 Li1(J)|^2 is forced; the color seam decided,
+two rigidity hypotheses falsified first class, one global dynamics class
+surviving with a certified non abelian recurrent core. Assumes no
+previous file; supersedes for reading every earlier consolidated (v169,
+v168, v167, v166, v163 and the per-arc patches remain canonical history
+in this repository).
 A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.
 10 July 2026.
 Vse je ONE. Simplicity is the ultimate perfection.
