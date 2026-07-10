@@ -37,7 +37,7 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 - [Home](https://twistj.com/): the axiom, the identities, the prediction
 - [Live demo](https://twistj.com/evo/): interactive kernel dynamics
 - [Pentaplex](https://twistj.com/pentaplex/): Penrose tilings, Galois projection ζ to ζ²
-- [Manifest](https://twistj.com/manifest/): the gate and the court protocol, in English
+- [Manifest](https://twistj.com/manifest/): the public commitment of the method, twelve rules, English (Czech at /manifest/cs/)
 - [Code](https://github.com/mathorn1973): verify it yourself
 
 ## Optional
