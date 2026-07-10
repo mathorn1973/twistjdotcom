@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TWIST-J Manifest</title>
-    <meta name="description" content="TWIST-J Manifest: a finite rule, unbounded becoming. The whole universe, matter, both forces, space and time, from one step J = 1 + ζ₅², computed in integers, with zero free parameters.">
+    <meta name="description" content="The TWIST-J manifest: twelve commitments of a program of discrete integer physics. One closed arithmetic object, J = 1 + ζ₅², zero free parameters. We ask for no faith: compute it, reproduce it, try to destroy it.">
     <meta name="author" content="A. M. Thorn">
     <meta property="og:title" content="TWIST-J Manifest">
-    <meta property="og:description" content="A finite rule, unbounded becoming. That is TWIST-J in a nutshell.">
+    <meta property="og:description" content="We ask for no faith. We offer an object, rules, code, falsifiers, and a ledger of errors.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://twistj.com/manifest/">
     <meta property="og:locale" content="en_US">
     <link rel="canonical" href="https://twistj.com/manifest/">
+    <link rel="alternate" hreflang="en" href="https://twistj.com/manifest/">
+    <link rel="alternate" hreflang="cs" href="https://twistj.com/manifest/cs/">
+    <link rel="alternate" hreflang="x-default" href="https://twistj.com/manifest/">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
@@ -48,11 +51,22 @@
             color: var(--text-bright); margin: .4rem 0 .6rem;
         }
         .byline { text-align: center; color: var(--muted); font-size: 1.02rem; font-style: italic; }
+        .version { text-align: center; color: var(--dim); font-size: .92rem; margin-top: .2rem; }
+        .lang { text-align: center; font-size: .95rem; margin-top: .5rem; }
         .motto {
-            text-align: center; font-size: 1.45rem; font-weight: 500;
+            text-align: center; font-size: 1.42rem; font-weight: 500;
             color: var(--text-bright); margin: 2.4rem 0 .8rem;
         }
-        .lede { text-align: center; font-style: italic; color: var(--muted); margin-bottom: 2.6rem; }
+        .lede { text-align: center; font-style: italic; color: var(--muted); margin-bottom: 1.8rem; }
+        blockquote.creed {
+            margin: 1.6rem 0; padding: .1rem 1.2rem;
+            border-left: 2px solid var(--accent);
+            font-size: 1.28rem; font-style: italic; color: var(--text-bright);
+        }
+        .jline {
+            text-align: center; font-size: 1.5rem; color: var(--text-bright);
+            margin: 1.4rem 0;
+        }
         h2 {
             font-weight: 500; font-size: .92rem; letter-spacing: .22em;
             text-transform: uppercase; color: var(--accent);
@@ -60,6 +74,14 @@
             border-top: 1px solid var(--rule);
         }
         p { margin-bottom: 1rem; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: .25rem; }
+        .aphorisms {
+            margin-top: 2.6rem; padding-top: 1.6rem; border-top: 1px solid var(--rule);
+            text-align: center; font-size: 1.32rem; font-weight: 500;
+            color: var(--text-bright); line-height: 1.9;
+        }
+        .lastrule { text-align: center; font-style: italic; margin-top: 1.4rem; font-size: 1.18rem; }
         .foot {
             margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
             text-align: center; color: var(--muted); font-size: 1rem;
@@ -72,9 +94,14 @@
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "TWIST-J Manifest",
-      "author": { "@type": "Person", "name": "A. M. Thorn" },
+      "author": [
+        { "@type": "Person", "name": "A. M. Thorn" },
+        { "@type": "Person", "name": "Marek \u0160pan\u011bl" }
+      ],
       "url": "https://twistj.com/manifest/",
-      "description": "A finite rule, unbounded becoming. The whole universe, matter, both forces, space and time, from one step J = 1 + \u03b6\u2085\u00b2, computed in integers, with zero free parameters."
+      "inLanguage": "en",
+      "datePublished": "2026-07-10",
+      "description": "Twelve commitments of a program of discrete integer physics. One closed arithmetic object, J = 1 + \u03b6\u2085\u00b2, zero free parameters. We ask for no faith: compute it, reproduce it, try to destroy it."
     }
     </script>
 </head>
@@ -82,62 +109,161 @@
     <div class="page">
         <div class="eyebrow">TWIST-J</div>
         <h1>Manifest</h1>
-        <div class="byline">A. M. Thorn</div>
+        <div class="byline">A public manifesto of a program of discrete integer physics</div>
+        <div class="byline">A. M. Thorn / Marek &Scaron;pan&#283;l</div>
+        <div class="version">v2 &middot; after Canon v170 &middot; 10 July 2026</div>
+        <div class="lang"><a href="/manifest/cs/">&#268;esky</a></div>
 
-        <div class="motto">A finite rule, unbounded becoming.<br>That is TWIST-J in a nutshell.</div>
-        <p class="lede">One sentence longer: the whole universe, matter, both forces, space and time,
-        flows from a single step, J&nbsp;=&nbsp;1&nbsp;+&nbsp;&zeta;&#8325;&sup2;, computed entirely in
-        integers, with not a single free parameter.</p>
+        <div class="motto">What cannot be calculated in integers is not fundamental physics.<br>
+        It is an approximation, a limit, or a tool for engineers.</div>
 
-        <h2>For the layperson</h2>
-        <p>Picture a coin standing on its edge. Outwardly silent, balanced. Inside, it counts;
-        one step, repeated over and over. Out of that repetition the golden ratio and pi climb out
-        on their own; nothing is plugged in, they simply appear. The space around you is not a stage,
-        and the time you live through is not a river; both are just this counting, read from inside.
-        And what people call empty space is not empty: it is the plenum, a full, counting substance.
-        The universe is not a thing. It is a verb.</p>
+        <p class="lede">TWIST-J investigates one simple, risky hypothesis:</p>
 
-        <h2>For the physicist, for the scientist</h2>
-        <p>TWIST-J has no free dimensional parameter; the single calibration for all of physics is
-        the electron mass, and that only for the sake of units. Gravity and electromagnetism are two
-        projections of one J, the modulus and the argument. The strongest piece is the fine structure
-        constant, derived purely from J; it agrees with the measured value to a tenth of a billionth,
-        it was never aimed there, it simply fell out of the computation. The proton to electron mass
-        ratio, 6&pi;&#8309; with a small correction, differs from measurement by one part in a
-        million, and that remainder is admitted, not celebrated. Dark energy carries a fixed
-        prediction, w&nbsp;=&nbsp;&minus;14/15, now standing trial before the DESI data. And the
-        discipline is falsification: the exponential metric was refuted by the ringdown of
-        gravitational wave GW250114, and out of that refutation grew, the same day, a closed
-        gravitational wave sector; the one derivation still owed, O-TT-GAUGE-DERIVATION, stands
-        with its falsifier armed.</p>
+        <blockquote class="creed">Physical reality is not, at bottom, a continuous field on a
+        pre-given spacetime. It is a closed, exact, deterministic integer system. Continuum,
+        geometry, probability and fields are its large-scale readings.</blockquote>
 
-        <h2>For the mathematician</h2>
-        <p>The foundation of TWIST-J is the cyclotomic field Q(&zeta;&#8325;). Multiplication by the
-        generator J is a four by four integer matrix with entries only &minus;1, 0, 1, determinant
-        one, trace three. The step group is the binary icosahedral 2I&nbsp;=&nbsp;SL(2,5), and through
-        the McKay correspondence it leads to the affine Dynkin diagram &Etilde;&#8328;. The
-        classification of stable classes gives exactly 313 attractors (125&nbsp;+&nbsp;125&nbsp;+&nbsp;62&nbsp;+&nbsp;1).
-        Every claim carries an explicit status, definition, axiom, identity, theorem, computation,
-        open wall, and no summary is stronger than its own label.</p>
+        <p>The core of the program is a single closed arithmetic object with the operator</p>
 
-        <h2>For the programmer, for the engineer</h2>
-        <p>In practice TWIST-J is a machine of four additions per step and zero multiplications; no
-        drift, just exact integer arithmetic, verified bit by bit on two different architectures,
-        with a SHA-256 hash over every result. A by-product, JAM, is a small language model built to
-        test whether the J-algebra helps as a computational layer. Almost everything failed; a linear
-        transform placed before a learned layer is absorbed into it without remainder. Two things
-        survived, the D<sub>J</sub> motor and the BinDJ positional encoding. Inference runs in INT4.</p>
+        <div class="jline">J&nbsp;=&nbsp;1&nbsp;+&nbsp;&zeta;&#8325;&sup2;</div>
 
-        <h2>For the philosopher</h2>
-        <p>The axiom reads: reality is the closed integer J-plenum, with no outer boundary, no outer
-        clock, only an inner reading. The total energy sums to zero, not as a wish but as a theorem.
-        Time is a counter, space is a commutator, curvature is what remains. The central principle:
-        if it cannot be calculated in integers, it is not physics. It is at once a claim about the
-        nature of the world and about the method of knowing it; a map of responsibility, not a
-        request for faith.</p>
+        <p>We do not ask anyone to believe it. We ask them to compute it, reproduce it,
+        and try to destroy it.</p>
+
+        <h2>1 &middot; Exactness before approximation</h2>
+        <p>A fundamental law must be finite, exact and reproducible. It must not depend on
+        rounding, on an integrator step, on an arbitrary regularization, or on a number tuned
+        after the measurement.</p>
+        <p>We do not forbid real numbers, differential equations or smooth manifolds. We refuse
+        to accept them as the final ontological layer as long as they can be derived as limits
+        or effective descriptions of an exact discrete structure.</p>
+        <p>In this program the universe is not rubber foam. Spacetime is not a fabric. It is a
+        macroscopic reading of relations, order and noncommutativity.</p>
+
+        <h2>2 &middot; Determinism before chance</h2>
+        <p>We do not take Einstein's &ldquo;God does not play dice&rdquo; as a proof.
+        We take it as a research commitment.</p>
+        <p>We do not accept randomness as a primitive explanation until experiment unambiguously
+        forces us to. We attempt to derive probability from deterministic history, restricted
+        reading, quadratic registration and an invariant measure.</p>
+        <p>If this attempt fails, the failure must be exact and published.</p>
+
+        <h2>3 &middot; One core, two projections</h2>
+        <p>TWIST-J investigates whether the two fundamental abelian interactions can be two
+        readings of a single algebraic object:</p>
+        <ul>
+            <li>the modulus as scale and gravity,</li>
+            <li>the argument as phase and electromagnetism.</li>
+        </ul>
+        <p>This is a working physical interpretation, not a settled fact about nature. The
+        algebraic claims and the physical dictionary are always published separately.</p>
+
+        <h2>4 &middot; Time is a count. Space is a commutator</h2>
+        <p>Time in TWIST-J is not an outer river. It is the inner order of steps.</p>
+        <p>Space is not a stage stretched out in advance. It arises from the noncommutativity
+        of the permitted operations.</p>
+        <p>Smooth relativistic geometry is to be a limit of this discrete structure, not
+        its assumption.</p>
+
+        <h2>5 &middot; Every claim has a status</h2>
+        <p>We distinguish:</p>
+        <ul>
+            <li>a theorem about an exactly defined system,</li>
+            <li>a derived physical dictionary,</li>
+            <li>a finite computation,</li>
+            <li>a hypothesis with a falsifier,</li>
+            <li>an open problem,</li>
+            <li>a falsified claim.</li>
+        </ul>
+        <p>An internal theorem about TWIST-J is not automatically a theorem about the universe.
+        The passage to physics is a separate obligation.</p>
+        <p>The word LOCK means a frozen building block with an exactly delimited scope. It does
+        not mean protection from proof or from data.</p>
+
+        <h2>6 &middot; Failure is a result</h2>
+        <p>Falsification is first-class knowledge.</p>
+        <p>Before a computation we write down what would kill the hypothesis. When a falsifier
+        fires, we do not delete the result and we do not move the threshold. We archive the dead
+        branch and rebuild only what its death actually permits us to rebuild.</p>
+        <p>TWIST-J may be wrong. But it must be wrong exactly.</p>
+
+        <h2>7 &middot; Discovery is not confirmation</h2>
+        <p>A numerical agreement found while searching is a lead, not a confirmed prediction.</p>
+        <p>Confirmatory weight belongs only to results for which, before the data were opened,
+        the following were frozen:</p>
+        <ul>
+            <li>the equation,</li>
+            <li>the code version,</li>
+            <li>the dataset,</li>
+            <li>the systematic uncertainties,</li>
+            <li>the failure threshold.</li>
+        </ul>
+        <p>We will not call numerical closeness a derivation. We will not mistake a count of
+        possibilities for physical necessity.</p>
+
+        <h2>8 &middot; Reproduction must be hostile</h2>
+        <p>Every significant result must be recomputable in exact arithmetic. Two architectures
+        are the minimum. Real confirmation requires independent authors, independent code, and
+        an attempt to find a counterexample.</p>
+        <p>We do not want admirers. We want critics who can compute.</p>
+
+        <h2>9 &middot; Relation to current physics</h2>
+        <p>TWIST-J does not ask the consensus for permission. It also does not dismiss a hundred
+        years of experiments with rhetoric.</p>
+        <p>We are not obliged to be humble before authority. We are obliged to be humble before
+        proof, reproduction and measurement.</p>
+        <p>The Standard Model, quantum theory and general relativity are the measure of what a
+        new program must explain. Where TWIST-J merely reproduces their result, we say so. Where
+        it gives a different prediction, we publish the falsifier. Where the bridge is missing,
+        we write OPEN.</p>
+
+        <h2>10 &middot; What we claim today</h2>
+        <p>We claim that:</p>
+        <ol>
+            <li>there exists a concrete closed integer system with a rich, exactly provable structure;</li>
+            <li>this system supports a unified research vocabulary for time, space, measurement, fields and matter;</li>
+            <li>substantial parts of the finite mathematics and dynamics are reproducible;</li>
+            <li>the program has already survived, and recorded, several falsifications of its own;</li>
+            <li>the decisive bridges to full physics are not yet all closed.</li>
+        </ol>
+        <p>We do not claim that TWIST-J is today an experimentally confirmed final theory.</p>
+
+        <h2>11 &middot; How the program can lose</h2>
+        <p>TWIST-J loses if it turns out, for example, that:</p>
+        <ul>
+            <li>the physical decoder is not forced by the arithmetic, and many equally successful readings exist;</li>
+            <li>the relativistic and quantum limits cannot be derived without hidden continuous assumptions;</li>
+            <li>future preregistered predictions systematically fail;</li>
+            <li>independent implementations refute key finite theorems;</li>
+            <li>the counting of discrete structures serves only as parameter tuning in disguise.</li>
+        </ul>
+        <p>Such a defeat would be no disgrace. The disgrace would be to make it impossible.</p>
+
+        <h2>12 &middot; The invitation</h2>
+        <p>TWIST-J is an open challenge:</p>
+        <ul>
+            <li>to mathematicians: find the errors and the alternative classifications;</li>
+            <li>to physicists: demand a unique bridge to measurement;</li>
+            <li>to programmers: write an independent implementation;</li>
+            <li>to experimentalists: help design blind tests;</li>
+            <li>to critics: attack the strongest claims, not the slogans.</li>
+        </ul>
+        <p>We ask for no faith. We offer an object, rules, code, falsifiers, and a ledger
+        of errors.</p>
+
+        <div class="aphorisms">
+            Simplicity is the ultimate perfection.<br>
+            The universe is not rubber foam.<br>
+            Chance is not an explanation.<br>
+            What cannot be computed exactly is not yet fundamental physics.
+        </div>
+
+        <p class="lastrule">And the last rule: we are not obliged to be humble before the
+        mainstream. We are obliged to be humble before the truth.</p>
 
         <div class="foot">
-            <a href="/canon/">the Canon</a> &middot; <a href="/">twistj.com</a>
+            The Canon is the ledger. This manifest is the public commitment of the method.<br>
+            <a href="/canon/">the Canon</a> &middot; <a href="/">twistj.com</a> &middot; <a href="/manifest/cs/">&#269;esky</a>
         </div>
     </div>
 </body>

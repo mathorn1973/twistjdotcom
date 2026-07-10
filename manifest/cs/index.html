@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWIST-J Manifest &middot; česky</title>
+    <meta name="description" content="Manifest TWIST-J: dvanáct závazků programu diskrétní celočíselné fyziky. Jeden uzavřený aritmetický objekt, J = 1 + ζ₅², žádné volné parametry. Nežádáme víru: spočítejte jej, zreprodukujte, pokuste se jej zničit.">
+    <meta name="author" content="A. M. Thorn">
+    <meta property="og:title" content="TWIST-J Manifest">
+    <meta property="og:description" content="Nežádáme víru. Nabízíme objekt, pravidla, kód, falsifikátory a účetní knihu omylů.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://twistj.com/manifest/cs/">
+    <meta property="og:locale" content="cs_CZ">
+    <link rel="canonical" href="https://twistj.com/manifest/cs/">
+    <link rel="alternate" hreflang="en" href="https://twistj.com/manifest/">
+    <link rel="alternate" hreflang="cs" href="https://twistj.com/manifest/cs/">
+    <link rel="alternate" hreflang="x-default" href="https://twistj.com/manifest/">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f1eb; --text: #2a2520; --text-bright: #1a1714;
+            --accent: #8b4513; --muted: #7a7570; --dim: #999;
+            --rule: #d4cfc7; --link: #6b6560; --link-hover: #8b4513;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1c1915; --text: #b8b3a8; --text-bright: #d4cfc6;
+                --accent: #b08050; --muted: #7a7268; --dim: #605850;
+                --rule: #38332c; --link: #9a9488; --link-hover: #b08050;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.22rem; font-weight: 400; line-height: 1.62;
+        }
+        .page { max-width: 40em; margin: 0 auto; padding: 4rem 1.4rem 3rem; }
+        .eyebrow {
+            font-size: .82rem; letter-spacing: .34em; text-transform: uppercase;
+            color: var(--accent); text-align: center;
+        }
+        h1 {
+            font-weight: 500; font-size: 2.7rem; text-align: center;
+            color: var(--text-bright); margin: .4rem 0 .6rem;
+        }
+        .byline { text-align: center; color: var(--muted); font-size: 1.02rem; font-style: italic; }
+        .version { text-align: center; color: var(--dim); font-size: .92rem; margin-top: .2rem; }
+        .lang { text-align: center; font-size: .95rem; margin-top: .5rem; }
+        .motto {
+            text-align: center; font-size: 1.42rem; font-weight: 500;
+            color: var(--text-bright); margin: 2.4rem 0 .8rem;
+        }
+        .lede { text-align: center; font-style: italic; color: var(--muted); margin-bottom: 1.8rem; }
+        blockquote.creed {
+            margin: 1.6rem 0; padding: .1rem 1.2rem;
+            border-left: 2px solid var(--accent);
+            font-size: 1.28rem; font-style: italic; color: var(--text-bright);
+        }
+        .jline {
+            text-align: center; font-size: 1.5rem; color: var(--text-bright);
+            margin: 1.4rem 0;
+        }
+        h2 {
+            font-weight: 500; font-size: .92rem; letter-spacing: .22em;
+            text-transform: uppercase; color: var(--accent);
+            margin: 2.2rem 0 .6rem; padding-top: 1.4rem;
+            border-top: 1px solid var(--rule);
+        }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: .25rem; }
+        .aphorisms {
+            margin-top: 2.6rem; padding-top: 1.6rem; border-top: 1px solid var(--rule);
+            text-align: center; font-size: 1.32rem; font-weight: 500;
+            color: var(--text-bright); line-height: 1.9;
+        }
+        .lastrule { text-align: center; font-style: italic; margin-top: 1.4rem; font-size: 1.18rem; }
+        .foot {
+            margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+            text-align: center; color: var(--muted); font-size: 1rem;
+        }
+        a { color: var(--link); text-decoration: none; border-bottom: 1px solid var(--rule); }
+        a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "TWIST-J Manifest",
+      "author": [
+        { "@type": "Person", "name": "A. M. Thorn" },
+        { "@type": "Person", "name": "Marek \u0160pan\u011bl" }
+      ],
+      "url": "https://twistj.com/manifest/cs/",
+      "inLanguage": "cs",
+      "datePublished": "2026-07-10",
+      "description": "Dvanáct závazků programu diskrétní celočíselné fyziky. Jeden uzavřený aritmetický objekt, J = 1 + \u03b6\u2085\u00b2, žádné volné parametry. Nežádáme víru: spočítejte jej, zreprodukujte, pokuste se jej zničit."
+    }
+    </script>
+</head>
+<body>
+    <div class="page">
+        <div class="eyebrow">TWIST-J</div>
+        <h1>Manifest</h1>
+        <div class="byline">Veřejný manifest programu diskrétní celočíselné fyziky</div>
+        <div class="byline">A. M. Thorn / Marek &Scaron;pan&#283;l</div>
+        <div class="version">v2 &middot; po Canonu v170 &middot; 10. července 2026</div>
+        <div class="lang"><a href="/manifest/">English</a></div>
+
+        <div class="motto">Co nejde spočítat v celých číslech, není základní fyzika.<br>
+        Je to aproximace, limit nebo nástroj pro inženýry.</div>
+
+        <p class="lede">TWIST-J zkoumá jednoduchou a riskantní hypotézu:</p>
+
+        <blockquote class="creed">Fyzikální realita není v základu spojité pole na předem daném
+        časoprostoru. Je to uzavřený, přesný a deterministický celočíselný systém. Kontinuum,
+        geometrie, pravděpodobnost a pole jsou jeho čtení ve velkém měřítku.</blockquote>
+
+        <p>Jádrem programu je jediný uzavřený aritmetický objekt s operátorem</p>
+
+        <div class="jline">J&nbsp;=&nbsp;1&nbsp;+&nbsp;&zeta;&#8325;&sup2;</div>
+
+        <p>Nežádáme, aby mu někdo věřil. Žádáme, aby jej spočítal, zreprodukoval a pokusil se
+        jej zničit.</p>
+
+        <h2>1 &middot; Přesnost před aproximací</h2>
+        <p>Základní zákon má být konečný, přesný a reprodukovatelný. Nemá záviset na zaokrouhlení,
+        kroku integrátoru, libovolné regularizaci ani na číslu doladěném po měření.</p>
+        <p>Reálná čísla, diferenciální rovnice a hladké variety nezakazujeme. Odmítáme je však
+        přijmout jako poslední ontologickou vrstvu, pokud mohou být odvozeny jako limity nebo
+        účinné popisy přesné diskrétní struktury.</p>
+        <p>Vesmír podle tohoto programu není gumová pěna. Časoprostor není látka. Je to
+        makroskopické čtení vztahů, pořadí a nekomutativity.</p>
+
+        <h2>2 &middot; Determinismus před náhodou</h2>
+        <p>Einsteinovu větu &bdquo;Bůh nehraje v kostky&ldquo; nebereme jako důkaz. Bereme ji
+        jako výzkumný závazek.</p>
+        <p>Náhodu nepřijímáme jako primitivní vysvětlení, dokud nás k tomu jednoznačně nedonutí
+        experiment. Pravděpodobnost se pokoušíme odvodit z deterministické historie, omezeného
+        čtení, kvadratické registrace a invariantní míry.</p>
+        <p>Jestli tento pokus selže, selhání musí být přesné a zveřejněné.</p>
+
+        <h2>3 &middot; Jedno jádro, dvě projekce</h2>
+        <p>TWIST-J zkoumá, zda dvě základní abelovské interakce mohou být dvěma čteními jediného
+        algebraického objektu:</p>
+        <ul>
+            <li>modul jako měřítko a gravitace,</li>
+            <li>argument jako fáze a elektromagnetismus.</li>
+        </ul>
+        <p>Toto je pracovní fyzikální interpretace, nikoli hotový fakt o přírodě. Algebraická
+        tvrzení a fyzikální slovník vždy zveřejňujeme odděleně.</p>
+
+        <h2>4 &middot; Čas je počet. Prostor je komutátor</h2>
+        <p>Čas v TWIST-J není vnější řeka. Je to vnitřní pořadí kroků.</p>
+        <p>Prostor není předem roztažené jeviště. Vzniká z nekomutativity povolených operací.</p>
+        <p>Hladká relativistická geometrie má být limitem této diskrétní struktury, ne jejím
+        předpokladem.</p>
+
+        <h2>5 &middot; Každé tvrzení má status</h2>
+        <p>Rozlišujeme:</p>
+        <ul>
+            <li>větu o přesně definovaném systému,</li>
+            <li>odvozený fyzikální slovník,</li>
+            <li>konečný výpočet,</li>
+            <li>hypotézu s falsifikátorem,</li>
+            <li>otevřený problém,</li>
+            <li>falsifikované tvrzení.</li>
+        </ul>
+        <p>Interní věta o TWIST-J není automaticky větou o vesmíru. Přechod k fyzice je
+        samostatná povinnost.</p>
+        <p>Slovo LOCK znamená zmrazený stavební kámen a přesně vymezený rozsah. Neznamená
+        ochranu před důkazem nebo daty.</p>
+
+        <h2>6 &middot; Neúspěch je výsledek</h2>
+        <p>Falsifikace je první třída poznání.</p>
+        <p>Před výpočtem zapisujeme, co by hypotézu zabilo. Když falsifikátor vystřelí, výsledek
+        nemažeme a práh neposouváme. Mrtvou větev archivujeme a přestavujeme jen to, co její smrt
+        skutečně dovoluje přestavět.</p>
+        <p>TWIST-J může být chybný. Musí však být chybný přesně.</p>
+
+        <h2>7 &middot; Objev není potvrzení</h2>
+        <p>Číselná shoda nalezená při hledání je podnět, nikoli potvrzená předpověď.</p>
+        <p>Potvrzovací váhu mají jen výsledky, u nichž byly před otevřením dat zmrazeny:</p>
+        <ul>
+            <li>rovnice,</li>
+            <li>verze kódu,</li>
+            <li>datový soubor,</li>
+            <li>systematické nejistoty,</li>
+            <li>práh selhání.</li>
+        </ul>
+        <p>Nebudeme nazývat numerickou blízkost derivací. Nebudeme zaměňovat počet možností za
+        fyzikální nutnost.</p>
+
+        <h2>8 &middot; Reprodukce musí být nepřátelská</h2>
+        <p>Každý významný výsledek musí být přepočitatelný v přesné aritmetice. Dvě architektury
+        jsou minimum. Skutečné potvrzení vyžaduje nezávislé autory, nezávislý kód a pokus nalézt
+        protipříklad.</p>
+        <p>Nechceme obdivovatele. Chceme kritiky, kteří umějí počítat.</p>
+
+        <h2>9 &middot; Vztah k současné fyzice</h2>
+        <p>TWIST-J nežádá povolení od konsensu. Současně neodmítá sto let experimentů
+        rétorikou.</p>
+        <p>Nejsme povinni být pokorní před autoritou. Jsme povinni být pokorní před důkazem,
+        reprodukcí a měřením.</p>
+        <p>Standardní model, kvantová teorie a obecná relativita jsou měřítkem toho, co musí nový
+        program vysvětlit. Kde TWIST-J pouze reprodukuje jejich výsledek, řekneme to. Kde dává
+        odlišnou předpověď, zveřejníme falsifikátor. Kde most chybí, napíšeme OTEVŘENO.</p>
+
+        <h2>10 &middot; Co dnes tvrdíme</h2>
+        <p>Tvrdíme, že:</p>
+        <ol>
+            <li>existuje konkrétní uzavřený celočíselný systém s bohatou přesně dokazatelnou strukturou;</li>
+            <li>tento systém podporuje jednotný výzkumný slovník pro čas, prostor, měření, pole a hmotu;</li>
+            <li>významné části konečné matematiky a dynamiky jsou reprodukovatelné;</li>
+            <li>program už přežil i zaznamenal několik vlastních falsifikací;</li>
+            <li>rozhodující mosty k plné fyzice ještě nejsou všechny uzavřeny.</li>
+        </ol>
+        <p>Netvrdíme, že TWIST-J je dnes experimentálně potvrzená finální teorie.</p>
+
+        <h2>11 &middot; Jak může program prohrát</h2>
+        <p>TWIST-J prohraje, jestliže se ukáže například, že:</p>
+        <ul>
+            <li>fyzikální dekodér není aritmetikou vynucen a existuje mnoho stejně úspěšných čtení;</li>
+            <li>relativistický a kvantový limit nelze odvodit bez skrytých kontinuálních předpokladů;</li>
+            <li>budoucí předregistrované předpovědi systematicky selžou;</li>
+            <li>nezávislé implementace vyvrátí klíčové konečné věty;</li>
+            <li>počet diskrétních struktur slouží jen jako převlečené ladění parametrů.</li>
+        </ul>
+        <p>Taková porážka by nebyla ostuda. Ostuda by byla znemožnit, aby k ní mohlo dojít.</p>
+
+        <h2>12 &middot; Pozvání</h2>
+        <p>TWIST-J je otevřená výzva:</p>
+        <ul>
+            <li>matematikům: hledejte chyby a alternativní klasifikace;</li>
+            <li>fyzikům: požadujte jedinečný most k měření;</li>
+            <li>programátorům: napište nezávislou implementaci;</li>
+            <li>experimentátorům: pomozte formulovat slepé testy;</li>
+            <li>kritikům: útočte na nejsilnější tvrzení, ne na slogany.</li>
+        </ul>
+        <p>Nežádáme víru. Nabízíme objekt, pravidla, kód, falsifikátory a účetní knihu omylů.</p>
+
+        <div class="aphorisms">
+            Simplicity is the ultimate perfection.<br>
+            Vesmír není gumová pěna.<br>
+            Náhoda není vysvětlení.<br>
+            Co nejde přesně spočítat, ještě není základní fyzika.
+        </div>
+
+        <p class="lastrule">A poslední pravidlo: nejsme povinni být pokorní před mainstreamem.
+        Jsme povinni být pokorní před pravdou.</p>
+
+        <div class="foot">
+            Canon je účetní kniha. Tento manifest je veřejný závazek metody.<br>
+            <a href="/canon/">Canon</a> &middot; <a href="/">twistj.com</a> &middot; <a href="/manifest/">English</a>
+        </div>
+    </div>
+</body>
+</html>
