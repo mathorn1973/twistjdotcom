@@ -17,9 +17,9 @@ The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j�
 
 The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
 
-- [Canon latest (currently v169, 10 July 2026)](https://twistj.com/canon/latest.md): always points at the current head, SHA-256 36b9995c8f154ebee05002896dd52a4e1d27b54b72f074acce830925a147767f
+- [Canon latest (currently v170, 10 July 2026)](https://twistj.com/canon/latest.md): always points at the current head, SHA-256 109b4779719bee09829da96d556a1029ec6a2b35547ca27fa66485af1708089c
+- [Canon v170 all in one, the Basel gate and the color seam decision (the sixth of zeta(2) is minted by the clock, f00 = 1/6; O-BASEL-GATE closed at D; two A18 rigidity falsifiers fired first class)](https://twistj.com/canon/v170.md): SHA-256 109b4779719bee09829da96d556a1029ec6a2b35547ca27fa66485af1708089c
 - [Canon v169 all in one, the substitution covariance closure and the seam (Thue-Morse forced at the state level with no import, O-A17-SUBCOV-SEAM closed)](https://twistj.com/canon/v169.md): SHA-256 36b9995c8f154ebee05002896dd52a4e1d27b54b72f074acce830925a147767f
-- [Canon v168 all in one, the dynamics from action chain and the sigma geometry (the action as a fixed ray)](https://twistj.com/canon/v168.md): SHA-256 13cd28dd4de557d7deef48d96f53f5309f52720b7a2909d2283c8dd184fdc820
 
 ## Papers
 
