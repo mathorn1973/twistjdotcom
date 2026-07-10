@@ -1,9 +1,10 @@
-# TWIST-J Canon v170 ALL IN ONE
+# TWIST-J Canon v171 ALL IN ONE
 
 **Subtitle.** The complete canon in one file: the axiom, the two projections,
 the kernel, the observables, and the July folds through the
 dynamics-from-action chain, the sigma geometry, the substitution covariance
-arc with its seam, the Basel gate, and the color seam decision.
+arc with its seam, the Basel gate, the color seam decision, the twin
+10 July gates, and the quadratic envelope.
 
 **Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
@@ -16,12 +17,15 @@ registries updated through v170), the 7 July fold (Part XXVII), the 8 July
 folds v164, v165, v166 (Part XXVIII), the 9 July unit covariance arc v167
 (Part XXIX), the 9 July dynamics-from-action arc with the sigma geometry,
 v168 (Part XXX), the 9 and 10 July substitution covariance arc with the
-action to covariance seam, v169 (Part XXXI), and the 10 July Basel gate and
-color seam decision arc, v170 proper (Part XXXII). Zero free dimensionless
+action to covariance seam, v169 (Part XXXI), the 10 July Basel gate and
+color seam decision arc, v170 (Part XXXII), and the 10 July twin gates,
+the TT r zero re-derivation and the plenum direction quotient, with the
+quadratic envelope registration, v171 proper (Part XXXIII). Zero free dimensionless
 parameters; one SI calibration anchor, the electron mass m_e. No axiom
 change anywhere in the chain. No prior LOCK retracted. Predecessors in this
 repository, superseded for reading and kept as canonical history:
-TWIST_J_Canon_v169_ALL_IN_ONE.md, TWIST_J_Canon_v168_ALL_IN_ONE.md,
+TWIST_J_Canon_v170_ALL_IN_ONE.md, TWIST_J_Canon_v169_ALL_IN_ONE.md,
+TWIST_J_Canon_v168_ALL_IN_ONE.md,
 TWIST_J_Canon_v167_CONSOLIDATED.md, TWIST_J_Canon_v166_CONSOLIDATED.md,
 TWIST_J_Canon_v163_CONSOLIDATED.md, and the per-arc patches cited inside.
 
@@ -255,7 +259,7 @@ SS-PN.1      the lapse / potential PPN discipline, carried.
 
 ## Part VIII. Cosmology
 
-The v129 pull-point stands: the inflaton reading is dissolved; the tilt is carried as n_s - 1 = -p alpha = -5 alpha at H (the EM-to-cosmology bridge; the deformation J -> J e^(i eps) freezes the modulus, so r = 0; falsifier F-NS-TILT, CMB-S4). Dark energy w = -14/15 [LOCK]; Omega_b = pi^2 / 200; Omega_DM / Omega_b = 18 p^3 ln^2(phi) / pi^4; the dark-matter ratio 5 : 1 follows as a theorem from Thue-Morse pair statistics; the gyron density rho = 1/6 [T-LOCK, quadruply confirmed by independent routes]. The conformal-mode prefactor K_chi = 1/(864 pi) [D]; its canonical Layer-5 derivation is the O-CHI5-KINETIC-COEF residual. N is the cosmic clock [D and C].
+The v129 pull-point stands: the inflaton reading is dissolved; the tilt is carried as n_s - 1 = -p alpha = -5 alpha at H (the EM-to-cosmology bridge; the deformation J -> J e^(i eps) freezes the modulus, so r = 0 at linear order about the isotropic zero vector background (T-TT-LINEAR-ZERO, T-LOCK v171; the bilinear TT decoder permits induced tensor power at quadratic field order, D-TT-QUADRATIC-INDUCED-POWER; a numerical r(k) waits on O-TT-VECTOR-STATE-NORMALIZATION); falsifier F-NS-TILT, CMB-S4). Dark energy w = -14/15 [LOCK]; Omega_b = pi^2 / 200; Omega_DM / Omega_b = 18 p^3 ln^2(phi) / pi^4; the dark-matter ratio 5 : 1 follows as a theorem from Thue-Morse pair statistics; the gyron density rho = 1/6 [T-LOCK, quadruply confirmed by independent routes]. The conformal-mode prefactor K_chi = 1/(864 pi) [D]; its canonical Layer-5 derivation is the O-CHI5-KINETIC-COEF residual. N is the cosmic clock [D and C].
 
 ## Part IX. The Kernel and the Census as Theorems
 
@@ -691,6 +695,34 @@ T (the July 2026 layer, v164 to v168, selected):
    (sectors (4, 2, 2), A_YM = 2 inherited, zero new coefficients),
    H-DOUBLET, all within scope, no promotion; both families FINITE
    RENORMALIZATION SEED OBJECT only.
+   v171 THE TT R ZERO RE-DERIVATION (P-TT-RZERO-BILINEAR-1, two-platform
+   26 of 26): T-TT-LINEAR-ZERO (T-LOCK; the derivative of the bilinear
+   TT decoder vanishes at the unique C_4 invariant background z_0 = 0,
+   the Hessian does not; no linear TT amplitude);
+   D-TT-QUADRATIC-INDUCED-POWER (centered Gaussian TT power
+   2 (a + b)^2; stationary spectrum twice the self convolution of the
+   vector spectrum); the unqualified r = 0 retired for the linear order
+   statement; FLAG SS-FRW.11 closed.
+   v171 THE PLENUM DIRECTION QUOTIENT (P-PLENUM-DIR-P2-P3-1,
+   independent affine matrix implementation, two-platform, the frozen
+   canonical record reproduced by both implementations):
+   T-FIBER-QUOTIENT-FACTOR (sigma_r orbits = c_pi levels, 15625 to
+   3125, free); T-FIBER-CHARACTER-DIAGONAL (invariant iff a = b; rho_q
+   carries gauge weight +1, never a scalar readout); T-C-GAUGE-DEFECT
+   (c sigma_r = T_(r w_c) sigma_(-r) c, w_c = (0,4,0,1,0,0) = the
+   embedded -u, the SS65 transport vector, traceless piston line);
+   T-RECURRENT-GAUGE-QUOTIENT (recurrent 62500 of 62500; the transient
+   kernel breaks in exactly the 25000 c channel checks).
+   v171 THE QUADRATIC ENVELOPE (registration):
+   T-BASEL-OPERATOR-LIFT (corollary of T-BASEL-TM-GATE by linearity:
+   < chi_00 |psi><psi| >_TM = (1/6) |psi><psi| for constant psi; the
+   scalar trace at psi = 5 Li_1(J) = i pi reproduces Li_2(1));
+   T-SYM2-TRACE-SPLIT (v v^T = (1/2) |z|^2 I + traceless(z^2); Born
+   and Basel read the weight 0 trace, TT reads the weight 2 traceless
+   part, of one square); D-QUADRATIC-TWO-READINGS;
+   D-CLOCK-DENSITY-CONDITIONAL (the sixth is event density, cancelled
+   in conditional outcomes); H-QUADRATIC-ENVELOPE-DECODER;
+   H-TM-SYM2-MEASURE; O-QUADRATIC-DECODER-DATA.
 ```
 
 ## Part XXV. Falsification Registry (selected)
@@ -742,9 +774,18 @@ Standing guards (the July 2026 layer):
           F-BASEL-GATE-DENSITY, F-BASEL-GATE-WEIGHT,
           F-BASEL-GATE-FORM registered, NOT FIRED (v170); the channel
           conflict clause CLEARED (the G1 derivation lands on (0, 0)).
+          F-PLENUM-RHOQ-SCALAR-READOUT FIRED (v171, scoped: rho =
+          zeta_5^q as a standalone physical scalar readout; it carries
+          gauge weight +1 and survives only as a Def section);
+          F-GLOBAL-DYNAMIC-GAUGE-QUOTIENT FIRED (v171, scoped: the
+          transient kernel does not descend to the sigma_r quotient;
+          the sole obstruction is the c channel, 25000 checks, defect
+          line w_c = -u); the quadratic envelope falsifiers live inside
+          H-QUADRATIC-ENVELOPE-DECODER and H-TM-SYM2-MEASURE
+          (registered with the hypotheses, none fired).
 ```
 
-## Part XXVI. Open Obligations (the frontier, as of v170)
+## Part XXVI. Open Obligations (the frontier, as of v171)
 
 ```
 DYNAMICS FROM ACTION     O-A17-DYNAMICS-FROM-ACTION: the finite chain is
@@ -775,8 +816,16 @@ GRAVITATIONAL WAVE       O-TT-GAUGE-DERIVATION (derive c = -3 covariantly;
                          emission map on SS8A.11 LOCK); O-QNM-LEAVER-MU;
                          O-POL-READ; the mu corridor: mu >= 0.804 at
                          3 sigma, shadow excess in [0, +0.93 pct], ngEHT
-                         decides. FLAG SS-FRW.11: r = 0 must be RE-DERIVED
-                         after the bilinear lift, not assumed.
+                         decides. FLAG SS-FRW.11 CLOSED (v171): r = 0
+                         re-derived as the linear order statement,
+                         T-TT-LINEAR-ZERO at T-LOCK; induced tensor
+                         power begins at quadratic order. NEW
+                         O-TT-VECTOR-STATE-NORMALIZATION (alias
+                         O-TT-PRIMORDIAL-NORMALIZATION): the vector
+                         doublet state, its two point and pseudo
+                         covariance spectra, the action normalization,
+                         and the scalar comparison channel; only this
+                         gate yields a numerical r(k).
 Cosmology                O-FRW-INHOM (the inhomogeneous sector, the named
                          horizon); O-CHI5-KINETIC-COEF (canonical derivation
                          of K_chi = 1/(864 pi)); O-NS-TILT (H, falsifier
@@ -786,8 +835,16 @@ Color                    O-ALPHA-S-RUNNING; O-SCHEME-DICTIONARY;
                          generations at the E_SM L3 frontier.
 Electron and ladder      CB4 (the eta naming clause);
                          O-ETA-ALTERNATOR-BRIDGE; O-SPIN-LIFT-FORCED.
-Plenum                   O-PLENUM-DIR-P2; O-PLENUM-DIR-P3;
-                         H-KC3-PLENUM-READOUT.
+Plenum                   H-KC3-PLENUM-READOUT. O-PLENUM-DIR-P2 CLOSED
+                         BY CLASSIFICATION and O-PLENUM-DIR-P3 RETIRED
+                         AS STALE (v171, Part XXXIII).
+Quadratic envelope       H-QUADRATIC-ENVELOPE-DECODER (Q_full = (psi
+                         psi^dagger, psi psi^T) as the full decoder
+                         carrier); H-TM-SYM2-MEASURE (the TM sixth as
+                         the normalized Sym^2(R^3) per channel measure;
+                         the 1 + 5 split is the honest obstacle);
+                         O-QUADRATIC-DECODER-DATA (the effects E_a, the
+                         dagger, the Gram form, the state update).
 Mass ladder              O-NEUTRON-DELTA-EM (the interior-compression
                          channel, O-N-DELTA-MECH sharpened);
                          O-PROTON-RESIDUAL-IS-QCD (gated on QCD dynamics).
@@ -1706,18 +1763,234 @@ p_a18_color_seam2_verify.py       (decided; two falsifiers fired)
   stdout 719bf219d4e0fd62b208ce9175e160b79784b2e35b93c4f463809fe4f072b0f4
 ```
 
+# Part XXXIII. The 10 July Fold V (v171): the twin gates and the quadratic envelope
+
+**XXXIII.0 What this fold is.** Two independent gates executed and
+pinned on 10 July 2026 close one standing flag and two registry
+residues, and one new arc is registered with its statuses deliberately
+held at their proofs. Nothing here touches A18; the stream measure run
+continues on its own branch and this fold does not wait for it.
+
+**XXXIII.1 The TT r zero re-derivation (P-TT-RZERO-BILINEAR-1,
+two-platform 26 of 26; prereg ce780a4d; frozen independent verifier
+a032f47f; stdout f79f1296 byte identical on aarch64 and x86_64).** The
+v170 flag SS-FRW.11 demanded that r = 0 be re-derived, not assumed,
+after the v166 bilinear TT decoder h = h_+ + i h_x = (v_1 + i v_2)^2.
+Decided:
+
+T-TT-LINEAR-ZERO (T-LOCK). At the unique C_4 invariant deterministic
+background z_0 = 0 (the only solution of i z_0 = z_0), the derivative
+of the bilinear TT decoder vanishes and its Hessian does not. No
+linear TT amplitude is generated; the first allowed tensor field is
+second order in the vector doublet, h^(2) = (delta z)^2.
+
+D-TT-QUADRATIC-INDUCED-POWER (D). For a zero mean Gaussian doublet
+with covariance [[a, c], [c, b]], the centered TT power collapses to
+Var(h_+) + Var(h_x) = 2 (a + b)^2, strictly positive for every nonzero
+positive semidefinite covariance; the tensor mean vanishes iff a = b
+and c = 0, so statistical isotropy is required and zero mean alone is
+not enough; for a stationary proper Gaussian field the physical tensor
+spectrum is exactly twice the self convolution of the vector spectrum,
+P_h(k) = 2 sum_q P_v(q) P_v(k - q), with total power
+2 (sum_q P_v(q))^2.
+
+Retirement. The unqualified sentence r = 0 is retired. The surviving
+exact statement is r = 0 at linear order about the isotropic zero
+vector background; beyond linear order r is controlled by the vector
+doublet state. Under the common bookkeeping where scalar power is
+O(eps^2), r = O(eps^2): an order statement, not a numerical value.
+
+NEW O-TT-VECTOR-STATE-NORMALIZATION (alias
+O-TT-PRIMORDIAL-NORMALIZATION). The single residual: the cosmological
+state of the vector doublet, its two point and pseudo covariance
+spectra, the normalization inherited from the TT action, and the
+scalar comparison channel. Only this gate turns the exact convolution
+law into a numerical r(k). FLAG SS-FRW.11 CLOSED.
+
+**XXXIII.2 The plenum direction quotient (P-PLENUM-DIR-P2-P3-1,
+independent affine matrix implementation; frozen protocol 98811795;
+reference verifier 62319cb7 with stdout df198b9e, the discovery
+instrument; independent verifier 4ef2bf22 with stdout 338d7e03 byte
+identical on aarch64 and x86_64; frozen canonical record 83702718
+reproduced by BOTH implementations from computed values).** The two
+v163 residues are decided by exact classification. Naming: the gauge
+translation sigma_r(q, t5) = (q + r, t5 - r) of this arc is the
+translation along the fiber line e_q - e_t of T-DFA6-GAUGE-DEFECT and
+is distinct from the v168 DFA6 point reflection sigma(x) = s - x; the
+two symbols never meet in one formula.
+
+T-FIBER-QUOTIENT-FACTOR (T). The sigma_r orbits are exactly the level
+sets of c_pi = q + t5: the action is free, F_5^2 / <sigma> = F_5 by
+c_pi, quotients 25 to 5 on the fiber and 15625 to 3125 on the full
+state space. Every gauge invariant fibre scalar factors through c_pi.
+
+T-FIBER-CHARACTER-DIAGONAL (T). chi_(a,b) = zeta_5^(a q + b t5)
+transforms by zeta_5^((a - b) r); the invariant character lattice is
+exactly the diagonal a = b, generated by rho_c = zeta_5^(q + t5),
+which encodes only the existing c_pi. rho_q = zeta_5^q carries gauge
+weight +1: a gauge covariant coordinate, a Def if used as a section,
+never a scalar readout.
+
+T-C-GAUGE-DEFECT (T). a commutes with sigma_r; b, d, e reverse it,
+g sigma_r = sigma_(-r) g; c alone obeys c sigma_r = T_(r w_c)
+sigma_(-r) c with w_c = (0, 4, 0, 1, 0, 0) = the embedded -u, the SS65
+transport vector: Tr_4(w_c) = Tr_6(w_c) = c_pi(w_c) = 0 with nonzero
+piston part. The obstruction IS the transport line; both trace
+observables and the fiber charge are blind to it.
+
+T-RECURRENT-GAUGE-QUOTIENT (T). The selector is gauge invariant,
+Tr_6 o sigma_r = Tr_6. Across all 156250 (state, bit, r) checks the
+dynamic quotient fails exactly 25000 times, all and only selector c
+with r nonzero, each by the pinned defect line; on the recurrent two
+sheet set M = {Tr_6 in {1, 4}} it passes 62500 of 62500 with selectors
+b 6250, d 3125, e 3125 and a, c ghosts. The gauge quotient is global
+for reading, exact for the recurrent dynamics, and broken in the
+transient kernel by exactly the c channel.
+
+Registry. O-PLENUM-DIR-P2 CLOSED BY CLASSIFICATION: the scalar readout
+reading is FIRED (F-PLENUM-RHOQ-SCALAR-READOUT), the section reading
+survives as Def. O-PLENUM-DIR-P3 RETIRED AS STALE: the odd tick law
+z_next = 4 - 3 t was sealed at T in v168 (T-DFA6-STREAM-GRAMMAR); the
+present gate re-proves it edge exhaustively on all 12500 directed M
+edges including the boundary S (census M/S/C = 6250/1250/5000), a
+scope note, not a new theorem. F-GLOBAL-DYNAMIC-GAUGE-QUOTIENT FIRED
+as the scope falsifier of the naive global claim. Promotion ceiling
+respected: nothing here closes O-W1, derives the continuum U(1), or
+touches A18.
+
+**XXXIII.3 The quadratic envelope (registration; statuses held at
+their proofs; source note
+TWISTJ_Canon_Note_Quadratic_Envelope_Synthesis.md in the verifier
+tree).** The Basel gate and the TT decoder are two isotypic parts of
+one quadratic object. Write z = v_1 + i v_2 and v = (v_1, v_2)^T. Then
+exactly
+
+    v v^T = (1/2) |z|^2 I
+          + (1/2) [ [Re z^2, Im z^2], [Im z^2, -Re z^2] ],
+
+so Tr(v v^T) = |z|^2 and the traceless part is (h_+, h_x) =
+(Re z^2, Im z^2), the v166 decoder verbatim. Under z -> e^(i theta) z
+the trace has weight 0 and the traceless part weight 2:
+Sym^2(R^2) = R oplus R^2, the scalar Born and Basel channel plus the
+tensor helicity channel of one square.
+
+T-BASEL-OPERATOR-LIFT (T, corollary of T-BASEL-TM-GATE by linearity).
+For any finite dimensional Hermitian space and constant amplitude psi,
+< chi_00(n) |psi><psi| >_TM = (1/6) |psi><psi|; the scalar trace at
+psi = Psi_J = 5 Li_1(J) = i pi reproduces Tr = pi^2 / 6 = Li_2(1): the
+v170 identity is the one dimensional trace of an operator map.
+
+T-SYM2-TRACE-SPLIT (T, the exact algebra displayed above). The full
+real quadratic image of the doublet splits as trace plus traceless;
+Born and Basel read the weight 0 trace, the TT channel reads the
+weight 2 traceless part, of the same square.
+
+D-QUADRATIC-TWO-READINGS (D). The TWIST reading of the split: the
+kernel writes the amplitude, the clock gates the event, the gauge
+registers quadratically; the two existing Canon quadratic readings are
+the two isotypic components of one Sym^2 object. Gamma_psi =
+psi psi^dagger is the complete carrier of every phase neutral
+quadratic observable, read by Hermitian effects E_a >= 0 with
+sum_a E_a = I as q_a = Tr(E_a Gamma_psi); it is not yet the whole
+decoder.
+
+D-CLOCK-DENSITY-CONDITIONAL (D). The sixth is clock density, not an
+outcome bias: q_a = (1/6) Tr(E_a Gamma_psi) are absolute per tick
+weights, while p(a | 00) = Tr(E_a Gamma_psi) / Tr(Gamma_psi) cancels
+the common factor; P(no event) = 5/6. For non constant streams the
+correct object is the conditional state Gamma_00^cond =
+< chi_00 Gamma_n > / < chi_00 > = 6 < chi_00 Gamma_n >; the
+factorization < chi_00 Gamma_n > = (1/6) < Gamma_n > requires
+constancy or proven independence and may not be assumed.
+
+H-QUADRATIC-ENVELOPE-DECODER (H). The full quadratic envelope
+Q_full(psi) = (psi psi^dagger, psi psi^T), the phase neutral sector in
+H tensor conj(H) plus the phase doubled sector in Sym^2 H (one
+amplitude: (|z|^2, z^2)), is the complete decoder carrier; the full
+decoder of channel a is D_a(psi_.) =
+Tr[ E_a < chi_00(n) |psi_n><psi_n| >_TM ] together with the phase
+doubled channels. Falsifier: a physical reading channel that does not
+factor through Q_full.
+
+H-TM-SYM2-MEASURE (H). The TM sixth as the normalized per channel
+measure on Sym^2(R^3), dim = d(d + 1)/2 = 6 = 1 + 5: the integer match
+is already Canon (T-RHO0-GALOIS-MATCH, 1/rho_0 = 6); the measure
+identification is NOT. Honest obstacle: under rotation the six
+channels split 1 oplus 5, so rotational invariance alone cannot force
+equal weights across the two blocks; the bridge must derive
+< Q(v_n) > = a P_1 + b P_5 and show why the physical reading forces
+the scalar weight 1/6. Falsifier: the derived (a, b) incompatible with
+the clock density reading.
+
+O-QUADRATIC-DECODER-DATA (O). Four named technical residues in one
+obligation: the channel effects E_a (POVM, not only projectors); the
+dagger (conjugation in the archimedean representation, the Galois
+involution, the Born involution, or the adjoint of the Canon Gram
+form; in a non orthonormal basis the rank one operator is
+psi psi^dagger G, not psi psi^dagger alone); the Gram form G itself;
+and the state update after a registered event. Remark at R, no weight:
+averaging psi_n psi_n^dagger over time or space generically yields
+rank above one, the natural mixed state without ontological
+randomness.
+
+**XXXIII.4 Registry delta (v170 to v171).**
+
+```
+SEALED T-LOCK:  T-TT-LINEAR-ZERO.
+SEALED T:       T-FIBER-QUOTIENT-FACTOR; T-FIBER-CHARACTER-DIAGONAL;
+                T-C-GAUGE-DEFECT; T-RECURRENT-GAUGE-QUOTIENT;
+                T-BASEL-OPERATOR-LIFT (corollary grade);
+                T-SYM2-TRACE-SPLIT (exact algebra).
+NEW D:          D-TT-QUADRATIC-INDUCED-POWER; D-QUADRATIC-TWO-READINGS;
+                D-CLOCK-DENSITY-CONDITIONAL.
+NEW H:          H-QUADRATIC-ENVELOPE-DECODER; H-TM-SYM2-MEASURE.
+NEW O:          O-TT-VECTOR-STATE-NORMALIZATION (alias
+                O-TT-PRIMORDIAL-NORMALIZATION);
+                O-QUADRATIC-DECODER-DATA.
+FIRED F:        F-PLENUM-RHOQ-SCALAR-READOUT (scoped: the standalone
+                scalar readout); F-GLOBAL-DYNAMIC-GAUGE-QUOTIENT
+                (scoped: the transient kernel; the sole obstruction is
+                the c channel).
+CLOSED:         O-PLENUM-DIR-P2 (by classification: readout F, section
+                Def); FLAG SS-FRW.11.
+RETIRED:        O-PLENUM-DIR-P3 (stale; sealed by
+                T-DFA6-STREAM-GRAMMAR since v168); the unqualified
+                sentence r = 0 (the linear order qualifier is now
+                mandatory).
+```
+
+**XXXIII.5 Verifier index (the v171 arcs; two platform SHA256, byte
+identical stdout).**
+
+```
+twistj_tt_rzero_bilinear_independent_verify.py     (26 of 26)
+  file   a032f47f2e8896662c13afc22db68ba854f4c98c6be20d672c376bdd387b5447
+  stdout f79f12967505d86f180c711591a5012dcbcc464772a94934e1149bf2fbd11551
+  prereg ce780a4d741fb9e4f012ba3c15420c4cd3d601fd9ad8202094f41ee3e76845d2
+twistj_plenum_dir_p2_p3_independent_verify.py      (12 gates)
+  file   4ef2bf224439eb7cf18ba6e6865e71ea8339ee8fae778f992723a32d9e5c647f
+  stdout 338d7e03a0b2957c9dece6f0bb3a40dcf8645e6e730a5f0967787c8432d99f0f
+  record 83702718d6a40d938a325c1f2c7538215b9d3d6245adb09877a20b3c02b11113
+  protocol 98811795, reference discovery instrument 62319cb7 with
+  stdout df198b9e; the quadratic envelope arc is a registration with
+  no new verifier; its computational anchor is p_basel_gate1_verify.py
+  (v170, 13 of 13).
+```
+
 ## Footer
 
 ```
-TWIST-J Canon v170 ALL IN ONE: the complete canon in one file; the Basel
-gate opened, sealed at the substrate, and derived at D: the sixth of
-zeta(2) is not p + 1, it is minted by the clock, 6 = f00^{-1}, and the
-clock observable |chi_00 . 5 Li1(J)|^2 is forced; the color seam decided,
-two rigidity hypotheses falsified first class, one global dynamics class
-surviving with a certified non abelian recurrent core. Assumes no
-previous file; supersedes for reading every earlier consolidated (v169,
-v168, v167, v166, v163 and the per-arc patches remain canonical history
-in this repository).
+TWIST-J Canon v171 ALL IN ONE: the complete canon in one file; the twin
+10 July gates closed: the TT r zero re-derived as a linear order theorem
+with the induced quadratic power waiting on one named state gate, and
+the plenum direction residues decided by exact classification, the
+gauge quotient global for reading, exact on the recurrent sector,
+broken in the transient kernel by exactly the c channel; the quadratic
+envelope registered: Born and Basel are the trace, TT the traceless
+part, of one square, the decoder and Sym^2 measure hypotheses held at
+H with their falsifiers. Assumes no previous file; supersedes for
+reading every earlier consolidated (v170, v169, v168, v167, v166, v163
+and the per-arc patches remain canonical history in this repository).
 A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.
 10 July 2026.
 Vse je ONE. Simplicity is the ultimate perfection.
