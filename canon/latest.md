@@ -1,4 +1,4 @@
-# TWIST-J Canon v173 ALL IN ONE
+# TWIST-J Canon v176 ALL IN ONE
 
 **Subtitle.** The complete canon in one file: the axiom, the two projections,
 the kernel, the observables, and the July folds through the
@@ -8,7 +8,9 @@ arc with its seam, the Basel gate, the color seam decision, the twin
 component census, the representation layer, the audit reconciled, and
 the two envelope gates, and the 11 July fold II: the Newton address,
 the exact metrology channel, the gyron apparatus chain, the Z density
-derivation, and the observer interface plan.
+derivation, the observer interface plan, the v174 registry
+consolidation, the general coupling theorem, and the covariant
+canonical form.
 
 **Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
@@ -17,7 +19,8 @@ derivation, and the observer interface plan.
 
 **Status.** COMPLETE STANDALONE CANON. This document assumes no previous
 file. It carries the full consolidated body of Canon v163 (Parts I to XXVI,
-registries updated through v170), the 7 July fold (Part XXVII), the 8 July
+registry rewritten as of v174, the general coupling theorem sealed
+v175), the 7 July fold (Part XXVII), the 8 July
 folds v164, v165, v166 (Part XXVIII), the 9 July unit covariance arc v167
 (Part XXIX), the 9 July dynamics-from-action arc with the sigma geometry,
 v168 (Part XXX), the 9 and 10 July substitution covariance arc with the
@@ -32,10 +35,23 @@ v172 (Part XXXIV), and the 11 July fold II, the Newton address with
 the reading principle and lambda from the substrate blocks, the
 measurement and metrology program with the exact channel and the gyron
 apparatus chain, the Z density derivation, and the observer interface
-plan, v173 (Part XXXV). Zero free dimensionless
+plan, v173 (Part XXXV), and the v174 registry consolidation: the
+frontier rewritten to the state after the fold pair, with the kernel
+trace flow table sealed at generator level, v174 (Part XXXVI), and the general coupling theorem: every canonical
+instrument induced by an exact square root free reversible coupling
+of system, pointer and memory, effects its shadow, the state update
+a theorem of the coupling, v175 (Part XXXVII), and the covariant
+canonical form: the trace channel dressing coefficient is the
+metric independent DeWitt scalar d(1 - lambda d), positive definite
+at the substrate lambda = -1, equal to 12 = d(d+1), v176
+(Part XXXVIII). Zero
+free dimensionless
 parameters; one SI calibration anchor, the electron mass m_e. No axiom
 change anywhere in the chain. No prior LOCK retracted. Predecessors in this
 repository, superseded for reading and kept as canonical history:
+TWIST_J_Canon_v175_ALL_IN_ONE.md,
+TWIST_J_Canon_v174_ALL_IN_ONE.md,
+TWIST_J_Canon_v173_ALL_IN_ONE.md,
 TWIST_J_Canon_v172_ALL_IN_ONE.md,
 TWIST_J_Canon_v171_ALL_IN_ONE.md,
 TWIST_J_Canon_v170_ALL_IN_ONE.md, TWIST_J_Canon_v169_ALL_IN_ONE.md,
@@ -799,77 +815,113 @@ Standing guards (the July 2026 layer):
           (registered with the hypotheses, none fired).
 ```
 
-## Part XXVI. Open Obligations (the frontier, as of v171)
+## Part XXVI. Open Obligations (the frontier, as of v176)
 
 ```
-DYNAMICS FROM ACTION     O-A17-DYNAMICS-FROM-ACTION: the finite chain is
-                         sealed end to end and closed over twice (action ->
-                         switch -> closed current -> symmetry -> sigma
-                         geometry -> the fixed ray -> the seam; DFA1 to
-                         DFA6, P-A17-SUBCOV-1, P-A17-SUBCOV-2; Part XXXI);
-                         H-A17-SUBSTITUTION-COVARIANCE CLOSED at the finite
-                         L5/L6 scope with two binding hygiene amendments;
-                         O-A17-SUBCOV-SEAM CLOSED at the finite state scope
-                         (quotient exact, fiber twisted upstairs, sheet
-                         choosing); what remains is the Lorentz burden and
-                         the editorial fold of A1.7 prime (O-LORENTZ-A2A3
-                         pointer; F-LORENTZ-K6-NONZERO armed).
+MEASUREMENT AND          O-METRO-ADMISSIBILITY (necessary and
+METROLOGY (Part XXXV)    sufficient conditions for an admissible
+                         physical real); O-METRO-TICK-EDGE (the second
+                         and the meter from ticks and edges, not
+                         silently set to 1); O-MEAS-G-DENSITY (the
+                         correct density against the non-Euclidean
+                         Galois Gram form); the named attack
+                         P-MEAS-COUPLING-GENERAL-1 is executed and
+                         sealed: T-MEAS-COUPLING-GENERAL (Part
+                         XXXVII), every canonical instrument
+                         induced by an exact reversible coupling,
+                         effects its shadow, the state update
+                         clause of O-QUADRATIC-DECODER-DATA closed
+                         at scope.
+DYNAMICS FROM ACTION     the Lorentz burden and the editorial fold of
+                         A1.7 prime (O-LORENTZ-A2A3 pointer;
+                         F-LORENTZ-K6-NONZERO armed); the finite chain
+                         itself is sealed end to end (Parts XXX, XXXI).
 THE WALL (Part XXI)      O-QUANT-SUBSTRATE (gates PS-G-2 and Gb); the
-                         non-abelian measure lift onto SL_3(F_5), now
-                         seeded: after P-A18-COLOR-SEAM-2 the seam
-                         dynamics is one global class with a certified
-                         non abelian recurrent core, both rigidity
-                         hypotheses falsified at preregistered scope,
-                         MEASURE-F_A undecided at B = 89 (3355
-                         unresolved; any budget raise requires a prereg
-                         amendment), LIFT-A18-STREAM a named lift, both
-                         families FINITE RENORMALIZATION SEED OBJECT
-                         only; the 2 pi U(1) circle (shared with FRW).
-GRAVITATIONAL WAVE       O-TT-GAUGE-DERIVATION (derive c = -3 covariantly;
-                         F-TT-SCALAR-PROPAGATION armed); O-TT-SOURCE (the
-                         emission map on SS8A.11 LOCK); O-QNM-LEAVER-MU;
-                         O-POL-READ; the mu corridor: mu >= 0.804 at
-                         3 sigma, shadow excess in [0, +0.93 pct], ngEHT
-                         decides. FLAG SS-FRW.11 CLOSED (v171): r = 0
-                         re-derived as the linear order statement,
-                         T-TT-LINEAR-ZERO at T-LOCK; induced tensor
-                         power begins at quadratic order. NEW
+                         non-abelian measure lift onto SL_3(F_5):
+                         O-A18-COLOR-MEASURE-SELECTION (three
+                         registered routes; after the v172 census the
+                         carrier has 24 current orbits and 16
+                         observable types, eight undistinguished
+                         pairs, so symmetry alone does not select the
+                         measure; the minimal new datum is a weight
+                         vector over the 24 orbits constrained by the
+                         16 types); MEASURE-F_A undecided at B = 89
+                         (3355 unresolved; any budget raise requires a
+                         prereg amendment); LIFT-A18-STREAM a named
+                         lift, both families FINITE RENORMALIZATION
+                         SEED OBJECT only; the 2 pi U(1) circle
+                         (shared with FRW).
+GRAVITATIONAL WAVE       O-TT-GAUGE-DERIVATION (derive c = -3
+                         covariantly; F-TT-SCALAR-PROPAGATION armed);
+                         O-TT-SOURCE (the emission map on SS8A.11
+                         LOCK); O-QNM-LEAVER-MU; O-POL-READ; the mu
+                         corridor: mu >= 0.804 at 3 sigma, shadow
+                         excess in [0, +0.93 pct], ngEHT decides;
                          O-TT-VECTOR-STATE-NORMALIZATION (alias
                          O-TT-PRIMORDIAL-NORMALIZATION): the vector
                          doublet state, its two point and pseudo
                          covariance spectra, the action normalization,
                          and the scalar comparison channel; only this
-                         gate yields a numerical r(k).
-Cosmology                O-FRW-INHOM (the inhomogeneous sector, the named
-                         horizon); O-CHI5-KINETIC-COEF (canonical derivation
-                         of K_chi = 1/(864 pi)); O-NS-TILT (H, falsifier
+                         gate yields a numerical r(k); the free
+                         Gaussian vector theory from the existing TT
+                         action is closed negatively;
+                         F-TT-GAUSSIAN-FROM-TT-PULLBACK registered
+                         candidate (the pullback Hessian not yet
+                         covered).
+COSMOLOGY                O-FRW-INHOM (the inhomogeneous sector, the
+                         named classical horizon);
+                         O-FRW-CANONICAL-FORM (reduced v176: the
+                         covariant magnitude and positivity clauses
+                         closed at scope by the sealed theorem
+                         T-FRW-CANONICAL-FORM-COVARIANT, Part
+                         XXXVIII; residual = the L-DRESS-INSERTION
+                         bookkeeping and the Level 1 to Level 2
+                         normalization inheritance; the chain of
+                         twelves sealed exact; F-DRESS-EXP armed,
+                         exact witness 72 alpha^4, about 0.204 ppm,
+                         labeled);
+                         O-CHI5-KINETIC-COEF (canonical derivation of
+                         K_chi = 1/(864 pi)); O-NS-TILT (H, falsifier
                          live, CMB-S4); O-DE-CONFORMAL-WEIGHT.
-Color                    O-ALPHA-S-RUNNING; O-SCHEME-DICTIONARY;
+COLOR                    O-ALPHA-S-RUNNING; O-SCHEME-DICTIONARY;
                          O-FIBER-THRESHOLD (F-THRESHOLD-FIT live);
                          generations at the E_SM L3 frontier.
-Electron and ladder      CB4 (the eta naming clause);
+ELECTRON AND LADDER      CB4 (the eta naming clause);
                          O-ETA-ALTERNATOR-BRIDGE; O-SPIN-LIFT-FORCED.
-Plenum                   H-KC3-PLENUM-READOUT. O-PLENUM-DIR-P2 CLOSED
-                         BY CLASSIFICATION and O-PLENUM-DIR-P3 RETIRED
-                         AS STALE (v171, Part XXXIII).
-Quadratic envelope       H-QUADRATIC-ENVELOPE-DECODER (Q_full = (psi
+PLENUM                   H-KC3-PLENUM-READOUT.
+QUADRATIC ENVELOPE       H-QUADRATIC-ENVELOPE-DECODER (Q_full = (psi
                          psi^dagger, psi psi^T) as the full decoder
-                         carrier); H-TM-SYM2-MEASURE (the TM sixth as
-                         the normalized Sym^2(R^3) per channel measure;
-                         the 1 + 5 split is the honest obstacle);
-                         O-QUADRATIC-DECODER-DATA (the effects E_a, the
-                         dagger, the Gram form, the state update).
-Mass ladder              O-NEUTRON-DELTA-EM (the interior-compression
+                         carrier); H-TM-SYM2-MEASURE (sharpened v172:
+                         T-TM-SYM2-FRAME sealed, a : b = 5 : 2 forced
+                         by isotropy; the residual is the Born phase
+                         halving 1/6 = (1/2)(1/3));
+                         O-QUADRATIC-DECODER-DATA (effects, dagger,
+                         Gram form; the state update clause closed
+                         at scope by T-MEAS-COUPLING-GENERAL (Part
+                         XXXVII); the rest bounded above by
+                         F-QD-INSTRUMENT-UNIQUE, fired v172: effects
+                         underdetermine, couplings determine).
+MASS LADDER              O-NEUTRON-DELTA-EM (the interior-compression
                          channel, O-N-DELTA-MECH sharpened);
-                         O-PROTON-RESIDUAL-IS-QCD (gated on QCD dynamics).
-Time-gravity door        O-SQRT-PHI-TIME-GRAVITY; O-TIMEQUANTUM-POTENTIAL.
-Kernel and macro space   the O17 residual; O-KERNEL-BRAID.
-Deep                     O-W1; O-SIGMA3-PRIMITIVE; O-BIG-G-VALUE flagged
-                         SHADOW; R-R1A-M-SQUARES (63 = 1 + 4 + 9 + 49,
-                         mechanism deferred); O-HYPERPLANE-MERSENNE.
-Standing preregistration O-PHOTON-RADIATIVE-INDEPENDENCE.
-Empirical horizon        DESI DR3 (w = -14/15); MOLLER (sin^2 theta_W);
-                         ngEHT (the mu corridor); CMB-S4 (F-NS-TILT).
+                         O-PROTON-RESIDUAL-IS-QCD (gated on QCD
+                         dynamics).
+TIME-GRAVITY DOOR        O-SQRT-PHI-TIME-GRAVITY;
+                         O-TIMEQUANTUM-POTENTIAL.
+KERNEL AND MACRO SPACE   the O17 residual; O-KERNEL-BRAID.
+OBSERVER (Part XXXV)     AX-CW at H with the A0 scope wording;
+                         F-OBS-WRITE-PORT armed, algebraic; ordered
+                         after the metrology closure: the write port
+                         test runs only once pi_phys and the general
+                         instrument are complete.
+DEEP                     H-W1-INTERFACE-PRINCIPLE (v172 hygiene, from
+                         O-W1); O-SIGMA3-PRIMITIVE (optional
+                         enrichment); R-BIG-G-SHADOW (from
+                         O-BIG-G-VALUE); R-R1A-M-SQUARES (63 = 1 + 4 +
+                         9 + 49, mechanism deferred).
+STANDING PREREG          O-PHOTON-RADIATIVE-INDEPENDENCE.
+EMPIRICAL HORIZON        DESI DR3 (w = -14/15); MOLLER (sin^2
+                         theta_W); ngEHT (the mu corridor); CMB-S4
+                         (F-NS-TILT).
 ```
 
 ---
@@ -2540,10 +2592,284 @@ phibit/canon_cayley/np_address, frw_lambda_blocks and meas_metro and in
 CROSSPLATFORM_LOCK_RECORD.md.
 ```
 
+# Part XXXVI. The v174 Registry Consolidation: the frontier cleaned to the fold pair, and the kernel table sealed
+
+**XXXVI.0 What this revision is.** A registry act plus one probe, no new
+physics claim beyond it. Part XXVI carried the frontier as of v171 and
+was overtaken by the 11 July fold pair; it is rewritten in place to the
+state as of v174, applying the XXXIV.6 and XXXV.11 deltas. Closed,
+converted, and stale items are removed from the frontier list; they
+remain, with their pins, in the fold parts and in
+CROSSPLATFORM_LOCK_RECORD.md. The one open item cheap enough to close
+rather than carry, O-Z-KERNEL-CONFIRM, is closed by a preregistered two
+platform probe. No axiom change; no prior LOCK retracted; no label
+weakened.
+
+**XXXVI.1 The kernel table sealed (P-Z-KERNEL-CONFIRM-1, two platform;
+verifier 24ff87e0, stdout 7c795954, 12 of 12; pin ab914e32, record
+f7e10bb5).** The SS66 generators materialized inline, the full state
+space Z_5^6 enumerated (15625 states), and the v13 SS5.3 Trace Flow
+table
+
+    tau_S = (0, 4, 0, 4, 4)      tau_F = (2, 1, 1, 3, 1)
+
+confirmed at generator level. The carrying fact is the affine trace
+laws z(g x) = m z(x) + k mod 5:
+
+    a: (1, 0)   b: (4, 0)   c: (4, 2)   d: (4, 2)   e: (4, 3)
+
+For c the law holds because sum(s) = 1 and sum(u) = 0 mod 5; for d and
+e because z(c_d) = 2 and z(c_d + v_e) = 3. Composed with the SS74
+selector these laws reproduce tau_S and tau_F symbolically (gate G12),
+so the table is forced by the generators, not merely observed. Also
+confirmed on the full space: the involutions and (bc)^5 = id; the
+images {0, 4} and {1, 2, 3}; on shell Snap -> 4 and Flow -> 1 with the
+generator map (Snap, 1) -> b, (Snap, 4) -> e, (Flow, 1) -> d,
+(Flow, 4) -> b, 3125 states each, a and c never firing on shell; the
+full kernel merge z_3 = 1 from every initial state; and Z-MEMORY,
+z_n = 4 iff t_(n-1) = 0, over [3, 67] from every seed. Sealed:
+T-Z-KERNEL-TRACE-FLOW (T, two platform). Consequences: the SS5.3 table
+is promoted from T/C to T; the conditional clause of T-MEAS-Z-DENSITY
+(XXXV.9) is discharged, the Z density derivation now plain T at its
+sealed scope; the gyron = Thue-Morse pair 00 reading and the derived
+walk weights (2/3, 1/6, 1/6) stand on an unconditional table.
+O-Z-KERNEL-CONFIRM CLOSED. Neither scoped falsifier fired
+(F-Z-AFFINE-TRACE, F-Z-TABLE-MISMATCH).
+
+**XXXVI.2 Registry delta (v173 to v174).**
+
+```
+CLOSED:         O-Z-KERNEL-CONFIRM (P-Z-KERNEL-CONFIRM-1, 12 of 12,
+                byte identical).
+SEALED T:       T-Z-KERNEL-TRACE-FLOW (the SS5.3 table at generator
+                level on all of Z_5^6, carried by the affine trace
+                laws).
+PROMOTED:       the SS5.3 Trace Flow table T/C -> T;
+                T-MEAS-Z-DENSITY conditionality discharged (plain T
+                at its sealed scope).
+NEW OPENS:      none.
+FRONTIER REWRITE (Part XXVI, v171 -> v174), removals with their
+resting places:
+                closed flags pruned from the list (the SS-FRW.11
+                closure, the plenum direction closures, the dynamics
+                from action closed recital) -> Parts XXX to XXXIII;
+                v172 hygiene carried in: O-HYPERPLANE-MERSENNE removed
+                stale; O-BIG-G-VALUE -> R-BIG-G-SHADOW; O-W1 ->
+                H-W1-INTERFACE-PRINCIPLE; O-SIGMA3-PRIMITIVE optional
+                enrichment (XXXIV.6);
+                v173 deltas carried in: O-NP-ADDRESS,
+                O-MEAS-GYRON-INSTRUMENT, O-MEAS-GYRON-LIFT,
+                O-MEAS-Z-DENSITY closed; O-NP-DRESSING-DERIVATION
+                subsumed by O-FRW-CANONICAL-FORM; the MEAS/METRO opens
+                and the observer interface carried at H (XXXV.11);
+                the general coupling theorem named as the next attack
+                (P-MEAS-COUPLING-GENERAL-1, to be preregistered), per
+                the author's v173 review, Krok 1.
+```
+
+**XXXVI.3 Pins (two platform byte identical).**
+
+```
+z_kernel_confirm_verify.py                         (12 of 12)
+  file 24ff87e0   stdout 7c795954 (1258 bytes)
+preregistration, run note and the lock entry live in
+phibit/canon_cayley/meas_metro and in CROSSPLATFORM_LOCK_RECORD.md;
+commits ab914e32 (pin) and f7e10bb5 (record).
+```
+
+# Part XXXVII. The General Coupling Theorem: couplings determine instruments, effects are the shadow
+
+**XXXVII.0 What this part is.** The named attack of the MEAS/METRO
+frontier row, executed as preregistered
+(P-MEAS-COUPLING-GENERAL-1, layer L1; prereg a7e4bf6a with Amendment
+1; verifier 4fbfe132, pin 3053ad25; stdout dde1e2c4, 1441 bytes,
+14 of 14, byte identical JAS 2 aarch64 and TWISTER x86_64). It
+generalizes the gyron chain XXXV.6 to XXXV.8 from one apparatus to
+every canonical instrument at the declared scope, and it supplies the
+missing principle named by the fired F-QD-INSTRUMENT-UNIQUE (XXXIV.5):
+what the effects cannot fix, the coupling does.
+
+**XXXVII.1 The theorem (T-MEAS-COUPLING-GENERAL, T, two platform,
+sealed at scope).** Scope: finite carriers F^d, F in {Q, Q(i)},
+Euclidean Gram, fine grained canonical instruments (one Kraus per
+outcome, entries in F, sum_a K_a^dagger K_a = I); coarse graining is
+an outcome surjection. Statement, three clauses.
+
+EXISTENCE. Every canonical instrument is induced by an exact
+admissible reversible coupling of system, pointer and memory. The
+construction is square root free: V = sum_a K_a tensor |a>_P is an
+isometry by the Kraus normalization alone (V^dagger V = I is an
+algebraic identity), Pi = V V^dagger is a projection with entries in
+F, and on S tensor P tensor M with M = F^2 the record flag and ready
+pair (r_P, |1>_M) the Halmos type block
+
+    U (y tensor 0)          = ((I - Pi) y) tensor 0
+                              + (V^dagger y) tensor r tensor 1
+    U (x tensor r tensor 1) = (V x) tensor 0
+    U = identity on (S tensor P minus S tensor r) tensor 1
+
+is a genuine unitary with every entry in F. No square root is taken
+anywhere: the dilation lives in the same exact field as the
+instrument.
+
+UNIQUENESS OF THE INDUCED INSTRUMENT AND THE RECORD CLAUSE. The
+extracted Kraus of the coupling, T_(a,m) = (I tensor <a| tensor <m|)
+U Emb with Emb the wiring e_s -> |s, r, 1>, satisfies T_(a,0) = K_a on
+the nose and T_(a,1) = 0 identically: the wired input has exactly zero
+component in the |1>_M output sector, so the memory flag flips to 0
+deterministically. The coupling writes the record; reading the pointer
+alone induces the instrument, with no post selection; the state update
+is a theorem of the coupling, conditioning on the record, not an extra
+postulate. Branch Choi matrices are hermitian, PSD by explicit rank
+one factorization, of rank exactly 1, and recover K_a up to a unit of
+F: the coupling determines the branch Kraus up to phase.
+
+SHADOW. The effect of every branch is the pushforward of the pointer
+projector through the coupling and equals E_a = K_a^dagger K_a, with
+sum_a E_a = I. Effects underdetermine the coupling: the XXXIV.5 pair
+(Lueders K_a = |a><a| and flip L_a = X K_a) is re-derived
+constructively as two distinct admissible couplings with identical
+shadows and distinct instruments. In the other direction the coupling
+map is not injective onto instruments either: the native gyron CX at
+d = p = 5 and the general construction are two distinct unitaries
+inducing the identical copy instrument, and the Lueders rule for it is
+a theorem of the coupling (XXXV.7 recovered at the general level).
+Witnesses: the Lueders and flip qubits, the gyron copy, a complex
+Pythagorean non projective qubit over Q(i) built on the (3, 4, 5)
+witness, and a rectangular real d = 3 instrument; shapes (2, 2),
+(5, 5), (3, 2) on one dimension blind code path.
+
+Honesty clause. The first pinned rectangular witness violated the
+class condition itself (sum K^dagger K carried an off diagonal 4/5);
+the gates caught it in the recorded run 14159ed2 (9 of 14, failing
+exactly on that witness), and Amendment 1 replaced the witness before
+the accepted runs. Nothing else changed. The catch is recorded as the
+gates doing their job.
+
+**XXXVII.2 Registry delta (v174 to v175).**
+
+```
+SEALED T:       T-MEAS-COUPLING-GENERAL (two platform, at the
+                declared scope: F in {Q, Q(i)}, fine grained
+                instruments, Euclidean Gram).
+CLOSED AT SCOPE: the STATE UPDATE clause of O-QUADRATIC-DECODER-DATA
+                (the missing principle named by XXXIV.5 is the
+                coupling; collapse is conditioning on the record).
+PROMOTED:       P-MEAS-PRINCIPLE ("instruments determine physics") at
+                theorem grade at the same scope.
+UNCHANGED:      the remaining clauses of O-QUADRATIC-DECODER-DATA
+                (dagger versus transpose carrier, Gram form, the
+                effect list against the Galois Gram);
+                O-MEAS-G-DENSITY; O-METRO-ADMISSIBILITY;
+                O-METRO-TICK-EDGE; the observer ordering (the write
+                port test still waits on the metrology closure).
+NEW OPENS:      none.
+```
+
+**XXXVII.3 Pins (two platform byte identical).**
+
+```
+meas_coupling_general_verify.py                    (14 of 14)
+  file 4fbfe132   stdout dde1e2c4 (1441 bytes)
+prereg a7e4bf6a (with Amendment 1); pin 3053ad25 (first pin c3daab36,
+verifier ade022bf, catch run 14159ed2); record 42341045; runs note in
+phibit/canon_cayley/meas_metro.
+```
+
+# Part XXXVIII. The Covariant Canonical Form: the dressing coefficient is the DeWitt norm
+
+**XXXVIII.0 What this part is.** The named attack of the COSMOLOGY
+frontier row O-FRW-CANONICAL-FORM, executed as preregistered
+(P-FRW-CANONICAL-FORM-1, layer L1; prereg 4e3c90c3; verifier 289ede3c;
+pin 642397bb; stdout 1895805b, 1575 bytes, 14 of 14, byte identical
+JAS 2 aarch64 and TWISTER x86_64). It derives the magnitude that
+G-FRW-SOURCE-K12 Pass 3 named as the residual and discharges the v147
+covariant positivity gate at the quadratic form level.
+
+**XXXVIII.1 The theorem (T-FRW-CANONICAL-FORM-COVARIANT, T, two
+platform, sealed at scope).** Scope: symmetric positive definite
+metrics over Q on the declared witness family, d in {2, 3, 4}, lambda
+rational, exact arithmetic, alpha formal. Three clauses.
+
+MAGNITUDE. For every metric g the DeWitt form G[g]^{abcd} =
+(1/2)(g^{ac} g^{bd} + g^{ad} g^{bc}) - lambda g^{ab} g^{cd} evaluated
+on the metric itself is the metric independent scalar G[g](g, g) =
+d(1 - lambda d). At the substrate lambda = 1/d - 4/3 = -1
+(T-FRW-LAMBDA-BLOCKS, computed, not fitted) and d = 3 the value is
+12 = d(d+1): the wall and Newton dressing coefficient and the FRW
+kinetic multiplicity are one covariant constant, and lambda = -1 is
+the unique parameter with d(1 - lambda d) = d(d+1). This is the
+Reading I magnitude of G-FRW-SOURCE-K12, derived.
+
+POSITIVITY. At lambda = -1 the form annihilates exactly the
+antisymmetric directions and is positive definite on Sym^2 (Sylvester,
+exact, every witness); the spectrum at g = I, d = 3 is {0 x3 antisym,
+1 x5 traceless, 4 x1 trace}. Positive definiteness on Sym^2 holds iff
+lambda < 1/d (the exact Gram identity tr(h^2) = tr(h_tl^2) +
+(tr h)^2 / d), degenerating at lambda = 1/d. The GR value lambda = +1
+is indefinite with G[g](g, g) = d(1 - d) = -6: the conformal ghost,
+exhibited exactly. The substrate value passes with margin: the ghost
+is exhibited and escaped in one exact computation.
+
+CHAIN AND FORM. 12 = d(d+1) = (d/(d+1))(d+1)^2 = d(1 - lambda d) at
+(-1, 3) = the A_3 coordination number (enumerated); the muon
+coefficient decomposes 89/5 = (1/2)(12)(3) - 1/5 = 18 - 1/p. The
+three closed dressing forms separate exactly at alpha^4: linear (0),
+the p compound (288/5), the exponential (72); the F-DRESS-EXP witness
+72 alpha^4 is re-derived exactly; the Queen S = (1 + X/5)^(-5) =
+1 - X + (3/5) X^2 - (7/25) X^3 + ... is the compound family member,
+compounding because the object passes p sequential gates. A single
+reading is one coupling crossing (T-MEAS-COUPLING-GENERAL record
+clause, cited): the linear form stays the single crossing candidate
+at H, nothing promoted.
+
+**XXXVIII.2 Registry delta (v175 to v176).**
+
+```
+SEALED T:        T-FRW-CANONICAL-FORM-COVARIANT (two platform, at the
+                 declared scope).
+CLOSED AT SCOPE: the COVARIANT MAGNITUDE and POSITIVITY clauses of
+                 O-FRW-CANONICAL-FORM (the v147 covariant positivity
+                 gate discharged at the quadratic form level; the
+                 Reading I magnitude of G-FRW-SOURCE-K12 derived).
+REDUCED:         O-FRW-CANONICAL-FORM to the named residual: the
+                 L-DRESS-INSERTION bookkeeping and the Level 1 to
+                 Level 2 normalization inheritance.
+UNCHANGED:       O-CHI5-KINETIC-COEF; O-GAUGE-ACTION-NORMALIZATION;
+                 H-DRESS-READING (H); the form decision (H) with
+                 F-DRESS-EXP armed; G_pair12 auxiliary (v130).
+NEW OPENS:       none.
+```
+
+**XXXVIII.3 Pins (two platform byte identical).**
+
+```
+prereg   4e3c90c3722554c8bc8ba5848ded53574ea9b09d1cec5a9b7f41151b507387eb
+verifier 289ede3c408a1e88ff8b0e270f084bf58eb1218bff254a668dd8f2d7a36a3378
+pin      commit 642397bb; lock record 27fcdf92
+stdout   1895805b3931e794eeb9ee5d2176ac43ecc88b6cef8da7d2f546ea758840711c
+         (1575 bytes; JAS 2 aarch64 Python 3.12.3; TWISTER x86_64
+         Python 3.13.5)
+```
+
 ## Footer
 
 ```
-TWIST-J Canon v173 ALL IN ONE: the complete canon in one file; the
+TWIST-J Canon v176 ALL IN ONE: the complete canon in one file; the
+covariant canonical form sealed (T-FRW-CANONICAL-FORM-COVARIANT:
+the trace channel dressing coefficient is the covariant DeWitt
+scalar d(1 - lambda d), metric independent, positive definite at
+the substrate lambda = -1, equal to 12 = d(d+1) at d = 3, the GR
+conformal ghost exhibited and escaped, Part XXXVIII); carried
+forward, the general coupling theorem sealed (T-MEAS-COUPLING-GENERAL: every
+canonical instrument induced by an exact square root free
+reversible coupling, effects its shadow, the state update clause of
+O-QUADRATIC-DECODER-DATA closed at scope, Part XXXVII); the v174
+registry consolidation rewrote the frontier (Part XXVI), removed
+closed, converted and stale items, and sealed the kernel trace flow
+table at generator level (T-Z-KERNEL-TRACE-FLOW; O-Z-KERNEL-CONFIRM
+closed); carried
+forward, the
 11 July fold II sealed the Newton address 2677/25 with coefficient 12,
 the exact metrology channel with the first admissible Cauchy real 1/6,
 the gyron apparatus chain from coupling to instrument, the Z density
@@ -2564,7 +2890,7 @@ broken in the transient kernel by exactly the c channel; the quadratic
 envelope registered: Born and Basel are the trace, TT the traceless
 part, of one square, the decoder and Sym^2 measure hypotheses held at
 H with their falsifiers. Assumes no previous file; supersedes for
-reading every earlier consolidated (v172, v171, v170, v169, v168, v167, v166, v163
+reading every earlier consolidated (v175, v174, v173, v172, v171, v170, v169, v168, v167, v166, v163
 and the per-arc patches remain canonical history in this repository).
 A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.
 11 July 2026.
