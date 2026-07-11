@@ -1,4 +1,4 @@
-# TWIST-J Canon v172 ALL IN ONE
+# TWIST-J Canon v173 ALL IN ONE
 
 **Subtitle.** The complete canon in one file: the axiom, the two projections,
 the kernel, the observables, and the July folds through the
@@ -6,7 +6,9 @@ dynamics-from-action chain, the sigma geometry, the substitution covariance
 arc with its seam, the Basel gate, the color seam decision, the twin
 10 July gates, the quadratic envelope, and the 11 July fold: the
 component census, the representation layer, the audit reconciled, and
-the two envelope gates.
+the two envelope gates, and the 11 July fold II: the Newton address,
+the exact metrology channel, the gyron apparatus chain, the Z density
+derivation, and the observer interface plan.
 
 **Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
@@ -26,10 +28,15 @@ quadratic envelope registration, v171 proper (Part XXXIII), and the
 11 July fold, the A18 component census with its two I relocation, the
 QENV representation layer, the quadratic and TT audit folded into the
 existing names, the TM-SYM2 gate 0 and the instrument non-uniqueness,
-v172 (Part XXXIV). Zero free dimensionless
+v172 (Part XXXIV), and the 11 July fold II, the Newton address with
+the reading principle and lambda from the substrate blocks, the
+measurement and metrology program with the exact channel and the gyron
+apparatus chain, the Z density derivation, and the observer interface
+plan, v173 (Part XXXV). Zero free dimensionless
 parameters; one SI calibration anchor, the electron mass m_e. No axiom
 change anywhere in the chain. No prior LOCK retracted. Predecessors in this
 repository, superseded for reading and kept as canonical history:
+TWIST_J_Canon_v172_ALL_IN_ONE.md,
 TWIST_J_Canon_v171_ALL_IN_ONE.md,
 TWIST_J_Canon_v170_ALL_IN_ONE.md, TWIST_J_Canon_v169_ALL_IN_ONE.md,
 TWIST_J_Canon_v168_ALL_IN_ONE.md,
@@ -2293,10 +2300,257 @@ qd_instrument_nonunique_verify.py                  (11 of 11)
   prereg 0ac5e892430d287b99694b89ae60641d8627d0a5a4080b431b84f3d3f8b8a430
 ```
 
+# Part XXXV. The 11 July Fold II (v173): the Newton address, the exact metrology channel, the gyron apparatus chain, the Z density derivation, and the observer interface plan
+
+**XXXV.0 What this fold is.** Eight arcs executed and pinned on 11 July
+2026 on branch P-NP-ADDRESS-1 (base the v172 lock 1f6ed525), every one
+two platform byte identical: JAS 2 aarch64 (Python 3.12, run over LAN
+ssh from JAS 4 while the MCP tunnel was down; same canonical
+interpreter, same pinned bytes) and TWISTER x86_64 (Python 3.13). The
+Newton address closes the coupling exponent question with a pure
+address in Q. The reading principle sorts every known dressing and
+reduces the dressing derivation to the FRW canonical form. Lambda is
+computed from the substrate blocks, not fitted; the democratic
+hypothesis fired. Part MEAS/METRO is registered: the measurement
+protocol and the metrological decoder as first class canon objects; the
+exact metrology channel produces the first admissible physical real.
+The gyron apparatus chain derives instruments from couplings at the
+classical, quantum, and ERA-II level. The Z density derivation closes
+the gyron statistics from the kernel: the gyron is the Thue-Morse pair
+00 and the sealed walk weights drop out of the trace dynamics. The
+observer interface plan registers the conscious-agent axiom
+architecture at H with the A0 scope clarification. No physics axiom
+change; no prior LOCK retracted.
+
+**XXXV.1 The Newton address (T-NP-ADDRESS, T, two platform; reference
+verifier e11a58f8, stdout 9ca8af36, 11 of 11; rational verifier
+5f4cf034, stdout 63526d3c).** The gravitational coupling of the
+electron is an address in Q with an integer dressing coefficient:
+
+    G m_e^2 / (hbar c) = phi^(-2 (2^p + d p^2 + chi / p^2))
+                         * (1 + d (d + 1) alpha^2),
+    (p, d, chi) = (5, 3, 2):  address 2677/25, coefficient 12.
+
+The address is 2^5 + 3 * 25 + 2/25 = 2677/25; the dressing coefficient
+is d(d+1) = 12. A fully rational verifier (Fraction end to end)
+reproduces the chain and lands at z_G = -0.2516 sigma against CODATA
+(engineering witness, labeled). The G12 audit passes: the single
+numerical consumer of the wall constant g is the wall complex, no
+double counting. O-NP-ADDRESS closed.
+
+**XXXV.2 The reading principle (note, commit 5de18d61).** The dressing
+inventory across the canon: proton +alpha^2/d, muon -(18 - 1/p)
+alpha^2, wall +12 alpha^2, Weinberg +X, Queen S = (1 + X/5)^(-5). The
+chain of twelves: 12 = d(d+1) = DeWitt d(1 - lambda d) at lambda = -1 =
+deg K_sp = the muon (B1:B1) index. O-NP-DRESSING-DERIVATION is reduced
+to O-FRW-CANONICAL-FORM: one covariant statement of the dressing law
+would close the whole family. F-DRESS-EXP armed: the two candidate
+dressing forms differ by 72 alpha^4 = 0.204 ppm, decidable by the next
+CODATA class of G measurements in principle.
+
+**XXXV.3 Lambda from the substrate blocks (T-FRW-LAMBDA-BLOCKS, T, two
+platform; verifier 9256fe07, stdout 20b141d9, 13 of 13).** The
+q-Fourier blocks of the attractor Laplacian give |a_0|^2 = 1, pair sum
+3/4, ratio 4/3, hence
+
+    lambda = 1/d - 4/3 = -1   exactly, computed not fitted.
+
+H-A0-DEMOCRATIC fired: the democratic prediction |a_0|^2 = 1/4 is
+falsified and recorded as first class progress.
+
+**XXXV.4 Part MEAS/METRO registered (program note, commit 00861beb).**
+DEF-METRO-DPHYS: the metrological decoder D_phys: (L|_W, M) -> (a,
+X_hat, Delta X, [X]) taking a windowed Log and a protocol to a value,
+an uncertainty, and a unit. DEF-METRO-CAUCHY: a physical real number is
+an admissible Cauchy class of window readings. DEF-MEAS-PROTOCOL: M =
+(S, A, R, F_SA, {Gamma_a}, W, U). RULE-MEAS-5: carrier, Gram,
+involution, normalization, effect declared for every measurement.
+RULE-NO-SILENT-UNITS: eta_t and eta_l are never silently 1.
+P-MEAS-PRINCIPLE: effects determine statistics, instruments determine
+physics; there is no universal Lueders rule; collapse is conditioning
+on the record. L-DRESS-INSERTION is reassigned as a MEAS lemma. The
+home-direction coupling seed 1/p and the block kinetic weight 1 are two
+distinct objects (consistency note).
+
+**XXXV.5 The exact metrology channel (T-METRO-RHO, T, two platform;
+verifier 40590e84, stdout 47a4ad6f, 10 of 10).** The gyron pair channel
+counted exactly by executed induction:
+
+    N_00(m) = (2^m - 3 - (-1)^m) / 6
+
+with the three companion counts a 2^m + b (-1)^m + c; deviation
+
+    rho_hat(m) - 1/6 = -(2 + (-1)^m) / (6 (2^m - 1)),
+
+envelope 1/(2 (2^m - 1)). The admissible Cauchy class of the channel is
+the sealed rho_0 = 1/6: the first physical real produced end to end by
+D_phys. Window records 1/7, 2/15, 5/31, 21/127, 14/85.
+
+**XXXV.6 The classical gyron apparatus (T-MEAS-GYRON, T, two platform;
+verifier f326a6e9, stdout c1c5a1d4, 12 of 12).** A Z_5 pointer with
+ready state r = 0; the native CX as the copy coupling (QND) and the
+engagement absorb (e, r) -> (0, r + e). Identical effects, distinct
+instruments, both by exact pushforward: the v172 instrument
+non-uniqueness (F-QD-INSTRUMENT-UNIQUE) is constructively explained:
+effects underdetermine, couplings determine.
+
+**XXXV.7 The quantum lift (T-MEAS-GYRON-QLIFT, T, two platform;
+verifier 61857022, stdout 843a7429, 14 of 14).** The couplings lifted:
+CX on dimension 10 and the engagement dilation |e, r, mu> -> |mu, r +
+e, e> on dimension 20; Kraus operators extracted, copy |a><a| and
+absorb |0><a|; the POVMs agree including on the complex witness (3/5,
+4i/5) -> (9/25, 16/25); the Lueders rule is a theorem of CX; the
+unconditional copy is exact dephasing, the absorb an exact reset;
+repeatability holds on superpositions. The Gram layer: 5G is the Galois
+Gram and G^(-1) = I + ones ones^T (a wrong first inverse was caught by
+the gate before pinning and is recorded); the P_psi caveat (idempotent,
+G self adjoint, not hermitian); the canonical 1 + 3 measurement carries
+Born additivity; the euclidean trace G weight is 1/p.
+O-MEAS-G-DENSITY registered.
+
+**XXXV.8 The ERA-II lift (T-MEAS-GYRON-LIFT, T, two platform; verifier
+e60fb78c, stdout 47f6a2d1, 14 of 14).** z_obs = Tr_4 on the sealed
+piston addresses (0,0,4,0), (1,0,0,0), (1,1,3,4), (2,1,4,4): traces
+(4, 1, 4, 1), and in signed representatives the gyron class is the sign
+of the trace, -1 on z = 4 and +1 on z = 1. The address G geometry is
+pinned: norms (4, 4, 34, 34), products (1, 31, 9, 9, 6, 6), anchored on
+the SS108.24 controls. The class controlled CX has extracted Kraus
+operators Pi_4 and Pi_1: the degenerate Lueders rule is a theorem of
+the coupling; coherence within a z class survives the measurement; the
+Separation Axiom holds as a commutant statement (the coupling commutes
+with every class preserving unitary and with no class mixing one); the
+tick effect is E_1(n) = [t_n = 0] Pi_4; the sealed rho = 1/6 with the
+exact TM balance forces P(z = 4 | t = 0) = 1/3.
+
+**XXXV.9 The Z density derivation (T-MEAS-Z-DENSITY, T conditional on
+the SS5.3 Trace Flow table at T/C, two platform; verifier 0b505c9a,
+stdout 8cb527ed, 11 of 11).** From T-LOG-1 (Snap applies g_z, Flow
+applies g_(z+2 mod 5)) and the Trace Flow table:
+
+    Z-MEMORY.  For n >= 3, z_n = 4 iff t_(n-1) = 0; all five trace
+    seeds merge at n = 3.
+
+The ERA-II predicate collapses to driver combinatorics: a gyron is
+exactly a Thue-Morse pair (0, 0); the gyron count over [3, 2^m) equals
+N_00(m) verbatim; rho = 1/6 is reproduced structurally; the conditional
+has the closed deviation
+
+    cond(m) - 1/3 = -(1 + (-1)^m) / (6 (2^(m-1) - 1)),
+
+exactly 1/3 at odd m. The attractor generator map (Snap, 1) -> b,
+(Snap, 4) -> e, (Flow, 1) -> d, (Flow, 4) -> b derives the walk triple
+{b, d, e} (a and c never fire past the transient), derives the sealed
+weights (2/3, 1/6, 1/6) as the TM pair frequencies (mixed, 11, 00), and
+identifies the e step as the gyron step: the magnetic verb weight 1/6
+is the gyron density. The remark 1/3 = w_d + w_e is promoted to
+derived; it holds because f_00 = f_11. The gyron echo channel of
+XXXV.5 is the gyron itself, one tick shifted. O-Z-KERNEL-CONFIRM
+registered (optional full Z_5^6 confirmation once the SS66 generators
+are materialized in a verifier).
+
+**XXXV.10 The observer interface plan (OBS; note in meas_metro; all DEF
+and H, no physics derivation).** The third component of the measurement
+program, next to the physical instrument and the metrological decoder.
+
+    The algebra determines the socket. An extra axiom determines that
+    a conscious subject occupies it.
+
+DEF-OBS-SLOT. The observer slot is the undistinguished fiber F_b =
+pi_phys^(-1)(b) of the full physical readout. Algebraic capacity, not
+consciousness; invariant under decoder extension (a new channel shrinks
+the fiber, the definition stands).
+
+DEF-OBS-ROLES. Quadratic basis: public content. Residual fiber: private
+address slot. u_n on Flow: write actuator. Category distinctions: C is
+not q, C is not E+, C is not u_n.
+
+PRINCIPLE-OBS-ORDER. Physical registration completes before
+consciousness: rho -> instrument -> stable record -> experience. The
+v172 instrument non-uniqueness makes the physical instrument non
+optional; consciousness never substitutes for a missing instrument.
+Physical registration ends in a stable record; conscious measurement
+ends in the experience of that record.
+
+AX-CW (registered extended-ontology axiom; H for all physics
+purposes). Clause C: a stable record r_a may be present to the subject
+as experience epsilon_a (a relation introduced by the axiom, not
+derived from J). Clause W: on an admissible Flow interface the subject
+may choose c_n in Adm_n(psi_n, t_n), the choice not a function of the
+full physical history, entering only through the fixed interface c_n ->
+theta_res -> u_n on t_n = 1; on Snap u_n = 1 is forced. The will does
+not produce an inadmissible state; it selects among admissible
+interface options. Measurement ends in consciousness; action begins in
+the will.
+
+A0-SCOPE (wording clarification, no physics change). A0 reads: all
+physical reality is the closed integer J-Cayley plenum. Total ontology
+under AX-CW: U = P_J union C union I_(C<->P). One physical axiom, J;
+no longer a claim of one axiom of all being. E_total = 0 and every
+sealed result untouched.
+
+NONCLAIMS-OBS. No outcome selection: outcomes and back action belong to
+the physical instrument; Born weights and no signalling protected.
+Consciousness does not drive D_clock; the observer-slot excision from
+proper time stands; H-W1-INTERFACE-PRINCIPLE is extended, not reopened.
+
+F-OBS-WRITE-PORT (armed, algebraic). A genuine write port requires two
+lifts with equal readout now and, through the single permitted gate,
+different readout later: pi_phys(x) = pi_phys(x') and pi_phys(F_c^k(x))
+!= pi_phys(F_c'^k(x')) for some admissible pair and k > 0. If no such
+pair exists the slot is gauge redundancy and the write reading of
+clause W is falsified. If u_n = f(L_<=n) on every Flow tick, the
+libertarian write port is closed negatively. The first-person claim of
+clause C need not be third-person falsifiable; its proposed
+intervention into physics must be.
+
+**XXXV.11 Registry deltas.** Closed: O-NP-ADDRESS;
+O-MEAS-GYRON-INSTRUMENT; O-MEAS-GYRON-LIFT; O-MEAS-Z-DENSITY (trace
+level, conditional on SS5.3). Reduced: O-NP-DRESSING-DERIVATION into
+O-FRW-CANONICAL-FORM. Fired: H-A0-DEMOCRATIC (recorded). Registered
+open: O-MEAS-G-DENSITY; O-METRO-ADMISSIBILITY; O-METRO-TICK-EDGE;
+O-Z-KERNEL-CONFIRM; O-FRW-CANONICAL-FORM. Registered at H: AX-CW with
+F-OBS-WRITE-PORT armed; A0-SCOPE wording. New falsifiers armed:
+F-DRESS-EXP (72 alpha^4 = 0.204 ppm); F-OBS-WRITE-PORT. Passed at
+range: F-Z-MEMORY, F-Z-WEIGHTS, F-MEAS-LIFT-1, F-MEAS-LIFT-COHERENCE.
+Branch P-NP-ADDRESS-1 is folded to main at this lock; its commits are
+canonical history.
+
+**XXXV.12 Pins (all two platform byte identical).**
+
+```
+np_address_verify.py                               (11 of 11)
+  file e11a58f8   stdout 9ca8af36
+np_address_verify_q.py                             (rational, full chain)
+  file 5f4cf034   stdout 63526d3c
+frw_lambda_blocks_verify.py                        (13 of 13)
+  file 9256fe07   stdout 20b141d9
+metro_rho_verify.py                                (10 of 10)
+  file 40590e84   stdout 47a4ad6f (1269 bytes)
+meas_gyron_verify.py                               (12 of 12)
+  file f326a6e9   stdout c1c5a1d4 (1343 bytes)
+meas_qlift_verify.py                               (14 of 14)
+  file 61857022   stdout 843a7429 (1765 bytes)
+meas_lift_verify.py                                (14 of 14)
+  file e60fb78c   stdout 47f6a2d1 (1795 bytes)
+meas_zdensity_verify.py                            (11 of 11)
+  file 0b505c9a   stdout 8cb527ed (1614 bytes)
+branch commits 537fc24a (registration) to e513d5d7 (OBS note);
+preregistrations, run notes and the lock record entries live in
+phibit/canon_cayley/np_address, frw_lambda_blocks and meas_metro and in
+CROSSPLATFORM_LOCK_RECORD.md.
+```
+
 ## Footer
 
 ```
-TWIST-J Canon v172 ALL IN ONE: the complete canon in one file; the
+TWIST-J Canon v173 ALL IN ONE: the complete canon in one file; the
+11 July fold II sealed the Newton address 2677/25 with coefficient 12,
+the exact metrology channel with the first admissible Cauchy real 1/6,
+the gyron apparatus chain from coupling to instrument, the Z density
+derivation (the gyron is the Thue-Morse pair 00; the walk weights
+2/3, 1/6, 1/6 derived from the trace dynamics), and registered the
+observer interface plan at H with the A0 scope clarification;
+carried forward, the
 11 July fold sealed the A18 component census (24 orbits, 16 types)
 and the QENV representation layer, folded the quadratic and TT audit
 into the existing names, derived the TM-SYM2 frame identity with scalar
@@ -2310,7 +2564,7 @@ broken in the transient kernel by exactly the c channel; the quadratic
 envelope registered: Born and Basel are the trace, TT the traceless
 part, of one square, the decoder and Sym^2 measure hypotheses held at
 H with their falsifiers. Assumes no previous file; supersedes for
-reading every earlier consolidated (v171, v170, v169, v168, v167, v166, v163
+reading every earlier consolidated (v172, v171, v170, v169, v168, v167, v166, v163
 and the per-arc patches remain canonical history in this repository).
 A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.
 11 July 2026.
