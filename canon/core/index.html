@@ -192,27 +192,57 @@ M_J  =  (  0   1  -1   0 )   in SL(4, Z)
     </ol>
 
     <h2>Minimal machine-readable card</h2>
+    <p class="dim">The card separates fixed mathematics from physical reading. Everything through the event block is exact: the existence of the Thue-Morse pair 00 and its density 1/6 are theorems of the finite carrier. The physical channels block is the strongest physical reading of the program; the full identification with the measured gyron event and the closed bridge to gravity and electromagnetism are where the decoder and measurement work continues, with its own Canon labels.</p>
 <pre>
 name: TWIST-J
 canon_basis: v176
-axiom: A0, closed integer J-Cayley plenum
-J: 1 + zeta_5^2
-field: Q(zeta_5)
-ring: Z[zeta_5]
-unit_facts: N(J)=1, Tr(J)=3, zeta_5=(J-1)^3
-state: F_5^6, 15625 states
-driver: t_n = popcount(n) mod 2, Thue-Morse
-update: psi_(n+1) = Pi_(t_n)(M_J psi_n)
-geometry: G = I_4 - (1/5)11^T, spectrum 1,1,1,1/5
-space: ker(Tr_4), dimension 3
-gauge: Z_5 fiber, q invisible
-reading: kernel linear, driver binary, gauge quadratic
-decoder: D_clock o D_geom o D_matter
-event: Gyron = Thue-Morse pair 00
-density: rho = 1/6
-forces: modulus(J) -&gt; gravity/scale; argument(J) -&gt; EM/phase
-method: preregister, exact arithmetic, two-platform byte-identical verification
-rule: no summary stronger than its Canon label
+
+axiom:
+  A0: closed integer J-Cayley plenum
+
+arithmetic:
+  J: 1 + zeta_5^2
+  field: Q(zeta_5)
+  ring: Z[zeta_5]
+  unit_facts:
+    norm: N(J) = 1
+    trace: Tr(J) = 3
+    reconstruction: zeta_5 = (J - 1)^3
+
+finite_carrier:
+  state_space: F_5^6
+  state_count: 15625
+
+internal_driver:
+  sequence: t_n = popcount(n) mod 2
+  name: Thue-Morse
+  update: psi_(n+1) = Pi_(t_n)(M_J psi_n)
+
+geometry:
+  gram: G = I_4 - (1/5) 11^T
+  spectrum: [1, 1, 1, 1/5]
+  space: ker(Tr_4)
+  spatial_dimension: 3
+
+three_readings:
+  kernel: linear
+  driver: binary
+  gauge: quadratic
+
+gauge:
+  fiber: Z_5
+  invisible_coordinate: q
+
+decoder:
+  order: D_clock o D_geom o D_matter
+
+event:
+  gyron_address: Thue-Morse pair 00
+  asymptotic_density: rho = 1/6
+
+physical_channels:
+  modulus_J: scale / gravity channel
+  argument_J: phase / electromagnetic channel
 </pre>
 
     <p class="dim">Axiom: J = 1 + j&sup2;. Zero free dimensionless parameters; one SI calibration anchor.
