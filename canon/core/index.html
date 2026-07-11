@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TWIST-J Canon Core Summary</title>
-    <meta name="description" content="The stable entry point to TWIST-J: one axiom J = 1 + zeta_5^2, the integer kernel, the 3+1 split from the Galois Gram, the gyron density 1/6, the status discipline, and the machine-readable card. Canon basis v176.">
+    <meta name="description" content="The stable entry point to TWIST-J: one axiom J = 1 + zeta_5^2, the integer kernel, the 3+1 split from the Galois Gram, the gyron density 1/6, the status discipline, and the machine-readable card. Canon basis v177.">
     <meta name="author" content="A. M. Thorn">
     <link rel="canonical" href="https://twistj.com/canon/core/">
     <link rel="alternate" type="text/markdown" href="/canon/core-summary.md" title="TWIST-J Canon Core Summary, full markdown source">
@@ -37,8 +37,8 @@
     <h1>TWIST-J Canon Core Summary</h1>
 
     <p>
-        <span class="label">canon basis</span> v176, 11 July 2026<br>
-        <span class="label">canon pin</span> <code>SHA-256 a5df28b2301d7b518426d38388c343831023b832b281eee80b8c82bbc3633ac7</code><br>
+        <span class="label">canon basis</span> v177, 11 July 2026<br>
+        <span class="label">canon pin</span> <code>SHA-256 a2872dd586bb6ec590556a64781e08add924590331c909c9916187f098bec79f</code><br>
         <span class="label">purpose</span> stable public entry point for humans and AI systems that cannot read the full Canon<br>
         <span class="label">authority</span> authoritative public summary, subordinate to the current private Canon repository HEAD; it does not replace the full Canon or its status registry<br>
         <span class="label">portable source</span> <a href="/canon/core-summary.md">core-summary.md</a>, a Markdown copy of the same summary for systems that can read it
@@ -145,7 +145,7 @@ M_J  =  (  0   1  -1   0 )   in SL(4, Z)
     </table>
     <p>A particle name belongs to the decoder-lifted physical layer. It must not be projected backward into an unsupported substrate-level particle claim.</p>
 
-    <h2>8. Scoped sealed theorems at v176</h2>
+    <h2>8. Scoped sealed theorems at v177</h2>
     <p>These results are exact and sealed at their declared scopes. They are not broader than those scopes.</p>
 
     <h3>8.1 General measurement coupling, v175</h3>
@@ -157,7 +157,7 @@ M_J  =  (  0   1  -1   0 )   in SL(4, Z)
         <li>the effects <em class="mv">E<sub>a</sub></em> = <em class="mv">K<sub>a</sub></em><sup>&dagger;</sup><em class="mv">K<sub>a</sub></em> are the shadow of the coupling;</li>
         <li>effects do not determine the instrument, and distinct couplings may induce the same instrument.</li>
     </ol>
-    <p>This theorem does <strong>not</strong> yet close the physical Galois-Gram density and adjoint problem.</p>
+    <p>The Galois-Gram lift of this theorem is sealed at v177; see 8.3.</p>
 
     <h3>8.2 Covariant canonical coefficient, v176</h3>
     <p>For the DeWitt form &Gscr;<sub>&lambda;</sub>[<em class="mv">g</em>](<em class="mv">h</em>, <em class="mv">h</em>) = <em class="mv">h<sub>ab</sub>h<sup>ab</sup></em> &minus; &lambda;(tr<sub><em class="mv">g</em></sub> <em class="mv">h</em>)<sup>2</sup>, the value on the metric itself is independent of the metric:</p>
@@ -167,11 +167,22 @@ M_J  =  (  0   1  -1   0 )   in SL(4, Z)
     <p>At &lambda; = &minus;1 the form is positive definite on symmetric tensors. The GR value &lambda; = +1 has the negative conformal direction. This fixes the covariant home of the coefficient 12 at theorem grade.</p>
     <p>It does <strong>not</strong> prove full equivalence with general relativity, and it does not yet select the physical dressing insertion 1 + 12&alpha;<sup>2</sup>. That insertion and its normalization bridge remain open.</p>
 
+    <h3>8.3 Galois-Gram measurement coupling and the carrier no-go, v177</h3>
+    <p>For the fixed rational Gram of section 5, <em class="mv">G</em> = <em class="mv">I</em><sub>4</sub> &minus; (1/5)&thinsp;<strong>1</strong><strong>1</strong><sup>T</sup>, its integer scale <em class="mv">G</em><sub>5</sub> = 5<em class="mv">G</em>, carriers over &Qopf; or &Qopf;(<em class="mv">i</em>), the sharp adjoint <em class="mv">A</em><sup>&sharp;</sup> = <em class="mv">G</em><sup>&minus;1</sup><em class="mv">A</em><sup>&dagger;</sup><em class="mv">G</em>, and fine-grained canonical instruments &sum;<sub><em class="mv">a</em></sub> <em class="mv">K<sub>a</sub></em><sup>&sharp;</sup><em class="mv">K<sub>a</sub></em> = <em class="mv">I</em>:</p>
+    <p>1. The correct density against the Gram form is</p>
+    <div class="eq">&rho;<sub>&psi;</sub> = &psi;&psi;<sup>&dagger;</sup><em class="mv">G</em> / (&psi;<sup>&dagger;</sup><em class="mv">G</em>&psi;)</div>
+    <p>ordinary trace one and sharp self-adjoint, and the Born value <em class="mv">p</em>(<em class="mv">a</em>) = Tr(<em class="mv">E<sub>a</sub></em>&rho;<sub>&psi;</sub>) is the branch <em class="mv">G</em> norm &Vert;<em class="mv">K<sub>a</sub></em>&psi;&Vert;<sub><em class="mv">G</em></sub><sup>2</sup>/&Vert;&psi;&Vert;<sub><em class="mv">G</em></sub><sup>2</sup>, invariant under <em class="mv">G</em> versus <em class="mv">G</em><sub>5</sub>. On the sealed piston witness the pinned projective instrument gives exactly <em class="mv">p<sub>G</sub></em> = (9/34, 25/34); the three Euclidean contaminations give 1/7, 3/14, 3/17, all different.</p>
+    <p>2. Every such instrument is induced by an exact square-root-free <em class="mv">&Gcirc;</em>-unitary coupling of system, pointer, and memory, with effects <em class="mv">E<sub>a</sub></em> = <em class="mv">K<sub>a</sub></em><sup>&sharp;</sup><em class="mv">K<sub>a</sub></em> the shadow of the coupling; the construction never uses a Cholesky factor, and at <em class="mv">G</em> = <em class="mv">I</em> it reduces to the sealed Euclidean theorem of 8.1.</p>
+    <p>3. Carrier no-go: on the coordinate piston carrier (&Qopf;<sup>4</sup>, <em class="mv">G</em><sub>5</sub>) the identity</p>
+    <div class="eq"><em class="mv">w</em> = <em class="mv">v</em><sub>0</sub> &minus; <em class="mv">v</em><sub>2</sub> = <em class="mv">v</em><sub>1</sub> &minus; <em class="mv">v</em><sub>3</sub> = (&minus;1, &minus;1, 1, 1) &ne; 0</div>
+    <p>puts a nonzero vector in both gyron class spans, so perfect class discrimination is impossible for <strong>any</strong> instrument-realizable effect; the best sharp projector leaks exactly 7/22 and 172/187. The sealed exact class readout therefore lives on the orthogonal <strong>label</strong> carrier indexed by the piston addresses, not on the coordinate carrier. This locates the gyron readout of section 6 precisely.</p>
+    <p>Scope ceilings: the fixed <em class="mv">G</em> and its scale only; mixed states only as prepared finite rational mixtures; no identity is claimed between the coordinate Gram involution and the cyclotomic, Born, residue-field, or global involutions; the identification of the hybrid <em class="mv">G</em> &otimes; <em class="mv">I</em><sub>label</sub> carrier with the physical gyron decoder is recorded at most at D.</p>
+
     <h2>9. What this summary does not claim</h2>
     <p>The following are not part of the immutable core and must be read from the current full Canon with their actual labels:</p>
     <ul>
         <li>complete SI metrology and the tick-to-edge unit bridge;</li>
-        <li>the physical Galois-Gram density and general <em class="mv">G</em>-adjoint instrument theorem;</li>
+        <li>the quadratic decoder effects clause on data; any Gram beyond the fixed <em class="mv">G</em> = <em class="mv">I</em><sub>4</sub> &minus; (1/5)&thinsp;<strong>1</strong><strong>1</strong><sup>T</sup> and its integer scale; the identity of the coordinate Gram involution with the cyclotomic, Born, residue-field, and global involutions;</li>
         <li>the dressing insertion and Level-1 to Level-2 normalization inheritance;</li>
         <li>the full inhomogeneous Einstein sector or a proof that &lambda; = &minus;1 is GR;</li>
         <li>numerical tensor normalization for primordial or radiative <em class="mv">r</em>(<em class="mv">k</em>);</li>
@@ -195,7 +206,7 @@ M_J  =  (  0   1  -1   0 )   in SL(4, Z)
     <p class="dim">The card separates fixed mathematics from physical reading. Everything through the event block is exact: the existence of the Thue-Morse pair 00 and its density 1/6 are theorems of the finite carrier. The physical channels block is the strongest physical reading of the program; the full identification with the measured gyron event and the closed bridge to gravity and electromagnetism are where the decoder and measurement work continues, with its own Canon labels.</p>
 <pre>
 name: TWIST-J
-canon_basis: v176
+canon_basis: v177
 
 axiom:
   A0: closed integer J-Cayley plenum
