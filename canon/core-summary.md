@@ -1,7 +1,7 @@
 # TWIST-J Canon Core Summary
 
-**Canon basis:** v176, 11 July 2026  
-**Canon SHA-256:** `a5df28b2301d7b518426d38388c343831023b832b281eee80b8c82bbc3633ac7`  
+**Canon basis:** v177, 11 July 2026  
+**Canon SHA-256:** `a2872dd586bb6ec590556a64781e08add924590331c909c9916187f098bec79f`  
 **Purpose:** stable public entry point for humans and AI systems that cannot read the full Canon.  
 **Authority:** authoritative public summary, subordinate to the current private Canon repository HEAD. It does not replace the full Canon or its status registry.  
 **This file:** a portable Markdown copy of the summary published at https://twistj.com/canon/core/ (the primary public reading surface). If the two differ, treat the discrepancy as a publication error. The full Canon remains authoritative over both.
@@ -231,7 +231,7 @@ The following is the stable TWIST-J dictionary. Its algebraic inputs are exact; 
 
 A particle name belongs to the decoder-lifted physical layer. It must not be projected backward into an unsupported substrate-level particle claim.
 
-## 8. Scoped sealed theorems at v176
+## 8. Scoped sealed theorems at v177
 
 These results are exact and sealed at their declared scopes. They are not broader than those scopes.
 
@@ -245,7 +245,7 @@ For finite carriers over \(\mathbb Q\) or \(\mathbb Q(i)\), Euclidean Gram geome
 4. the effects \(E_a=K_a^\dagger K_a\) are the shadow of the coupling;
 5. effects do not determine the instrument, and distinct couplings may induce the same instrument.
 
-This theorem does **not** yet close the physical Galois-Gram density and adjoint problem.
+The Galois-Gram lift of this theorem is sealed at v177; see 8.3.
 
 ### 8.2 Covariant canonical coefficient, v176
 
@@ -272,12 +272,36 @@ At \(\lambda=-1\) the form is positive definite on symmetric tensors. The GR val
 
 It does **not** prove full equivalence with general relativity, and it does not yet select the physical dressing insertion \(1+12\alpha^2\). That insertion and its normalization bridge remain open.
 
+### 8.3 Galois-Gram measurement coupling and the carrier no-go, v177
+
+For the fixed rational Gram of section 5, \(G=I_4-\frac15\mathbf1\mathbf1^T\), its integer scale \(G_5=5G\), carriers over \(\mathbb Q\) or \(\mathbb Q(i)\), the sharp adjoint \(A^\sharp=G^{-1}A^\dagger G\), and fine-grained canonical instruments \(\sum_a K_a^\sharp K_a=I\):
+
+1. the correct density against the Gram form is
+
+\[
+\boxed{\rho_\psi=\frac{\psi\psi^\dagger G}{\psi^\dagger G\psi}},
+\]
+
+ordinary trace one and sharp self-adjoint, and the Born value \(p(a)=\operatorname{Tr}(E_a\rho_\psi)\) is the branch \(G\) norm \(\lVert K_a\psi\rVert_G^2/\lVert\psi\rVert_G^2\), invariant under \(G\) versus \(G_5\). On the sealed piston witness the pinned projective instrument gives exactly \(p_G=(9/34,\,25/34)\); the three Euclidean contaminations give \(1/7\), \(3/14\), \(3/17\), all different.
+
+2. every such instrument is induced by an exact square-root-free \(\hat G\)-unitary coupling of system, pointer, and memory, with effects \(E_a=K_a^\sharp K_a\) the shadow of the coupling; the construction never uses a Cholesky factor, and at \(G=I\) it reduces to the sealed Euclidean theorem of 8.1.
+
+3. carrier no-go: on the coordinate piston carrier \((\mathbb Q^4,G_5)\) the identity
+
+\[
+\boxed{w=v_0-v_2=v_1-v_3=(-1,-1,1,1)\neq0}
+\]
+
+puts a nonzero vector in both gyron class spans, so perfect class discrimination is impossible for **any** instrument-realizable effect; the best sharp projector leaks exactly \(7/22\) and \(172/187\). The sealed exact class readout therefore lives on the orthogonal **label** carrier indexed by the piston addresses, not on the coordinate carrier. This locates the gyron readout of section 6 precisely.
+
+Scope ceilings: the fixed \(G\) and its scale only; mixed states only as prepared finite rational mixtures; no identity is claimed between the coordinate Gram involution and the cyclotomic, Born, residue-field, or global involutions; the identification of the hybrid \(G\otimes I_{\rm label}\) carrier with the physical gyron decoder is recorded at most at D.
+
 ## 9. What this summary does not claim
 
 The following are not part of the immutable core and must be read from the current full Canon with their actual labels:
 
 - complete SI metrology and the tick-to-edge unit bridge;
-- the physical Galois-Gram density and general \(G\)-adjoint instrument theorem;
+- the quadratic decoder effects clause on data; any Gram beyond the fixed \(G=I_4-\frac15\mathbf1\mathbf1^T\) and its integer scale; the identity of the coordinate Gram involution with the cyclotomic, Born, residue-field, and global involutions;
 - the dressing insertion and Level-1 to Level-2 normalization inheritance;
 - the full inhomogeneous Einstein sector or a proof that \(\lambda=-1\) is GR;
 - numerical tensor normalization for primordial or radiative \(r(k)\);
@@ -301,7 +325,7 @@ The card separates fixed mathematics from physical reading. Everything through t
 
 ```yaml
 name: TWIST-J
-canon_basis: v176
+canon_basis: v177
 
 axiom:
   A0: closed integer J-Cayley plenum
