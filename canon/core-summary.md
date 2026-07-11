@@ -2,8 +2,9 @@
 
 **Canon basis:** v176, 11 July 2026  
 **Canon SHA-256:** `a5df28b2301d7b518426d38388c343831023b832b281eee80b8c82bbc3633ac7`  
-**Purpose:** a stable entry point for humans and AI systems that cannot read the full Canon.  
-**Authority:** this summary is subordinate to the current private Canon repository HEAD. It does not replace the full Canon or its status registry.
+**Purpose:** stable public entry point for humans and AI systems that cannot read the full Canon.  
+**Authority:** authoritative public summary, subordinate to the current private Canon repository HEAD. It does not replace the full Canon or its status registry.  
+**This file:** a portable Markdown copy of the summary published at https://twistj.com/canon/core/ (the primary public reading surface). If the two differ, treat the discrepancy as a publication error. The full Canon remains authoritative over both.
 
 ## 1. What TWIST-J is
 
@@ -120,7 +121,9 @@ The compact Canon form of the update is
 \boxed{\psi_{n+1}=\Pi_{t_n}(M_J\psi_n)},
 \]
 
-with \(\Pi_1=\mathrm{Id}\) for Flow and \(\Pi_0\) for Snap. Snap is the source of irreversibility. In the Cayley realization the active generator is selected by
+Dimension note: the displayed \(M_J\) is the \(4\times4\) kernel acting on the four piston coordinates \((p_1,p_4,p_1',p_4')\) of \(\psi_n\in\mathbb F_5^6\); the compact form abbreviates the extended finite map on \(\mathbb F_5^6\), in which \(M_J\) updates the piston block while the fiber \(q\) and the trace register \(t_5\) are updated by the accompanying rules of the same map.
+
+Here \(\Pi_1=\mathrm{Id}\) for Flow and \(\Pi_0\) for Snap. Snap is the source of irreversibility. In the Cayley realization the active generator is selected by
 
 \[
 i_n=\operatorname{Tr}_6(\psi_n)+2t_n\pmod 5.

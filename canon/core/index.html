@@ -39,17 +39,18 @@
     <p>
         <span class="label">canon basis</span> v176, 11 July 2026<br>
         <span class="label">canon pin</span> <code>SHA-256 a5df28b2301d7b518426d38388c343831023b832b281eee80b8c82bbc3633ac7</code><br>
-        <span class="label">purpose</span> a stable entry point for humans and AI systems that cannot read the full Canon<br>
-        <span class="label">authority</span> subordinate to the current private Canon repository HEAD; it does not replace the full Canon or its status registry
+        <span class="label">purpose</span> stable public entry point for humans and AI systems that cannot read the full Canon<br>
+        <span class="label">authority</span> authoritative public summary, subordinate to the current private Canon repository HEAD; it does not replace the full Canon or its status registry<br>
+        <span class="label">portable source</span> <a href="/canon/core-summary.md">core-summary.md</a>, a Markdown copy of the same summary for systems that can read it
     </p>
 
     <div class="links">
-        <span class="label">this page, source</span> <a href="/canon/core-summary.md">core-summary.md</a> <span class="dim">the full markdown of this summary, the authoritative form of this page</span><br>
         <span class="label">full canon</span> <a href="/canon/latest.md">latest.md</a> <span class="dim">the complete committed body of record</span><br>
-        <span class="label">canon index</span> <a href="/canon/">/canon/</a> &middot; <span class="label" style="min-width:auto">manifest</span> <a href="/manifest/">/manifest/</a>
+        <span class="label">canon index</span> <a href="/canon/">/canon/</a> &middot; <span class="label" style="min-width:auto">manifest</span> <a href="/manifest/">/manifest/</a><br>
+        <span class="label">portable copy</span> <a href="/canon/core-summary.md">core-summary.md</a> <span class="dim">the same summary as Markdown, for humans and tools that prefer it</span>
     </div>
 
-    <p class="dim">The HTML below renders the same summary for convenient reading. Where it and the markdown disagree, the markdown wins; where the markdown and the full Canon disagree, the Canon wins.</p>
+    <p class="dim">This HTML page is the primary public reading surface. The Markdown file is a portable copy of the same summary. If they differ, treat the discrepancy as a publication error. The full Canon remains authoritative over both.</p>
 
     <h2>1. What TWIST-J is</h2>
     <p>TWIST-J is a program of discrete integer physics built on one closed arithmetic object.</p>
@@ -100,7 +101,8 @@ M_J  =  (  0   1  -1   0 )   in SL(4, Z)
     <p>The canonical finite state is &psi;<sub><em class="mv">n</em></sub> = (<em class="mv">p</em><sub>1</sub>, <em class="mv">p</em><sub>4</sub>, <em class="mv">p</em><sub>1</sub>&prime;, <em class="mv">p</em><sub>4</sub>&prime;, <em class="mv">q</em>, <em class="mv">t</em><sub>5</sub>) &isin; 𝔽<sub>5</sub><sup>6</sup>, with |𝔽<sub>5</sub><sup>6</sup>| = 5<sup>6</sup> = 15625. The global binary driver is the Thue-Morse bit <em class="mv">t<sub>n</sub></em> = popcount(<em class="mv">n</em>) mod 2.</p>
     <p>The compact Canon form of the update is</p>
     <div class="eq">&psi;<sub><em class="mv">n</em>+1</sub> = &Pi;<sub><em class="mv">t<sub>n</sub></em></sub>(<em class="mv">M<sub>J</sub></em>&thinsp;&psi;<sub><em class="mv">n</em></sub>)</div>
-    <p>with &Pi;<sub>1</sub> = Id for Flow and &Pi;<sub>0</sub> for Snap. Snap is the source of irreversibility. In the Cayley realization the active generator is selected by <em class="mv">i<sub>n</sub></em> = Tr<sub>6</sub>(&psi;<sub><em class="mv">n</em></sub>) + 2<em class="mv">t<sub>n</sub></em> (mod 5). The offset 2 is the exponent in <em class="mv">J</em> = 1 + <em class="mv">j</em><sup>2</sup>. The finite Cayley system is the canonical finite realization of the same J-action, not a second axiom.</p>
+    <p>Dimension note: the displayed <em class="mv">M<sub>J</sub></em> is the 4&times;4 kernel acting on the four piston coordinates (<em class="mv">p</em><sub>1</sub>, <em class="mv">p</em><sub>4</sub>, <em class="mv">p</em><sub>1</sub>&prime;, <em class="mv">p</em><sub>4</sub>&prime;) of &psi;<sub><em class="mv">n</em></sub> &isin; 𝔽<sub>5</sub><sup>6</sup>; the compact form abbreviates the extended finite map on 𝔽<sub>5</sub><sup>6</sup>, in which <em class="mv">M<sub>J</sub></em> updates the piston block while the fiber <em class="mv">q</em> and the trace register <em class="mv">t</em><sub>5</sub> are updated by the accompanying rules of the same map.</p>
+    <p>Here &Pi;<sub>1</sub> = Id for Flow and &Pi;<sub>0</sub> for Snap. Snap is the source of irreversibility. In the Cayley realization the active generator is selected by <em class="mv">i<sub>n</sub></em> = Tr<sub>6</sub>(&psi;<sub><em class="mv">n</em></sub>) + 2<em class="mv">t<sub>n</sub></em> (mod 5). The offset 2 is the exponent in <em class="mv">J</em> = 1 + <em class="mv">j</em><sup>2</sup>. The finite Cayley system is the canonical finite realization of the same J-action, not a second axiom.</p>
 
     <h2>5. Geometry, gauge housing, and the decoder</h2>
     <p>The Galois projection of the four piston coordinates has Gram form</p>
