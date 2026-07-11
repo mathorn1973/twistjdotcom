@@ -17,9 +17,9 @@ The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j�
 
 The Canon is the committed body of record. Read it directly; it is plain markdown with exact arithmetic and per-claim status labels.
 
-- [Canon latest (currently v171, 10 July 2026)](https://twistj.com/canon/latest.md): always points at the current head, SHA-256 c7700ad5b173495f830bb5863087bb589bd7284cedf4a1362010673b44c839c3
+- [Canon latest (currently v172, 11 July 2026)](https://twistj.com/canon/latest.md): always points at the current head, SHA-256 4303713c19e439dd90564eaf81e121266ff58da28b22342ec56dec1eef914e9f
+- [Canon v172 all in one, the component census, the representation layer, the audit reconciled, and the two envelope gates (A18 types 24 orbits 16 types with the 2I subgroup relocation; the QENV representation layer sealed on integer data; the TM-SYM2 frame identity a:b = 5:2 with the uniform tie fired first class; instrument non-uniqueness fired first class)](https://twistj.com/canon/v172.md): SHA-256 4303713c19e439dd90564eaf81e121266ff58da28b22342ec56dec1eef914e9f
 - [Canon v171 all in one, the twin gates and the quadratic envelope (r = 0 re-derived at linear order T-LOCK; the plenum direction quotient decided by classification; Born and Basel the trace, TT the traceless part, of one square)](https://twistj.com/canon/v171.md): SHA-256 c7700ad5b173495f830bb5863087bb589bd7284cedf4a1362010673b44c839c3
-- [Canon v170 all in one, the Basel gate and the color seam decision (the sixth of zeta(2) is minted by the clock, f00 = 1/6; O-BASEL-GATE closed at D; two A18 rigidity falsifiers fired first class)](https://twistj.com/canon/v170.md): SHA-256 109b4779719bee09829da96d556a1029ec6a2b35547ca27fa66485af1708089c
 
 ## Papers
 

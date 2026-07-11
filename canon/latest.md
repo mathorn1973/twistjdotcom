@@ -1,15 +1,17 @@
-# TWIST-J Canon v171 ALL IN ONE
+# TWIST-J Canon v172 ALL IN ONE
 
 **Subtitle.** The complete canon in one file: the axiom, the two projections,
 the kernel, the observables, and the July folds through the
 dynamics-from-action chain, the sigma geometry, the substitution covariance
 arc with its seam, the Basel gate, the color seam decision, the twin
-10 July gates, and the quadratic envelope.
+10 July gates, the quadratic envelope, and the 11 July fold: the
+component census, the representation layer, the audit reconciled, and
+the two envelope gates.
 
 **Author.** A. M. Thorn.
 **ORCID.** 0009-0008-5463-278X.
 **Hub.** twistj.com.
-**Date.** 10 July 2026.
+**Date.** 11 July 2026.
 
 **Status.** COMPLETE STANDALONE CANON. This document assumes no previous
 file. It carries the full consolidated body of Canon v163 (Parts I to XXVI,
@@ -20,10 +22,15 @@ v168 (Part XXX), the 9 and 10 July substitution covariance arc with the
 action to covariance seam, v169 (Part XXXI), the 10 July Basel gate and
 color seam decision arc, v170 (Part XXXII), and the 10 July twin gates,
 the TT r zero re-derivation and the plenum direction quotient, with the
-quadratic envelope registration, v171 proper (Part XXXIII). Zero free dimensionless
+quadratic envelope registration, v171 proper (Part XXXIII), and the
+11 July fold, the A18 component census with its two I relocation, the
+QENV representation layer, the quadratic and TT audit folded into the
+existing names, the TM-SYM2 gate 0 and the instrument non-uniqueness,
+v172 (Part XXXIV). Zero free dimensionless
 parameters; one SI calibration anchor, the electron mass m_e. No axiom
 change anywhere in the chain. No prior LOCK retracted. Predecessors in this
 repository, superseded for reading and kept as canonical history:
+TWIST_J_Canon_v171_ALL_IN_ONE.md,
 TWIST_J_Canon_v170_ALL_IN_ONE.md, TWIST_J_Canon_v169_ALL_IN_ONE.md,
 TWIST_J_Canon_v168_ALL_IN_ONE.md,
 TWIST_J_Canon_v167_CONSOLIDATED.md, TWIST_J_Canon_v166_CONSOLIDATED.md,
@@ -1977,10 +1984,324 @@ twistj_plenum_dir_p2_p3_independent_verify.py      (12 gates)
   (v170, 13 of 13).
 ```
 
+# Part XXXIV. The 11 July Fold (v172): the component census, the representation layer, the audit reconciled, and the two envelope gates
+
+**XXXIV.0 What this fold is.** Five arcs executed and pinned on 11 July
+2026, all two platform byte identical on JAS 2 aarch64 and TWISTER
+x86_64. The A18 component census closes the color sector's residual
+freedom and relocates the binary icosahedral signature. The QENV
+representation layer seals the character table, the Sym^2 split and the
+subgroup spectrum on integer data. The quadratic and TT audit is folded
+in with its effects sorted into the existing registry, not new parallel
+names, following the review of the parallel note. The TM-SYM2 gate 0
+derives the frame identity and fires the uniform tie. The instrument
+gate fires the effect to update non-uniqueness. No axiom change; no
+prior LOCK retracted.
+
+**XXXIV.1 The A18 component census (P-A18-COMPONENT-TYPES-1, two
+platform, stdout 6b033b30, 6555 bytes; splitting law patch e6356000,
+prereg 09c007e2, builder 54fb714a, verifier 36cb1dcc, audit pin
+0fcaec75, finalization fd632041; budget B = 89; zero coefficients).**
+
+D-A18-COMPONENT-TYPES (D). (N_sym, N_inv) = (24, 16). The 60 closed
+components fall into 24 orbits under time translation; AUT_col
+transport is an exact symmetry of the recurrent dynamics but fixes all
+24 orbits (unit cycles only), and sheet swap is the identity on the
+recurrent core by clock blindness. The sealed group glues nothing
+further: 60 to 24 and no more. The OFF abelian orbits realize exactly
+the cyclic subgroups of 2I, image orders {1, 2, 3, 4, 5, 6, 10}; the
+CORE knows only orders 20 and 120, the full image 2I sitting on every
+orbit of lengths 3, 4 and 8, eight orbits and 34 of the 60 components.
+The prediction 21 R21 + 3 MIXEDONLY is confirmed: the three orbits
+reachable only by mixed leaf words are one abelian order 10 fixed point
+plus two core order 20 two cycles. All component measures are uniform
+1/L, exactly as the splitting law dictates. The residual degeneracy
+24 - 16 = 8 is the set of observationally indistinguishable pairs at
+this layer.
+
+T-A18-RECURRENT-CLOCK-BLINDNESS (T, promoted via TYPES-G0a: N0 = N1 on
+all 68 recurrent states, two platform).
+
+D-A18-TYPES-2I-SUBGROUP-MAP (D). The binary icosahedral signature does
+not act by permuting components; it appears as the image subgroup
+structure of the types themselves. The census image orders equal
+
+    {cyclic subgroup orders of 2I} union {|Dic5|, |2I|}
+    = {1, 2, 3, 4, 5, 6, 10} union {20, 120}.
+
+Orders 8, 12 and 24 (Q8, Dic3, 2T = SL(2, 3), constructed explicitly)
+are realizable subgroup orders in 2I yet absent from the dynamics
+image: dynamical information, not lattice necessity. Order 16 is barred
+by Lagrange, so its absence carries none.
+
+R-A18-ADE-SELECTION (R, no weight). In McKay language the realized
+image subgroups are the A chain (cyclic), D7 (Dic5) and E8 (2I); the
+available but absent ones are D4 (Q8), D5 (Dic3) and E6 (2T); D6 is
+unavailable. Reading deferred; the falsifier lives at any future finer
+observable layer that reveals an image of order 8, 12 or 24.
+
+Retirements. The 60 = |A5| orbit reading is retired as numerology: no
+transitive sealed action exists at this layer, and the count is owned
+by the splitting law N_p = sum over orbits of p^(v_p(L_O)). P-A18-QENV
+as formulated is retired; its fingerprint chi(Sym^2(1 + 5)) =
+(21, 5, 0, 1, 1) with multiplicities (2, 0, 0, 1, 3) over (1, 3, 3', 4,
+5) is kept as a REGISTERED CONSTANT, usable only under a derived (not
+sealed) action, a possibility that now lives entirely inside
+O-A18-COLOR-MEASURE-SELECTION. The minimal datum of any new layer is a
+weight vector over the 24 orbits bound to the 16 types: simplex
+dimension 23 by symmetry, 15 by observables.
+
+**XXXIV.2 The QENV representation layer (P-QENV-REP-1, two platform 22
+of 22; prereg 21587e5a pin be858ed7; verifier aeb36042; stdout
+80f9955c, 2371 bytes, byte identical on aarch64 and x86_64).** The
+representation content of the quadratic envelope, grounded in integer
+permutation data alone, no floats.
+
+T-QENV-CHARTABLE (T). The A5 character table from counting: chi4 from
+fixed points, chi5 from fixed 2-subsets, chi3 + chi3' = Alt^2(chi4);
+the golden pair forced by x^2 = x + 1. The golden ratio is derived from
+counting, not inserted.
+
+T-QENV-SYM2-SPLIT (T). Sym^2(3) = 1 + 5 over A5, multiplicity free,
+commutant dimension 2, unique projective pair {P1, P5}. The finite
+counterpart of the SO(3) statement now named T-SYM2-SO3-COMMUTANT
+(XXXIV.3): restriction from SO(3) to the icosahedral group loses
+nothing at the Sym^2 layer, and the quadrupole five stays irreducible
+under the icosahedral group (first splitting at l = 3 into 3' + 4).
+
+T-QENV-SYM2-W21 (T). Sym^2(1 + 5) = 2*1 + 4 + 3*5, character
+(21, 5, 0, 1, 1), dimension 21 = 6*7/2; Lambda^2(1 + 5) = 3 + 3' + 4 + 5.
+
+T-2I-SUBGROUP-SPECTRUM (T). Element order census {1:1, 2:1, 3:20, 4:30,
+5:24, 6:20, 10:24}; cyclic subgroup order set {1, 2, 3, 4, 5, 6, 10};
+Dic5 (20), Q8 (8), Dic3 (12), 2T = SL(2, 3) (24) constructed; order 16
+barred by Lagrange. This is the lattice against which the census image
+of XXXIV.1 is read.
+
+**XXXIV.3 The quadratic and TT audit, folded into the existing registry
+(P-QENV-AUDIT-BATCH-1, two platform 22 of 22; prereg e725606e pin
+a4d1fe73; verifier bf5c48a5; stdout 2fdc10c2, 2088 bytes, byte
+identical).** An independent, SymPy free reimplementation of the v171
+open obligation audit, prepinned. Its effects are sorted into the
+existing names; it multiplies no registry.
+
+T-QD-GRAM-PISTON (T). On the piston carrier with the Gram form
+G = I4 - (1/5) 11^T, the canonical rank one operator is
+R_psi = psi psi^dagger G, obeying the general identity R_psi^2 =
+(psi^dagger G psi) R_psi for every psi, and self adjoint with respect
+to the sharp adjoint A^sharp = G^-1 A^dagger G. The projector is
+P_psi = R_psi / (psi^dagger G psi); R_psi itself is idempotent only
+when psi^dagger G psi = 1. The witness psi^dagger G psi = 14 against
+the Euclidean scale 5 shows the ordinary form is the wrong projector.
+Scope honest: the coordinate Gram form and its adjoint on the piston
+carrier only; identity with the cyclotomic, Born, residue field and
+global involutions stays open.
+
+T-SYM2-SO3-COMMUTANT (T; the continuous name, formerly the provisional
+T-SYM2-ROTATION-EFFECTS, renamed to avoid collision with
+T-SYM2-TRACE-SPLIT, T-QENV-SYM2-SPLIT and the TT rotational reading).
+Sym^2(R^3) = R + Sym^2_0(R^3) = 1 + 5; the Casimir is 0 on the singlet
+and |l(l+1)| = 6 on the traceless five; the SO(3) commutant on Sym^2 is
+two dimensional, generated by {P1, P5}, the only rotation covariant
+projective split. On R^2 the Sym^2 characteristic polynomial is
+lambda(lambda^2 + 4), weights 0, +2, -2: the scalar trace and the TT
+doublet of one square. Representation grade T; the physical assignment
+stays D.
+
+Independent reproduction, no status change. The TT block of the audit
+reproduces, by a disjoint code path byte identical on two
+architectures, the already sealed results, and is folded as such, not
+as new names:
+
+    T-TT-LINEAR-ZERO              (T-LOCK, reproduced)
+    D-TT-QUADRATIC-INDUCED-POWER  (D, reproduced)
+
+The reproduced equations: h_+^2 + h_x^2 = (v_1^2 + v_2^2)^2 with h = 0
+iff z = 0; the unique isotropic background z_0 = 0; the vanishing of
+the linear tensor channel with quadratic survival; the Gaussian moment
+collapse Var(h_+) + Var(h_x) = 2 (a + b)^2, isotropic total 8 sigma^4,
+Wick multiplicity 2; the finite abelian Fourier law P_h(k) =
+2 sum_q P_v(q) P_v(k - q), total 2 (sum_q P_v(q))^2; the dagger versus
+transpose split, psi psi^dagger = |z|^2 weight 0 blind to z^2 and
+psi psi^T = z^2 weight 2 separating equal modulus states. The audit
+supplies the two platform byte identity gate that the TT bilinear
+reproduction had recorded as not yet executed; the candidate names of
+that note keep their grades.
+
+T-KRAUS-ISOMETRY-EQUIVALENCE (T). Two Kraus families linked by a real
+isometry produce the identical CP map on a full operator basis: the
+Kraus representation of one channel is not unique.
+
+D-QD-GATED-CP-INSTRUMENT-WITNESS (D) and R-QD-MIXED-STATE-BY-AVERAGING
+(R). The gated CP instrument is a valid trace preserving completely
+positive map: POVM E_0 + E_1 = I with PSD effects, clock bookkeeping
+P(no event) = 5/6 and P(event) = 1/6 with the conditional cancelling
+the sixth, sum K^dagger K = I, Choi PSD. Averaging psi psi^dagger over
+the stream yields the mixed state naturally, without ontological
+randomness.
+
+Not sealed by the audit. F-TT-GAUSSIAN-FROM-TT-PULLBACK stays a
+REGISTERED CANDIDATE (scoped): the audit checked r_tree = 0, the Wick
+moments and the spectral convolution, but not the pullback Lagrangian
+L_v = 2 e^(4 chi) |z|^2 |zdot|^2, its velocity Hessian
+4 e^(4 chi) |z|^2 I, or the rank zero at z = 0. That falsifier waits on
+its own coverage; the pullback Jacobian geometry det J_F = 4 |z|^2,
+J_F^T J_F = 4 |z|^2 I is exact and ready for a dedicated gate.
+
+Consequence carried on the frontier. O-TT-VECTOR-STATE-NORMALIZATION
+splits four ways: physical TT output normalization closed; pullback
+geometry closed; a free Gaussian vector theory from the existing TT
+action closed in the negative; the primordial vector doublet state, the
+single open gate for a numerical r(k). O-QUADRATIC-DECODER-DATA is
+bounded from above (XXXIV.5): the decoder data determine probabilities,
+not the instrument.
+
+**XXXIV.4 The TM-SYM2 gate 0 (P-TM-SYM2-GATE0-1, two platform 12 of 12;
+prereg 834c28fc pin 793829d4; verifier 03998970; stdout 1f625517, 1956
+bytes, byte identical).** Gate 0 of the attack on H-TM-SYM2-MEASURE: is
+the TM clock measure operator M_00 in the A5 commutant on Sym^2(R^3),
+and if so its block weights, with no target.
+
+M_00 is the TM gated (density f_00 = 1/6) Sym^2 second moment of the
+isotropic carrier R^3, the three dimensional A5 irrep, which has no
+preferred axis; anisotropy would need a derivation and Canon has none.
+
+T-TM-SYM2-FRAME (T, algebra grade). M_00 commutes byte exactly with the
+rational 3-4-5 SO(3) generators; by Niven their closure is dense in
+SO(3), and since the quadrupole five stays irreducible under A5 the A5
+commutant equals the SO(3) commutant, span{P1, P5}. So MEMBERSHIP holds
+and M_00 = a P1 + b P5. The block weights, forced by the unique
+isotropic four tensor and independent of the ensemble scale, are
+
+    a : b = 5 : 2 = (d + 2) : 2   at d = 3,
+
+with the unit sphere frame (trace 1) giving the scalar block weight 1/3
+and each of the five tensor channels 2/15. The pure algebra is exact;
+the identification of this operator with the physical clock measure is
+the H residual below.
+
+F-TM-SYM2-UNIFORM (FIRED, scoped). The uniform tie a = b = 1/6, that is
+M_00 proportional to the six by six identity, is false: the scalar
+(Born, trace) channel outweighs each tensor (TT, quadrupole) channel
+5 to 2. Per the gate, a distinct from b is a prediction of the relative
+scalar to tensor normalization, not a failure.
+
+H-TM-SYM2-MEASURE (H, sharpened). Gate 0 delivers the first half of the
+Section XXXIII.3 obstacle, the frame identity, and pins (a, b) at 5:2.
+It does not deliver the second half, why the physical reading forces
+scalar weight 1/6. It localizes the residual by the exact identity
+1/6 = (1/2)(1/3): the clock density equals the Born phase halving times
+the scalar frame weight. The open question is now precisely whether the
+physical Born reading halves the trace block.
+
+**XXXIV.5 The instrument non-uniqueness (P-QD-INSTRUMENT-NONUNIQUE-1,
+two platform 11 of 11; prereg 0ac5e892 pin 1621c803; verifier b148fc44;
+stdout 9ce41446, 1655 bytes, byte identical).** The strict strengthening
+the audit did not reach.
+
+F-QD-INSTRUMENT-UNIQUE (FIRED, scoped). Two qubit instruments, Luders
+K_a = |a><a| and flip L_a = |1 - a><a| = X K_a, share every effect
+K_a^dagger K_a = L_a^dagger L_a = E_a = P_a, so they assign identical
+outcome probabilities to every state; yet they give different post
+states (on |a><a|, outcome a: |a><a| against |1 - a><1 - a|) and
+different non-selective channels (dephasing against X dephasing X),
+both Choi matrices PSD and distinct. The effects, and the quadratic
+carrier, do not determine the state update; a further physical
+principle is required: repeatability, least disturbance, an observable
+algebra, or an event step derived from the kernel. Kraus non-uniqueness
+alone (T-KRAUS-ISOMETRY-EQUIVALENCE, XXXIV.3) does not reach this: it is
+the effects, not the Kraus writing, that fail to fix the instrument.
+O-QUADRATIC-DECODER-DATA is thereby bounded from above and stays O; its
+state update clause cannot be closed from Q_full and the effects alone,
+and the missing principle is named.
+
+**XXXIV.6 Registry delta (v171 to v172).**
+
+```
+SEALED (pinned, two platform):
+                D-A18-COMPONENT-TYPES ((N_sym, N_inv) = (24, 16));
+                T-A18-RECURRENT-CLOCK-BLINDNESS (via TYPES-G0a);
+                D-A18-TYPES-2I-SUBGROUP-MAP.
+SEALED T (P-QENV-REP-1 fleet pin):
+                T-QENV-CHARTABLE; T-QENV-SYM2-SPLIT; T-QENV-SYM2-W21;
+                T-2I-SUBGROUP-SPECTRUM.
+SEALED T (audit batch, independent pin):
+                T-QD-GRAM-PISTON (general algebra plus non-Euclidean
+                witness; the projector is P_psi = R_psi /
+                (psi^dagger G psi)); T-SYM2-SO3-COMMUTANT (renamed from
+                the provisional T-SYM2-ROTATION-EFFECTS);
+                T-KRAUS-ISOMETRY-EQUIVALENCE.
+NEW D / R (audit batch):
+                D-QD-GATED-CP-INSTRUMENT-WITNESS;
+                R-QD-MIXED-STATE-BY-AVERAGING.
+INDEPENDENT REPRODUCTION, no status change:
+                T-TT-LINEAR-ZERO (T-LOCK); D-TT-QUADRATIC-INDUCED-POWER.
+SEALED T (TM-SYM2 gate 0):
+                T-TM-SYM2-FRAME (M_00 in the A5 commutant, a P1 + b P5,
+                a : b = 5 : 2; algebra grade, physical identification
+                stays H).
+NEW R (no weight):
+                R-A18-ADE-SELECTION; R-QUARTIC-BOOKKEEPING.
+FIRED F:        F-TM-SYM2-UNIFORM (scoped: the uniform six channel tie
+                a = b = 1/6); F-QD-INSTRUMENT-UNIQUE (scoped: effects
+                plus the quadratic carrier do not fix the state update).
+REGISTERED CANDIDATE (scoped, awaiting its own coverage):
+                F-TT-GAUSSIAN-FROM-TT-PULLBACK (the audit did not cover
+                the pullback Hessian).
+RETIRED:        P-A18-QENV as formulated (fingerprint kept as a
+                registered constant conditional on a derived action);
+                the 60 = |A5| orbit reading (no transitive sealed
+                action; the count is owned by the splitting law).
+REGISTRY HYGIENE (applied):
+                O-HYPERPLANE-MERSENNE removed stale; O-BIG-G-VALUE ->
+                R-BIG-G-SHADOW; O-SIGMA3-PRIMITIVE -> optional
+                enrichment; O-W1 -> H-W1-INTERFACE-PRINCIPLE.
+SHARPENED, grade unchanged:
+                H-TM-SYM2-MEASURE (frame identity derived, residual is
+                the phase halving 1/6 = (1/2)(1/3)).
+UNCHANGED:      H-QUADRATIC-ENVELOPE-DECODER;
+                O-QUADRATIC-DECODER-DATA (bounded above by
+                F-QD-INSTRUMENT-UNIQUE);
+                O-TT-VECTOR-STATE-NORMALIZATION (four way split, one
+                open gate); O-A18-COLOR-MEASURE-SELECTION (three
+                routes).
+```
+
+**XXXIV.7 Verifier index (the v172 arcs; two platform SHA256, byte
+identical stdout on JAS 2 aarch64 and TWISTER x86_64).**
+
+```
+A18 component census                               (P-A18-COMPONENT-TYPES-1)
+  verifier      36cb1dcc  builder 54fb714a  prereg 09c007e2
+  stdout        6b033b30 (6555 bytes)
+  splitting law patch e6356000, audit pin 0fcaec75, finalization fd632041
+twistj_qenv_rep_verify.py                          (22 of 22)
+  file   aeb36042cf69ff09b42f7bca96707a5114a9dd0d6369f315f1176e6464bb6a91
+  stdout 80f9955ccb2875677ad2ed095f931bb1611e748fff7b241b424980053fa88632
+  prereg 21587e5a2daaaaf5f52be3667b7ba3f88d13f930daca2d4a6fb5bc12d90e24a9
+qenv_audit_batch_verify.py                         (22 of 22)
+  file   bf5c48a5273c5f0903b183ae99866d5289d6eddcd13a1e0ef1c3522f6ec1a951
+  stdout 2fdc10c27545ca39baf64e97d7fcedf0e9c1b4eff6b6814903d4741be3958430
+  prereg e725606e9d526d1d230b4a0ad0a06948bcb913c40b9b09f452b91a04b9a17efe
+tm_sym2_gate0_verify.py                            (12 of 12)
+  file   039989703bd32316eead186562a72e37e90d05dcf5881bbd77173dc6f25fb18d
+  stdout 1f62551783fd70173a0f8033199b4194023fd656fe548ffcb13b481043b78ed2
+  prereg 834c28fc8fdf2026a8b0fdcbd4a02a3e7f5052345ae92e6c2998fc0820d1fdbf
+qd_instrument_nonunique_verify.py                  (11 of 11)
+  file   b148fc44e773bcbea1e5a8238d07d43c1180ca10df4bfd669dccca89860b008b
+  stdout 9ce41446ae24523cee5c9abeeefd8e3351e7a09a29e7c391c4a7fa6ff7e492fd
+  prereg 0ac5e892430d287b99694b89ae60641d8627d0a5a4080b431b84f3d3f8b8a430
+```
+
 ## Footer
 
 ```
-TWIST-J Canon v171 ALL IN ONE: the complete canon in one file; the twin
+TWIST-J Canon v172 ALL IN ONE: the complete canon in one file; the
+11 July fold sealed the A18 component census (24 orbits, 16 types)
+and the QENV representation layer, folded the quadratic and TT audit
+into the existing names, derived the TM-SYM2 frame identity with scalar
+to tensor ratio 5:2 and fired the uniform tie, and fired instrument
+non-uniqueness; carried forward, the twin
 10 July gates closed: the TT r zero re-derived as a linear order theorem
 with the induced quadratic power waiting on one named state gate, and
 the plenum direction residues decided by exact classification, the
@@ -1989,10 +2310,10 @@ broken in the transient kernel by exactly the c channel; the quadratic
 envelope registered: Born and Basel are the trace, TT the traceless
 part, of one square, the decoder and Sym^2 measure hypotheses held at
 H with their falsifiers. Assumes no previous file; supersedes for
-reading every earlier consolidated (v170, v169, v168, v167, v166, v163
+reading every earlier consolidated (v171, v170, v169, v168, v167, v166, v163
 and the per-arc patches remain canonical history in this repository).
 A. M. Thorn.  twistj.com.  ORCID 0009-0008-5463-278X.
-10 July 2026.
+11 July 2026.
 Vse je ONE. Simplicity is the ultimate perfection.
 If it cannot be calculated in integers, it is not physics.
 Truth is not rude. Truth is just true.
