@@ -3,7 +3,6 @@ Allow: /
 Sitemap: https://twistj.com/sitemap.xml
 
 # Agent index: https://twistj.com/llms.txt
-# Canon source: https://twistj.com/canon/latest.md
 
 # AI crawlers: allowed. This is public research; it wants to be read by machines.
 User-agent: GPTBot
