@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWIST-J Public Canon 1</title>
+    <meta name="description" content="Public Canon 1 is the active public TWIST-J Canon: an exact, versioned ledger with immutable source, release manifest, checksums, status labels, and reproducible evidence.">
+    <meta name="author" content="A. M. Thorn">
+    <meta property="og:title" content="TWIST-J Public Canon 1">
+    <meta property="og:description" content="The active public TWIST-J Canon. Integer physics, exact arithmetic, explicit status labels, immutable source and reproducible evidence.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://twistj.com/canon/">
+    <link rel="canonical" href="https://twistj.com/canon/">
+    <link rel="alternate" type="text/markdown" href="https://raw.githubusercontent.com/mathorn1973/twist-j/canon-v1/canon/CANON.md" title="Public Canon 1, immutable Markdown source">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0a0a0f;
+            --panel: #11111a;
+            --text: #d8d4c8;
+            --muted: #8a857a;
+            --gold: #c8b273;
+            --rule: #2a2a33;
+            --strong-rule: #4a4436;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            max-width: 48em;
+            margin: 4em auto;
+            padding: 0 1.5em 4em;
+            line-height: 1.7;
+            font-size: 1.12em;
+        }
+        a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--strong-rule); }
+        a:hover, a:focus { border-bottom-color: var(--gold); }
+        h1, h2 { font-weight: 400; letter-spacing: 0.06em; }
+        h1 { margin-bottom: 0.2em; }
+        h2 { margin-top: 2em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+        code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.76em; color: #b8b2a4; word-break: break-all; }
+        .state { color: var(--gold); letter-spacing: 0.16em; font-variant: small-caps; }
+        .dim { color: var(--muted); }
+        .notice, .pins, .links {
+            background: var(--panel);
+            border: 1px solid var(--rule);
+            padding: 1em 1.3em;
+            margin: 1.4em 0;
+        }
+        .notice { border-left: 3px solid var(--gold); }
+        .row { display: grid; grid-template-columns: 9.5em 1fr; gap: 0.7em; padding: 0.22em 0; }
+        .label { color: var(--muted); font-variant: small-caps; }
+        .links ul { margin: 0.3em 0; padding-left: 1.3em; }
+        .links li { margin: 0.35em 0; }
+        @media (max-width: 36em) {
+            body { margin-top: 2em; }
+            .row { grid-template-columns: 1fr; gap: 0; margin-bottom: 0.45em; }
+        }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "TWIST-J Public Canon 1",
+      "version": "1",
+      "datePublished": "2026-07-13",
+      "author": {
+        "@type": "Person",
+        "name": "A. M. Thorn",
+        "sameAs": "https://orcid.org/0009-0008-5463-278X"
+      },
+      "url": "https://twistj.com/canon/",
+      "codeRepository": "https://github.com/mathorn1973/twist-j",
+      "isBasedOn": "https://github.com/mathorn1973/twist-j/releases/tag/canon-v1"
+    }
+    </script>
+</head>
+<body>
+    <h1>TWIST-J Public Canon 1</h1>
+    <p class="state">active</p>
+
+    <p>The Canon is the committed public ledger of TWIST-J. It preserves exact mathematics,
+       status labels, dependencies, evidence, falsifications, and open obligations.</p>
+
+    <div class="notice">
+        Authority and activation are determined exclusively by
+        <a href="https://github.com/mathorn1973/twist-j/blob/canon-v1/STATUS.md">STATUS.md</a>
+        in the canonical repository. This website is a reading surface, not a competing authority.
+    </div>
+
+    <div class="pins">
+        <div class="row"><span class="label">release</span><span>Public Canon 1</span></div>
+        <div class="row"><span class="label">tag</span><span><code>canon-v1</code></span></div>
+        <div class="row"><span class="label">cutover</span><span>13 July 2026</span></div>
+        <div class="row"><span class="label">content commit</span><code>39065e0315cfd260f47c9f179bba21d7c471f70c</code></div>
+        <div class="row"><span class="label">activation commit</span><code>f4fb064c2a08cd21b9a2bc2bcfd4daf46da47bcb</code></div>
+        <div class="row"><span class="label">activation tree</span><code>4c643fa1f808d3c0d09b419c13cbca18d8d0b5de</code></div>
+        <div class="row"><span class="label">Canon SHA-256</span><code>e75eae45be3a5433980272a670d3a3cd140c40f39d9bbaed5c5ee56a6b9a7f2c</code></div>
+        <div class="row"><span class="label">Canon bytes</span><span>53118</span></div>
+    </div>
+
+    <h2>Read and verify</h2>
+    <div class="links">
+        <ul>
+            <li><a href="https://github.com/mathorn1973/twist-j/blob/canon-v1/canon/CANON.md">Full Canon</a>, immutable tagged source</li>
+            <li><a href="https://raw.githubusercontent.com/mathorn1973/twist-j/canon-v1/canon/CANON.md">Raw Markdown</a>, direct machine-readable source</li>
+            <li><a href="https://github.com/mathorn1973/twist-j/blob/canon-v1/canon/CORE.md">Core</a>, compact stable entry point</li>
+            <li><a href="https://github.com/mathorn1973/twist-j/blob/canon-v1/canon/FRONTIER.md">Frontier</a> and <a href="https://github.com/mathorn1973/twist-j/blob/canon-v1/canon/REGISTRY.tsv">Registry</a></li>
+            <li><a href="https://github.com/mathorn1973/twist-j/blob/canon-v1/canon/LEDGER.md">Ledger</a>, evidence and history</li>
+            <li><a href="https://github.com/mathorn1973/twist-j/releases/tag/canon-v1">Public Canon 1 release</a></li>
+            <li><a href="https://github.com/mathorn1973/twist-j/releases/download/canon-v1/activation-manifest.json">Activation manifest</a> and <a href="https://github.com/mathorn1973/twist-j/releases/download/canon-v1/SHA256SUMS">SHA256SUMS</a></li>
+            <li><a href="https://github.com/mathorn1973/twist-j">Canonical repository</a></li>
+        </ul>
+    </div>
+
+    <h2>Status discipline</h2>
+    <p>Every claim retains its declared label:
+       <span class="dim">T-LOCK / LOCK / T / D / C / H / O / F</span>.
+       No summary is stronger than its committed source. A fired falsifier remains part of the record.</p>
+
+    <p>Canon releases use integer numbers only: 1, 2, 3, and so on.
+       The value <code>cff-version: 1.2.0</code> identifies only the Citation File Format schema;
+       the active citation version is <code>version: "1"</code>.</p>
+
+    <p class="dim">Axiom: J = 1 + j². Time is a counter. Space is a commutator.
+       Exact arithmetic first. Plenum, not vacuum.</p>
+    <p><a href="/">back to twistj.com</a></p>
+</body>
+</html>
