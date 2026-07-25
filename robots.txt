@@ -4,7 +4,7 @@ Sitemap: https://twistj.com/sitemap.xml
 
 # Agent index: https://twistj.com/llms.txt
 # Active Canon: https://twistj.com/canon/
-# Immutable Canon source: https://raw.githubusercontent.com/mathorn1973/twist-j/canon-v10/canon/CANON.md
+# Current Canon source: https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md
 
 # AI crawlers: allowed. This is public research; it wants to be read by machines.
 User-agent: GPTBot
