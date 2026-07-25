@@ -13,7 +13,12 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://twistj.com/">
     <meta property="og:site_name" content="TWIST-J">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="https://twistj.com/og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="TWIST-J, J = 1 + j squared">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://twistj.com/og.png">
     <meta name="twitter:site" content="@amthorn73">
     <meta name="twitter:title" content="TWIST-J | Integer Physics from One Axiom: J = 1 + j²">
     <meta name="twitter:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. Zero free dimensionless parameters; one SI calibration anchor.">
@@ -740,53 +745,168 @@
     }
     </script>
     <script type="application/json" id="twistj-agent-card">
-    {
-      "name": "TWIST-J",
-      "hub": "https://twistj.com",
-      "axiom": {"statement": "J = 1 + zeta_5^2", "label": "axiom"},
-      "twist_unit": {"j": "zeta_5 = exp(2*pi*i/5)", "relation": "j^5 = 1", "label": "definition"},
-      "kernel": {
-        "basis": ["1", "j", "j^2", "j^3"],
-        "matrix_rows_M_J": [[1,0,-1,1],[0,1,-1,0],[1,0,0,0],[0,1,-1,1]],
-        "entries": "{-1, 0, 1}",
-        "det": 1, "trace": 3,
-        "charpoly": "x^4 - 3*x^3 + 4*x^2 - 2*x + 1",
-        "step_rule": "(a,b,c,d) -> (a-c+d, b-c, a, b-c+d)",
-        "cost_per_step": "4 additions, 0 multiplications",
-        "label": "theorem, verified exactly"
-      },
-      "polar": {"modulus": "1/phi", "argument": "2*pi/5", "label": "identity"},
-      "identities": ["J*phi = j", "(J-1)^3 = j", "J^5 = phi^(-5)", "pi = -5i*Li_1(J)", "phi = -j^2 - j^3"],
-      "decomposition": {"reading": "3+1+0: three commuting directions, one counter, zero remainder", "decoder": "D = D_clock o D_geom o D_matter, acyclic, 1+3+0", "label": "T-LOCK"},
-      "reading": ["Time is a counter.", "Space is a commutator.", "Two forces are two projections of one J: gravity reads the modulus, electromagnetism reads the angle."],
-      "parameters": "zero free dimensionless parameters; one SI calibration anchor (the electron mass)",
-      "status_taxonomy": {
-        "order": "T-LOCK > T > D > C > H > O > F",
-        "T-LOCK": "immutable theorem", "T": "theorem proved", "D": "derived",
-        "C": "computationally verified at finite range", "H": "hypothesis with explicit falsification condition",
-        "O": "open obligation", "F": "falsified, archived as first-class result", "LOCK": "immutable datum",
-        "rule": "no summary is stronger than its label"
-      },
-      "predictions": [
-        {"claim": "PPN gamma = beta = 1, worked", "label": "D"},
-        {"claim": "g00 * grr = 1 exactly (static conformally flat decoder form)", "label": "D"},
-        {"claim": "divergence from Schwarzschild exactly +1/6 at order Phi^3; horizonless compact objects", "label": "prediction, O-METRIC-O3 open"},
-        {"claim": "dark energy w = -14/15 constant in the delimited homogeneous regime; DESI final analyses judge", "label": "prediction"},
-        {"claim": "alpha^-1 derived from J, relative deviation under 1 ppb vs CODATA", "label": "derivation with verifier"},
-        {"claim": "electroweak coupling ratio 3/10 stands as dictionary value; derivation from the action is an open wall", "label": "prediction + open wall"}
+{
+  "name": "TWIST-J",
+  "hub": "https://twistj.com",
+  "axiom": {
+    "statement": "J = 1 + zeta_5^2",
+    "label": "axiom"
+  },
+  "twist_unit": {
+    "j": "zeta_5 = exp(2*pi*i/5)",
+    "relation": "j^5 = 1",
+    "label": "definition"
+  },
+  "kernel": {
+    "basis": [
+      "1",
+      "j",
+      "j^2",
+      "j^3"
+    ],
+    "matrix_rows_M_J": [
+      [
+        1,
+        0,
+        -1,
+        1
       ],
-      "sources": {
-        "canon": "https://twistj.com/canon/",
-        "canon_core": "https://twistj.com/canon/core/",
-        "canon_status": "https://github.com/mathorn1973/twist-j/blob/main/STATUS.md",
-        "canon_source": "https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md",
-        "canon_release": "https://github.com/mathorn1973/twist-j/releases",
-        "agent_index": "https://twistj.com/llms.txt",
-        "manifest": "https://twistj.com/manifest/",
-        "orcid": "https://orcid.org/0009-0008-5463-278X",
-        "code": "https://github.com/mathorn1973/twist-j"
-      }
+      [
+        0,
+        1,
+        -1,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        -1,
+        1
+      ]
+    ],
+    "entries": "{-1, 0, 1}",
+    "det": 1,
+    "trace": 3,
+    "charpoly": "x^4 - 3*x^3 + 4*x^2 - 2*x + 1",
+    "step_rule": "(a,b,c,d) -> (a-c+d, b-c, a, b-c+d)",
+    "cost_per_step": "4 additions, 0 multiplications",
+    "label": "T",
+    "verifier": "https://twistj.com/verify/kernel_identities.py"
+  },
+  "polar": {
+    "modulus": "1/phi",
+    "argument": "2*pi/5",
+    "label": "identity"
+  },
+  "identities": [
+    "J*phi = j",
+    "(J-1)^3 = j",
+    "J^5 = phi^(-5)",
+    "pi = -5i*Li_1(J)",
+    "phi = -j^2 - j^3"
+  ],
+  "decomposition": {
+    "measure_split": "the trace and conformal directions carry Gram weight 1/p, the spatial base ker(Tr) carries weight 1, and d/(d + 1) = 3/4 exactly",
+    "measure_split_id": "MEASURE-SPATIAL-ONLY",
+    "measure_split_label": "T",
+    "cell_reading": "time is the clock tick; space is the three F_5 directions of ker Tr_4",
+    "cell_reading_id": "KERNEL-CELL-DICTIONARY",
+    "cell_reading_label": "D"
+  },
+  "reading": {
+    "statements": [
+      "Time is a counter.",
+      "Space is a commutator.",
+      "Two forces are two projections of one J: gravity reads the modulus, electromagnetism reads the angle."
+    ],
+    "dictionary_id": "AXIOM-PROJECTION-DICTIONARY",
+    "label": "D"
+  },
+  "parameters": "zero free dimensionless parameters; one SI calibration anchor (the electron mass)",
+  "status_taxonomy": {
+    "order": "T-LOCK > T > D > C > H > O > F",
+    "T-LOCK": "immutable theorem",
+    "T": "theorem proved",
+    "D": "derived",
+    "C": "computationally verified at finite range",
+    "H": "hypothesis with explicit falsification condition",
+    "O": "open obligation",
+    "F": "falsified, archived as first-class result",
+    "LOCK": "immutable datum",
+    "rule": "no summary is stronger than its label",
+    "public_maximum": "T",
+    "public_note": "the public line carries no T-LOCK; internal LOCK grade data enters at its evidential grade"
+  },
+  "sources": {
+    "canon": "https://twistj.com/canon/",
+    "canon_core": "https://twistj.com/canon/core/",
+    "canon_status": "https://github.com/mathorn1973/twist-j/blob/main/STATUS.md",
+    "canon_source": "https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md",
+    "canon_release": "https://github.com/mathorn1973/twist-j/releases",
+    "agent_index": "https://twistj.com/llms.txt",
+    "manifest": "https://twistj.com/manifest/",
+    "orcid": "https://orcid.org/0009-0008-5463-278X",
+    "code": "https://github.com/mathorn1973/twist-j",
+    "canon_registry": "https://github.com/mathorn1973/twist-j/blob/main/canon/REGISTRY.tsv",
+    "canon_frontier": "https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md",
+    "kernel_verifier": "https://twistj.com/verify/kernel_identities.py"
+  },
+  "claims": [
+    {
+      "id": "HYPERCHARGE-LAW",
+      "label": "T",
+      "claim": "Y_F = (B - L) + 2 T_3^R gives all seven standard model hypercharges exactly in Q"
+    },
+    {
+      "id": "WEINBERG-TREE",
+      "label": "T",
+      "claim": "the tree value sin^2 theta_W = 3/13 = deg_f/(V + 1) exactly"
+    },
+    {
+      "id": "WEINBERG-FORM",
+      "label": "D",
+      "claim": "the committed form sin^2 theta_W = 3/13 + 1/(32 pi^2 phi^4); the measured comparison stays fenced"
+    },
+    {
+      "id": "MU-EXCHANGE-IDENTITY",
+      "label": "T",
+      "claim": "delta mu_tau + 240 delta mu_mu = 0 exactly in Q"
+    },
+    {
+      "id": "ALPHA-FORM",
+      "label": "D",
+      "claim": "the committed form alpha = 5 S/((8 pi)^2 sqrt(s)) with S = (1 + X/5)^-5 and X = 1/(32 pi^2 phi^4)"
+    },
+    {
+      "id": "ALPHA-VALUE-DIGITS",
+      "label": "C",
+      "claim": "the value of the committed form enclosed by exact integer interval arithmetic; the sub ppb CODATA window is a fenced measured witness and moves no status"
+    },
+    {
+      "id": "COSMOLOGY-REGISTER",
+      "label": "D",
+      "claim": "the committed register forms w = -14/15 and Omega_b = pi^2/200 in the delimited homogeneous regime"
+    },
+    {
+      "id": "NS-TILT",
+      "label": "H",
+      "claim": "the scalar tilt read as n_s - 1 = -5 alpha",
+      "falsifier": "fails against CMB-S4"
+    },
+    {
+      "id": "QUANT-SUBSTRATE",
+      "label": "O",
+      "claim": "the Larmor gate and the Schwinger physical-realization gate on the archimedean wall stay open"
     }
+  ],
+  "claims_note": "every id resolves in canon/REGISTRY.tsv on the repository head; no claim here is stronger than its row"
+}
     </script>
 </head>
 <body>
@@ -897,8 +1017,8 @@
         <div class="sep"></div>
 
         <div class="substance">
-            <span class="gr">Ansatz: if the algebra maps to physics, it reproduces General Relativity through PPN order (γ = β = 1, worked, not asserted) with zero free dimensionless parameters.</span><br>
-            Predicts <span class="hl">g<sub>00</sub> g<sub>rr</sub> = 1</span> exactly, and a divergence from Schwarzschild of exactly +1/6 at order Φ³: horizonless compact objects. Experiment decides.
+            <span class="gr">Ansatz: if the algebra maps to physics, the dictionary is forced, not fitted. Zero free dimensionless parameters, one SI calibration anchor.</span><br>
+            The public ledger commits, each claim with its label: all seven standard model hypercharges exactly in <span class="hl">Q</span> [T]; the electroweak tree value <span class="hl">sin²θ<sub>W</sub> = 3/13</span> [T], committed form 3/13 + 1/(32π²φ⁴) [D]; dark energy <span class="hl">w = −14/15</span> in the delimited homogeneous regime [D]; the scalar tilt <span class="hl">n<sub>s</sub> − 1 = −5α</span> [H], which CMB-S4 can kill. Experiment decides.
         </div>
     </div>
 
