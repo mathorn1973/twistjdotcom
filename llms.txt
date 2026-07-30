@@ -1,6 +1,6 @@
 # TWIST-J
 
-> TWIST-J derives physics from one axiom: J = 1 + j², where j is the twist unit, a primitive fifth root of unity. Multiplication by J is a 4x4 integer matrix over {-1, 0, 1}. Galois structure yields an exact 3+1+0 decomposition. Zero free dimensionless parameters; one SI calibration anchor (the electron mass). The algebra is proved. The physics is falsifiable.
+> TWIST-J derives physics from one axiom: J = 1 + j², where j is the twist unit, a primitive fifth root of unity. Multiplication by J is a 4x4 integer matrix over {-1, 0, 1}. Galois structure yields an exact 3+1+0 decomposition. No fitted dimensionless parameter is introduced in the stated forms; the single SI calibration anchor is the electron mass. The algebra is proved. The physics is falsifiable.
 
 Author: A. M. Thorn. ORCID: https://orcid.org/0009-0008-5463-278X
 Hub: https://twistj.com
@@ -54,6 +54,5 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 
 ## Optional
 
-- [Storyteller](https://twistj.com/storyteller/)
 - [Fractal](https://twistj.com/fractal/)
 - [Fractalus](https://twistj.com/fractalus/)

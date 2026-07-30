@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TWIST-J | Integer Physics from One Axiom: J = 1 + j²</title>
-    <meta name="description" content="TWIST-J derives physics from one equation: J = 1 + j², where j is the twist unit (fifth root of unity). The 4x4 integer matrix M_J has entries {-1, 0, 1} and yields an exact 3+1+0 decomposition. The algebra is proved. The physics is falsifiable. Zero free dimensionless parameters; one SI calibration anchor (the electron mass).">
-    <meta name="keywords" content="TWIST-J, TWIST, J-Operator, plenum, fine structure constant, golden ratio, twist unit, integer arithmetic, icosahedral symmetry, algebraic number theory, cyclotomic field, Thue-Morse, aperiodic dynamics">
+    <meta name="description" content="TWIST-J derives physics from one equation: J = 1 + j², where j is the twist unit (fifth root of unity). The 4x4 integer matrix M_J has entries {-1, 0, 1} and yields an exact 3+1+0 decomposition. The algebra is proved. The physics is falsifiable. No fitted dimensionless parameter is introduced in the stated forms; the single SI calibration anchor is the electron mass.">
+    <meta name="keywords" content="cyclotomic field, Q(zeta_5), algebraic number theory, cyclotomic unit, hyperbolic toral automorphism, integer arithmetic, aperiodic dynamics, Thue-Morse, icosahedral symmetry, TWIST-J, J-Operator, twist unit, plenum">
     <meta name="author" content="A. M. Thorn">
 
     <meta property="og:title" content="TWIST-J">
-    <meta property="og:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. Zero free dimensionless parameters; one SI calibration anchor.">
+    <meta property="og:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. No fitted dimensionless parameter in the stated forms; one SI calibration anchor.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://twistj.com/">
     <meta property="og:site_name" content="TWIST-J">
@@ -21,7 +21,7 @@
     <meta name="twitter:image" content="https://twistj.com/og.png">
     <meta name="twitter:site" content="@amthorn73">
     <meta name="twitter:title" content="TWIST-J | Integer Physics from One Axiom: J = 1 + j²">
-    <meta name="twitter:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. Zero free dimensionless parameters; one SI calibration anchor.">
+    <meta name="twitter:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. No fitted dimensionless parameter in the stated forms; one SI calibration anchor.">
     <link rel="canonical" href="https://twistj.com/">
     <link rel="alternate" type="text/markdown" href="https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md" title="TWIST-J Public Canon, current Markdown source">
 
@@ -402,144 +402,6 @@
             color: var(--accent);
         }
 
-        /* ── Audio player ── */
-        .audio-toggle {
-            position: fixed;
-            top: 1.5rem;
-            right: 5rem;
-            width: 36px;
-            height: 36px;
-            border: 1px solid transparent;
-            border-radius: 50%;
-            background: transparent;
-            color: var(--muted);
-            opacity: 0.5;
-            font-size: 1.15rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-        .audio-toggle:hover { opacity: 1; color: var(--accent); }
-        .audio-toggle.playing { opacity: 1; color: var(--accent); border-color: var(--accent); background: var(--panel-bg); }
-
-        .audio-panel {
-            position: fixed;
-            top: 4.2rem;
-            right: 1.5rem;
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            padding: 1rem 1.2rem;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 0.7rem;
-            min-width: 180px;
-            opacity: 0;
-            transform: translateY(-8px);
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .audio-panel.visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .audio-panel label {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 0.82rem;
-            letter-spacing: 0.12em;
-            color: var(--muted);
-            text-transform: lowercase;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.6rem;
-        }
-        .audio-panel label span.val {
-            color: var(--silver);
-            font-size: 0.78rem;
-            min-width: 2.2rem;
-            text-align: right;
-        }
-
-        .audio-panel input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 90px;
-            height: 3px;
-            background: var(--slider-track);
-            border-radius: 2px;
-            outline: none;
-            cursor: pointer;
-        }
-        .audio-panel input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-        }
-        .audio-panel input[type="range"]::-moz-range-thumb {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: none;
-            cursor: pointer;
-        }
-
-        .audio-panel select {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 0.82rem;
-            letter-spacing: 0.08em;
-            background: var(--select-bg);
-            color: var(--select-text);
-            border: 1px solid var(--panel-border);
-            border-radius: 4px;
-            padding: 3px 6px;
-            cursor: pointer;
-            outline: none;
-        }
-        .audio-panel select:focus { border-color: var(--accent); }
-
-
-
-        .audio-chevron {
-            position: fixed;
-            top: 4rem;
-            right: 5rem;
-            width: 36px;
-            height: 24px;
-            padding-bottom: 0;
-            text-align: center;
-            font-size: 1.6rem;
-            line-height: 24px;
-            color: var(--accent);
-            opacity: 0;
-            cursor: pointer;
-            z-index: 101;
-            transition: all 0.3s ease;
-            user-select: none;
-            pointer-events: none;
-        }
-        .audio-chevron.show {
-            opacity: 0.7;
-            pointer-events: auto;
-        }
-        .audio-chevron.show:hover {
-            opacity: 1;
-        }
-        .audio-chevron.open {
-            transform: rotate(180deg);
-        }
-
         @keyframes breathe {
             0%   { transform: scale(1); }
             50%  { transform: scale(1.04); }
@@ -657,9 +519,6 @@
 
             .footer { flex-direction: column; gap: 0.5rem; padding: 2rem 0 1.5rem; }
             .footer .dot { display: none; }
-            .audio-toggle { top: 1.2rem; right: 4rem; }
-            .audio-panel { top: 3.6rem; right: 1rem; }
-            .audio-chevron { top: 3.4rem; right: 4rem; }
             .theme-toggle { top: 1.2rem; right: 1rem; }
         }
     </style>
@@ -671,7 +530,7 @@
       "@type": "ResearchProject",
       "name": "TWIST-J",
       "url": "https://twistj.com",
-      "description": "A framework derived from one axiom: J = 1 + j², where j is the twist unit (a primitive fifth root of unity). The multiplication matrix M_J has entries in {-1, 0, 1} and determinant 1. Galois structure yields an exact 3+1+0 decomposition. Zero free dimensionless parameters; one SI calibration anchor (the electron mass). The algebra is proved. The physics is falsifiable.",
+      "description": "A framework derived from one axiom: J = 1 + j², where j is the twist unit (a primitive fifth root of unity). The multiplication matrix M_J has entries in {-1, 0, 1} and determinant 1. Galois structure yields an exact 3+1+0 decomposition. No fitted dimensionless parameter is introduced in the stated forms; the single SI calibration anchor is the electron mass. The algebra is proved. The physics is falsifiable.",
       "dateModified": "2026-07-05",
       "sameAs": [
         "https://orcid.org/0009-0008-5463-278X",
@@ -828,7 +687,7 @@
     "dictionary_id": "AXIOM-PROJECTION-DICTIONARY",
     "label": "D"
   },
-  "parameters": "zero free dimensionless parameters; one SI calibration anchor (the electron mass)",
+  "parameters": "no fitted dimensionless parameter in the stated forms; one SI calibration anchor (the electron mass)",
   "status_taxonomy": {
     "order": "T-LOCK > T > D > C > H > O > F",
     "T-LOCK": "immutable theorem",
@@ -947,9 +806,6 @@
             <span class="id-label">inverse</span>
             <span class="id-eq">J⁻¹ = −j − j² <span class="dim">= (0, −1, −1, 0)</span></span>
 
-            <span class="id-label">golden</span>
-            <span class="id-eq">φ = −j² − j³ <span class="dim">= (0, 0, −1, −1)</span></span>
-
             <span class="id-label">bridge</span>
             <span class="id-eq"><span class="white">J · φ = j</span></span>
 
@@ -1017,28 +873,10 @@
         <div class="sep"></div>
 
         <div class="substance">
-            <span class="gr">Ansatz: if the algebra maps to physics, the dictionary is forced, not fitted. Zero free dimensionless parameters, one SI calibration anchor.</span><br>
+            <span class="gr">Ansatz: if the algebra maps to physics, the dictionary is forced, not fitted. No fitted dimensionless parameter in the stated forms, one SI calibration anchor.</span><br>
             The public ledger commits, each claim with its label: all seven standard model hypercharges exactly in <span class="hl">Q</span> [T]; the electroweak tree value <span class="hl">sin²θ<sub>W</sub> = 3/13</span> [T], committed form 3/13 + 1/(32π²φ⁴) [D]; dark energy <span class="hl">w = −14/15</span> in the delimited homogeneous regime [D]; the scalar tilt <span class="hl">n<sub>s</sub> − 1 = −5α</span> [H], which CMB-S4 can kill. Experiment decides.
         </div>
     </div>
-
-    <!-- Audio player -->
-    <div class="audio-toggle" id="audioToggle" title="Toggle audio">&#x1f507;</div>
-    <div class="audio-panel" id="audioPanel">
-        <label>volume <input type="range" id="audioVol" min="0" max="100" value="50"> <span class="val" id="audioVolVal">50</span></label>
-        <label>speed <input type="range" id="audioSpeed" min="0" max="100" value="51" step="1"> <span class="val" id="audioSpeedVal">10</span></label>
-        <label>riff
-            <select id="audioRiff">
-                <option value="calm">calm</option>
-                <option value="drift" selected>drift</option>
-                <option value="pulse">pulse</option>
-                <option value="storm">storm</option>
-                <option value="layers">layers</option>
-                <option value="weave">weave</option>
-            </select>
-        </label>
-    </div>
-    <div class="audio-chevron" id="audioChevron" title="Toggle controls">&#x25BE;</div>
 
     <div class="footer">
         <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
@@ -1104,7 +942,7 @@
         // Coordinates
         { html: '<span class="gold">(1, 0, 1, 0)</span> <span class="dim">in Q(j)</span>', sub: 'four registers. the complete definition.', hold: 5000 },
         // M_J
-        { html: '<span class="dim">M<sub>J</sub></span> <span class="silver">∈ {−1, 0, 1}<sup>4×4</sup></span>', sub: 'five additions per tick. zero multiplications.', hold: 5500 },
+        { html: '<span class="dim">M<sub>J</sub></span> <span class="silver">∈ {−1, 0, 1}<sup>4×4</sup></span>', sub: 'four additions per tick. zero multiplications.', hold: 5500 },
         // Unimodular
         { html: '<span class="gold">det(M<sub>J</sub>) = 1</span>', sub: 'unimodular. exact integer inverse. zero drift.', hold: 5000 },
         // Eigenvalues
@@ -1126,14 +964,14 @@
         // Incommensurability
         { html: '<span class="silver">ln 2 / ln φ</span> <span class="dim">is transcendental</span>', sub: 'binary clock and golden eigenvalue never synchronize', hold: 5000 },
         // State space
-        { html: '<span class="gold">5⁴ = 625</span> <span class="dim">states ·</span> <span class="silver">20 on the attractor</span>', sub: 'icosahedral geometry from integer arithmetic', hold: 5000 },
+        { html: '<span class="gold">5⁶ = 15625</span> <span class="dim">checkpoint states ·</span> <span class="silver">313 attractors</span>', sub: '312 of size 20 and one singlet of size 10. full enumeration [C]', hold: 5000 },
         // --- Transition ---
         { html: '<span class="dim">the algebra above is proved.</span>', hold: 4500 },
         { html: '<span class="dim">what follows is an</span> <span class="gold">ansatz.</span>', sub: 'predictions that need experiment to confirm or kill', hold: 5500 },
         // Physics: two invariants
         { html: '<span class="gold">|J| → gravity</span> <span class="dim">·</span> <span class="gold">arg(J) → electromagnetism</span>', sub: 'two invariants of J. two forces. a conjecture.', hold: 5500 },
         // Fine structure
-        { html: '<span class="gold">α⁻¹ ≈ 137.036</span>', sub: 'derived with zero free parameters', hold: 5000 },
+        { html: '<span class="gold">α</span> <span class="dim">from the committed form</span>', sub: 'ALPHA-FORM [D], digits ALPHA-VALUE-DIGITS [C]. no value is claimed beyond the form.', hold: 5000 },
         // Falsifiable prediction
         { html: '<span class="gold">g₀₀ · g<sub>rr</sub> = 1</span>', sub: 'General Relativity: g₀₀ = 1 − 2GM/rc². falsifiable. testable.', hold: 5500 },
         // Closing
@@ -1626,212 +1464,6 @@
     requestAnimationFrame(draw);
     </script>
 
-    <!-- TWIST-J Schumann Riff Engine -->
-    <script>
-const TwistJ=(()=>{
-const PHI=(1+Math.sqrt(5))/2,PHI_I=1/PHI,PHI_2=PHI*PHI,PHI_I2=1/PHI_2,F_SCH=7.83;
-const FIBS=[3,5,8,13,21];
-const TEMPO_MULS=[PHI_I2,PHI_I,1,PHI,PHI_2];
-const TEMPO_NAMES=['largo','adagio','andante','allegro','presto'];
-const TEMPO_LABELS=['φ⁻²','φ⁻¹','1','φ','φ²'];
-const ROOT_HARMONICS=[24,27,30,36,40];
-const ROOT_NAMES=['I','II','III','V','VI'];
-const SCALE_RATIOS=[[1,1],[9,8],[5,4],[4,3],[3,2],[5,3],[15,8],[2,1]];
-const RIFF_NAMES=[
-  'jab','snap','kick','stab','pop','hit','crack','dart',
-  'whip','burst','slam','rush','punch','spike','bang','zip',
-  'flick','hook','rip','tap','dive','sting','chop','zap',
-  'thump','click','buzz','ping','slash','drop','clip','bolt',
-  'grind','lash','poke','blitz','smash','jolt','strike','cut'
-];
-const RIFFS=[
-  [[0,.25],[4,.25]],[[- 1,.125],[0,.25],[7,.125]],[[0,.5],[4,.25],[7,.25]],
-  [[7,.125],[4,.125],[0,.25]],[[-1,.25],[0,.125],[0,.125]],
-  [[0,.125],[4,.125],[7,.125],[4,.125]],[[7,.25],[-1,.125],[0,.125]],
-  [[0,.125],[2,.125],[4,.125],[7,.125]],[[4,.25],[-1,.125],[0,.125]],
-  [[0,.125],[7,.125],[-1,.125],[4,.125]],[[0,.5],[7,.125],[0,.125]],
-  [[2,.125],[4,.125],[7,.125]],[[0,.25],[0,.125],[4,.125]],
-  [[-1,.125],[7,.25],[4,.125]],[[4,.125],[4,.125],[7,.25]],
-  [[7,.125],[4,.125]],[[0,.125],[-1,.125],[7,.25]],
-  [[4,.125],[0,.125],[7,.25]],[[7,.25],[4,.125],[0,.125]],
-  [[0,.5],[-1,.125],[0,.125]],[[7,.125],[5,.125],[4,.125]],
-  [[0,.25],[-1,.125],[4,.125]],[[4,.125],[7,.125],[4,.125],[0,.125]],
-  [[-1,.125],[0,.125],[4,.25]],[[0,.125],[0,.125],[0,.125],[-1,.125]],
-  [[4,.125],[-1,.125],[0,.125]],[[0,.125],[4,.125],[0,.125]],
-  [[7,.25],[5,.25]],[[0,.125],[7,.375]],[[7,.375],[0,.125]],
-  [[-1,.125],[4,.125],[7,.125],[4,.125]],[[0,.125],[4,.25],[7,.125]],
-  [[0,.25],[2,.125],[4,.125]],[[7,.125],[0,.25],[4,.125]],
-  [[-1,.125],[0,.375]],[[4,.125],[7,.125],[0,.125],[4,.125]],
-  [[0,.375],[7,.125]],[[4,.25],[0,.25]],
-  [[0,.125],[4,.125],[7,.125],[0,.125],[4,.125]],
-  [[7,.125],[4,.125],[2,.125],[0,.125],[7,.125],[0,.125]]
-];
-const BASS_RIFFS=[
-  [[0,.25],[-1,.25]],[[0,.25],[0,.125],[4,.125]],[[0,.375],[4,.125]],
-  [[-1,.125],[0,.25],[-1,.125]],[[4,.125],[0,.375]],
-  [[0,.125],[0,.125],[-1,.25]],[[0,.25],[4,.25]],
-  [[0,.125],[-1,.125],[4,.25]],[[0,.5]],
-  [[-1,.125],[0,.125],[0,.25]],[[4,.25],[0,.125],[4,.125]],
-  [[0,.125],[4,.125],[0,.125],[-1,.125]],
-  [[0,.125],[0,.125],[4,.125],[0,.125]],
-  [[-1,.125],[0,.125],[-1,.125],[4,.125]],
-  [[0,.25],[0,.125],[-1,.125]],[[4,.125],[0,.125],[4,.125],[0,.125]]
-];
-function riffNoteDeg(r,p){return r[p][0];}
-function riffNoteDur(r,p){return r[p][1];}
-function riffEndDeg(r){for(let i=r.length-1;i>=0;i--)if(r[i][0]>=0)return r[i][0];return 0;}
-function riffStartDeg(r){for(let i=0;i<r.length;i++)if(r[i][0]>=0)return r[i][0];return 0;}
-function selectRiff(n,prevEnd){const base=gPhase(n,RIFFS.length);const gap=Math.abs(riffStartDeg(RIFFS[base])-prevEnd);if(gap<=3)return base;const off=tm(n*3+1)===1?7:13;const alt=(base+off)%RIFFS.length;return Math.abs(riffStartDeg(RIFFS[alt])-prevEnd)<gap?alt:base;}
-function selectBassRiff(n){return gPhase(n*7,BASS_RIFFS.length);}
-const VOICE_DEFS=[{name:'lead',wave:'triangle',vol:0.50,regOff:0},{name:'counter',wave:'sine',vol:0.30,regOff:0},{name:'bass',wave:'triangle',vol:0.45,regOff:-1},{name:'pad',wave:'sine',vol:0.18,regOff:0},{name:'pulse',wave:'square',vol:0.12,regOff:1}];
-function tm(n){n=n>>>0;n^=n>>16;n^=n>>8;n^=n>>4;n^=n>>2;n^=n>>1;return n&1;}
-function gPhase(n,mod){mod=mod||5;return Math.floor((((n*PHI)%1+1)%1)*mod);}
-function fibAt(n){let a=0,b=1;for(let i=0;i<((n%24)+24)%24;i++){const t=a+b;a=b;b=t;}return a;}
-function scaleHarmonic(rootH,deg,octShift){const d=((deg%8)+8)%8;const oct=Math.floor(deg/8)+(octShift||0);const[num,den]=SCALE_RATIOS[d];return Math.round(rootH*num/den*Math.pow(2,oct));}
-function rootHarmonicsAtReg(reg){const mul=Math.pow(2,reg);return ROOT_HARMONICS.map(h=>Math.round(h*mul));}
-function sectionTempoIdx(s){const b=gPhase(s*3+7,5);const j=tm(s*5+1)===1?2:0;return(b+j)%5;}
-function computeSection(secNum){const t1=tm(secNum),t2=tm(secNum*3+1),t3=tm(secNum*7+2);const count=[1,2,3,5][t1+t2+t3];const start=gPhase(secNum*11+3,5);const step=tm(secNum*5)===0?1:2;const set=[];let idx=start;for(let i=0;i<count;i++){set.push(idx%5);idx+=step;}return{count:[...new Set(set)].length,activeSet:[...new Set(set)],sectionLen:FIBS[gPhase(secNum*13,4)]};}
-function articulate(step,noteIdx){const t1=tm(step+noteIdx*3);const t2=tm(step*5+noteIdx*7);if(t1===1&&t2===1)return'accent';if(noteIdx===0)return'accent';return'normal';}
-function shouldSilence(themeNum,silWeight){if(silWeight<=0)return false;return(tm(themeNum*3+7)+tm(themeNum*11+2))/2>=(1-silWeight);}
-class Engine{
-constructor(opts){opts=opts||{};this.baseTempo=opts.tempo||84;this.reverb=opts.reverb!=null?opts.reverb:0.77;this.breath=opts.breath!=null?opts.breath:0.65;this.silW=opts.silence!=null?opts.silence:0.50;this.regW=opts.register||2;this.wander=opts.wander||false;this.vTM=opts.vTM||[1,1,1,1,1];this.playing=false;this.step=0;this._listeners={};this._ax=null;this._master=null;this._dryB=null;this._revS=null;this._revC=null;this._comp=null;this._schedId=null;this._masterNextT=0;this._initState();}
-start(n){this._initAudio();this._jumpToN(n||0);this.playing=true;if(this._ax.state==='suspended')this._ax.resume();const now=this._ax.currentTime;this._masterNextT=now;this._voices.forEach(v=>{if(v.nextT<now)v.nextT=now;});this._sched();}
-pause(){this.playing=false;if(this._schedId)clearTimeout(this._schedId);}
-resume(){if(!this._ax)return this.start(this.step);this.playing=true;if(this._ax.state==='suspended')this._ax.resume();const now=this._ax.currentTime;this._masterNextT=now;this._voices.forEach(v=>{if(v.nextT<now)v.nextT=now;});this._sched();}
-stop(){this.playing=false;if(this._schedId)clearTimeout(this._schedId);this.step=0;this._initState();}
-setTempo(bpm){this.baseTempo=Math.max(0.5,Math.min(400,bpm));}
-setWander(on){this.wander=!!on;}
-setVoiceVol(i,vol){if(this._voices&&this._voices[i])this._voices[i].vol=Math.max(0,Math.min(1,vol));}
-forceAllVoices(on){this._forceAll=!!on;if(on&&this._voices)this._voices.forEach(v=>{v.structActive=true;});}
-muteVoice(i){if(this._voices&&this._voices[i])this._voices[i].muted=true;}
-unmuteVoice(i){if(this._voices&&this._voices[i])this._voices[i].muted=false;}
-set(opts){if(opts.reverb!=null){this.reverb=opts.reverb;this._updateReverb();}if(opts.breath!=null)this.breath=opts.breath;if(opts.silence!=null)this.silW=opts.silence;if(opts.register!=null)this.regW=opts.register;if(opts.tempo!=null)this.setTempo(opts.tempo);if(opts.wander!=null)this.setWander(opts.wander);if(opts.vTM)this.vTM=opts.vTM;}
-on(event,fn){if(!this._listeners[event])this._listeners[event]=[];this._listeners[event].push(fn);}
-off(event,fn){if(!this._listeners[event])return;this._listeners[event]=this._listeners[event].filter(f=>f!==fn);}
-get state(){return{n:this.step,playing:this.playing,section:this._S.sectionNum,theme:this._S.themeNum,tempo:this._effectiveTempo(),tempoName:TEMPO_NAMES[this._S.tempoMulIdx],tempoLabel:TEMPO_LABELS[this._S.tempoMulIdx],tempoMul:this._S.tempoMul,rootIdx:this._S.rootIdx,rootName:ROOT_NAMES[this._S.rootIdx],rootReg:this._S.rootReg,rootHarmonic:rootHarmonicsAtReg(this._S.rootReg)[this._S.rootIdx],leadRiff:RIFF_NAMES[this._S.leadRiffIdx],leadRiffIdx:this._S.leadRiffIdx,voiceCount:this._S.activeCount,activeVoices:this._S.activeSet,silence:this._S.inSilence,wander:this.wander,voices:this._voices.map(v=>({name:v.name,active:v.active,muted:v.muted,harmonic:v.curH,freq:v.curH?v.curH*F_SCH:0}))};}
-_emit(event,data){(this._listeners[event]||[]).forEach(fn=>{try{fn(data);}catch(e){}});}
-_initState(){this._S={sectionNum:0,sectionLen:5,themesInSection:0,themeNum:0,activeCount:3,activeSet:[0,1,2],inSilence:false,silBeatsLeft:0,silPhraseNum:0,tempoMulIdx:2,tempoMul:1,prevTempoMul:1,tempoTransition:1,tempoTransLen:0,leadRiffIdx:0,leadRiffPos:0,leadEndDeg:0,leadPhraseNum:0,counterRiffIdx:10,counterRiffPos:0,counterEndDeg:4,counterPhraseNum:0,bassRiffIdx:0,bassRiffPos:0,bassPhraseNum:0,rootIdx:0,rootReg:1,breathBeats:0};this._voices=VOICE_DEFS.map((d,i)=>({...d,i,step:0,nextT:0,muted:false,structActive:true,curH:0,active:false}));}
-_jumpToN(n){n=Math.max(0,Math.floor(n));this.step=n;const S=this._S;this._voices.forEach((v,i)=>{v.step=n+i*5;});S.sectionNum=Math.floor(n/200);S.themeNum=Math.floor(n/40);S.leadPhraseNum=Math.floor(n/3);S.counterPhraseNum=Math.floor(n/3)+5;S.bassPhraseNum=Math.floor(n/3)+3;S.leadRiffIdx=selectRiff(S.leadPhraseNum,0);S.counterRiffIdx=selectRiff(S.counterPhraseNum*3+11,4);S.bassRiffIdx=selectBassRiff(S.bassPhraseNum);S.leadRiffPos=0;S.counterRiffPos=0;S.bassRiffPos=0;S.rootIdx=gPhase(S.themeNum,5);S.rootReg=Math.max(0,Math.min(3,1+fibAt(S.themeNum)%this.regW-Math.floor(this.regW/2)));const sec=computeSection(S.sectionNum);S.sectionLen=sec.sectionLen;S.activeCount=sec.count;S.activeSet=sec.activeSet;S.themesInSection=S.themeNum%S.sectionLen;const tIdx=sectionTempoIdx(S.sectionNum);S.tempoMulIdx=tIdx;S.tempoMul=TEMPO_MULS[tIdx];S.prevTempoMul=S.tempoMul;S.tempoTransition=1;this._voices.forEach((v,j)=>{v.structActive=this._forceAll||sec.activeSet.includes(j);});S.inSilence=false;S.breathBeats=0;}
-_effectiveTempo(){const S=this._S;let mul;if(S.tempoTransition>=1)mul=S.tempoMul;else{const t=S.tempoTransition;const e=t*t*(3-2*t);mul=S.prevTempoMul+(S.tempoMul-S.prevTempoMul)*e;}return this.baseTempo*mul;}
-_updateReverb(){if(this._dryB)this._dryB.gain.value=1-this.reverb;if(this._revS)this._revS.gain.value=this.reverb;}
-_initAudio(){if(this._ax)return;const ax=new(window.AudioContext||window.webkitAudioContext)();this._ax=ax;this._comp=ax.createDynamicsCompressor();this._comp.threshold.value=-10;this._comp.knee.value=12;this._comp.ratio.value=4;this._comp.connect(ax.destination);this._master=ax.createGain();this._master.gain.value=0.70;this._dryB=ax.createGain();this._dryB.gain.value=1-this.reverb;this._dryB.connect(this._comp);this._revS=ax.createGain();this._revS.gain.value=this.reverb;this._revS.connect(this._comp);const sr=ax.sampleRate,len=sr*5;const buf=ax.createBuffer(2,len,sr);for(let c=0;c<2;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++){const t=i/sr;d[i]=((Math.random()*2-1)*.25+(tm(i>>>4)*2-1)*.008)*Math.exp(-t*PHI*.55)+Math.sin(2*Math.PI*F_SCH*2*t)*Math.exp(-t*5)*.015;}}this._revC=ax.createConvolver();this._revC.buffer=buf;this._master.connect(this._dryB);this._master.connect(this._revC);this._revC.connect(this._revS);}
-_synth(freq,dur,vel,when,wave,vi){if(!this._ax||freq<18)return;const ax=this._ax,master=this._master;const S=this._S;const tScale=Math.min(2.5,Math.max(0.25,1/S.tempoMul));const osc=ax.createOscillator();osc.type=wave;osc.frequency.setValueAtTime(freq,when);let atk,sus,rel;switch(vi){case 0:atk=.008*tScale;sus=dur*.35;rel=dur*.25*tScale;break;case 1:atk=.02*tScale;sus=dur*.4;rel=dur*.3*tScale;break;case 2:atk=.005;sus=dur*.5;rel=dur*.25;break;case 3:atk=.08*tScale;sus=dur*.9;rel=dur*.6*tScale;break;case 4:atk=.002;sus=dur*.06;rel=dur*.05;break;}const tot=atk+sus+rel;const env=ax.createGain();env.gain.setValueAtTime(0,when);env.gain.linearRampToValueAtTime(vel*.30,when+atk);if(vi===4){env.gain.exponentialRampToValueAtTime(.001,when+Math.max(tot,.03));}else{env.gain.linearRampToValueAtTime(vel*.18,when+atk+sus);env.gain.exponentialRampToValueAtTime(.0003,when+Math.max(tot,.04));}if(vi<2||vi===3){const vib=ax.createOscillator(),vG=ax.createGain();vib.frequency.value=F_SCH*PHI_I*(1+vi*.3);vG.gain.value=freq*.002*tScale;vib.connect(vG);vG.connect(osc.frequency);vib.start(when);vib.stop(when+tot+.1);}if(vi===2&&freq>60){const sub=ax.createOscillator();sub.type='sine';sub.frequency.setValueAtTime(freq/2,when);const sE=ax.createGain();sE.gain.setValueAtTime(0,when);sE.gain.linearRampToValueAtTime(vel*.10,when+.01);sE.gain.exponentialRampToValueAtTime(.0003,when+tot);sub.connect(sE);sE.connect(master);sub.start(when);sub.stop(when+tot+.1);}osc.connect(env);env.connect(master);osc.start(when);osc.stop(when+tot+.1);}
-_advanceVoice(v,when){const S=this._S;const beatDur=(60/this._effectiveTempo())*(this.vTM[v.i]||1);if(S.inSilence){v.active=false;v.step++;return beatDur*.5;}if(!v.structActive){v.active=false;v.step++;return beatDur*PHI*.5;}if(S.breathBeats>0&&v.i===0){S.breathBeats--;v.active=false;v.step++;return beatDur*.5;}const roots=rootHarmonicsAtReg(S.rootReg+v.regOff);const rootH=roots[S.rootIdx];let harm=0,isRest=false,dur=beatDur*.5;switch(v.i){case 0:{const riff=RIFFS[S.leadRiffIdx];const note=riff[S.leadRiffPos];const deg=note[0];const durMul=note[1];dur=beatDur*durMul;const art=articulate(v.step,S.leadRiffPos);if(deg<0)isRest=true;else{harm=scaleHarmonic(rootH,deg,0);this._synth(harm*F_SCH,dur,v.vol*(art==='accent'?1:.65),when,v.wave,0);}S.leadRiffPos++;if(S.leadRiffPos>=riff.length){S.leadEndDeg=riffEndDeg(riff);S.leadRiffPos=0;S.leadPhraseNum++;S.leadRiffIdx=selectRiff(S.leadPhraseNum,S.leadEndDeg);this._emit('riff',this.state);}break;}case 1:{const riff=RIFFS[S.counterRiffIdx];const note=riff[S.counterRiffPos];const deg=note[0];const durMul=note[1];dur=beatDur*durMul;const art=articulate(v.step+7,S.counterRiffPos);if(deg<0)isRest=true;else{const inv=tm(S.counterPhraseNum)===1?(7-deg):deg;harm=scaleHarmonic(rootH,inv,tm(S.counterPhraseNum*3)===1?1:0);this._synth(harm*F_SCH,dur,v.vol*(art==='accent'?1:.55),when,v.wave,1);}S.counterRiffPos++;if(S.counterRiffPos>=riff.length){S.counterEndDeg=riffEndDeg(riff);S.counterRiffPos=0;S.counterPhraseNum++;S.counterRiffIdx=selectRiff(S.counterPhraseNum*3+11,S.counterEndDeg);}break;}case 2:{const bRiff=BASS_RIFFS[S.bassRiffIdx%BASS_RIFFS.length];const note=bRiff[S.bassRiffPos];const deg=note[0];const durMul=note[1];dur=beatDur*durMul;if(deg<0)isRest=true;else{harm=scaleHarmonic(rootH,deg,-1);if(harm<12)harm*=2;this._synth(harm*F_SCH,dur*1.1,v.vol*(S.bassRiffPos===0?1:.7),when,v.wave,2);}S.bassRiffPos++;if(S.bassRiffPos>=bRiff.length){S.bassRiffPos=0;S.bassPhraseNum++;S.bassRiffIdx=selectBassRiff(S.bassPhraseNum);}break;}case 3:{const padDeg=[0,2,4,7][v.step%4];dur=beatDur*2;if(tm(v.step*2)!==1&&v.step>0)isRest=true;else{harm=scaleHarmonic(rootH,padDeg,0);this._synth(harm*F_SCH,dur,v.vol*.7,when,v.wave,3);}break;}case 4:{dur=beatDur*0.25;if(!(tm(v.step)===1&&tm(v.step*3+1)===1))isRest=true;else{harm=scaleHarmonic(rootH,tm(v.step*7)===0?0:4,1);this._synth(harm*F_SCH,dur*.6,v.vol*.9,when,'square',4);}break;}}v.curH=harm||0;v.active=!isRest&&!v.muted;v.step++;if(v.i===0&&S.leadPhraseNum>0&&S.leadPhraseNum%FIBS[gPhase(S.sectionNum,4)]===0){this._advanceTheme();}return dur;}
-_advanceTheme(){const S=this._S;S.themeNum++;if(shouldSilence(S.themeNum,this.silW)){S.inSilence=true;S.silBeatsLeft=FIBS[gPhase(S.silPhraseNum*7,4)];S.silPhraseNum++;}const restB=Math.round((tm(S.themeNum*5+3)+1)*this.breath*2);if(restB>0)S.breathBeats=restB;S.rootIdx=gPhase(S.themeNum,5);S.rootReg=Math.max(0,Math.min(3,1+fibAt(S.themeNum)%this.regW-Math.floor(this.regW/2)));S.themesInSection++;if(S.themesInSection>=S.sectionLen){S.themesInSection=0;S.sectionNum++;const sec=computeSection(S.sectionNum);S.sectionLen=sec.sectionLen;S.activeCount=sec.count;S.activeSet=sec.activeSet;this._voices.forEach((v,j)=>{v.structActive=this._forceAll||sec.activeSet.includes(j);});const newTIdx=sectionTempoIdx(S.sectionNum);S.prevTempoMul=S.tempoMul;S.tempoMulIdx=newTIdx;S.tempoMul=TEMPO_MULS[newTIdx];S.tempoTransition=0;S.tempoTransLen=4;if(this.wander){const jump=104729*gPhase(S.sectionNum*7+3,5)+7919*tm(S.sectionNum*11);const newN=this.step+jump;this._voices.forEach(v=>{v.step=newN+v.i*5;});this.step=newN;S.leadPhraseNum=gPhase(newN,100);S.counterPhraseNum=gPhase(newN+7,100);S.bassPhraseNum=gPhase(newN+13,50);S.leadRiffIdx=selectRiff(S.leadPhraseNum,0);S.counterRiffIdx=selectRiff(S.counterPhraseNum*3+11,4);S.bassRiffIdx=selectBassRiff(S.bassPhraseNum);S.leadRiffPos=0;S.counterRiffPos=0;S.bassRiffPos=0;}this._emit('section',this.state);}if(S.tempoTransition<1&&S.tempoTransLen>0){S.tempoTransition=Math.min(1,S.tempoTransition+1/S.tempoTransLen);}this._emit('beat',this.state);}
-_advanceSilence(){const S=this._S;if(!S.inSilence)return;S.silBeatsLeft--;if(S.silBeatsLeft<=0)S.inSilence=false;}
-_sched(){if(!this.playing||!this._ax)return;const now=this._ax.currentTime;const S=this._S;const AHEAD=0.22;while(S.inSilence&&this._masterNextT<now+AHEAD){if(this._masterNextT<now)this._masterNextT=now;this._advanceSilence();this._masterNextT+=60/this._effectiveTempo();}for(const v of this._voices){while(v.nextT<now+AHEAD){if(v.nextT<now)v.nextT=now;const d=this._advanceVoice(v,v.nextT);v.nextT+=d;}}let mx=0;for(const v of this._voices)if(v.step>mx)mx=v.step;if(mx!==this.step){this.step=mx;this._emit('beat',this.state);}this._schedId=setTimeout(()=>this._sched(),28);}
-}
-function TwistJC(opts){return new Engine(opts);}
-TwistJC.tm=tm;TwistJC.gPhase=gPhase;TwistJC.F_SCHUMANN=F_SCH;TwistJC.PHI=PHI;TwistJC.TEMPO_MULS=TEMPO_MULS;
-return TwistJC;
-})();
-    </script>
-
-    <!-- Audio player controls -->
-    <script>
-    (() => {
-        const RIFF_PRESETS = {
-            calm:    { tempo: 5,   reverb: 0.95, breath: 0.9,  silence: 0.7,  wander: false, seed: 0, vTM: [1,1,1,1,1] },
-            drift:   { tempo: 10,  reverb: 0.85, breath: 0.75, silence: 0.55, wander: false, seed: 0, vTM: [1,1,1,1,1] },
-            pulse:   { tempo: 15,  reverb: 0.6,  breath: 0.45, silence: 0.30, wander: false, seed: 500, vTM: [1,1,1,1,1] },
-            storm:   { tempo: 25,  reverb: 0.4,  breath: 0.2,  silence: 0.10, wander: true,  seed: 1000, vTM: [1,1,1,1,1] },
-            layers:  { tempo: 10,  reverb: 0.93, breath: 0.5,  silence: 0.08, wander: false, seed: 200, vTM: [1, 2/3, 3/2, 2, 1/2] },
-            weave:   { tempo: 14,  reverb: 0.82, breath: 0.25, silence: 0.04, wander: true,  seed: 777, vTM: [1, 5/3, 3/5, 4/3, 3/4] }
-        };
-
-        const engine = TwistJ({ tempo: 10, reverb: 0.85, breath: 0.75, silence: 0.55, wander: false });
-        let playing = false;
-
-        const btn = document.getElementById('audioToggle');
-        const panel = document.getElementById('audioPanel');
-        const volSlider = document.getElementById('audioVol');
-        const volVal = document.getElementById('audioVolVal');
-        const speedSlider = document.getElementById('audioSpeed');
-        const speedVal = document.getElementById('audioSpeedVal');
-        const riffSelect = document.getElementById('audioRiff');
-
-        // Logarithmic slider: 0-100 maps to 0.5-180 BPM
-        function sliderToBpm(v) {
-            const t = v / 100;
-            return Math.round(0.5 * Math.pow(180 / 0.5, t) * 10) / 10;
-        }
-        function bpmToSlider(bpm) {
-            return Math.round(100 * Math.log(bpm / 0.5) / Math.log(180 / 0.5));
-        }
-
-        function applyPreset(name) {
-            const p = RIFF_PRESETS[name];
-            if (!p) return;
-            speedSlider.value = bpmToSlider(p.tempo);
-            speedVal.textContent = p.tempo;
-            engine.forceAllVoices(name === 'layers' || name === 'weave');
-            engine.set({ reverb: p.reverb, breath: p.breath, silence: p.silence, wander: p.wander, tempo: p.tempo, vTM: p.vTM || [1,1,1,1,1] });
-            if (playing) {
-                engine.stop();
-                engine.forceAllVoices(name === 'layers' || name === 'weave');
-                engine.start(p.seed);
-            }
-        }
-
-        const chevron = document.getElementById('audioChevron');
-        let panelOpen = false;
-
-        btn.addEventListener('click', () => {
-            if (!playing) {
-                playing = true;
-                const keys = Object.keys(RIFF_PRESETS);
-                const randomKey = keys[Math.floor(Math.random() * keys.length)];
-                riffSelect.value = randomKey;
-                const p = RIFF_PRESETS[randomKey];
-                const vol = volSlider.value / 100;
-                engine.forceAllVoices(randomKey === 'layers' || randomKey === 'weave');
-                engine.set({ tempo: sliderToBpm(speedSlider.value), reverb: p.reverb, breath: p.breath, silence: p.silence, wander: p.wander, vTM: p.vTM || [1,1,1,1,1] });
-                engine.start(p.seed);
-                if (engine._master) {
-                    engine._master.gain.setTargetAtTime(vol * 0.7, engine._ax.currentTime, 0.05);
-                }
-                btn.textContent = '\u{1f50a}';
-                btn.classList.add('playing');
-                chevron.classList.add('show');
-                panel.classList.add('visible');
-                chevron.classList.add('open');
-                panelOpen = true;
-            } else {
-                playing = false;
-                engine.stop();
-                btn.textContent = '\u{1f507}';
-                btn.classList.remove('playing');
-                panel.classList.remove('visible');
-                chevron.classList.remove('show', 'open');
-                panelOpen = false;
-            }
-        });
-
-        chevron.addEventListener('click', () => {
-            panelOpen = !panelOpen;
-            panel.classList.toggle('visible', panelOpen);
-            chevron.classList.toggle('open', panelOpen);
-        });
-
-        volSlider.addEventListener('input', () => {
-            const v = volSlider.value;
-            volVal.textContent = v;
-            if (playing && engine._master) {
-                engine._master.gain.setTargetAtTime((v / 100) * 0.7, engine._ax.currentTime, 0.05);
-            }
-        });
-
-        speedSlider.addEventListener('input', () => {
-            const bpm = sliderToBpm(speedSlider.value);
-            speedVal.textContent = bpm < 10 ? bpm.toFixed(1) : Math.round(bpm);
-            engine.setTempo(bpm);
-        });
-
-        riffSelect.addEventListener('change', () => {
-            applyPreset(riffSelect.value);
-        });
-    })();
-    </script>
 
 </body>
 </html>
