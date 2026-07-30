@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWIST-J Demo Lab</title>
+    <meta name="description" content="Interactive demonstrations attached to TWIST-J: the live kernel dynamics, the Pentaplex Penrose explorer, and the Mandelbrot escape-time explorer. Illustrations of the arithmetic, not part of the Canon.">
+    <meta name="author" content="A. M. Thorn">
+    <meta property="og:title" content="TWIST-J Demo Lab">
+    <meta property="og:description" content="Interactive demonstrations attached to TWIST-J. Illustrations of the arithmetic, not part of the Canon.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://twistj.com/demolab/">
+    <link rel="canonical" href="https://twistj.com/demolab/">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0a0a0f;
+            --panel: #11111a;
+            --text: #d8d4c8;
+            --muted: #8a857a;
+            --gold: #c8b273;
+            --rule: #2a2a33;
+            --strong-rule: #4a4436;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            max-width: 48em;
+            margin: 4em auto;
+            padding: 0 1.5em 4em;
+            line-height: 1.7;
+            font-size: 1.12em;
+        }
+        a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--strong-rule); }
+        a:hover, a:focus { border-bottom-color: var(--gold); }
+        h1, h2 { font-weight: 400; letter-spacing: 0.06em; }
+        h1 { margin-bottom: 0.2em; }
+        h2 { margin-top: 2em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+        .state { color: var(--gold); letter-spacing: 0.16em; font-variant: small-caps; }
+        .dim { color: var(--muted); }
+        .notice {
+            background: var(--panel);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--gold);
+            padding: 1em 1.3em;
+            margin: 1.4em 0;
+        }
+        .demo {
+            background: var(--panel);
+            border: 1px solid var(--rule);
+            padding: 1em 1.3em;
+            margin: 1.1em 0;
+        }
+        .demo a.demo-title {
+            display: inline-block;
+            font-size: 1.06em;
+            letter-spacing: 0.05em;
+            border-bottom: none;
+        }
+        .demo a.demo-title:hover, .demo a.demo-title:focus { border-bottom: 1px solid var(--gold); }
+        .demo p { margin: 0.3em 0 0; color: var(--muted); font-size: 0.94em; }
+        @media (max-width: 36em) {
+            body { margin-top: 2em; }
+        }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "TWIST-J Demo Lab",
+      "author": {
+        "@type": "Person",
+        "name": "A. M. Thorn",
+        "sameAs": "https://orcid.org/0009-0008-5463-278X"
+      },
+      "url": "https://twistj.com/demolab/",
+      "isPartOf": "https://twistj.com/",
+      "description": "Interactive demonstrations attached to TWIST-J. Illustrations of the arithmetic, not part of the Canon."
+    }
+    </script>
+</head>
+<body>
+    <h1>Demo Lab</h1>
+    <p class="state">illustrations, not canon</p>
+
+    <p>Interactive pages that let you turn the handle on parts of the program yourself.</p>
+
+    <div class="notice">
+        Nothing on this page carries a status label and nothing here is evidence.
+        These are demonstrations and visual aids. The committed claims, with their
+        labels, live in the <a href="/canon/">Public Canon</a>; the mathematics is
+        verified in the <a href="https://github.com/mathorn1973/twist-j">canonical
+        repository</a>, not here.
+    </div>
+
+    <h2>Demonstrations</h2>
+
+    <div class="demo">
+        <a class="demo-title" href="/evo/">live demo</a>
+        <p>Interactive kernel dynamics: a finite rule with unbounded evolution,
+           stepped in exact integer arithmetic.</p>
+    </div>
+
+    <div class="demo">
+        <a class="demo-title" href="/pentaplex/">pentaplex</a>
+        <p>Penrose tilings as a Galois projection of &zeta; &#8614; &zeta;&sup2;.</p>
+    </div>
+
+    <div class="demo">
+        <a class="demo-title" href="/fractal/">fractal</a>
+        <p>The Mandelbrot set as escape-time counting, z &#8614; z&sup2; + c.
+           Time as a counter, in the small.</p>
+    </div>
+
+    <p class="dim">Axiom: J = 1 + j&sup2;. Time is a counter. Space is a commutator.
+       Exact arithmetic first. Plenum, not vacuum.</p>
+    <p><a href="/">back to twistj.com</a></p>
+</body>
+</html>

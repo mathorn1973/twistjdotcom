@@ -31,28 +31,28 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://twistj.com/demolab/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://twistj.com/evo/</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://twistj.com/pentaplex/</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://twistj.com/fractal/</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://twistj.com/fractalus/</loc>
-    <lastmod>2026-06-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://twistj.com/manifest/</loc>
