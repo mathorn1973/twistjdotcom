@@ -102,15 +102,23 @@
     .canon-src a{color:var(--accent);border-bottom:1px solid var(--rule);
       text-decoration:none;word-break:break-word}
     .canon-src a:hover{border-bottom-color:var(--accent)}
-    @media(max-width:34rem){.ledger{gap:.15rem .8rem}}
     @media(max-width:34rem){
-      body{font-size:18px}
-      .container{padding:3.6rem 1.25rem 3rem}
+      .ledger{grid-template-columns:1fr;gap:0}
+      .ledger .claim{margin-top:.7rem}
+      .ledger .claim:first-of-type{margin-top:0}
+      .ledger .lab{justify-self:start}
+    }
+    @media(max-width:34rem){
+      html{font-size:24px}
+      body{font-size:27px}
+      .container{padding:2.4rem .85rem 2rem}
       .title{font-size:2.2rem}
       .identities{grid-template-columns:1fr;gap:.3rem 0;padding:1.2rem 1.1rem}
       .id-label{margin-top:.7rem}
       .id-label:first-child{margin-top:0}
       .links a{grid-template-columns:1fr;gap:.15rem}
+      .theme-toggle{width:1.4rem;height:1.4rem;top:.75rem;right:.75rem}
+      .theme-toggle svg{width:.63rem;height:.63rem}
     }
     </style>
 </head>
