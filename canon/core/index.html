@@ -15,14 +15,29 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         :root {
+            color-scheme: light dark;
+            --bg: #f4f1eb;
+            --panel: #f3f0ea;
+            --text: #2a2520;
+            --muted: #7a7570;
+            --gold: #8b4513;
+            --rule: #d4cfc7;
+            --strong-rule: #d4cfc7;
+            --panel-bg: rgba(244, 241, 235, 0.95);
+            --panel-border: #d4cfc7;
+        }
+        [data-theme="light"] { color-scheme: light; }
+        [data-theme="dark"] {
             color-scheme: dark;
-            --bg: #0a0a0f;
-            --panel: #11111a;
-            --text: #d8d4c8;
-            --muted: #8a857a;
-            --gold: #c8b273;
-            --rule: #2a2a33;
-            --strong-rule: #4a4436;
+            --bg: #1c1915;
+            --panel: #252118;
+            --text: #b8b3a8;
+            --muted: #7a7268;
+            --gold: #b08050;
+            --rule: #38332c;
+            --strong-rule: #38332c;
+            --panel-bg: rgba(28, 25, 21, 0.95);
+            --panel-border: #38332c;
         }
         * { box-sizing: border-box; }
         body {
@@ -44,7 +59,7 @@
         code {
             font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
             font-size: 0.78em;
-            color: #b8b2a4;
+            color: var(--muted);
             word-break: break-word;
         }
         .subtitle { color: var(--muted); font-style: italic; margin-top: 0; }
@@ -68,6 +83,18 @@
             body { margin-top: 2em; }
             .reading { grid-template-columns: 1fr; }
         }
+    
+        body { transition: background .4s ease, color .4s ease; }
+        .theme-toggle {
+            position: fixed; top: 1.15rem; right: 1.15rem;
+            width: 2.1rem; height: 2.1rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; background: var(--panel-bg);
+            border: 1px solid var(--panel-border); border-radius: 50%;
+            color: var(--muted); z-index: 10;
+        }
+        .theme-toggle:hover { color: var(--gold); }
+        .theme-toggle svg { width: .95rem; height: .95rem; }
     </style>
     <script type="application/ld+json">
     {
@@ -86,6 +113,9 @@
     </script>
 </head>
 <body>
+<button class="theme-toggle" id="themeToggle" title="Toggle theme: light / dark">
+<svg id="themeIcon" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="none" r="5" stroke="currentColor" stroke-width="1.5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"></path></svg>
+</button>
     <p style="margin:0 0 1.5em; font-size:0.95em;"><a href="/">&larr; twistj.com</a></p>
     <h1>TWIST-J Canon Core</h1>
     <p class="subtitle">A short orientation to the program</p>
@@ -175,5 +205,18 @@
         <p class="dim">Time is a counter. Space is read through commutators.
            Exact arithmetic first. Plenum, not vacuum.</p>
     </div>
+<script>
+    (function(){
+      var r=document.documentElement, k='twistj-theme';
+      var t=null; try{t=localStorage.getItem(k)}catch(e){}
+      if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light';
+      r.setAttribute('data-theme',t);
+      document.addEventListener('click',function(e){
+        var b=e.target.closest('.theme-toggle'); if(!b) return;
+        var n = r.getAttribute('data-theme')==='dark'?'light':'dark';
+        r.setAttribute('data-theme',n); try{localStorage.setItem(k,n)}catch(e){}
+      });
+    })();
+    </script>
 </body>
 </html>
