@@ -46,13 +46,15 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 ## Site
 
 - [Home](https://twistj.com/): the axiom, the identities, the prediction
-- [Live demo](https://twistj.com/evo/): interactive kernel dynamics
-- [Pentaplex](https://twistj.com/pentaplex/): Penrose tilings, Galois projection ζ to ζ²
 - [Manifest](https://twistj.com/manifest/): the public commitment of the method, twelve rules, English (Czech at /manifest/cs/)
 - [Public Canon](https://twistj.com/canon/): the active public ledger
 - [Code](https://github.com/mathorn1973/twist-j): verify it yourself
 
 ## Optional
 
-- [Fractal](https://twistj.com/fractal/)
-- [Fractalus](https://twistj.com/fractalus/)
+Interactive demonstrations. Illustrations of the arithmetic; they carry no status label and are not evidence.
+
+- [Demo Lab](https://twistj.com/demolab/): index of the demonstrations below
+- [Live demo](https://twistj.com/evo/): interactive kernel dynamics
+- [Pentaplex](https://twistj.com/pentaplex/): Penrose tilings, Galois projection ζ to ζ²
+- [Fractal](https://twistj.com/fractal/): Mandelbrot set as escape-time counting, z to z² + c
