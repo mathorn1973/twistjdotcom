@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TWIST-J | Integer Physics from One Axiom: J = 1 + j²</title>
     <meta name="description" content="TWIST-J derives physics from one equation: J = 1 + j², where j is the twist unit (fifth root of unity). The 4x4 integer matrix M_J has entries {-1, 0, 1} and yields an exact 3+1+0 decomposition. The algebra is proved. The physics is falsifiable. No fitted dimensionless parameter is introduced in the stated forms; the single SI calibration anchor is the electron mass.">
     <meta name="keywords" content="cyclotomic field, Q(zeta_5), algebraic number theory, cyclotomic unit, hyperbolic toral automorphism, integer arithmetic, aperiodic dynamics, Thue-Morse, icosahedral symmetry, TWIST-J, J-Operator, twist unit, plenum">
     <meta name="author" content="A. M. Thorn">
-
     <meta property="og:title" content="TWIST-J">
     <meta property="og:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. No fitted dimensionless parameter in the stated forms; one SI calibration anchor.">
     <meta property="og:type" content="website">
@@ -24,505 +23,13 @@
     <meta name="twitter:description" content="One axiom: J = 1 + j². Integer arithmetic. Falsifiable physics. No fitted dimensionless parameter in the stated forms; one SI calibration anchor.">
     <link rel="canonical" href="https://twistj.com/">
     <link rel="alternate" type="text/markdown" href="https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md" title="TWIST-J Public Canon, current Markdown source">
-
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
-
-    <style>
-        /* ── Theme: Da Vinci ── */
-        :root {
-            --bg: #f4f1eb;
-            --bg-rgb: 244, 241, 235;
-            --text: #2a2520;
-            --text-bright: #1a1714;
-            --accent: #8b4513;
-            --accent-rgb: 139, 69, 19;
-            --muted: #7a7570;
-            --dim: #999;
-            --rule: #d4cfc7;
-            --eq-bg: #f3f0ea;
-            --silver: #6b6560;
-            --gold-class: #8b4513;
-            --white-class: #2a2520;
-            --link: #6b6560;
-            --link-hover: #8b4513;
-            --glow-alpha: 0.04;
-            --panel-bg: rgba(244, 241, 235, 0.95);
-            --panel-border: #d4cfc7;
-            --slider-track: #d4cfc7;
-            --select-bg: #f3f0ea;
-            --select-text: #6b6560;
-            --canvas-fade: rgba(250, 248, 244, 0.15);
-        }
-
-        [data-theme="dark"] {
-            --bg: #1c1915;
-            --bg-rgb: 28, 25, 21;
-            --text: #b8b3a8;
-            --text-bright: #d4cfc6;
-            --accent: #b08050;
-            --accent-rgb: 176, 128, 80;
-            --muted: #7a7268;
-            --dim: #605850;
-            --rule: #38332c;
-            --eq-bg: #252118;
-            --silver: #9a9488;
-            --gold-class: #b08050;
-            --white-class: #e0dbd2;
-            --link: #9a9488;
-            --link-hover: #b08050;
-            --glow-alpha: 0.03;
-            --panel-bg: rgba(28, 25, 21, 0.95);
-            --panel-border: #38332c;
-            --slider-track: #38332c;
-            --select-bg: #252118;
-            --select-text: #9a9488;
-            --canvas-fade: rgba(28, 25, 21, 0.15);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root:not([data-theme="light"]):not([data-theme="dark"]) {
-                --bg: #1c1915;
-                --bg-rgb: 28, 25, 21;
-                --text: #b8b3a8;
-                --text-bright: #d4cfc6;
-                --accent: #b08050;
-                --accent-rgb: 176, 128, 80;
-                --muted: #7a7268;
-                --dim: #605850;
-                --rule: #38332c;
-                --eq-bg: #252118;
-                --silver: #9a9488;
-                --gold-class: #b08050;
-                --white-class: #e0dbd2;
-                --link: #9a9488;
-                --link-hover: #b08050;
-                --glow-alpha: 0.03;
-                --panel-bg: rgba(28, 25, 21, 0.95);
-                --panel-border: #38332c;
-                --slider-track: #38332c;
-                --select-bg: #252118;
-                --select-text: #9a9488;
-                --canvas-fade: rgba(28, 25, 21, 0.15);
-            }
-        }
-
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        body {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            position: relative;
-            transition: background 0.4s ease, color 0.4s ease;
-        }
-
-        canvas#bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* warm glow behind content */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 46%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 880px;
-            height: 620px;
-            background: radial-gradient(
-                ellipse at center,
-                rgba(var(--accent-rgb), var(--glow-alpha)) 0%,
-                transparent 70%
-            );
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0;
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            padding: 2rem 2.5rem 1rem;
-            margin: auto 0;  /* centers when space available, scrolls naturally when tall */
-        }
-
-        .title {
-            font-size: 4rem;
-            font-weight: 400;
-            letter-spacing: 0.35em;
-            color: var(--text);
-            margin-bottom: 0.75rem;
-        }
-
-        .title span { color: var(--accent); }
-
-        .tagline {
-            font-size: 1.65rem;
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            color: var(--muted);
-            margin-bottom: 2.75rem;
-            font-style: italic;
-        }
-
-        .axiom-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.5), rgba(var(--accent-rgb), 0.15));
-            transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .axiom-line {
-            height: 5.5rem;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 100%;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .axiom-item {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.3rem;
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
-        }
-
-        .axiom-item.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .axiom-item.leaving {
-            opacity: 0;
-            transform: translateY(-12px);
-        }
-
-        .axiom-item .main {
-            white-space: nowrap;
-            font-size: 1.7rem;
-            font-weight: 400;
-            letter-spacing: 0.04em;
-        }
-
-        .axiom-item .main.big {
-            font-size: 3.5rem;
-            font-weight: 300;
-            letter-spacing: -0.01em;
-        }
-
-        .axiom-item .sub {
-            font-size: 0.9rem;
-            font-weight: 400;
-            font-style: italic;
-            opacity: 0.3;
-            letter-spacing: 0.04em;
-            white-space: nowrap;
-        }
-
-        .axiom-item .gold { color: var(--accent); }
-        .axiom-item .silver { color: var(--silver); }
-        .axiom-item .dim { color: var(--muted); }
-
-        .description {
-            font-size: 1.2rem;
-            font-weight: 400;
-            line-height: 1.9;
-            color: var(--text-bright);
-            text-align: center;
-            margin-bottom: 2.5rem;
-            max-width: 650px;
-        }
-
-        .identities {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.25rem 0;
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 2.5rem;
-        }
-
-        .identities .id-label {
-            color: var(--accent);
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            text-align: right;
-            padding-top: 0.25rem;
-            padding-right: 0.8rem;
-            opacity: 0.8;
-        }
-
-        .identities .id-eq {
-            color: var(--text);
-            font-size: 1.1rem;
-            font-weight: 400;
-            letter-spacing: 0.02em;
-            padding: 0.08rem 0 0.08rem 0.5rem;
-        }
-
-        .identities .id-eq .gold { color: var(--gold-class); }
-        .identities .id-eq .white { color: var(--white-class); }
-        .identities .id-eq .dim { color: var(--dim); font-size: 0.95rem; }
-
-        .identities .id-rule {
-            grid-column: 1 / -1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.15), transparent);
-            margin: 0.4rem 0;
-        }
-
-        .sep {
-            width: 1px;
-            height: 28px;
-            background: linear-gradient(to bottom, rgba(var(--accent-rgb), 0.35), transparent);
-            margin-bottom: 2.75rem;
-        }
-
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 1.1rem;
-            align-items: center;
-        }
-
-        .links a {
-            display: flex;
-            align-items: baseline;
-            gap: 0.9rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .links a .link-label {
-            font-size: 1.45rem;
-            font-weight: 600;
-            letter-spacing: 0.18em;
-            text-transform: lowercase;
-            color: var(--link);
-            text-decoration: underline;
-            text-underline-offset: 0.25em;
-            text-decoration-color: rgba(var(--accent-rgb), 0.25);
-            transition: color 0.3s ease, text-decoration-color 0.3s ease;
-            min-width: 5.5rem;
-            text-align: right;
-        }
-
-        .links a .link-desc {
-            font-size: 1.15rem;
-            font-weight: 400;
-            letter-spacing: 0.06em;
-            color: var(--muted);
-            font-style: italic;
-            transition: color 0.3s ease;
-        }
-
-        .links a:hover .link-label { color: var(--link-hover); text-decoration-color: rgba(var(--accent-rgb), 0.5); }
-        .links a:hover .link-desc { color: var(--silver); }
-
-        .footer {
-            display: flex;
-            gap: 1.8rem;
-            align-items: center;
-            z-index: 10;
-            pointer-events: auto;
-            padding: 3rem 0 2.5rem;
-        }
-
-        .footer a,
-        .footer span {
-            font-size: 0.9rem;
-            font-weight: 400;
-            letter-spacing: 0.12em;
-            color: var(--dim);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover { color: var(--muted); }
-        .footer .dot { color: var(--rule); }
-
-        .footer .x-link {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px;
-            opacity: 0.7;
-            transition: opacity 0.3s ease, color 0.3s ease;
-            position: relative;
-            z-index: 3;
-        }
-
-        .footer .x-link:hover {
-            opacity: 0.9;
-            color: var(--accent);
-        }
-
-        @keyframes breathe {
-            0%   { transform: scale(1); }
-            50%  { transform: scale(1.04); }
-            100% { transform: scale(1); }
-        }
-
-        .substance {
-            max-width: 800px;
-            text-align: center;
-            margin-bottom: 2.5rem;
-            line-height: 1.85;
-            font-size: 1.25rem;
-            font-weight: 400;
-            color: var(--muted);
-            letter-spacing: 0.03em;
-            border: 1px solid rgba(var(--accent-rgb), 0.12);
-            border-radius: 6px;
-            padding: 2.2rem 2.8rem;
-            background: rgba(var(--accent-rgb), 0.02);
-        }
-
-        .substance .hl {
-            color: var(--silver);
-            font-weight: 500;
-            display: block;
-            animation: breathe 4s ease-in-out 1.5s 1 both;
-        }
-
-        .substance .gr {
-            color: var(--accent);
-            font-weight: 500;
-            font-size: 1.35rem;
-            letter-spacing: 0.04em;
-            display: block;
-            padding: 0.4rem 0;
-            animation: breathe 4.5s ease-in-out 2.2s 1 both;
-        }
-
-        /* ── Theme toggle ── */
-        .theme-toggle {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--rule);
-            border-radius: 50%;
-            background: transparent;
-            color: var(--muted);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            user-select: none;
-            opacity: 0.5;
-        }
-        .theme-toggle:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
-        .theme-toggle svg { width: 18px; height: 18px; fill: currentColor; }
-
-        @media (max-width: 600px) {
-            /* compact mobile container */
-            .container {
-                padding: 2.2rem 1.6rem 4rem;
-                margin: 0;  /* no auto-centering on mobile, pin to top */
-            }
-
-            /* title: large and prominent */
-            .title { font-size: 2.8rem; letter-spacing: 0.25em; margin-bottom: 0.3rem; }
-            .tagline { font-size: 1.05rem; margin-bottom: 1rem; }
-
-            /* rotating message: compact single line */
-            .axiom-line { height: 3.2rem; margin-bottom: 0.7rem; }
-            .axiom-item .main { font-size: 1.15rem; }
-            .axiom-item .main.big { font-size: 2.2rem; }
-            .axiom-item .sub { font-size: 0.72rem; }
-
-            /* description: tight, readable */
-            .description {
-                font-size: 0.95rem;
-                line-height: 1.7;
-                padding: 0 0.3rem;
-                margin-bottom: 1rem;
-            }
-
-            /* identities table: compact for mobile */
-            .identities {
-                gap: 0.15rem 0;
-                margin-bottom: 1.2rem;
-            }
-            .identities .id-label { font-size: 0.58rem; padding-top: 0.2rem; padding-right: 0.5rem; }
-            .identities .id-eq { font-size: 0.92rem; padding-left: 0.3rem; }
-            .identities .id-eq .dim { font-size: 0.82rem; }
-            .identities .id-rule { margin: 0.25rem 0; }
-
-            /* substance equations: compact */
-            .substance {
-                font-size: 0.95rem;
-                padding: 1.4rem 1.2rem;
-                line-height: 1.8;
-                margin-bottom: 1rem;
-            }
-            .substance .hl { font-size: 1.1rem; }
-            .substance .gr { font-size: 1.05rem; padding: 0.2rem 0; }
-
-            /* separator: shorter */
-            .sep { height: 20px; margin-bottom: 1rem; }
-
-            /* menu: directly after content, tight */
-            .links { gap: 0.5rem; margin-bottom: 1.2rem; }
-            .links a .link-label { font-size: 1.15rem; min-width: auto; }
-            .links a .link-desc { font-size: 0.88rem; }
-
-            .footer { flex-direction: column; gap: 0.5rem; padding: 2rem 0 1.5rem; }
-            .footer .dot { display: none; }
-            .theme-toggle { top: 1.2rem; right: 1rem; }
-        }
-    </style>
-
     <!-- Structured Data for search engines and academic crawlers -->
     <script type="application/ld+json">
     {
@@ -767,699 +274,211 @@
   "claims_note": "every id resolves in canon/REGISTRY.tsv on the repository head; no claim here is stronger than its row"
 }
     </script>
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#f4f1eb;--text:#2a2520;--text-bright:#1a1714;--accent:#8b4513;
+      --muted:#7a7570;--dim:#999;--rule:#d4cfc7;--eq-bg:#f3f0ea;--white-class:#2a2520;
+      --link:#6b6560;--link-hover:#8b4513;--panel-bg:rgba(244,241,235,.95);--panel-border:#d4cfc7}
+    [data-theme="dark"]{--bg:#1c1915;--text:#b8b3a8;--text-bright:#d4cfc6;--accent:#b08050;
+      --muted:#7a7268;--dim:#605850;--rule:#38332c;--eq-bg:#252118;--white-class:#e0dbd2;
+      --link:#9a9488;--link-hover:#b08050;--panel-bg:rgba(28,25,21,.95);--panel-border:#38332c}
+    html{-webkit-text-size-adjust:100%}
+    body{background:var(--bg);color:var(--text);
+      font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;
+      line-height:1.65;font-size:19px;
+      transition:background .4s ease,color .4s ease}
+    .container{max-width:37rem;margin:0 auto;padding:5.5rem 1.6rem 4rem}
+    .title{font-size:2.9rem;font-weight:300;letter-spacing:.14em;color:var(--text-bright);
+      line-height:1.1;margin-bottom:.55rem}
+    .tagline{font-style:italic;color:var(--muted);font-size:1.12rem;margin-bottom:2.9rem}
+    .lede p{margin-bottom:1.15rem;font-size:1.1rem}
+    .lede .beat{color:var(--text-bright);font-size:1.15rem;margin-top:1.7rem;margin-bottom:0}
+    .sep{height:1px;background:var(--rule);opacity:.55;margin:3.1rem 0}
+    .section{font-size:.74rem;font-weight:400;letter-spacing:.24em;text-transform:uppercase;
+      color:var(--dim);margin-bottom:1.5rem}
+    .identities{display:grid;grid-template-columns:auto 1fr;gap:.85rem 1.5rem;align-items:baseline;
+      background:var(--eq-bg);border:1px solid var(--rule);border-radius:2px;
+      padding:1.5rem 1.4rem;font-size:1.03rem}
+    .id-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+      white-space:nowrap}
+    .id-eq{color:var(--accent);word-break:break-word}
+    .id-eq .white{color:var(--white-class)}
+    .id-eq .dim{color:var(--dim)}
+    .note{margin-top:1.25rem;font-size:.96rem;color:var(--muted)}
+    .note a{color:var(--link);border-bottom:1px solid var(--rule);text-decoration:none}
+    .note a:hover{color:var(--link-hover)}
+    .links{display:grid;gap:.1rem}
+    .links a{display:grid;grid-template-columns:7.2rem 1fr;gap:1.2rem;align-items:baseline;
+      text-decoration:none;padding:.62rem 0;border-bottom:1px solid var(--rule)}
+    .links a:first-child{border-top:1px solid var(--rule)}
+    .link-label{font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-bright)}
+    .link-desc{color:var(--muted);font-size:.97rem}
+    .links a:hover .link-label{color:var(--link-hover)}
+    .links a:hover .link-desc{color:var(--text)}
+    .substance{font-size:.99rem;color:var(--muted)}
+    .substance p{margin-bottom:1rem}
+    .substance .hl{color:var(--text-bright)}
+    .substance .gr{color:var(--accent)}
+    .footer{margin-top:3.1rem;padding-top:1.5rem;border-top:1px solid var(--rule);
+      font-size:.86rem;color:var(--dim);display:flex;flex-wrap:wrap;gap:.55rem;align-items:center}
+    .footer a{color:var(--link);text-decoration:none}
+    .footer a:hover{color:var(--link-hover)}
+    .footer .dot{opacity:.5}
+    .theme-toggle{position:fixed;top:1.15rem;right:1.15rem;width:2.1rem;height:2.1rem;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;
+      background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:50%;
+      color:var(--muted);z-index:10}
+    .theme-toggle:hover{color:var(--accent)}
+    .theme-toggle svg{width:.95rem;height:.95rem}
+
+
+    .claim-lede{margin-top:1.6rem;margin-bottom:1.1rem;font-size:1.1rem;color:var(--text-bright)}
+    .split{display:grid;grid-template-columns:auto 1fr auto;gap:1.05rem 1.4rem;align-items:baseline;
+      border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:1.25rem 0}
+    .split-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+      white-space:nowrap}
+    .split-text{color:var(--text)}
+    .split .lab{font-size:.74rem;letter-spacing:.12em;color:var(--accent);white-space:nowrap}
+    .split-note{margin-top:1.15rem;font-size:.99rem;color:var(--muted)}
+    @media(max-width:34rem){
+      .split{grid-template-columns:1fr auto;gap:.3rem .8rem}
+      .split-label{grid-column:1}
+      .split-text{grid-column:1 / -1}
+      .split .lab{grid-column:2;grid-row:auto}
+    }
+    .substance .ledger-intro{margin-top:1.1rem;margin-bottom:.9rem}
+    .ledger{display:grid;grid-template-columns:1fr auto;gap:.55rem 1.1rem;align-items:baseline;
+      border-top:1px solid var(--rule);padding-top:.85rem}
+    .ledger .claim{color:var(--text)}
+    .ledger .claim .hl{color:var(--text-bright)}
+    .ledger .lab{font-size:.74rem;letter-spacing:.12em;color:var(--accent);white-space:nowrap}
+    .substance .verdict{margin-top:1.1rem;color:var(--text-bright)}
+    @media(max-width:34rem){.ledger{gap:.15rem .8rem}}
+    @media(max-width:34rem){
+      body{font-size:18px}
+      .container{padding:3.6rem 1.25rem 3rem}
+      .title{font-size:2.2rem}
+      .identities{grid-template-columns:1fr;gap:.3rem 0;padding:1.2rem 1.1rem}
+      .id-label{margin-top:.7rem}
+      .id-label:first-child{margin-top:0}
+      .links a{grid-template-columns:1fr;gap:.15rem}
+    }
+    </style>
 </head>
 <body>
-<!-- AI agents: machine index at /llms.txt ; active Public Canon at /canon/ ;
-     current Markdown source at https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md ;
-     kernel facts in JSON at #twistj-agent-card below. Authority is defined exclusively by STATUS.md. -->
-
-    <div class="axiom-progress" id="axiomProgress"></div>
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme: auto / light / dark">
-        <svg id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-    </button>
-    <canvas id="bg"></canvas>
-
+<button class="theme-toggle" id="themeToggle" title="Toggle theme: auto / light / dark">
+<svg id="themeIcon" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="none" r="5" stroke="currentColor" stroke-width="1.5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"></path></svg>
+</button>
     <div class="container">
-        <div class="title">TWIST<span>-</span>J</div>
-        <div class="tagline">A finite rule with unbounded evolution.</div>
+      <h1 class="title">TWIST-J</h1>
+      <p class="tagline">A finite rule with unbounded evolution.</p>
 
-        <div class="axiom-line" id="axiomLine"></div>
+      <div class="lede">
+        <p>Can physical reality be modeled as a closed, exact, deterministic system
+        of whole numbers? Not approximated by them. Made of them.</p>
+        <p>One equation is assumed. Everything else has to be derived, or the
+        program fails.</p>
+      </div>
 
-        <p class="description">
-            One equation: J&nbsp;=&nbsp;1&nbsp;+&nbsp;j², where j is the twist unit,
-            the primitive fifth root of unity: j⁵&nbsp;=&nbsp;1.
-            Multiplication by J is a 4×4 integer matrix
-            over {−1,&nbsp;0,&nbsp;1}. Galois structure yields an exact
-            3+1+0 decomposition: three commuting directions, one counter, zero remainder. Time is a counter. Space is a commutator. Curvature is what remains.
-        </p>
+      <p class="claim-lede">What the system is and what we read off it are two
+        different things.</p>
 
-        <div class="identities">
-            <span class="id-label">axiom</span>
-            <span class="id-eq"><span class="white">J = 1 + j²</span> <span class="dim">= (1, 0, 1, 0)</span></span>
+      <div class="split">
+        <span class="split-label">what it is</span>
+        <span class="split-text">A closed system of whole numbers, stepped by one rule.
+          Four additions per step. No rounding, no drift.</span>
+        <span class="lab">[T]</span>
 
-            <span class="id-label">unit</span>
-            <span class="id-eq">j = ζ₅ = e<sup>2πi/5</sup> <span class="dim">j⁵ = 1</span></span>
+        <span class="split-label">what we read</span>
+        <span class="split-text">Time is a counter. Space is a commutator. Two forces are two projections of one J: gravity reads the modulus, electromagnetism reads the angle.</span>
+        <span class="lab">[D]</span>
+      </div>
 
-            <span class="id-label">polar</span>
-            <span class="id-eq">J = (1/φ) · e<sup>i · 2π/5</sup></span>
+      <p class="split-note">The algebra is proved. The decoder is the work, and it is
+        where the program can fail. Every claim on this site says which of the two
+        it is.</p>
 
-            <span class="id-label">inverse</span>
-            <span class="id-eq">J⁻¹ = −j − j² <span class="dim">= (0, −1, −1, 0)</span></span>
+      <div class="sep"></div>
 
-            <span class="id-label">bridge</span>
-            <span class="id-eq"><span class="white">J · φ = j</span></span>
+<div class="links">
+<a href="/core/">
+<span class="link-label">core</span>
+<span class="link-desc">the kernel · every identity, the matrix, the step rule</span>
+</a>
+<a href="/demolab/">
+<span class="link-label">demo lab</span>
+<span class="link-desc">live kernel dynamics, pentaplex, fractal · illustrations, not canon</span>
+</a>
+<a href="/manifest/">
+<span class="link-label">manifest</span>
+<span class="link-desc">the public commitment of the method · en + cs</span>
+</a>
+<a href="/canon/">
+<span class="link-label">canon</span>
+<span class="link-desc">Public Canon · active ledger</span>
+</a>
+<a href="https://orcid.org/0009-0008-5463-278X" rel="noopener" target="_blank">
+<span class="link-label">papers</span>
+<span class="link-desc">mathematics + gravity, on ORCID</span>
+</a>
+<a href="https://github.com/mathorn1973/twist-j" rel="noopener" target="_blank">
+<span class="link-label">code</span>
+<span class="link-desc">verify it yourself</span>
+</a>
+</div>
 
-            <span class="id-label">cubic</span>
-            <span class="id-eq">(J − 1)³ = j</span>
+      <div class="sep"></div>
 
-            <span class="id-label">quintic</span>
-            <span class="id-eq"><span class="white">J⁵ = φ⁻⁵</span></span>
+      <h2 class="section">the kernel</h2>
+      <div class="identities">
+        <span class="id-label">axiom</span>
+        <span class="id-eq"><span class="white">J = 1 + j²</span> <span class="dim">= (1, 0, 1, 0)</span></span>
 
-            <div class="id-rule"></div>
+        <span class="id-label">step</span>
+        <span class="id-eq">(a, b, c, d) ↦ (a−c+d, b−c, a, b−c+d)</span>
 
-            <span class="id-label">matrix</span>
-            <span class="id-eq">M<sub>J</sub> = [1 0 −1 1; 0 1 −1 0; 1 0 0 0; 0 1 −1 1] <span class="dim">basis (1, j, j², j³)</span></span>
+        <span class="id-label">matrix</span>
+        <span class="id-eq">M<sub>J</sub> = [1 0 −1 1; 0 1 −1 0; 1 0 0 0; 0 1 −1 1] <span class="dim">basis (1, j, j², j³)</span></span>
+      </div>
+      <p class="note">j is the twist unit, the primitive fifth root of unity: j&#8309; = 1. Four additions per step, zero multiplications, exact integer arithmetic, zero drift. <a href="/core/">Every identity</a>.</p>
 
-            <span class="id-label">step</span>
-            <span class="id-eq">(a, b, c, d) ↦ (a−c+d, b−c, a, b−c+d)</span>
+      <div class="sep"></div>
 
-            <span class="id-label">norm</span>
-            <span class="id-eq">N(J) = det(M<sub>J</sub>) = 1</span>
-
-            <span class="id-label">trace</span>
-            <span class="id-eq">Tr(J) = 3</span>
-
-            <span class="id-label">engine</span>
-            <span class="id-eq"><span class="dim">4 additions per step, zero multiplications: the step rule above, exactly.</span></span>
-
-            <span class="id-label">drift</span>
-            <span class="id-eq"><span class="dim">Zero. Exact integer arithmetic.</span></span>
-
-            <span class="id-label">canon</span>
-            <span class="id-eq"><span class="dim">Public Canon · ACTIVE · repository head</span></span>
+      <div class="substance">
+        <p class="gr">Ansatz: if the algebra maps to physics, the dictionary is forced, not fitted. No fitted dimensionless parameter in the stated forms, one SI calibration anchor.</p>
+        <p class="ledger-intro">The public ledger commits, each claim with its label:</p>
+        <div class="ledger">
+          <span class="claim">all seven standard model hypercharges exactly in <span class="hl">Q</span></span><span class="lab">[T]</span>
+          <span class="claim">the electroweak tree value <span class="hl">sin&#178;&#952;<sub>W</sub> = 3/13</span></span><span class="lab">[T]</span>
+          <span class="claim">committed form 3/13 + 1/(32&#960;&#178;&#966;&#8308;)</span><span class="lab">[D]</span>
+          <span class="claim">dark energy <span class="hl">w = &#8722;14/15</span> in the delimited homogeneous regime</span><span class="lab">[D]</span>
+          <span class="claim">the scalar tilt <span class="hl">n<sub>s</sub> &#8722; 1 = &#8722;5&#945;</span>, which CMB-S4 can kill</span><span class="lab">[H]</span>
         </div>
+        <p class="verdict">Experiment decides.</p>
+      </div>
 
-        <div class="links">
-            <a href="/core/">
-                <span class="link-label">core</span>
-                <span class="link-desc">orientation to the program &middot; axiom, engine, status discipline</span>
-            </a>
-            <a href="/demolab/">
-                <span class="link-label">demo lab</span>
-                <span class="link-desc">live kernel dynamics, pentaplex, fractal &middot; illustrations, not canon</span>
-            </a>
-            <a href="/manifest/">
-                <span class="link-label">manifest</span>
-                <span class="link-desc">the public commitment of the method &middot; en + cs</span>
-            </a>
-            <a href="/canon/">
-                <span class="link-label">canon</span>
-                <span class="link-desc">Public Canon &middot; active ledger</span>
-            </a>
-            <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">
-                <span class="link-label">papers</span>
-                <span class="link-desc">mathematics + gravity, on ORCID</span>
-            </a>
-            <a href="https://github.com/mathorn1973/twist-j" target="_blank" rel="noopener">
-                <span class="link-label">code</span>
-                <span class="link-desc">verify it yourself</span>
-            </a>
-        </div>
-
-        <div class="sep"></div>
-
-        <div class="substance">
-            <span class="gr">Ansatz: if the algebra maps to physics, the dictionary is forced, not fitted. No fitted dimensionless parameter in the stated forms, one SI calibration anchor.</span><br>
-            The public ledger commits, each claim with its label: all seven standard model hypercharges exactly in <span class="hl">Q</span> [T]; the electroweak tree value <span class="hl">sin²θ<sub>W</sub> = 3/13</span> [T], committed form 3/13 + 1/(32π²φ⁴) [D]; dark energy <span class="hl">w = −14/15</span> in the delimited homogeneous regime [D]; the scalar tilt <span class="hl">n<sub>s</sub> − 1 = −5α</span> [H], which CMB-S4 can kill. Experiment decides.
-        </div>
+<div class="footer">
+<a href="https://orcid.org/0009-0008-5463-278X" rel="noopener" target="_blank">A. M. Thorn</a>
+<span class="dot">·</span>
+<a href="https://twistj.com" style="font-style:italic">J = 1 + j²</a>
+<span class="dot">·</span>
+<a class="x-link" href="https://x.com/amthorn73" rel="noopener" target="_blank" title="Follow on X">
+<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+</a>
+</div>
     </div>
-
-    <div class="footer">
-        <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
-        <span class="dot">·</span>
-        <a href="https://twistj.com" style="font-style:italic">J = 1 + j²</a>
-        <span class="dot">·</span>
-        <a href="https://x.com/amthorn73" target="_blank" rel="noopener" class="x-link" title="Follow on X">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </a>
-    </div>
-
     <script>
-    // ================================================================
-    // THEME TOGGLE: auto / light / dark
-    // ================================================================
-    (function() {
-        const modes = ['auto', 'light', 'dark'];
-        const icons = {
-            auto: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M12 7a5 5 0 0 1 0 10z" fill="currentColor" opacity="0.4"/></svg>',
-            light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>',
-            dark: '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>'
-        };
-        const titles = { auto: 'Theme: auto (follows system)', light: 'Theme: light', dark: 'Theme: dark' };
-
-        let current = localStorage.getItem('twistj-theme') || 'auto';
-        const btn = document.getElementById('themeToggle');
-        const iconEl = document.getElementById('themeIcon');
-
-        function apply(mode) {
-            current = mode;
-            localStorage.setItem('twistj-theme', mode);
-            const root = document.documentElement;
-            if (mode === 'auto') {
-                root.removeAttribute('data-theme');
-            } else {
-                root.setAttribute('data-theme', mode);
-            }
-            btn.innerHTML = icons[mode];
-            btn.querySelector('svg').style.width = '18px';
-            btn.querySelector('svg').style.height = '18px';
-            btn.querySelector('svg').style.fill = 'currentColor';
-            btn.title = titles[mode];
-        }
-
-        btn.addEventListener('click', function() {
-            const next = modes[(modes.indexOf(current) + 1) % modes.length];
-            apply(next);
-        });
-
-        apply(current);
+    (function(){
+      var r=document.documentElement, k='twistj-theme';
+      var t=null; try{t=localStorage.getItem(k)}catch(e){}
+      if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light';
+      r.setAttribute('data-theme',t);
+      document.addEventListener('click',function(e){
+        var b=e.target.closest('.theme-toggle'); if(!b) return;
+        var n = r.getAttribute('data-theme')==='dark'?'light':'dark';
+        r.setAttribute('data-theme',n); try{localStorage.setItem(k,n)}catch(e){}
+      });
     })();
     </script>
-
-    <script>
-    // ================================================================
-    // ROTATING AXIOM MESSAGES
-    // ================================================================
-    const messages = [
-        // The axiom
-        { html: '<span class="gold">J = 1 + j²</span>', sub: 'one equation. the entire axiom.', hold: 5500 },
-        // Cyclotomic polynomial
-        { html: '<span class="dim">j⁴ + j³ + j² + j + 1 = 0</span>', sub: 'the twist unit. a fifth root of unity.', hold: 5000 },
-        // Coordinates
-        { html: '<span class="gold">(1, 0, 1, 0)</span> <span class="dim">in Q(j)</span>', sub: 'four registers. the complete definition.', hold: 5000 },
-        // M_J
-        { html: '<span class="dim">M<sub>J</sub></span> <span class="silver">∈ {−1, 0, 1}<sup>4×4</sup></span>', sub: 'four additions per tick. zero multiplications.', hold: 5500 },
-        // Unimodular
-        { html: '<span class="gold">det(M<sub>J</sub>) = 1</span>', sub: 'unimodular. exact integer inverse. zero drift.', hold: 5000 },
-        // Eigenvalues
-        { html: '<span class="gold">|λ|</span> <span class="dim">=</span> <span class="silver">1/φ</span> <span class="dim">and</span> <span class="silver">φ</span>', sub: 'contraction and expansion. the golden ratio is the spectral gap.', hold: 5500 },
-        // Norm and Trace
-        { html: '<span class="gold">N(J) = 1</span> <span class="dim">·</span> <span class="silver">Tr(J) = 3</span>', sub: 'algebraic invariants of the minimal polynomial', hold: 5000 },
-        // Minimal polynomial
-        { html: '<span class="dim">μ(x) =</span> <span class="silver">x⁴ − 3x³ + 4x² − 2x + 1</span>', sub: 'irreducible over Q. degree 4.', hold: 5000 },
-        // Gram matrix identity
-        { html: '<span class="silver">L*L / 5</span> <span class="dim">=</span> <span class="gold">I₄ − 𝟏𝟏ᵀ / 5</span>', sub: 'exact algebraic identity. the Gram matrix of the trace form.', hold: 5500 },
-        // 3 spatial dimensions
-        { html: '<span class="dim">ker(Tr):</span> <span class="gold">metric = I₃</span>', sub: 'three exact orthogonal dimensions', hold: 5000 },
-        // Time direction
-        { html: '<span class="dim">trace direction:</span> <span class="gold">weight 1/5</span>', sub: 'the fourth dimension is algebraically suppressed', hold: 5000 },
-        // 3+1 conclusion
-        { html: '<span class="gold">4 = 3 + 1</span>', sub: 'not postulated. derived from the algebra of j.', hold: 5000 },
-        // Thue-Morse clock
-        { html: '<span class="dim">clock:</span> <span class="silver">Thue-Morse</span>', sub: 'deterministic. aperiodic. cube-free. density 1/2.', hold: 4500 },
-        // Incommensurability
-        { html: '<span class="silver">ln 2 / ln φ</span> <span class="dim">is transcendental</span>', sub: 'binary clock and golden eigenvalue never synchronize', hold: 5000 },
-        // State space
-        { html: '<span class="gold">5⁶ = 15625</span> <span class="dim">checkpoint states ·</span> <span class="silver">313 attractors</span>', sub: '312 of size 20 and one singlet of size 10. full enumeration [C]', hold: 5000 },
-        // --- Transition ---
-        { html: '<span class="dim">the algebra above is proved.</span>', hold: 4500 },
-        { html: '<span class="dim">what follows is an</span> <span class="gold">ansatz.</span>', sub: 'predictions that need experiment to confirm or kill', hold: 5500 },
-        // Physics: two invariants
-        { html: '<span class="gold">|J| → gravity</span> <span class="dim">·</span> <span class="gold">arg(J) → electromagnetism</span>', sub: 'two invariants of J. two forces. a conjecture.', hold: 5500 },
-        // Fine structure
-        { html: '<span class="gold">α</span> <span class="dim">from the committed form</span>', sub: 'ALPHA-FORM [D], digits ALPHA-VALUE-DIGITS [C]. no value is claimed beyond the form.', hold: 5000 },
-        // Falsifiable prediction
-        { html: '<span class="gold">g₀₀ · g<sub>rr</sub> = 1</span>', sub: 'General Relativity: g₀₀ = 1 − 2GM/rc². falsifiable. testable.', hold: 5500 },
-        // Closing
-        { html: '<span class="silver">always the same.</span> <span class="gold">forever new.</span>', hold: 5000 },
-    ];
-
-    const axiomLine = document.getElementById('axiomLine');
-    const axiomProgress = document.getElementById('axiomProgress');
-    let currentIndex = 0;
-    let currentEl = null;
-    let autoTimer = null;
-    let pauseTimer = null;
-    let paused = false;
-
-    function updateProgress() {
-        axiomProgress.style.width = ((currentIndex) / (messages.length - 1) * 100) + '%';
-    }
-
-    function showMessage(index) {
-        const msg = messages[index];
-        const el = document.createElement('div');
-        el.className = 'axiom-item';
-
-        const mainEl = document.createElement('div');
-        mainEl.className = 'main' + (msg.big ? ' big' : '');
-        mainEl.innerHTML = msg.html;
-        el.appendChild(mainEl);
-
-        if (msg.sub) {
-            const subEl = document.createElement('div');
-            subEl.className = 'sub';
-            subEl.textContent = msg.sub;
-            el.appendChild(subEl);
-        }
-
-        axiomLine.appendChild(el);
-
-        if (currentEl) {
-            currentEl.classList.remove('active');
-            currentEl.classList.add('leaving');
-            const old = currentEl;
-            setTimeout(() => { if (old.parentNode) old.parentNode.removeChild(old); }, 1000);
-        }
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => { el.classList.add('active'); });
-        });
-
-        currentEl = el;
-        updateProgress();
-        scheduleNext();
-    }
-
-    function scheduleNext() {
-        if (autoTimer) clearTimeout(autoTimer);
-        if (paused) return;
-        autoTimer = setTimeout(() => {
-            currentIndex = (currentIndex + 1) % messages.length;
-            showMessage(currentIndex);
-        }, messages[currentIndex].hold);
-    }
-
-    function goTo(dir) {
-        if (autoTimer) clearTimeout(autoTimer);
-        if (pauseTimer) clearTimeout(pauseTimer);
-        paused = true;
-        currentIndex = currentIndex + dir;
-        if (currentIndex < 0) currentIndex = messages.length - 1;
-        if (currentIndex >= messages.length) currentIndex = 0;
-        showMessage(currentIndex);
-        pauseTimer = setTimeout(() => { paused = false; scheduleNext(); }, 12000);
-    }
-
-    axiomLine.addEventListener('click', (e) => {
-        const rect = axiomLine.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        goTo(x > 0.5 ? 1 : -1);
-    });
-
-    showMessage(0);
-
-    // ================================================================
-    // GEOMETRIC BACKGROUND
-    // Pentagon, golden spiral, icosahedral wireframe, drifting particles
-    // ================================================================
-    const canvas = document.getElementById('bg');
-    const ctx = canvas.getContext('2d');
-    let W, H, cx, cy;
-
-    function resize() {
-        W = canvas.width = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-        cx = W / 2;
-        cy = H / 2;
-    }
-
-    window.addEventListener('resize', resize);
-    resize();
-
-    const PHI = (1 + Math.sqrt(5)) / 2;
-    const TAU = Math.PI * 2;
-    const GOLDEN_ANGLE = TAU / (PHI * PHI);
-    const DEG72 = TAU / 5;
-
-    // ---- Pentagon vertices at given center, radius, rotation ----
-    function pentagonPts(cx, cy, r, rot) {
-        const pts = [];
-        for (let i = 0; i < 5; i++) {
-            const a = rot + i * DEG72 - Math.PI / 2;
-            pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
-        }
-        return pts;
-    }
-
-    // ---- Theme-aware canvas colors ----
-    function getThemeColors() {
-        const style = getComputedStyle(document.documentElement);
-        const ar = style.getPropertyValue('--accent-rgb').trim();
-        const bgr = style.getPropertyValue('--bg-rgb').trim();
-        return { accent: ar || '139, 69, 19', bg: bgr || '250, 248, 244' };
-    }
-    let _tc = getThemeColors();
-    // Update canvas colors when theme changes
-    const _origClick = document.getElementById('themeToggle');
-    if (_origClick) _origClick.addEventListener('click', () => { setTimeout(() => { _tc = getThemeColors(); }, 50); });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { setTimeout(() => { _tc = getThemeColors(); }, 50); });
-
-    // ---- Draw polygon edges ----
-    function drawPoly(pts, alpha, width) {
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.closePath();
-        ctx.strokeStyle = `rgba(${_tc.accent}, ${alpha})`;
-        ctx.lineWidth = width;
-        ctx.stroke();
-    }
-
-    // ---- Draw star (pentagram) ----
-    function drawStar(pts, alpha, width) {
-        ctx.beginPath();
-        const order = [0, 2, 4, 1, 3];
-        ctx.moveTo(pts[order[0]].x, pts[order[0]].y);
-        for (let i = 1; i < 5; i++) ctx.lineTo(pts[order[i]].x, pts[order[i]].y);
-        ctx.closePath();
-        ctx.strokeStyle = `rgba(${_tc.accent}, ${alpha})`;
-        ctx.lineWidth = width;
-        ctx.stroke();
-    }
-
-    // ---- Golden spiral segment ----
-    function drawGoldenSpiral(cx, cy, startR, rot, alpha) {
-        ctx.beginPath();
-        const steps = 200;
-        for (let i = 0; i <= steps; i++) {
-            const t = i / steps;
-            const angle = rot + t * TAU * 2.5;
-            const r = startR * Math.pow(PHI, -t * 2.5);
-            const x = cx + r * Math.cos(angle);
-            const y = cy + r * Math.sin(angle);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = `rgba(${_tc.accent}, ${alpha})`;
-        ctx.lineWidth = 0.85;
-        ctx.stroke();
-    }
-
-    // ---- Icosahedral wireframe (2D projection of 3D icosahedron) ----
-    function icosahedronPts3D() {
-        // 12 vertices of icosahedron
-        const verts = [];
-        verts.push([0, 1, PHI]);
-        verts.push([0, 1, -PHI]);
-        verts.push([0, -1, PHI]);
-        verts.push([0, -1, -PHI]);
-        verts.push([1, PHI, 0]);
-        verts.push([1, -PHI, 0]);
-        verts.push([-1, PHI, 0]);
-        verts.push([-1, -PHI, 0]);
-        verts.push([PHI, 0, 1]);
-        verts.push([PHI, 0, -1]);
-        verts.push([-PHI, 0, 1]);
-        verts.push([-PHI, 0, -1]);
-        return verts;
-    }
-
-    const icoEdges = [
-        [0,2],[0,4],[0,6],[0,8],[0,10],
-        [1,3],[1,4],[1,6],[1,9],[1,11],
-        [2,5],[2,7],[2,8],[2,10],
-        [3,5],[3,7],[3,9],[3,11],
-        [4,6],[4,8],[4,9],
-        [5,7],[5,8],[5,9],
-        [6,10],[6,11],
-        [7,10],[7,11],
-        [8,9],[10,11]
-    ];
-
-    const icoVerts3D = icosahedronPts3D();
-
-    function rotateY(v, a) {
-        const c = Math.cos(a), s = Math.sin(a);
-        return [c * v[0] + s * v[2], v[1], -s * v[0] + c * v[2]];
-    }
-
-    function rotateX(v, a) {
-        const c = Math.cos(a), s = Math.sin(a);
-        return [v[0], c * v[1] - s * v[2], s * v[1] + c * v[2]];
-    }
-
-    function project(v, cx, cy, scale) {
-        const z = v[2] + 4;
-        const f = scale / z;
-        return { x: cx + v[0] * f, y: cy + v[1] * f, z: z };
-    }
-
-    // ---- Drifting particles (golden angle trajectories) ----
-    const NPART = 30;
-    const particles = [];
-    for (let i = 0; i < NPART; i++) {
-        particles.push({
-            x: Math.random() * 2000,
-            y: Math.random() * 2000,
-            angle: Math.random() * TAU,
-            speed: 0.06 + Math.random() * 0.1,
-            size: 0.3 + Math.random() * 0.6,
-            alpha: 0.05 + Math.random() * 0.06,
-            drift: (Math.random() - 0.5) * 0.0002,
-        });
-    }
-
-    // ---- Thue-Morse ring (binary pattern as dots around a circle) ----
-    function thueMorse(n) {
-        let count = 0;
-        let v = n;
-        while (v > 0) { count += v & 1; v >>= 1; }
-        return count & 1;
-    }
-
-    // ================================================================
-    // MAIN ANIMATION LOOP
-    // ================================================================
-    let t0 = performance.now();
-
-    function draw(now) {
-        const t = (now - t0) * 0.001; // seconds
-        ctx.fillStyle = `rgba(${_tc.bg}, 0.15)`;
-        ctx.fillRect(0, 0, W, H);
-
-        const minDim = Math.min(W, H);
-
-        // ===== STAGED REVEAL: elements appear gradually =====
-        // Middle geometry (pentagons, spirals, etc): fade in from 30-60s
-        // Icosahedron 1: Star Wars fly-in from 60-100s
-        // Icosahedron 2: Star Wars fly-in from 120-160s
-        const midReveal  = Math.max(0, Math.min(1, (t - 30) / 30));   // 30-60s
-        const ico1Reveal = Math.max(0, Math.min(1, (t - 60) / 40));   // 60-100s
-        const ico2Reveal = Math.max(0, Math.min(1, (t - 120) / 40));  // 120-160s
-
-        // ===== COSMIC ESCALATION: four phases of animation intensity =====
-        // Phases shifted later so they begin after icosahedrons have appeared
-        const awaken = Math.max(0, Math.min(1, (t - 100) / 50));    // 100-150s
-        const roam   = Math.max(0, Math.min(1, (t - 160) / 70));    // 160-230s
-        const wild   = Math.max(0, Math.min(1, (t - 240) / 90));    // 240-330s
-        const frenzy = Math.max(0, Math.min(1, (t - 340) / 120));   // 340-460s
-        const intensity = awaken + roam + wild + frenzy;             // 0→4
-
-        // ---- MIDDLE GEOMETRY: staged reveal from distance ----
-        // Scale from tiny (far away) to normal, with alpha fade-in
-        const midScale = 0.2 + 0.8 * midReveal;  // 0.2 → 1.0
-        const midAlpha = midReveal;                // 0 → 1
-
-        // ---- 1. OUTER PENTAGON: slow rotation ----
-        const pRot = t * 0.03;
-        const pRadius = minDim * 0.38 * midScale;
-        const outerPts = pentagonPts(cx, cy, pRadius, pRot);
-        drawPoly(outerPts, 0.04 * midAlpha, 0.5);
-
-        // ---- 2. INNER PENTAGON: counter-rotation, smaller ----
-        const innerPts = pentagonPts(cx, cy, pRadius / PHI, -pRot * PHI);
-        drawPoly(innerPts, 0.035 * midAlpha, 0.5);
-
-        // ---- 3. PENTAGRAM inside outer pentagon ----
-        drawStar(outerPts, 0.02 * midAlpha, 0.3);
-
-        // ---- 4. GOLDEN SPIRAL ----
-        const spiralRot = t * 0.05;
-        drawGoldenSpiral(cx, cy, pRadius * 0.85, spiralRot, 0.025 * midAlpha);
-        // second spiral, opposite
-        drawGoldenSpiral(cx, cy, pRadius * 0.85, spiralRot + Math.PI, 0.018 * midAlpha);
-
-        // ---- 5. ICOSAHEDRON 1 (Star Wars fly-in from upper-right) ----
-        if (ico1Reveal > 0) {
-        // Star Wars approach: starts as a tiny speck far away, grows to full size
-        const ico1Approach = ico1Reveal * ico1Reveal; // ease-in for dramatic approach
-        const ico1Alpha = ico1Reveal;
-
-        const home1X = W * 0.80, home1Y = H * 0.25;
-        // orbit center drifts toward viewport center as chaos escalates
-        const pull1 = roam * 0.3 + wild * 0.5 + frenzy * 0.2;
-        const base1X = home1X + (cx - home1X) * pull1;
-        const base1Y = home1Y + (cy - home1Y) * pull1;
-
-        // multi-frequency trajectory: amplitude and complexity grow per phase
-        const amp1X = W * (0.025 * awaken + 0.16 * roam + 0.35 * wild + 0.45 * frenzy);
-        const amp1Y = H * (0.02 * awaken + 0.13 * roam + 0.30 * wild + 0.42 * frenzy);
-        const ico1DriftX = Math.sin(t * 0.031) * amp1X * 0.4
-                         + Math.sin(t * 0.073 + 1.2) * amp1X * 0.35 * Math.min(1, roam + wild)
-                         + Math.sin(t * 0.113 + Math.sin(t * 0.017) * 3) * amp1X * 0.25 * frenzy;
-        const ico1DriftY = Math.cos(t * 0.023 + 0.5) * amp1Y * 0.4
-                         + Math.cos(t * 0.059 + 0.8) * amp1Y * 0.35 * Math.min(1, roam + wild)
-                         + Math.cos(t * 0.091 + Math.cos(t * 0.013) * 3) * amp1Y * 0.25 * frenzy;
-
-        // fly-through bursts: fast diagonal sweeps across the viewport
-        const burst1 = frenzy * Math.sin(t * 0.019) * Math.pow(Math.abs(Math.sin(t * 0.041)), 4);
-        const icoX = base1X + ico1DriftX + burst1 * W * 0.3;
-        const icoY = base1Y + ico1DriftY + burst1 * H * 0.12 * Math.cos(t * 0.029);
-
-        // breathing: amplitude and base size escalate
-        const breath1Amp = 0.15 + awaken * 0.05 + roam * 0.1 + wild * 0.15 + frenzy * 0.2;
-        const breath1Freq = 0.2 + awaken * 0.03 + roam * 0.05 + wild * 0.07 + frenzy * 0.1;
-        const icoBreath1 = 1 + breath1Amp * Math.sin(t * breath1Freq);
-        const baseScale1 = 0.22 + awaken * 0.06 + roam * 0.08 + wild * 0.12 + frenzy * 0.14;
-        // zoom pulse during fly-throughs
-        const zoom1 = 1 + frenzy * 0.7 * Math.pow(Math.max(0, Math.sin(t * 0.041)), 5);
-        // Star Wars scale: from 0.03 (distant speck) → 1.0 (full size)
-        const starWars1 = 0.03 + 0.97 * ico1Approach;
-        const icoScale = minDim * baseScale1 * icoBreath1 * zoom1 * starWars1;
-
-        // rotation: speed and tumble complexity escalate
-        const rotA = t * (0.07 + awaken * 0.015 + roam * 0.03 + wild * 0.06 + frenzy * 0.12);
-        const rotB = t * (0.05 + awaken * 0.01 + roam * 0.02 + wild * 0.05 + frenzy * 0.09);
-        // third axis tumble for wild/frenzy (chain second rotateY)
-        const rotC = t * (wild * 0.04 + frenzy * 0.08) + wild * Math.sin(t * 0.037) * 0.5;
-
-        const projected = icoVerts3D.map(v => {
-            let r = rotateY(v, rotA);
-            r = rotateX(r, rotB);
-            r = rotateY(r, rotC);
-            return project(r, icoX, icoY, icoScale);
-        });
-
-        const edge1AlphaBase = (0.045 + intensity * 0.018) * ico1Alpha;
-        const edge1AlphaRange = (0.06 + intensity * 0.015) * ico1Alpha;
-        for (const [a, b] of icoEdges) {
-            const pa = projected[a];
-            const pb = projected[b];
-            const depthAlpha = edge1AlphaBase + edge1AlphaRange * (1 - (pa.z + pb.z) / 12);
-            ctx.beginPath();
-            ctx.moveTo(pa.x, pa.y);
-            ctx.lineTo(pb.x, pb.y);
-            ctx.strokeStyle = `rgba(${_tc.accent},${Math.max(0.02, Math.min(0.45, depthAlpha))})`;
-            ctx.lineWidth = 0.35 + intensity * 0.12;
-            ctx.stroke();
-        }
-
-        const vert1AlphaBase = (0.08 + intensity * 0.025) * ico1Alpha;
-        const vert1AlphaRange = (0.10 + intensity * 0.02) * ico1Alpha;
-        for (const p of projected) {
-            const da = vert1AlphaBase + vert1AlphaRange * (1 - p.z / 8);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 1.6 + intensity * 0.35, 0, TAU);
-            ctx.fillStyle = `rgba(${_tc.accent},${Math.max(0.04, Math.min(0.55, da))})`;
-            ctx.fill();
-        }
-        } // end ico1Reveal guard
-
-        // ---- 6. ICOSAHEDRON 2 (Star Wars fly-in from lower-left) ----
-        if (ico2Reveal > 0) {
-        const ico2Approach = ico2Reveal * ico2Reveal; // ease-in
-        const ico2Alpha = ico2Reveal;
-
-        const home2X = W * 0.18, home2Y = H * 0.75;
-        const pull2 = roam * 0.25 + wild * 0.5 + frenzy * 0.25;
-        const base2X = home2X + (cx - home2X) * pull2;
-        const base2Y = home2Y + (cy - home2Y) * pull2;
-
-        // different frequencies so the two icosahedrons never synchronize
-        const amp2X = W * (0.02 * awaken + 0.14 * roam + 0.32 * wild + 0.44 * frenzy);
-        const amp2Y = H * (0.018 * awaken + 0.11 * roam + 0.28 * wild + 0.40 * frenzy);
-        const ico2DriftX = Math.sin(t * 0.027 + 1.5) * amp2X * 0.4
-                         + Math.sin(t * 0.061 + 2.3) * amp2X * 0.35 * Math.min(1, roam + wild)
-                         + Math.sin(t * 0.103 + Math.sin(t * 0.019) * 2.5) * amp2X * 0.25 * frenzy;
-        const ico2DriftY = Math.cos(t * 0.019 + 0.8) * amp2Y * 0.4
-                         + Math.cos(t * 0.047 + 1.7) * amp2Y * 0.35 * Math.min(1, roam + wild)
-                         + Math.cos(t * 0.083 + Math.cos(t * 0.015) * 2.5) * amp2Y * 0.25 * frenzy;
-
-        // fly-through bursts offset from ico1 so they don't collide simultaneously
-        const burst2 = frenzy * Math.cos(t * 0.023 + 1.8) * Math.pow(Math.abs(Math.sin(t * 0.037 + 2)), 4);
-        const ico2X = base2X + ico2DriftX + burst2 * W * 0.25;
-        const ico2Y = base2Y + ico2DriftY - burst2 * H * 0.15 * Math.sin(t * 0.031);
-
-        const breath2Amp = 0.12 + awaken * 0.04 + roam * 0.09 + wild * 0.14 + frenzy * 0.18;
-        const breath2Freq = 0.17 + awaken * 0.025 + roam * 0.04 + wild * 0.06 + frenzy * 0.09;
-        const icoBreath2 = 1 + breath2Amp * Math.sin(t * breath2Freq + 2);
-        const baseScale2 = 0.17 + awaken * 0.05 + roam * 0.07 + wild * 0.11 + frenzy * 0.13;
-        const zoom2 = 1 + frenzy * 0.6 * Math.pow(Math.max(0, Math.sin(t * 0.037 + 2)), 5);
-        // Star Wars scale: from 0.03 (distant speck) → 1.0 (full size)
-        const starWars2 = 0.03 + 0.97 * ico2Approach;
-        const ico2Scale = minDim * baseScale2 * icoBreath2 * zoom2 * starWars2;
-
-        const rot2A = t * (0.04 + awaken * 0.012 + roam * 0.025 + wild * 0.055 + frenzy * 0.11);
-        const rot2B = t * (0.03 + awaken * 0.008 + roam * 0.018 + wild * 0.045 + frenzy * 0.085) + 1.2;
-        const rot2C = t * (wild * 0.035 + frenzy * 0.07) + wild * Math.cos(t * 0.041) * 0.4;
-
-        const projected2 = icoVerts3D.map(v => {
-            let r = rotateY(v, rot2A);
-            r = rotateX(r, rot2B);
-            r = rotateY(r, rot2C);
-            return project(r, ico2X, ico2Y, ico2Scale);
-        });
-
-        const edge2AlphaBase = (0.035 + intensity * 0.015) * ico2Alpha;
-        const edge2AlphaRange = (0.05 + intensity * 0.012) * ico2Alpha;
-        for (const [a, b] of icoEdges) {
-            const pa = projected2[a];
-            const pb = projected2[b];
-            const depthAlpha = edge2AlphaBase + edge2AlphaRange * (1 - (pa.z + pb.z) / 12);
-            ctx.beginPath();
-            ctx.moveTo(pa.x, pa.y);
-            ctx.lineTo(pb.x, pb.y);
-            ctx.strokeStyle = `rgba(${_tc.accent},${Math.max(0.02, Math.min(0.42, depthAlpha))})`;
-            ctx.lineWidth = 0.4 + intensity * 0.12;
-            ctx.stroke();
-        }
-
-        for (const p of projected2) {
-            const da = ((0.055 + intensity * 0.022) + (0.07 + intensity * 0.015) * (1 - p.z / 8)) * ico2Alpha;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 1.3 + intensity * 0.3, 0, TAU);
-            ctx.fillStyle = `rgba(${_tc.accent},${Math.max(0.03, Math.min(0.5, da))})`;
-            ctx.fill();
-        }
-        } // end ico2Reveal guard
-
-        // ---- 7. THUE-MORSE RING (subtle binary pattern) ----
-        if (midReveal > 0) {
-        const tmRadius = pRadius * 0.72;
-        const tmN = 64;
-        const tmRot = t * 0.02;
-        for (let i = 0; i < tmN; i++) {
-            const bit = thueMorse(i);
-            const angle = tmRot + (i / tmN) * TAU;
-            const x = cx + tmRadius * Math.cos(angle);
-            const y = cy + tmRadius * Math.sin(angle);
-            const r = bit ? 1.4 : 0.6;
-            const a = (bit ? 0.1 : 0.015) * midAlpha;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, TAU);
-            ctx.fillStyle = `rgba(${_tc.accent},${a})`;
-            ctx.fill();
-        }
-
-        // ---- 8. DRIFTING PARTICLES ----
-        for (let i = 0; i < NPART; i++) {
-            const p = particles[i];
-            p.angle += GOLDEN_ANGLE * 0.0002 + p.drift;
-            p.x += Math.cos(p.angle) * p.speed;
-            p.y += Math.sin(p.angle) * p.speed;
-
-            if (p.x < -20) p.x = W + 20;
-            if (p.x > W + 20) p.x = -20;
-            if (p.y < -20) p.y = H + 20;
-            if (p.y > H + 20) p.y = -20;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, TAU);
-            ctx.fillStyle = `rgba(${_tc.accent},${p.alpha * midAlpha})`;
-            ctx.fill();
-        }
-
-        // ---- 9. CONNECTING LINES between pentagon vertices (pulsing) ----
-        const pulseAlpha = (0.02 + 0.012 * Math.sin(t * 0.4)) * midAlpha;
-        for (let i = 0; i < 5; i++) {
-            const a = outerPts[i];
-            const b = innerPts[i];
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(${_tc.accent},${pulseAlpha})`;
-            ctx.lineWidth = 0.3;
-            ctx.stroke();
-        }
-        } // end midReveal guard
-
-        requestAnimationFrame(draw);
-    }
-
-    requestAnimationFrame(draw);
-    </script>
-
-
 </body>
 </html>
