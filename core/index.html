@@ -84,8 +84,28 @@
     .split-text{color:var(--text)}
     .split .lab{font-size:.74rem;letter-spacing:.12em;color:var(--accent);white-space:nowrap}
     .split-note{margin-top:1.15rem;font-size:.99rem;color:var(--muted)}
+    .axiom-hinge{grid-column:1 / -1;justify-self:center;display:block;
+      margin:.6rem 0 .3rem;padding:.5rem 1.2rem;
+      font-size:2.05rem;letter-spacing:.05em;color:var(--accent);
+      text-decoration:none;border-bottom:1px solid transparent;
+      transition:border-color .25s ease}
+    .axiom-hinge:hover{border-bottom-color:var(--accent)}
+    .decoder{margin-top:1.9rem}
+    .chain{display:flex;flex-wrap:wrap;align-items:baseline;gap:.55rem .7rem;
+      margin:1rem 0 .55rem}
+    .chain .node{color:var(--text-bright)}
+    .chain .arrow{color:var(--accent)}
+    .noreturn{border-top:1px dashed var(--rule);padding-top:.4rem;margin-bottom:1.05rem;
+      font-size:.86rem;letter-spacing:.06em;color:var(--dim)}
+    .noreturn::before{content:"← ";color:var(--dim)}
+    .dec-line{font-size:.99rem;color:var(--muted);margin-bottom:.5rem}
+    .dec-line .lab{margin-left:.5rem;font-size:.74rem;letter-spacing:.12em;
+      color:var(--accent);white-space:nowrap}
     @media(max-width:34rem){
       .split{grid-template-columns:1fr auto;gap:.3rem .8rem}
+      .axiom-hinge{font-size:1.65rem;padding:.4rem .6rem}
+      .chain{flex-direction:column;align-items:flex-start;gap:.1rem}
+      .chain .arrow{transform:rotate(90deg);display:inline-block;margin-left:.35rem}
       .split-label{grid-column:1}
       .split-text{grid-column:1 / -1}
       .split .lab{grid-column:2;grid-row:auto}
