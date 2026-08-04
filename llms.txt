@@ -1,17 +1,26 @@
 # TWIST-J
 
-> TWIST-J derives physics from one axiom: J = 1 + j², where j is the twist unit, a primitive fifth root of unity. Multiplication by J is a 4x4 integer matrix over {-1, 0, 1}. Galois structure yields an exact 3+1+0 decomposition. No fitted dimensionless parameter is introduced in the stated forms; the single SI calibration anchor is the electron mass. The algebra is proved. The physics is falsifiable.
+> TWIST-J tests whether physical reality can be modeled as a closed, exact, deterministic integer system whose continuum, geometry, probability, and fields are readings. Its single algebraic axiom is J = 1 + j². A discrete architecture is declared separately; the checkpoint space, five kernel generators, selector, and decoder are not claimed to be uniquely derived from J. The decoder is typed and partial; totality, uniqueness, and completeness remain open. The declared architecture contains no fitted dimensionless parameter; its one SI calibration anchor is the electron mass.
 
 Author: A. M. Thorn. ORCID: https://orcid.org/0009-0008-5463-278X
 Hub: https://twistj.com
 
-Reading: Time is a counter. Space is a commutator. J is the verb; φ and π are projections of J. If it cannot be calculated in integers, it is not physics. Plenum, not vacuum.
+Reading: Time is a counter. Space is read through commutators. The modulus and argument of J provide two exact algebraic projections. Their physical interpretations are only as strong as the registered dictionary rows. If it cannot be calculated in integers, it is not physics. Plenum, not vacuum.
 
 Status discipline: every claim carries a label, T / D / C / H / O / F / LOCK, ordered T-LOCK > T > D > C > H > O > F. The public line carries no T-LOCK; T is the strongest public status. No summary is stronger than its committed source. Falsification is registered as first-class progress. Exact rational and algebraic arithmetic throughout: ratios, not decimals, unless a decimal is justified by measurement.
 
 ## Kernel
 
-The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j³), multiplication by J = 1 + j² is the matrix rows [1 0 -1 1; 0 1 -1 0; 1 0 0 0; 0 1 -1 1], entries in {-1, 0, 1}, det 1, trace 3, characteristic polynomial x⁴ - 3x³ + 4x² - 2x + 1. One step of the dynamics is (a, b, c, d) to (a-c+d, b-c, a, b-c+d): 4 additions, zero multiplications, exact integer arithmetic, zero drift. The measure split is exact: the trace and conformal directions carry Gram weight 1/p, the spatial base ker(Tr) carries weight 1, and d/(d + 1) = 3/4 (MEASURE-SPATIAL-ONLY, T); read as physics, time is the clock tick and space the three F_5 directions of ker Tr_4 (KERNEL-CELL-DICTIONARY, D). Machine-readable kernel facts are embedded in the homepage DOM as JSON at id twistj-agent-card. The same identities are published for human readers at https://twistj.com/core/.
+The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j³), multiplication by J = 1 + j² is the matrix rows [1 0 -1 1; 0 1 -1 0; 1 0 0 0; 0 1 -1 1], entries in {-1, 0, 1}, det 1, trace 3, characteristic polynomial x⁴ - 3x³ + 4x² - 2x + 1. The regular-representation J-step sends (a, b, c, d) to (a-c+d, b-c, a, b-c+d): 4 additions, zero multiplications, exact integer arithmetic, zero drift. The measure split is exact: the trace and conformal directions carry Gram weight 1/p, the spatial base ker(Tr) carries weight 1, and d/(d + 1) = 3/4 (MEASURE-SPATIAL-ONLY, T); read as physics, time is the clock tick and space the three F_5 directions of ker Tr_4 (KERNEL-CELL-DICTIONARY, D). Machine-readable kernel facts are embedded in the homepage DOM as JSON at id twistj-agent-card. These starting identities are published for human readers at https://twistj.com/core/.
+
+## Architecture and decoder
+
+The discrete architecture is declared separately. Its complete autonomous state is Omega = N_0 x F_5^6, with theta_n = s_2(n) mod 2, z_6(psi) = sum_k psi_k mod 5, U(n,psi) = (n+1,g_(z_6(psi)+2 theta_n mod 5)(psi)), and (g_0,...,g_4) = (a,b,c,d,e). N_0 is the forward orbit of zero under the 2-adic odometer. The finite checkpoint psi is not the whole state, and log streams are derived orbit records.
+
+For K the set of forward U-orbits, the decoder is a typed partial interface ordered matter, then geometry, then clock. Decoder outputs never feed back into U. READING-SPLIT [D] is a dictionary at its registered legs, not a completeness theorem; totality, uniqueness, and completeness remain open. The ansatz says that a successful complete decoder should be forced by the declared architecture, not selected by fit; that forcing and uniqueness are not yet proved.
+
+- COSMOLOGY-REGISTER [D] commits w = -14/15 as a target and consistency witness. DE-CONFORMAL-WEIGHT [O] owns the still-open typed selection of its density character.
+- PHOTON-KAPPA-LEMMA [F] and PHOTON-WINDOW-PROOF [F] falsify the necessary universal occupancy conjunct and the frozen compound route. Roughening was not reached; no Coulomb, continuum, propagator, or physical-photon conclusion follows.
 
 ## Canon
 
@@ -45,8 +54,8 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 
 ## Site
 
-- [Home](https://twistj.com/): the axiom, what is read off it, the committed claims
-- [The kernel](https://twistj.com/core/): every identity, the matrix, the step rule
+- [Home](https://twistj.com/): the algebraic axiom, declared architecture, typed partial decoder, and selected ledger claims
+- [The kernel](https://twistj.com/core/): starting identities, the matrix, the step rule
 - [Manifest](https://twistj.com/manifest/): the public commitment of the method, twelve rules, English (Czech at /manifest/cs/)
 - [Public Canon](https://twistj.com/canon/): the active public ledger
 - [Code](https://github.com/mathorn1973/twist-j): verify it yourself
@@ -56,6 +65,6 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 Interactive demonstrations. Illustrations of the arithmetic; they carry no status label and are not evidence.
 
 - [Demo Lab](https://twistj.com/demolab/): index of the demonstrations below
-- [Live demo](https://twistj.com/evo/): interactive kernel dynamics
+- [Live demo](https://twistj.com/evo/): exact finite checkpoint logic inside an illustrative floating-point particle, field, and rendering layer
 - [Pentaplex](https://twistj.com/pentaplex/): Penrose tilings, Galois projection ζ to ζ²
 - [Fractal](https://twistj.com/fractal/): Mandelbrot set as escape-time counting, z to z² + c

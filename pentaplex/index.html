@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Penrose · Pentaplex Explorer — twistj.com</title>
-<meta name="description" content="Pentaplex Explorer — Penrose tilings as a Galois projection of ζ ↦ ζ². Part of TWIST-J.">
+<meta name="description" content="TWIST-J Demo Lab: a floating-point, finite-patch Pentaplex illustration of Penrose tilings as a Galois projection of ζ ↦ ζ². Not Canon evidence.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
@@ -117,6 +117,10 @@
   .subtitle {
     font-style: italic; font-size: 14px; margin: 4px 0 0;
     color: var(--muted); letter-spacing: 0.02em;
+  }
+  .scope-note {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 10px; margin: 6px 0 0; color: var(--muted); letter-spacing: 0.04em;
   }
   .info {
     font-size: 11px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
@@ -266,6 +270,7 @@
     .app { padding: 40px 12px 16px; }
     h1 { font-size: 18px; letter-spacing: 0.12em; }
     .subtitle { font-size: 13px; }
+    .scope-note { font-size: 9px; }
     .info { font-size: 10px; }
     .back-link { top: 10px; left: 12px; }
     .theme-toggle { top: 8px; right: 10px; width: 28px; height: 28px; }
@@ -465,6 +470,7 @@
     <div>
       <h1>Penrose · Pentaplex</h1>
       <p class="subtitle">ζ ↦ ζ² &nbsp;·&nbsp; polární kódování Galoisovy projekce</p>
+      <p class="scope-note">numerická ilustrace (floating-point, konečná výseč) · nikoli důkaz Canonu</p>
     </div>
     <div class="info">
       zoom · <b id="z">28.0</b><br>
