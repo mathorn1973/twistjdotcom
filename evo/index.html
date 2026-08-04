@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>TWIST-J | A Finite Rule with Unbounded Evolution</title>
+<meta name="description" content="TWIST-J Demo Lab visualization: exact finite F5^6 checkpoint logic inside an illustrative floating-point particle, field, and rendering layer. Not Canon evidence." />
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body{
@@ -17,7 +18,14 @@
     padding:10px 16px; border-bottom:1px solid #141418; background:#06060a;
   }
   .top .t{ color:#00d2ff; letter-spacing:3px; font-size:12px; }
+  .top .scope{ margin-left:auto; color:#5a5a64; letter-spacing:1.4px; font-size:9px; white-space:nowrap; }
   .wrap{ position:relative; width:100%; height:calc(100vh - 44px); }
+  @media(max-width:700px){
+    .top{ height:54px; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px; padding:7px 12px; }
+    .top .t{ letter-spacing:2px; font-size:10px; }
+    .top .scope{ margin-left:0; font-size:8px; letter-spacing:1px; }
+    .wrap{ height:calc(100vh - 54px); }
+  }
   canvas{ width:100%; height:100%; display:block; cursor:crosshair; touch-action:none; }
   .hud{
     position:absolute; top:14px; right:14px;
@@ -209,7 +217,8 @@
 </head>
 <body>
   <div class="top">
-    <div class="t">TWIST-J: A FINITE RULE WITH UNBOUNDED EVOLUTION</div>
+    <div class="t">TWIST-J DEMO LAB</div>
+    <div class="scope">ILLUSTRATION ONLY · NOT CANON EVIDENCE</div>
   </div>
 
   <div class="wrap">
@@ -241,7 +250,7 @@
         <div class="tog">
           <label><input type="checkbox" id="tglPump" checked>PUMP <small>(5)</small></label>
           <label><input type="checkbox" id="tglReact">REACT <small>(opt)</small></label>
-          <label><input type="checkbox" id="tglExact">EXACT <small>(6)</small></label>
+          <label><input type="checkbox" id="tglExact">DIRECT IFS <small>(6)</small></label>
           <label><input type="checkbox" id="tglSolid">SOLID</label>
         </div>
       </div>
@@ -513,12 +522,18 @@
         <button onclick="document.getElementById('helpOverlay').classList.remove('show')" style="background:none;border:1px solid #2a2a36;color:#666;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px">&times; CLOSE</button>
       </div>
       <div style="color:#777;margin-bottom:8px;line-height:1.5">
+        <strong style="color:#aaa">Scope:</strong> the F<sub>5</sub><sup>6</sup>
+        checkpoint update is exact at its finite scope. This browser uses a 32-bit
+        counter; projected IFS coordinates, fields, forces, and rendering use GPU
+        floating-point arithmetic. The architecture and decoder are declared
+        separately from J.<br><br>
         J-Operator: <span style="color:#00d2ff">J = 1 + &#950;&#8325;&sup2;</span> &mdash; a single algebraic axiom.<br>
         Thue-Morse sequence serves as time driver in TWIST-J.<br>
         Kernel: z=Tr(x), t=TM(n), i=(z+2t) mod 5, x&#8592;g&#7522;(x).<br>
-        Field: gyron &#8594; mass(R), d/e &#8594; charge(G/B).<br>
-        &#8711;&#961;L = gravity, -&#8711;&#961;S = pressure, sign(&#961;Q)&middot;&#8711;&#961;Q = plasma. &#961; &#8712; [0,1].<br>
-        Time: d&#964;/dn = 1/(1+K&middot;&#961;).
+        Demo labels: gyron &#8594; mass-like (R), d/e &#8594; charge-like (G/B).<br>
+        Illustrative fields: &#8711;&#961;L = gravity-like, -&#8711;&#961;S = pressure-like,
+        sign(&#961;Q)&middot;&#8711;&#961;Q = plasma-like.<br>
+        Illustrative clock overlay: d&#964;/dn = 1/(1+K&middot;&#961;).
       </div>
       <h3>TOGGLES</h3>
       <div class="krow"><span class="kk">ESC</span><span>pause / resume</span></div>
@@ -530,7 +545,7 @@
       <div class="krow"><span class="kk">3</span><span>MOUSE on/off</span></div>
       <div class="krow"><span class="kk">4</span><span>CHAOS on/off</span></div>
       <div class="krow"><span class="kk">5</span><span>PUMP on/off</span></div>
-      <div class="krow"><span class="kk">6</span><span>EXACT IFS on/off (canonical step)</span></div>
+      <div class="krow"><span class="kk">6</span><span>DIRECT IFS on/off (floating-point projected map; bypasses forces)</span></div>
       <div class="krow"><span class="kk">M</span><span>mouse: repel / attract</span></div>
       <div class="krow"><span class="kk">P / N</span><span>more / fewer particles</span></div>
       <div class="krow"><span class="kk">Shift+P/N</span><span>beyond slider (vm2000=22M, vm8000=87M, vm16000=175M)</span></div>
