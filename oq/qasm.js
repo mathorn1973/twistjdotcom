@@ -179,6 +179,232 @@ function ccx(g, q) {                       /* Toffoli = H · CCZ · H */
     g.push(['h', q[2]], mcpow(q, 8), ['h', q[2]]);
 }
 
+/* ---- gate modifiers --------------------------------------------------- *
+ * ctrl @, negctrl @, inv @ and pow(k) @, handled at the GATE-LIST level and
+ * not by a second table of pre-controlled gates. The reason it can be done
+ * that way is that every primitive this engine has — h, x, zpow, cx, swap,
+ * mcpow, gphase — has an exact controlled form, and control passes straight
+ * through a conjugation:
+ *
+ *     ctrl(P† D P) = (I⊗P†) · ctrl(D) · (I⊗P)      because P†P = I
+ *
+ * so a controlled H is A† · ctrl(X) · A with A = T·H·S, which is the CH
+ * decomposition already in the table, and nothing new has to become exact.
+ * ctrl is a homomorphism — ctrl(ABC) = ctrl(A)ctrl(B)ctrl(C) — so controlling
+ * a gate means controlling the word it emits, whatever that word is. That is
+ * why ctrl @ U(θ,φ,λ) is exact on the same half-pi lattice U itself is: the
+ * word is p, Z, H and gphase, and each of those controls exactly. */
+
+/* Phases in this layer are counted in SIXTEENTHS (pi/8) and halved later if
+ * the whole circuit fits in Z[ζ₈] — see halvePhases. Keep them in [0,16). */
+function mod16(k) {
+    k = Math.round(k) % 16;
+    return k < 0 ? k + 16 : k;
+}
+
+/* A leading chain of "name @" / "name(arg) @". The @ is what makes it a
+ * modifier: without it "pow(2) q[0]" is an ordinary call to a gate named pow,
+ * and refusing it as a malformed modifier would be a worse error. */
+function splitMods(text) {
+    var mods = [], t = text.trim(), m, i, j, depth, arg, after;
+    for (;;) {
+        m = /^(ctrl|negctrl|inv|pow)\b/.exec(t);
+        if (!m) break;
+        i = m[0].length; arg = undefined;
+        while (i < t.length && /\s/.test(t.charAt(i))) i++;
+        if (t.charAt(i) === '(') {
+            depth = 0;
+            for (j = i; j < t.length; j++) {
+                if (t.charAt(j) === '(') depth++;
+                else if (t.charAt(j) === ')') { depth--; if (!depth) break; }
+            }
+            if (depth !== 0) break;
+            arg = t.slice(i + 1, j); i = j + 1;
+        }
+        after = t.slice(i).replace(/^\s+/, '');
+        if (after.charAt(0) !== '@') break;
+        mods.push({ kind: m[1], arg: arg });
+        t = after.slice(1).trim();
+    }
+    return { mods: mods, rest: t };
+}
+
+/* The inverse of splitMods, so a modifier chain can be re-attached to a
+ * statement that has been rewritten underneath it. */
+function modText(mods) {
+    var s = '', i;
+    for (i = 0; i < mods.length; i++)
+        s += mods[i].kind + (mods[i].arg === undefined ? '' : '(' + mods[i].arg + ')') + ' @ ';
+    return s;
+}
+
+/* ctrl and negctrl take control qubits off the FRONT of the operand list, in
+ * modifier order. inv and pow fold into one exponent, because all three
+ * commute the way they have to: ctrl(U^k) = ctrl(U)^k, ctrl(U†) = ctrl(U)†,
+ * and (U^a)^b = U^ab. So the whole chain is (controls, exponent). */
+function foldMods(mods, line, num) {
+    var ctrls = [], e = 1, i, kind, arg, n, c;
+    for (i = 0; i < mods.length; i++) {
+        kind = mods[i].kind; arg = mods[i].arg;
+        if (kind === 'inv') {
+            if (arg !== undefined && arg.trim()) throw new QasmError(line, 'inv takes no argument');
+            e = -e;
+        } else if (kind === 'pow') {
+            if (arg === undefined || !arg.trim()) throw new QasmError(line,
+                'pow needs an exponent, as in pow(2) @');
+            e *= num(arg);
+        } else {
+            n = arg === undefined || !arg.trim() ? 1 : num(arg);
+            if (n < 0 || Math.abs(n - Math.round(n)) > 1e-9) throw new QasmError(line,
+                kind + ' needs a whole, non-negative number of control qubits');
+            for (c = 0; c < Math.round(n); c++) ctrls.push(kind === 'negctrl');
+        }
+    }
+    return { ctrls: ctrls, e: e };
+}
+
+var MAX_POW = 4096;               /* a sanity bound on pow(k) @, not a physics one */
+
+/* U† is the word backwards with every letter inverted. h, x, cx and swap are
+ * their own inverses; a phase negates. */
+function invertGates(list, line) {
+    var out = [], i, g;
+    for (i = list.length - 1; i >= 0; i--) {
+        g = list[i];
+        switch (g[0]) {
+        case 'h': case 'x': case 'cx': case 'swap': out.push(g); break;
+        case 'zpow':   out.push(['zpow', g[1], mod16(-g[2])]); break;
+        case 'mcpow':  out.push(['mcpow', g[1], mod16(-g[2]), g[3]]); break;
+        case 'gphase': out.push(['gphase', mod16(-g[1])]); break;
+        case 'if':     out.push(['if', g[1], invertGates(g[2], line)]); break;
+        default: throw new QasmError(line,
+            'inv @ cannot invert a ' + g[0] + ' — it is not a unitary',
+            'measurement and reset destroy information, so there is nothing to run ' +
+            'backwards. Invert the unitary part and leave the measurement where it is.');
+        }
+    }
+    return out;
+}
+
+/* Every primitive, with controls added. Nothing here needs a kernel the
+ * engine does not already have. */
+function controlGates(list, cq, line) {
+    var out = [], i, g, t, seen = {}, j;
+    for (j = 0; j < cq.length; j++) {
+        if (seen[cq[j]]) throw new QasmError(line, 'the same qubit is named as a control twice');
+        seen[cq[j]] = 1;
+    }
+    function span(extra, tgt) {                       /* the qubit set of one mcpow */
+        var qs = cq.concat(extra).concat([tgt]), k;
+        for (k = 0; k < qs.length; k++) if (qs.lastIndexOf(qs[k]) !== k) throw new QasmError(line,
+            'a qubit cannot be a control and a target of the same gate');
+        return qs;
+    }
+    function ctrlX(extra, tgt) {                      /* controlled X = H · MCZ(pi) · H */
+        out.push(['h', tgt], mcpow(span(extra, tgt), 8), ['h', tgt]);
+    }
+    for (i = 0; i < list.length; i++) {
+        g = list[i];
+        switch (g[0]) {
+        case 'x':      ctrlX([], g[1]); break;
+        case 'cx':     ctrlX([g[1]], g[2]); break;
+        case 'zpow':   out.push(mcpow(span([], g[1]), g[2])); break;
+        case 'mcpow':  out.push(mcpow(cq.concat(g[3]), g[2])); break;
+        case 'gphase': out.push(mcpow(cq.slice(), g[1])); break;
+        case 'h':                                     /* H = A† · X · A, A = T·H·S */
+            t = g[1];
+            out.push(['zpow', t, 4], ['h', t], ['zpow', t, 2]);
+            ctrlX([], t);
+            out.push(['zpow', t, 14], ['h', t], ['zpow', t, 12]);
+            break;
+        case 'swap':                                  /* the Fredkin decomposition */
+            out.push(['cx', g[2], g[1]]);
+            ctrlX([g[1]], g[2]);
+            out.push(['cx', g[2], g[1]]);
+            break;
+        case 'if': out.push(['if', g[1], controlGates(g[2], cq, line)]); break;
+        default: throw new QasmError(line,
+            'ctrl @ cannot control a ' + g[0],
+            'a measurement is not a unitary, so there is no controlled form of it.');
+        }
+    }
+    return out;
+}
+
+/* U^k for a whole word. A word made only of phases folds into one phase per
+ * gate instead of k copies of it, which is what keeps pow(512) @ cp(θ) a
+ * single gate rather than 512 of them. */
+function repeatGates(list, e) {
+    var out = [], i, allPhase = list.length > 0;
+    for (i = 0; i < list.length; i++)
+        if (list[i][0] !== 'zpow' && list[i][0] !== 'mcpow' && list[i][0] !== 'gphase')
+            { allPhase = false; break; }
+    if (allPhase) {
+        for (i = 0; i < list.length; i++) {
+            if (list[i][0] === 'gphase') out.push(['gphase', mod16(list[i][1] * e)]);
+            else if (list[i][0] === 'zpow') out.push(['zpow', list[i][1], mod16(list[i][2] * e)]);
+            else out.push(['mcpow', list[i][1], mod16(list[i][2] * e), list[i][3]]);
+        }
+        return out;
+    }
+    for (i = 0; i < e; i++) out = out.concat(list);
+    return out;
+}
+
+/* A FRACTIONAL power needs the gate written as a phase in some basis:
+ *
+ *     G = P† · diag(1, e^{iθ}) · P     and then     G^e = P† · diag(1, e^{ieθ}) · P
+ *
+ * Every gate below is one of those, with P built from H, S and T. The
+ * rewrite is emitted as ordinary statements so the lattice check, the
+ * refusal messages and the broadcast rules stay in one place: pow(1/2) @ x
+ * becomes h; p(pi/2); h, and pow(1/3) @ x becomes h; p(pi/3); h, which is
+ * then refused for the angle, which is the honest reason. */
+var FRAC_BASIS = {
+    z: ['Z', 8], s: ['Z', 4], sdg: ['Z', -4], t: ['Z', 2], tdg: ['Z', -2],
+    cz: ['Z', 8], cs: ['Z', 4], csdg: ['Z', -4], ccz: ['Z', 8], mcz: ['Z', 8],
+    x: ['X', 8], sx: ['X', 4], sxdg: ['X', -4],
+    cx: ['X', 8], CX: ['X', 8], cnot: ['X', 8], ccx: ['X', 8], toffoli: ['X', 8], mcx: ['X', 8],
+    y: ['Y', 8], cy: ['Y', 8],
+    h: ['H', 8], ch: ['H', 8],
+    id: ['I', 0]
+};
+
+/* Gates whose angle IS the whole gate: a fractional power just scales it. */
+var FRAC_SCALE = { p: 1, u1: 1, phase: 1, cp: 1, cphase: 1, cu1: 1, mcp: 1,
+                   gphase: 1, rz: 1, rx: 1, ry: 1 };
+
+function fracPowStatements(name, params, ops, e, line) {
+    var E = '(' + e + ')';
+    if (Object.prototype.hasOwnProperty.call(FRAC_SCALE, name)) {
+        if (params === undefined || !params.trim()) throw new QasmError(line,
+            name + ' takes an angle, e.g. ' + name + '(pi/4)');
+        return [name + '(' + E + '*(' + params + '))' + (ops ? ' ' + ops : '')];
+    }
+    var f = FRAC_BASIS[name];
+    if (!f) throw new QasmError(line,
+        'pow(' + e + ') @ ' + name + ' — a fractional power of ' + name + ' is not exact here',
+        'a fractional power is exact when the gate is a phase in some basis reachable ' +
+        'from H, S and T: z, s, t, x, sx, y, h and their controlled forms all are, and ' +
+        'so is anything whose angle is a parameter (p, rz, rx, ry, cp, mcp, gphase). ' +
+        'swap and U are not — write the gate you mean directly.');
+    if (params !== undefined && params.trim()) throw new QasmError(line, name + ' takes no parameters');
+    if (f[0] === 'I') return [];
+    var oo = ops.trim() ? splitTop(ops).map(function (s) { return s.trim(); }) : [];
+    if (!oo.length) throw new QasmError(line, name + ' needs qubit operand(s)');
+    var tgt = oo[oo.length - 1];
+    var ang = (f[1] < 0 ? '-' : '') + E + '*pi' + (Math.abs(f[1]) === 4 ? '/2' :
+              Math.abs(f[1]) === 2 ? '/4' : '');
+    var core = oo.length === 1 ? ['p(' + ang + ') ' + tgt]
+                               : ['mcp(' + ang + ') ' + oo.join(',')];
+    if (f[0] === 'Z') return core;
+    if (f[0] === 'X') return ['h ' + tgt].concat(core, ['h ' + tgt]);
+    if (f[0] === 'Y') return ['sdg ' + tgt, 'h ' + tgt].concat(core, ['h ' + tgt, 's ' + tgt]);
+    /* H = A† · X · A with A = T·H·S, and X = H · Z · H */
+    return ['s ' + tgt, 'h ' + tgt, 't ' + tgt, 'h ' + tgt].concat(core,
+           ['h ' + tgt, 'tdg ' + tgt, 'h ' + tgt, 'sdg ' + tgt]);
+}
+
 /* Approximate synthesis, when and only when the caller asked for it.
  * parse(src, {synth: OQSYNTH, eps: 1e-3}) turns it on; without that object
  * every off-lattice angle is refused exactly as before. The module is passed
@@ -381,15 +607,69 @@ var TABLE = {
     }]
 };
 
-/* Gates that exist in qelib1.inc but have no exact representative here. */
-/* Still nothing here has an exact representative at a general angle. rx, ry,
- * u, u2 and u3 have LEFT this list: they are exact whenever theta lands on the
- * half-pi lattice, and the U decomposition refuses them by angle instead of by
- * name. What remains is the two-qubit rotations and the controlled rotations,
- * which would need a controlled RY kernel that does not exist here. */
-var IRRATIONAL = {
-    crx: 'crx', cry: 'cry', crz: 'crz',
-    rxx: 'rxx', ryy: 'ryy', rzz: 'rzz', cu: 'cu', cu3: 'cu3'
+/* The controlled and two-qubit rotations, as CIRCUITS rather than as
+ * refusals — the last names in qelib1.inc that were refused by name.
+ *
+ * They were refused because a controlled rotation looked like it needed a
+ * controlled-RY kernel. It does not. RY(m·pi/2) = (H·Z)^m, and ctrl @ is
+ * applied to the WORD a gate emits, letter by letter, so a controlled
+ * rotation is exact on exactly the lattice the rotation itself is exact on.
+ * And rzz is rz conjugated by CX — the sandwich, which costs nothing — with
+ * rxx and ryy the same thing in a rotated basis.
+ *
+ * So these are refused by ANGLE now, like rx and ry before them, which is
+ * the whole pattern: the lattice is the product, the gate table is not. */
+function twoq(o, line, name) {
+    var q = o.trim() ? splitTop(o).map(function (s) { return s.trim(); }) : [];
+    if (q.length !== 2) throw new QasmError(line,
+        name + ' takes 2 qubit operands, got ' + q.length);
+    return q;
+}
+
+var REWRITE = {
+    crx: function (p, o) { return ['ctrl @ rx(' + p + ') ' + o]; },
+    cry: function (p, o) { return ['ctrl @ ry(' + p + ') ' + o]; },
+    crz: function (p, o) { return ['ctrl @ rz(' + p + ') ' + o]; },
+    /* cu3 is a qelib1 name and means the controlled TEXTBOOK u3. The u3 in
+     * this table is the OpenQASM 3 one, which stdgates.inc defines with a
+     * gphase of -(theta+phi+lambda)/2 — that is e^{-i(phi+lambda)/2} times
+     * the textbook matrix. Global, and invisible, until it is controlled:
+     * then it is a relative phase on the control and very visible. So it is
+     * cancelled there, with the same u1((phi+lambda)/2) qelib1's own cu3
+     * decomposition carries. */
+    cu3: function (p, o, line) {
+        var a = p.trim() ? splitTop(p).map(function (s) { return s.trim(); }) : [], q = twoq(o, line, 'cu3');
+        if (a.length !== 3) throw new QasmError(line,
+            'cu3 takes 3 angles (theta, phi, lambda), got ' + a.length);
+        return ['p(((' + a[1] + ')+(' + a[2] + '))/2) ' + q[0],
+                'ctrl @ u3(' + p + ') ' + o];
+    },
+    /* stdgates.inc, verbatim: p(gamma - theta/2) on the control, then the
+     * controlled U — whose own e^{i theta/2} becomes p(theta/2) there, so the
+     * two together leave p(gamma) and the textbook controlled-U. */
+    cu:  function (p, o, line) {
+        var a = p.trim() ? splitTop(p).map(function (s) { return s.trim(); }) : [], q = twoq(o, line, 'cu');
+        if (a.length !== 4) throw new QasmError(line,
+            'cu takes 4 angles (theta, phi, lambda, gamma), got ' + a.length);
+        return ['p((' + a[3] + ')-(' + a[0] + ')/2) ' + q[0],
+                'ctrl @ U(' + a[0] + ',' + a[1] + ',' + a[2] + ') ' + o];
+    },
+    /* exp(-i theta/2 · Z⊗Z): the parity a xor b decides the sign, and CX is
+     * what writes the parity onto one qubit. */
+    rzz: function (p, o, line) {
+        var q = twoq(o, line, 'rzz');
+        return ['cx ' + q[0] + ',' + q[1], 'rz(' + p + ') ' + q[1], 'cx ' + q[0] + ',' + q[1]];
+    },
+    rxx: function (p, o, line) {
+        var q = twoq(o, line, 'rxx');
+        return ['h ' + q[0], 'h ' + q[1]].concat(REWRITE.rzz(p, o, line),
+               ['h ' + q[0], 'h ' + q[1]]);
+    },
+    ryy: function (p, o, line) {
+        var q = twoq(o, line, 'ryy');
+        return ['rx(pi/2) ' + q[0], 'rx(pi/2) ' + q[1]].concat(REWRITE.rzz(p, o, line),
+               ['rx(-pi/2) ' + q[0], 'rx(-pi/2) ' + q[1]]);
+    }
 };
 
 /* ---- parser --------------------------------------------------------- */
@@ -489,10 +769,16 @@ function q3Detect(src) {
 /* Brace-aware statement split. Returns simple statements and block
  * statements ({head, body}) with the line each one started on. */
 function q3Split(src, base) {
-    var out = [], buf = '', line = base || 1, start = line, depth, i, ch, head, bodyStart;
+    var out = [], buf = '', line = base || 1, start = line, depth, i, ch, head, bodyStart, br = 0;
     for (i = 0; i < src.length; i++) {
         ch = src[i];
         if (ch === '\n') line++;
+        /* An index set lives inside brackets — "q[{2*i, 2*i+1}]" — so a { is
+         * only a block opener at bracket depth zero. Without this the
+         * statement splitter cuts "let bp = q[" off from its own subscript. */
+        if (ch === '[' || ch === '(') br++;
+        else if (ch === ']' || ch === ')') { if (br > 0) br--; }
+        if (br > 0) { buf += ch; continue; }
         if (ch === ';') {
             if (buf.trim()) out.push({ text: buf.trim(), line: start });
             buf = ''; start = line;
@@ -524,7 +810,7 @@ function q3Split(src, base) {
 /* Compile-time integer arithmetic over the loop variables and the classical
  * constants. Anything a measurement wrote is deliberately NOT in scope --
  * that is the line between unrolling and feedback. */
-function q3Int(expr, env, line, what) {
+function q3Num(expr, env, line, what) {
     var t = expr.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\[\s*([^\]]+)\s*\]/g, function (m, nm, ix) {
         if (!(nm in env)) return m;
         var b = q3Int(ix, env, line, what);
@@ -537,36 +823,62 @@ function q3Int(expr, env, line, what) {
         throw new QasmError(line, 'cannot evaluate "' + expr.trim() + '" at translation time',
             '"' + m + '" is not a compile-time constant here. ' + (what || ''));
     });
-    var v = evalAngle(t, line);
+    return evalAngle(t, line);
+}
+
+function q3Int(expr, env, line, what) {
+    var v = q3Num(expr, env, line, what);
     if (Math.abs(v - Math.round(v)) > 1e-9)
         throw new QasmError(line, '"' + expr.trim() + '" is not an integer (' + v + ')');
     return Math.round(v);
 }
 
-/* name, name[i], name[a:b] and name[a:step:b] -> a list of "name[k]" */
-function q3Operand(arg, regs, env, line) {
+/* name, name[i], name[a:b], name[a:step:b] and the index set name[{i,j,k}]
+ * -> a list of element names.
+ *
+ * An ALIAS ("let bp = q[{2*i, 2*i+1}]") is already such a list, so it slices
+ * and indexes exactly like a register does — the only difference is that its
+ * elements name the qubits of whatever it was cut from. Everything below the
+ * translator therefore never learns that aliases exist. */
+function q3Operand(arg, regs, env, line, alias) {
     arg = arg.trim();
-    var m = /^([A-Za-z_][A-Za-z0-9_]*)\s*\[\s*([^\]]*)\s*\]$/.exec(arg), nm, size, i, out = [];
+    var m = /^([A-Za-z_][A-Za-z0-9_]*)\s*\[\s*([^\]]*)\s*\]$/.exec(arg), nm, i, out = [], elems;
+    function elemsOf(name) {
+        var k, e;
+        if (alias && Object.prototype.hasOwnProperty.call(alias, name)) return alias[name];
+        if (!(name in regs)) return null;
+        e = [];
+        for (k = 0; k < regs[name]; k++) e.push(name + '[' + k + ']');
+        return e;
+    }
     if (!m) {
-        nm = arg;
-        if (!(nm in regs)) return null;
-        for (i = 0; i < regs[nm]; i++) out.push(nm + '[' + i + ']');
-        return out;
+        elems = elemsOf(arg);
+        return elems ? elems.slice() : null;
     }
     nm = m[1];
-    if (!(nm in regs)) return null;
-    size = regs[nm];
-    var parts = m[2].split(':');
-    if (parts.length === 1) return [nm + '[' + q3Int(parts[0], env, line) + ']'];
+    elems = elemsOf(nm);
+    if (!elems) return null;
+    function at(ix) {
+        if (ix < 0) ix += elems.length;                /* the spec counts back from -1 */
+        if (ix < 0 || ix >= elems.length) throw new QasmError(line,
+            nm + '[' + ix + '] is out of range — ' + nm + ' has ' + elems.length + ' bits');
+        return elems[ix];
+    }
+    var inner = m[2].trim();
+    if (inner.charAt(0) === '{') {                      /* an index set, in the order written */
+        if (inner.charAt(inner.length - 1) !== '}') throw new QasmError(line,
+            'unbalanced { in "' + arg + '"');
+        var set = inner.slice(1, -1).split(',');
+        for (i = 0; i < set.length; i++) if (set[i].trim()) out.push(at(q3Int(set[i], env, line)));
+        return out;
+    }
+    var parts = inner.split(':');
+    if (parts.length === 1) return [at(q3Int(parts[0], env, line))];
     var a = q3Int(parts[0], env, line);
     var step = parts.length === 3 ? q3Int(parts[1], env, line) : 1;
     var b = q3Int(parts[parts.length - 1], env, line);
     if (step === 0) throw new QasmError(line, 'a slice step of 0 never ends');
-    for (i = a; step > 0 ? i <= b : i >= b; i += step) {
-        if (i < 0 || i >= size) throw new QasmError(line,
-            nm + '[' + i + '] is out of range — ' + nm + ' has ' + size + ' bits');
-        out.push(nm + '[' + i + ']');
-    }
+    for (i = a; step > 0 ? i <= b : i >= b; i += step) out.push(at(i));
     return out;
 }
 
@@ -596,6 +908,7 @@ var Q3_IDENT = /[\p{L}_][\p{L}\p{N}_]*/gu;
 
 function q3Translate(src) {
     var out = [], map = [], gdefs = {}, ddefs = {}, qregs = {}, cregs = {}, env = {}, fenv = {};
+    var qalias = {};
     var problems = [];
     var order = [], measured = {}, warnings = [], anyGate = false;
 
@@ -617,12 +930,6 @@ function q3Translate(src) {
      * reported as line 11 and not swallowed by a later refusal. The emit runs
      * into a throwaway list; only its exceptions matter here. */
     function checkGate(name, params, line) {
-        if (IRRATIONAL[name]) {
-            refuse(line, name + ' has no exact representative in Z[ζ₈]',
-                'continuous rotations are where float simulators start rounding. ' +
-                'Express the gate over {H, S, T, CX} — universal, and exact here.');
-            return false;
-        }
         var te = TABLE[name];
         if (!te) return true;                  /* unknown: let the gate layer say so */
         var np = te[1], dry = [], raw, wasDry = SYNTH && SYNTH.dry;
@@ -656,7 +963,7 @@ function q3Translate(src) {
         var g = gdefs[name], i, j, sub, argNames, args = [], flat;
         if (!g) return false;
         /* operands may be registers; broadcast the way the gate layer does */
-        argNames = operands.split(',').map(function (a) { return q3Operand(a, qregs, env, line) || [a.trim()]; });
+        argNames = operands.split(',').map(function (a) { return q3Operand(a, qregs, env, line, qalias) || [a.trim()]; });
         var width = 1;
         for (i = 0; i < argNames.length; i++) if (argNames[i].length > 1) width = argNames[i].length;
         var pv = params === undefined || !params.trim() ? [] : splitTop(params);
@@ -681,6 +988,145 @@ function q3Translate(src) {
         }
         return { text: one(st.text), body: st.body === undefined ? undefined : one(st.body),
                  line: st.line };
+    }
+
+    /* ---- gate modifiers ------------------------------------------------ *
+     * A modifier on a BUILT-IN goes straight down to the gate layer, which
+     * controls the word the gate emits. A modifier on a user-defined gate is
+     * distributed over the inlined body instead, because ctrl and inv are
+     * homomorphisms — ctrl(A·B) = ctrl(A)·ctrl(B), (A·B)† = B†·A† — so the
+     * body carries them one statement at a time and bottoms out at built-ins.
+     *
+     * The control qubits sit at the FRONT of the operand list, in modifier
+     * order, and stay there through every rewrite: prependCtrls puts the
+     * outer controls in front of whatever list the inner statement already
+     * had, which is exactly what nesting means. */
+    function prependCtrls(stmtText, ctrlOps, extraMods, line) {
+        var im = splitMods(stmtText), ic = splitCall(im.rest), ops;
+        if (!ic) throw new QasmError(line,
+            'cannot read "' + stmtText + '" inside a modified gate');
+        ops = ic.operands.trim() ? splitTop(ic.operands).map(function (s) { return s.trim(); }) : [];
+        ops = ctrlOps.concat(ops);
+        return extraMods + modText(im.mods) + ic.name +
+               (ic.params === undefined ? '' : '(' + ic.params + ')') +
+               (ops.length ? ' ' + ops.join(',') : '');
+    }
+
+    function modBody(body, pre, e, ctrlSel, line, depth) {
+        var i, r, reps;
+        for (i = 0; i < body.length; i++) if (body[i].body !== undefined) throw new QasmError(line,
+            'a gate body with a block statement in it cannot carry a modifier');
+        if (Math.abs(e - Math.round(e)) > 1e-9) {
+            /* (A·B)^k is not A^k·B^k, so a fractional power can only be pushed
+             * into a body that is ONE gate. gphase statements do not count:
+             * a global phase is a scalar, it commutes with everything, and
+             * its fractional power is unambiguous on this lattice. */
+            var real = 0;
+            for (i = 0; i < body.length; i++)
+                if (!/^gphase\b/i.test(body[i].text.trim())) real++;
+            if (real > 1) throw new QasmError(line,
+                'pow(' + e + ') @ over a gate of ' + real + ' statements is not exact',
+                'a fractional power distributes over a product only when the factors ' +
+                'commute, so it can be pushed inside a one-gate body and no further. ' +
+                'Write the root you mean as its own gate.');
+            for (i = 0; i < body.length; i++)
+                walk({ text: prependCtrls(body[i].text, ctrlSel, pre + 'pow(' + e + ') @ ', line),
+                       line: body[i].line }, line, depth + 1);
+            return;
+        }
+        reps = Math.abs(Math.round(e));
+        if (reps * body.length > MAX_POW) throw new QasmError(line,
+            'pow(' + Math.round(e) + ') @ would emit more than ' + MAX_POW + ' gates');
+        for (r = 0; r < reps; r++) {
+            if (e < 0) for (i = body.length - 1; i >= 0; i--)
+                walk({ text: prependCtrls(body[i].text, ctrlSel, pre + 'inv @ ', line),
+                       line: body[i].line }, line, depth + 1);
+            else for (i = 0; i < body.length; i++)
+                walk({ text: prependCtrls(body[i].text, ctrlSel, pre, line),
+                       line: body[i].line }, line, depth + 1);
+        }
+    }
+
+    /* Inline a subroutine, like a gate definition, with one extra binding: the
+     * local register the body returns is aliased to whatever the caller
+     * assigned it to, so "return b" needs no machinery of its own. A void def
+     * passes retTo = null and there is nothing to bind. */
+    function inlineDef(name, dargs, retTo, line, depth) {
+        var dd = ddefs[name], dsub = {}, di, rm;
+        if (dargs.length !== dd.params.length) throw new QasmError(line,
+            name + ' takes ' + dd.params.length + ' argument(s), got ' + dargs.length);
+        for (di = 0; di < dd.params.length; di++) dsub[dd.params[di]] = dargs[di];
+        if (retTo) for (di = 0; di < dd.body.length; di++) {
+            rm = /^return\s+([\p{L}_][\p{L}\p{N}_]*)/u.exec(dd.body[di].text);
+            if (rm) { dsub[rm[1]] = retTo; break; }
+        }
+        for (di = 0; di < dd.body.length; di++) walk(substitute(dd.body[di], dsub), line, depth + 1);
+    }
+
+    function walkMod(md, st, line, depth) {
+        if (depth > 32) throw new QasmError(line, 'gate modifiers nested more than 32 deep');
+        var call = splitCall(md.rest);
+        if (!call) throw new QasmError(line, 'cannot read statement "' + md.rest + '"');
+        var f = foldMods(md.mods, line, function (a) { return q3Num(a, env, line); });
+        var C = f.ctrls.length, i, w, pre = '';
+        var items = call.operands.trim()
+            ? splitTop(call.operands).map(function (s) { return s.trim(); }) : [];
+        if (items.length < C) throw new QasmError(line,
+            'this names ' + C + ' control qubit(s) before the gate operands, but only ' +
+            items.length + ' operand(s) were given');
+        for (i = 0; i < C; i++) pre += f.ctrls[i] ? 'negctrl @ ' : 'ctrl @ ';
+        var argv = items.map(function (a) { return q3Operand(a, qregs, env, line, qalias) || [a]; });
+        var ctrlSel = [];
+        for (i = 0; i < C; i++) {
+            if (argv[i].length !== 1) throw new QasmError(line,
+                'a control operand has to be a single qubit, not a whole register',
+                'name the bit — q[0] — or write ctrl @ once per control.');
+            ctrlSel.push(argv[i][0]);
+        }
+        anyGate = true;
+
+        var g = gdefs[call.name];
+        if (g) {
+            var pv = call.params === undefined || !call.params.trim() ? [] : splitTop(call.params);
+            if (pv.length !== g.params.length) throw new QasmError(line,
+                call.name + ' takes ' + g.params.length + ' parameter(s), got ' + pv.length);
+            if (argv.length - C !== g.args.length) throw new QasmError(line,
+                call.name + ' takes ' + g.args.length + ' qubit operand(s), got ' + (argv.length - C));
+            var width = 1;
+            for (i = C; i < argv.length; i++) if (argv[i].length > 1) width = argv[i].length;
+            for (w = 0; w < width; w++) {
+                var sub = {}, body = [], j;
+                for (i = 0; i < g.args.length; i++)
+                    sub[g.args[i]] = argv[C + i].length === 1 ? argv[C + i][0] : argv[C + i][w];
+                for (i = 0; i < g.params.length; i++) sub[g.params[i]] = '(' + pv[i] + ')';
+                for (j = 0; j < g.body.length; j++) body.push(substitute(g.body[j], sub));
+                modBody(body, pre, f.e, ctrlSel, line, depth);
+            }
+            return;
+        }
+
+        /* a built-in: the gate layer knows how to control the word it emits */
+        if (f.e !== 1) pre += 'pow(' + f.e + ') @ ';
+        else if (!checkGate(call.name, call.params, line)) return;
+        var ptxt = call.params === undefined ? '' : '(' + substConst(call.params) + ')';
+        var te = TABLE[call.name], flatq, sel;
+        if (te && te[0] === -1) {                     /* variadic: one control set */
+            flatq = ctrlSel.slice();
+            for (i = C; i < argv.length; i++) flatq = flatq.concat(argv[i]);
+            push(pre + call.name + ptxt + ' ' + flatq.join(',') + ';', line);
+            return;
+        }
+        var wd = 1;
+        for (i = C; i < argv.length; i++) if (argv[i].length > 1) {
+            if (wd > 1 && wd !== argv[i].length) throw new QasmError(line,
+                'operands of different widths cannot be broadcast together');
+            wd = argv[i].length;
+        }
+        for (w = 0; w < wd; w++) {
+            sel = ctrlSel.slice();
+            for (i = C; i < argv.length; i++) sel.push(argv[i].length === 1 ? argv[i][0] : argv[i][w]);
+            push(pre + call.name + ptxt + (sel.length ? ' ' + sel.join(',') : '') + ';', line);
+        }
     }
 
     function walk(st, callerLine, depth) {
@@ -721,13 +1167,53 @@ function q3Translate(src) {
             else fenv[m[2]] = '(' + substConst(m[3]) + ')';
             return;
         }
+        /* An angle register with no value exists to be WRITTEN while the
+         * circuit runs — iterative phase estimation shifts measurement
+         * outcomes into one and feeds it back as a phase. That is a runtime
+         * angle, and this engine fixes the circuit before it runs. Thrown
+         * rather than collected, because it declares a name: skipping it makes
+         * every later use of that name report something worse. */
+        m = /^(?:const\s+)?angle\s*(?:\[\s*([^\]]*)\s*\])?\s+([\p{L}_][\p{L}\p{N}_]*)$/iu.exec(text);
+        if (m) throw new QasmError(line,
+            'angle' + (m[1] ? '[' + m[1] + ']' : '') + ' ' + m[2] +
+            ' — an angle register with no value is a runtime angle',
+            'oq needs the circuit fixed before it runs, and a phase a measurement ' +
+            'writes is not. An angle declared WITH a value is substituted verbatim ' +
+            'and works. Note that this is not the only obstacle for iterative phase ' +
+            'estimation: an n-bit angle register steps by 2·pi/2^n, which is off the ' +
+            'pi/8 lattice for every n above 4.');
+
+        /* let: an alias for a register, a slice, or an index set. Nothing but
+         * a name for a list of qubits that already exist — so it is resolved
+         * here and never travels any further. Re-binding a name is allowed
+         * and is how varteleport.qasm walks its chain of Bell pairs: each
+         * iteration re-points "io" at the qubit the state just moved to. */
+        m = /^let\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/i.exec(text);
+        if (m) {
+            var alias = q3Operand(m[2], qregs, env, line, qalias);
+            if (!alias) throw new QasmError(line,
+                'let ' + m[1] + ' = "' + m[2].trim() + '" — that is not a qubit register, ' +
+                'slice or index set',
+                'an alias names qubits that already exist: let a = q[0:3], ' +
+                'let a = q[{0, 2, 5}], or let a = q.');
+            qalias[m[1]] = alias;
+            return;
+        }
 
         /* reset: free at the top, because the state starts there anyway */
         if (/^reset\b/i.test(text)) {
             /* Before any gate this is free: the state starts in |0..0>.
              * After one it is measure-and-correct, which the gate layer
-             * now knows how to do, so hand it down instead of refusing. */
-            if (anyGate) { push(text + ';', line); return; }
+             * now knows how to do, so hand it down instead of refusing.
+             * The operand is expanded here, because an alias is a translator
+             * idea and the gate layer has never heard of one. */
+            if (anyGate) {
+                var rq = q3Operand(text.replace(/^reset\s+/i, ''), qregs, env, line, qalias);
+                if (!rq) throw new QasmError(line,
+                    'unknown quantum register in "' + text + '"');
+                for (i = 0; i < rq.length; i++) push('reset ' + rq[i] + ';', line);
+                return;
+            }
             if (false) refuse(line,
                 'mid-circuit reset is not a unitary',
                 'a reset before any gate is free — the state starts in |0..0> — but once ' +
@@ -740,7 +1226,7 @@ function q3Translate(src) {
         m = /^([A-Za-z_][A-Za-z0-9_]*(?:\s*\[[^\]]*\])?)\s*=\s*measure\s+(.+)$/i.exec(text);
         if (!m) { var mm = /^measure\s+(.+?)\s*->\s*(.+)$/i.exec(text); if (mm) m = [null, mm[2], mm[1]]; }
         if (m) {
-            var cbits = q3Operand(m[1], cregs, env, line), qbits = q3Operand(m[2], qregs, env, line);
+            var cbits = q3Operand(m[1], cregs, env, line), qbits = q3Operand(m[2], qregs, env, line, qalias);
             if (!cbits) throw new QasmError(line, 'unknown classical register "' + m[1].trim() + '"');
             if (!qbits) throw new QasmError(line, 'unknown quantum register "' + m[2].trim() + '"');
             if (cbits.length !== qbits.length) throw new QasmError(line,
@@ -761,10 +1247,9 @@ function q3Translate(src) {
         if (head && Q3_NO[head] && Q3_NO[head][0]) throw new QasmError(line,
             Q3_NO[head][0] + ' (' + head + ') has no meaning in an exact statevector',
             Q3_NO[head][1]);
-        if (/@/.test(text) && /^(ctrl|negctrl|inv|pow)\b/.test(text)) return refuse(line,
-            'gate modifiers (ctrl @, inv @, pow @) are not supported yet',
-            'write the controlled or inverted form directly — cx, cz, cp, ccx, sdg, tdg ' +
-            'are all in the table');
+        /* gate modifiers: ctrl @, negctrl @, inv @, pow(k) @ */
+        var mdq = splitMods(text);
+        if (mdq.mods.length) return walkMod(mdq, st, line, depth);
 
         /* gate definition */
         m = /^gate\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(([^)]*)\))?\s*(.*)$/i.exec(text);
@@ -792,20 +1277,30 @@ function q3Translate(src) {
         }
         if (/^return\b/i.test(text)) return;      /* handled by the caller binding */
 
+        /* A subroutine call, in all three spellings the official examples
+         * actually use: assigned ("t = ymeasure(q)"), void as a statement
+         * ("xprepare(input_qubit);"), and the gate-call form the examples
+         * write for a void def with quantum operands ("bellprep bp;",
+         * "distill_and_buffer(buffer_size) workspace, buffer;"). The last
+         * one puts the classical arguments in the parentheses and the
+         * quantum ones after, so the argument list is the two concatenated. */
         m = /^([\p{L}_][\p{L}\p{N}_]*)\s*=\s*([\p{L}_][\p{L}\p{N}_]*)\s*\((.*)\)$/u.exec(text);
         if (m && ddefs[m[2]]) {
-            var dd = ddefs[m[2]], dargs = m[3].trim() ? splitTop(m[3]).map(function (x) { return x.trim(); }) : [];
-            if (dargs.length !== dd.params.length) throw new QasmError(line,
-                m[2] + ' takes ' + dd.params.length + ' argument(s), got ' + dargs.length);
-            var dsub = {}, di;
-            for (di = 0; di < dd.params.length; di++) dsub[dd.params[di]] = dargs[di];
-            /* whatever the body returns is the caller's register */
-            for (di = 0; di < dd.body.length; di++) {
-                var rm = /^return\s+([\p{L}_][\p{L}\p{N}_]*)/u.exec(dd.body[di].text);
-                if (rm) { dsub[rm[1]] = m[1]; break; }
-            }
-            for (di = 0; di < dd.body.length; di++) walk(substitute(dd.body[di], dsub), line, depth + 1);
+            inlineDef(m[2], m[3].trim() ? splitTop(m[3]).map(function (x) { return x.trim(); }) : [],
+                      m[1], line, depth);
             return;
+        }
+        {
+            var dcall = splitCall(text);
+            if (dcall && ddefs[dcall.name] && !gdefs[dcall.name]) {
+                var dargs = [];
+                if (dcall.params !== undefined && dcall.params.trim())
+                    dargs = splitTop(dcall.params).map(function (x) { return x.trim(); });
+                if (dcall.operands.trim())
+                    dargs = dargs.concat(splitTop(dcall.operands).map(function (x) { return x.trim(); }));
+                inlineDef(dcall.name, dargs, null, line, depth);
+                return;
+            }
         }
 
         /* for uint i in [a:b] { } and [a:step:b] */
@@ -883,7 +1378,7 @@ function q3Translate(src) {
          * times. Zip them the way the gate layer does: every operand is either
          * a single qubit or the full width. */
         var argv = opsrc.trim() ? splitTop(opsrc).map(function (a) {
-            return q3Operand(a, qregs, env, line) || [a.trim()];
+            return q3Operand(a, qregs, env, line, qalias) || [a.trim()];
         }) : [];
         anyGate = true;
         if (!checkGate(call.name, call.params, line)) return;   /* reported where written */
@@ -1063,19 +1558,32 @@ function parse2(src) {
                 return;
             }
 
+            /* ---- gate modifiers ---------------------------------------- *
+             * ctrl @, negctrl @, inv @ and pow(k) @. The base gate is emitted
+             * into a list of its own, and then that WORD is inverted, repeated
+             * and controlled — see controlGates. Nothing about the base gate
+             * has to know it is being modified, which is why a modifier works
+             * on everything the table has, U included. */
+            var md = splitMods(text);
+            if (md.mods.length) { emitModified(md, line, gates); return; }
+
             /* name(params) operands */
             var call = splitCall(text);
             if (!call) throw new QasmError(line, 'cannot read statement "' + text + '"');
             var name = call.name, params = call.params, operands = call.operands;
 
-            if (IRRATIONAL[name]) throw new QasmError(line,
-                name + ' has no exact representative in Z[ζ₈]',
-                'continuous rotations are where float simulators start rounding. ' +
-                'Express the gate over {H, S, T, CX} — universal, and exact here.');
+            /* the controlled and two-qubit rotations, as the circuits they are */
+            if (REWRITE[name]) {
+                if (params === undefined || !params.trim()) throw new QasmError(line,
+                    name + ' takes an angle, e.g. ' + name + '(pi/2)');
+                var rw = REWRITE[name](params, operands, line), ri;
+                for (ri = 0; ri < rw.length; ri++) doStatement(rw[ri], line, gates);
+                return;
+            }
 
             var entry = TABLE[name];
             if (!entry) throw new QasmError(line, 'unknown gate "' + name + '"',
-                'supported: ' + Object.keys(TABLE).sort().join(' '));
+                'supported: ' + Object.keys(TABLE).concat(Object.keys(REWRITE)).sort().join(' '));
 
             var nQ = entry[0], nP = entry[1], emit = entry[2];
             var k = 0;
@@ -1137,6 +1645,78 @@ function parse2(src) {
                 }
                 emit(gates, qsel, k, line);
             }
+    }
+
+    /* One modified statement. The controls come off the front of the operand
+     * list, in modifier order; the rest of the list belongs to the base gate,
+     * which is emitted through doStatement so it keeps its own broadcast,
+     * its own angle checks and its own refusals. negctrl is X-conjugation
+     * around the whole thing, which is the definition, not a trick. */
+    function emitModified(md, line, gates) {
+        var f = foldMods(md.mods, line, function (a) { return evalAngle(a, line); });
+        var call = splitCall(md.rest);
+        if (!call) throw new QasmError(line, 'cannot read statement "' + md.rest + '"');
+        var items = call.operands.trim() ? splitTop(call.operands) : [];
+        var C = f.ctrls.length, i, r, cq = [], sub = [], one = [], e = f.e;
+        if (items.length < C) throw new QasmError(line,
+            'this names ' + C + ' control qubit(s) before the gate operands, but only ' +
+            items.length + ' operand(s) were given');
+        for (i = 0; i < C; i++) {
+            r = resolve(items[i], qregs, line);
+            if (r.length !== 1) throw new QasmError(line,
+                'a control operand has to be a single qubit, not a whole register',
+                'write ctrl @ once per control qubit, or name the bit: q[0].');
+        cq.push(r[0]);
+        }
+        var rest = items.slice(C).join(',');
+        var ptxt = call.params !== undefined ? '(' + call.params + ')' : '';
+        var isFrac = Math.abs(e - Math.round(e)) > 1e-9;
+
+        /* Approximate synthesis is SUPPRESSED here, and that is correctness,
+         * not caution. Solovay-Kitaev approximates in SU(2), so the word it
+         * returns carries whatever global phase it happens to have. A global
+         * phase is invisible — until the gate is CONTROLLED, when it becomes a
+         * relative phase on the control qubit and is very visible indeed, in a
+         * way the quoted epsilon does not cover. Repeating a word k times is
+         * the same problem from the other end: the error the panel reports is
+         * the error of one copy. A fractional power is fine, because it is
+         * taken by scaling the ANGLE and then synthesizing that. */
+        var prevSynth = SYNTH;
+        var suppress = C > 0 || (!isFrac && Math.abs(Math.round(e)) > 1);
+        if (suppress) SYNTH = null;
+        try {
+            if (isFrac) {
+                var frac = fracPowStatements(call.name, call.params, rest, e, line), fi;
+                for (fi = 0; fi < frac.length; fi++) doStatement(frac[fi], line, sub);
+            } else {
+                e = Math.round(e);
+                if (e !== 0) {
+                    doStatement(call.name + ptxt + (rest ? ' ' + rest : ''), line, one);
+                    if (e < 0) { one = invertGates(one, line); e = -e; }
+                    if (e > MAX_POW) throw new QasmError(line,
+                        'pow(' + e + ') @ ' + call.name + ' would emit more than ' + MAX_POW + ' gates',
+                        'a power of a phase gate folds into the angle and costs nothing; ' +
+                        'this one does not, so it really is that many gates.');
+                    sub = repeatGates(one, e);
+                }
+            }
+        } catch (err) {
+            if (err.name === 'QasmError' && prevSynth && suppress)
+                err.hint = (err.hint ? err.hint + '\n\n' : '') +
+                    'Approximate synthesis is on, but it does not apply under ' +
+                    (C > 0 ? 'ctrl @' : 'pow(k) @') + '. A synthesized word carries ' +
+                    'whatever global phase it has, which is invisible — until it is ' +
+                    (C > 0 ? 'controlled, when it becomes a relative phase on the control qubit. '
+                           : 'repeated, when the error it is allowed grows with k. ') +
+                    'Synthesize the rotation as its own gate and control that, if that ' +
+                    'is really what you mean.';
+            throw err;
+        } finally { SYNTH = prevSynth; }
+        if (!sub.length) return;
+        if (C) sub = controlGates(sub, cq, line);
+        for (i = 0; i < C; i++) if (f.ctrls[i]) gates.push(['x', cq[i]]);
+        for (i = 0; i < sub.length; i++) gates.push(sub[i]);
+        for (i = C - 1; i >= 0; i--) if (f.ctrls[i]) gates.push(['x', cq[i]]);
     }
 
     for (si = 0; si < stmts.length; si++) {

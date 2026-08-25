@@ -743,6 +743,49 @@ var PRESETS = {
         'unmaj cin[0], b[0], a[0];',
         'measure b[0:3] -> ans[0:3];',
         'measure cout[0] -> ans[4];'
+    ].join(String.fromCharCode(10)),
+
+    /* Gate modifiers: ctrl @, negctrl @, inv @ and pow(k) @. Phase estimation
+     * is where they earn their keep -- "controlled-U to the 2^k" is one line
+     * with them and a hand-written ladder without, and the inverse QFT is the
+     * forward one with inv @ in front of it rather than a second gate to keep
+     * in step. The eigenvalue is e^(i.pi/4), so the phase is exactly 1/8 and
+     * three counting bits hold it with nothing left over: 001 at 100.000000%,
+     * denominator back to 2^0.
+     *
+     * ipe.qasm, the iterative version in the official examples, is refused
+     * here -- not for the modifiers any more, but because its angle register
+     * steps by 2.pi/2^n, which is off the lattice for every n above 4. */
+    'modifiers': [
+        'OPENQASM 3;',
+        'include "stdgates.inc";',
+        '',
+        'qubit[3] c;    // counting register, c[0] is the low bit',
+        'qubit[1] t;    // the eigenvector',
+        'bit[3] out;',
+        '',
+        'gate qft3 a, b, d {',
+        '    h d;',
+        '    cp(pi/2) b, d;',
+        '    cp(pi/4) a, d;',
+        '    h b;',
+        '    cp(pi/2) a, b;',
+        '    h a;',
+        '    swap a, d;',
+        '}',
+        '',
+        'x t;           // |1>, an eigenvector of p(theta)',
+        'h c;',
+        '',
+        '// controlled-U^(2^k), one line instead of a ladder',
+        'for uint k in [0: 2] {',
+        '  ctrl @ pow(2 ** k) @ p(pi/4) c[k], t[0];',
+        '}',
+        '',
+        '// the inverse QFT is the forward one, backwards',
+        'inv @ qft3 c[0], c[1], c[2];',
+        '',
+        'measure c -> out;'
     ].join(String.fromCharCode(10))
 };
 
@@ -1390,6 +1433,26 @@ function invertLines(lines) {
 /* A reference state with phases on both qubits: identities are checked on it,
  * not on |00>, so a gate that is wrong on a phase cannot hide. */
 var PREP2 = 'h q[0];\nt q[0];\nh q[1];\ns q[1];\n';
+var PREP3 = PREP2 + 'h q[2];\nt q[2];\ncx q[0],q[2];\n';
+var PREP4 = PREP3 + 'h q[3];\nt q[3];\n';
+
+/* The OpenQASM 3 preamble, for the checks that need a gate definition — the
+ * OpenQASM 2 layer has none, and mixing qreg into an OpenQASM 3 source is a
+ * different dialect, not a shorthand. */
+function head3(nq) {
+    return 'OPENQASM 3;\ninclude "stdgates.inc";\nqubit[' + nq + '] q;\n';
+}
+
+/* A word with no symmetry to hide behind: every kind of letter the inverter
+ * has to handle — H, X, a phase, a controlled phase, a swap, a Toffoli, a
+ * global phase — and inv @ has to turn the whole thing round and land back
+ * on the state it started from. */
+var MODWORD =
+    'gate mw a, b, c {\n' +
+    '    h a;\n    t a;\n    cx a, b;\n    s b;\n    ccx a, b, c;\n' +
+    '    cp(pi/4) b, c;\n    swap a, c;\n    sx b;\n    gphase(pi/4);\n' +
+    '    ctrl @ h a, b;\n    y c;\n' +
+    '}\n';
 
 function ringPair(gates, equiv) {
     return { a: head(2, 0) + PREP2 + gates, b: head(2, 0) + PREP2 + equiv };
@@ -1566,6 +1629,53 @@ var SUITE = [
     { kind: 'identity', name: 'stdgates: U(π,0,π)·gphase(−π/2) == x',
       p: { a: head(1, 0) + 'h q[0];t q[0];U(pi, 0, pi) q[0];gphase(-pi/2);',
            b: head(1, 0) + 'h q[0];t q[0];x q[0];' } },
+    /* Gate modifiers. ctrl @ is applied to the WORD a gate emits, not to a
+     * second table of pre-controlled gates, so the thing to check is that
+     * every modified form lands on the same state as the direct spelling —
+     * global phase included, because this engine tracks it. */
+    { kind: 'identity', name: 'ctrl @ x == cx,  ctrl(2) @ x == ccx',
+      p: { a: head(3, 0) + PREP3 + 'ctrl @ x q[0],q[1];\nctrl(2) @ x q[0],q[1],q[2];',
+           b: head(3, 0) + PREP3 + 'cx q[0],q[1];\nccx q[0],q[1],q[2];' } },
+    { kind: 'identity', name: 'ctrl @ h == ch — A† · ctrl(X) · A, A = T·H·S',
+      p: { a: head(3, 0) + PREP3 + 'ctrl @ h q[0],q[1];\nctrl @ swap q[0],q[1],q[2];',
+           b: head(3, 0) + PREP3 + 'ch q[0],q[1];\ncswap q[0],q[1],q[2];' } },
+    { kind: 'identity', name: 'ctrl @ U(π,0,π) · ctrl @ gphase(−π/2) == cx',
+      p: { a: head(2, 0) + PREP2 + 'ctrl @ U(pi, 0, pi) q[0],q[1];\nctrl @ gphase(-pi/2) q[0];',
+           b: head(2, 0) + PREP2 + 'cx q[0],q[1];' } },
+    { kind: 'identity', name: 'ctrl @ rz(π/2) == cp(π/2) · p(−π/4)',
+      p: { a: head(2, 0) + PREP2 + 'ctrl @ rz(pi/2) q[0],q[1];',
+           b: head(2, 0) + PREP2 + 'cp(pi/2) q[0],q[1];\np(-pi/4) q[0];' } },
+    { kind: 'identity', name: 'negctrl @ x == X · cx · X',
+      p: { a: head(2, 0) + PREP2 + 'negctrl @ x q[0],q[1];',
+           b: head(2, 0) + PREP2 + 'x q[0];\ncx q[0],q[1];\nx q[0];' } },
+    { kind: 'identity', name: 'inv @ W · W = I over an eleven-letter word',
+      p: { a: head3(3) + MODWORD + PREP3 + 'mw q[0],q[1],q[2];\ninv @ mw q[0],q[1],q[2];\n',
+           b: head3(3) + PREP3 } },
+    { kind: 'identity', name: 'ctrl @ (a user gate) == its body, letter by letter',
+      p: { a: head3(4) + 'gate w a, b { h a; cx a, b; t b; }\n' + PREP4 +
+              'ctrl @ w q[3],q[0],q[1];\n',
+           b: head3(4) + PREP4 +
+              'ch q[3],q[0];\nccx q[3],q[0],q[1];\ncp(pi/4) q[3],q[1];\n' } },
+    { kind: 'identity', name: 'pow(½) @ z == s,  pow(½) @ x == sx',
+      p: { a: head(2, 0) + PREP2 + 'pow(0.5) @ z q[0];\npow(0.5) @ x q[1];',
+           b: head(2, 0) + PREP2 + 's q[0];\nsx q[1];' } },
+    { kind: 'identity', name: 'pow(½) @ h twice == h,  pow(512) @ cp(π/4) == I',
+      p: { a: head(2, 0) + PREP2 + 'pow(0.5) @ h q[0];\npow(0.5) @ h q[0];\n' +
+              'pow(512) @ cp(pi/4) q[0],q[1];',
+           b: head(2, 0) + PREP2 + 'h q[0];' } },
+
+    /* The controlled and two-qubit rotations, which used to be refused by
+     * name for wanting a controlled-RY kernel. They do not: ctrl @ controls
+     * the WORD, and rzz is rz conjugated by CX. */
+    { kind: 'identity', name: 'crx(π) == cx·S†,  cry(π) == cy·S†,  cu3(π/2,0,π) == ch',
+      p: { a: head(2, 0) + PREP2 + 'crx(pi) q[0],q[1];\ncry(pi) q[0],q[1];\ncu3(pi/2,0,pi) q[0],q[1];',
+           b: head(2, 0) + PREP2 + 'cx q[0],q[1];\nsdg q[0];\ncy q[0],q[1];\nsdg q[0];\nch q[0],q[1];' } },
+    { kind: 'identity', name: 'rzz(π/2)² == rzz(π),  rxx(π) == −i X⊗X,  ryy(π) == −i Y⊗Y',
+      p: { a: head(2, 0) + PREP2 + 'rzz(pi/2) q[0],q[1];\nrzz(pi/2) q[0],q[1];\n' +
+              'rxx(pi) q[0],q[1];\nryy(pi) q[0],q[1];',
+           b: head(2, 0) + PREP2 + 'rzz(pi) q[0],q[1];\nx q[0];\nx q[1];\ngphase(-pi/2);\n' +
+              'y q[0];\ny q[1];\ngphase(-pi/2);' } },
+
     { kind: 'sparse', name: 'OpenQASM 3 adder, verbatim: 1 + 15 = 16',
       build: function () { return PRESETS['openqasm 3']; }, support: 1,
       sum: function (s) {
