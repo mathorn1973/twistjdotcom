@@ -103,8 +103,12 @@ body {
 /* ── masthead ── */
 header { text-align: center; margin-bottom: 34px; }
 .mark {
-    font-family: 'JetBrains Mono', monospace; font-size: 13px;
-    letter-spacing: 0.55em; color: var(--accent); margin-bottom: 12px;
+    /* The wordmark. Brackets want the letters closer than the old 0.55em
+       tracking, or they float away from what they are holding; text-indent
+       cancels the trailing letter-space so the whole thing stays centred. */
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    letter-spacing: 0.18em; text-indent: 0.18em;
+    color: var(--accent); margin-bottom: 12px;
 }
 h1 {
     font-size: clamp(27px, 5vw, 40px); font-weight: 300;
@@ -226,7 +230,7 @@ button.stop:disabled { opacity: 1; }
 <div class="wrap">
 
 <header>
-    <div class="mark">oq</div>
+    <div class="mark">(OQ)</div>
     <h1>Ordinary Quantum</h1>
     <p class="thesis">Exact, <b>zero-noise</b> discrete algebra for quantum circuits — leaving
     physical noise where it actually belongs: in condensed-matter spectroscopy, not in computation.</p>
@@ -266,6 +270,7 @@ button.stop:disabled { opacity: 1; }
         <button class="alt stop" id="stopBtn" style="display:none">Stop</button>
         <span class="lbl">shots</span><input type="number" id="shots" value="1024" min="1" max="100000" step="256">
         <span class="lbl">seed</span><input type="number" id="seed" value="20260605" min="0" step="1">
+        <span class="lbl"><label><input type="checkbox" id="synth"> approximate</label></span><span class="lbl">ε</span><select id="synthEps"><option value="1e-2">1e-2</option><option value="1e-3" selected>1e-3</option><option value="1e-4">1e-4</option></select>
         <span class="spacer"></span>
         <span class="lbl">ctrl + enter runs</span>
     </div>
@@ -287,12 +292,59 @@ button.stop:disabled { opacity: 1; }
 
 <script src="oq.js"></script>
 <script src="oq16.js"></script>
+<script src="oqsparse.js"></script>
+<script src="oqsynth.js"></script>
 <script src="qasm.js"></script>
 <script>
 (function () {
 'use strict';
 
 var el = function (id) { return document.getElementById(id); };
+
+/* The four engine modules are separate files, loaded by relative src. Open the
+ * page somewhere that has no base URL to resolve them against -- a data: URI,
+ * an inlined preview, a copy of the HTML on its own -- and none of them
+ * arrive, and the first thing that touches one dies on a name that is not
+ * there. A page that refuses circuits by name with a reason should manage the
+ * same for itself. */
+(function () {
+    var missing = [], b, i;
+    if (typeof OQ   === 'undefined') missing.push('oq.js');
+    if (typeof OQ16 === 'undefined') missing.push('oq16.js');
+    if (typeof OQS  === 'undefined') missing.push('oqsparse.js');
+    /* oqsynth.js is optional: without it the approximate box just stays off */
+    if (typeof QASM === 'undefined') missing.push('qasm.js');
+    if (!missing.length) return;
+
+    /* Two different causes, and they deserve two different sentences: a
+     * data: or blob: URL has no base for a relative src to resolve against at
+     * all, while over http or file the path resolves fine and the files
+     * simply are not there. */
+    var noBase = location.protocol === 'data:' || location.protocol === 'blob:' ||
+                 location.protocol === 'about:';
+    var out = el('out');
+    if (out) out.innerHTML =
+        '<span class="err">the engine did not load: ' + missing.join(', ') + '</span>\n\n' +
+        '<span class="d">oq is this page plus four JavaScript files beside it, loaded by\n' +
+        'relative path. ' +
+        (noBase
+          ? 'This copy is running from a ' + location.protocol + ' URL, which has no base\n' +
+            'address for those paths to resolve against, so none of them were ever fetched.\n\n' +
+            'Open the directory itself — serve it over http and go to /oq/, or use\n' +
+            'https://twistj.com/oq/.'
+          : 'They are not beside this copy of the page, so the requests for\nthem failed.\n\n' +
+            'Keep index.html, oq.js, oq16.js, oqsparse.js and qasm.js in one directory,\n' +
+            'or use https://twistj.com/oq/.') +
+        '\n\nNothing is wrong with the circuit you pasted — none of the arithmetic is here\n' +
+        'to run it with.</span>';
+    for (i = 0; i < 5; i++) {
+        b = el(['runBtn', 'testBtn', 'benchBtn', 'workBtn', 'stopBtn'][i]);
+        if (b) b.disabled = true;
+    }
+    var chip = el('chip');
+    if (chip) { chip.className = 'chip bad'; chip.textContent = 'engine not loaded'; }
+    throw new Error('oq: engine modules missing (' + missing.join(', ') + ')');
+}());
 
 /* The parser reports the narrowest ring a circuit is exact in; this hands
  * back the engine for it. Z[ζ₈] is four integers per amplitude, Z[ζ₁₆] is
@@ -313,6 +365,42 @@ el('themeToggle').addEventListener('click', function () {
 function head(nq, nc) {
     return 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[' + nq + '];' +
            (nc ? '\ncreg c[' + nc + '];' : '') + '\n\n';
+}
+
+/* Cuccaro ripple-carry adder: b += a, in place, no ancillas beyond one carry
+ * in and one carry out. Every gate is CX or CCX, so every gate is a
+ * permutation of the basis index — the state never leaves a single basis
+ * vector and the support never leaves 1, whatever k is. This is the circuit
+ * class the dense engine cannot touch and the sparse one does not notice.
+ *
+ *   layout: q[0] carry-in, q[1..k] a, q[k+1..2k] b, q[2k+1] carry-out
+ *   MAJ(x,y,z) = cx z,y ; cx z,x ; ccx x,y,z
+ *   UMA(x,y,z) = ccx x,y,z ; cx z,x ; cx x,y                                */
+function adderQasm(k, av, bv) {
+    var n = 2 * k + 2, s = head(n, 0), i, set = [];
+    var A = function (i) { return 1 + i; }, B = function (i) { return k + 1 + i; };
+    av = BigInt(av); bv = BigInt(bv);      /* k runs past what a JS shift holds */
+    s += '// ' + k + '-bit ripple-carry adder, b += a, on ' + n + ' qubits.\n' +
+         '// 2^' + n + ' amplitudes exist; exactly one of them is ever non-zero,\n' +
+         '// because CX and CCX permute basis states and never superpose them.\n' +
+         '// The dense engine would need 2^' + n + ' * 16 bytes. This needs one amplitude.\n\n';
+    for (i = 0; i < k; i++) {
+        if ((av >> BigInt(i)) & 1n) set.push('x q[' + A(i) + '];');
+        if ((bv >> BigInt(i)) & 1n) set.push('x q[' + B(i) + '];');
+    }
+    s += '// a = ' + av + ', b = ' + bv + '\n' + (set.length ? set.join(' ') + '\n' : '') + '\n';
+    s += '// forward sweep — the carry rides up the register\n';
+    for (i = 0; i < k; i++) {
+        var x = i === 0 ? 0 : A(i - 1), y = B(i), z = A(i);
+        s += 'cx q[' + z + '],q[' + y + ']; cx q[' + z + '],q[' + x + ']; ccx q[' + x + '],q[' + y + '],q[' + z + '];\n';
+    }
+    s += '\ncx q[' + A(k - 1) + '],q[' + (2 * k + 1) + '];   // carry out\n\n';
+    s += '// backward sweep — undo the carries, leaving the sum in b\n';
+    for (i = k - 1; i >= 0; i--) {
+        var x2 = i === 0 ? 0 : A(i - 1), y2 = B(i), z2 = A(i);
+        s += 'ccx q[' + x2 + '],q[' + y2 + '],q[' + z2 + ']; cx q[' + z2 + '],q[' + x2 + ']; cx q[' + x2 + '],q[' + y2 + '];\n';
+    }
+    return s;
 }
 
 function groverQasm(n, target, iters) {
@@ -562,7 +650,98 @@ var PRESETS = {
                 '// Phase gates are units in Z[ζ₈]: the width never moves.\nh q[0];\n', i;
         for (i = 0; i < 512; i++) s += 't q[0];' + ((i % 16 === 15) ? '\n' : ' ');
         return s + '\nh q[0];\n';
-    })()
+    })(),
+
+    /* 434 qubits, exactly, in a browser tab. Not a trick and not a
+     * truncation: a ripple-carry adder is CX and CCX all the way down, both
+     * of them permutations of the basis index, so the state is one basis
+     * vector before the circuit and one basis vector after it. All ones plus
+     * one, so every carry in the register actually fires. */
+    'adder-434': adderQasm(216, (1n << 216n) - 1n, 1n),
+
+    /* OpenQASM 3, verbatim from the openqasm/openqasm examples -- the
+     * shipped file, not a paraphrase. qubit[] and bit[] declarations,
+     * two gate definitions, for-loops with a step, uint constants read
+     * bit by bit, register slices, and both spellings of measure.
+     * 1 + 15 = 16, exactly, and the support never leaves 1. */
+    /* Dynamic: mid-circuit measurement, collapse, and gates that depend on
+     * the outcome. The collapse is exact -- see the note under the state. */
+    'teleport': head(3, 2) + [
+        '// Quantum teleportation. The state on q[0] is moved to q[2] using one',
+        '// Bell pair and two classical bits -- and the corrections at the end',
+        '// depend on what the measurement gave, so the circuit is not fixed',
+        '// before it runs. Change the seed to take a different branch.',
+        '//',
+        '// The last two lines undo the preparation on q[2]. If the protocol is',
+        '// exact, q[2] comes back to |0> at probability exactly 1, whichever of',
+        '// the four outcomes came up.',
+        '',
+        'h q[0];',
+        't q[0];        // |psi> = T H |0>',
+        '',
+        'h q[1];        // Bell pair on q[1], q[2]',
+        'cx q[1],q[2];',
+        '',
+        'cx q[0],q[1];  // Bell measurement on q[0], q[1]',
+        'h q[0];',
+        'measure q[0] -> c[0];',
+        'measure q[1] -> c[1];',
+        '',
+        'if(c==2) x q[2];   // corrections, read off the outcome',
+        'if(c==1) z q[2];',
+        'if(c==3) x q[2];',
+        'if(c==3) z q[2];',
+        '',
+        'tdg q[2];      // undo the preparation',
+        'h q[2];'
+    ].join(String.fromCharCode(10)),
+
+    'openqasm 3': [
+        '/*',
+        ' * quantum ripple-carry adder',
+        ' * Cuccaro et al, quant-ph/0410184',
+        ' */',
+        'include "stdgates.inc";',
+        '',
+        'gate majority a, b, c {',
+        '    cx c, b;',
+        '    cx c, a;',
+        '    ccx a, b, c;',
+        '}',
+        '',
+        'gate unmaj a, b, c {',
+        '    ccx a, b, c;',
+        '    cx c, a;',
+        '    cx a, b;',
+        '}',
+        '',
+        'qubit[1] cin;',
+        'qubit[4] a;',
+        'qubit[4] b;',
+        'qubit[1] cout;',
+        'bit[5] ans;',
+        'uint[4] a_in = 1;  // a = 0001',
+        'uint[4] b_in = 15; // b = 1111',
+        '// initialize qubits',
+        'reset cin;',
+        'reset a;',
+        'reset b;',
+        'reset cout;',
+        '',
+        '// set input states',
+        'for uint i in [0: 3] {',
+        '  if(bool(a_in[i])) x a[i];',
+        '  if(bool(b_in[i])) x b[i];',
+        '}',
+        '// add a to b, storing result in b',
+        'majority cin[0], b[0], a[0];',
+        'for uint i in [0: 2] { majority a[i], b[i + 1], a[i + 1]; }',
+        'cx a[3], cout[0];',
+        'for uint i in [2: -1: 0] { unmaj a[i],b[i+1],a[i+1]; }',
+        'unmaj cin[0], b[0], a[0];',
+        'measure b[0:3] -> ans[0:3];',
+        'measure cout[0] -> ans[4];'
+    ].join(String.fromCharCode(10))
 };
 
 var pbox = el('presets');
@@ -663,7 +842,13 @@ async function execute() {
 
     var prog;
     try {
-        prog = QASM.parse(src);
+        /* Synthesis is opt-in and stays off unless the box is ticked. With it
+         * off, an angle that is not in the ring is refused, which is the
+         * default the whole page argues for. */
+        var wantSynth = el('synth').checked && typeof OQSYNTH !== 'undefined';
+        prog = QASM.parse(src, wantSynth
+            ? { synth: OQSYNTH, eps: parseFloat(el('synthEps').value) || 1e-3 }
+            : undefined);
     } catch (e) {
         if (e.name !== 'QasmError') throw e;
         out.innerHTML = '<span class="err">line ' + e.line + ': ' + esc(e.message) + '</span>' +
@@ -688,9 +873,18 @@ async function execute() {
     setBusy(false);
 }
 
+/* Two containers for the same algebra. Dense keeps 2^n amplitudes because a
+ * scrambling circuit needs every one of them; sparse keeps only the non-zero
+ * ones, which is the right answer whenever the circuit is permutations and
+ * phases with a few Hadamards on top. The parser decides — it is the only
+ * place that has seen the whole gate list. */
 async function simulate(prog, out) {
+    if (prog.backend === 'sparse') return simulateSparse(prog, out);
     var ENG = engineFor(prog.ring);
     var s = new ENG.State(prog.n);
+    /* A dynamic circuit needs randomness, and it has to be seeded: one
+     * trajectory per seed, reproducible. */
+    s.rng = new ENG.Rng(+el('seed').value || 0);
     var total = prog.gates.length, ampOps = 0, markAmp = 0;
     var t0 = performance.now(), last = t0, i, now;
 
@@ -734,8 +928,166 @@ async function simulate(prog, out) {
     render(prog, s, tRun, ampOps, counts, shots, tShots, i);
 }
 
+/* A synthesized run is an exact run of a DIFFERENT circuit. That has to be the
+ * first thing on the panel, not a footnote, because it changes what every
+ * number below it means. */
+function synthNotice(prog) {
+    if (!prog.synthesis) return [];
+    var L = [], i, e, n = prog.synthesis.length, tot = 0, gt = 0;
+    for (i = 0; i < n; i++) { tot += prog.synthesis[i].length; gt += prog.synthesis[i].tCount; }
+    L.push('<span class="err">approximate</span>  <span class="d">' + n + ' rotation' +
+           (n > 1 ? 's' : '') + ' in this circuit ' + (n > 1 ? 'have' : 'has') +
+           ' no exact representative, so oq ran a NEARBY\n            circuit instead: ' +
+           tot.toLocaleString('en-US') + ' Clifford+T gates (' + gt.toLocaleString('en-US') +
+           ' T) substituted by Solovay–Kitaev.\n            The arithmetic below is exact — for ' +
+           'the substitute. It is not the circuit you wrote.</span>');
+    for (i = 0; i < Math.min(n, 6); i++) {
+        e = prog.synthesis[i];
+        L.push('  <span class="d">line ' + e.line + ': ' + e.gate + '(' + e.angle +
+               ') → ' + e.length + ' gates, ' + e.tCount + ' T, depth ' + e.depth +
+               ', operator distance ' + e.err.toExponential(2) + '</span>');
+    }
+    if (n > 6) L.push('  <span class="d">… ' + (n - 6) + ' more</span>');
+    L.push('  <span class="err">worst substitution: ' + prog.synthWorst.toExponential(2) +
+           '</span> <span class="d">against a tolerance of ' + prog.synthEps +
+           '. Global phase is not preserved by synthesis,\n  so the fingerprint below belongs to ' +
+           'the substitute circuit, not to the one you wrote.</span>');
+    L.push('');
+    return L;
+}
+
+/* ── sparse run ───────────────────────────────────────────────────────── */
+
+async function simulateSparse(prog, out) {
+    var gates = OQS.fuse(prog.gates);
+    var s = new OQS.SparseState(prog.n, QASM.SPARSE_CAP);
+    var total = gates.length, i, now;
+    var t0 = performance.now(), last = t0;
+
+    for (i = 0; i < total; i++) {
+        if (stopRequested) break;
+        OQS.apply(s, gates[i]);
+        now = performance.now();
+        if (now - last > 40) {
+            el('progText').textContent =
+                'gate ' + (i + 1) + '/' + total + '  ·  support ' +
+                s.support().toLocaleString('en-US') + '  ·  denom 2^' + s.denom +
+                '  ·  ' + ((now - t0) / 1000).toFixed(1) + ' s';
+            await frame();
+            last = performance.now();
+        }
+    }
+    renderSparse(prog, s, performance.now() - t0, i, total);
+}
+
+function renderSparse(prog, s, tRun, done, total) {
+    var L = synthNotice(prog), i;
+    if (done < total) {
+        L.push('<span class="err">stopped after ' + done + ' of ' + total +
+               ' gates</span> <span class="d">— the state below is the circuit up to that ' +
+               'point, and it is exact for that prefix</span>');
+        L.push('');
+    }
+
+    var perm = s.gates - s.hCount - s.phaseCount;
+    var width = s.widthBits();
+    var k = Math.max(1, Math.ceil((width + 1) / 64));
+    var perAmp = 4 * (8 + 8 * k) + 8 + Math.ceil(s.n / 8);   /* coefficients + key */
+    var mem = s.support() * perAmp;
+
+    L.push('<span class="h">circuit</span>     <span class="q">' + s.n + ' qubits</span> · 2^' + s.n +
+           ' amplitudes <span class="d">(' + (s.n > 270 ? 'more than atoms, and none of them stored'
+                                                       : 'none of them stored') + ')</span> · ' +
+           s.gates + ' gates <span class="d">(' + s.hCount + ' H · ' + s.phaseCount +
+           ' phase · ' + perm + ' permutation)</span>');
+    L.push('<span class="h">backend</span>     <span class="q">sparse</span> · support ' +
+           s.support().toLocaleString('en-US') + ' <span class="d">(peak ' +
+           s.maxSupport.toLocaleString('en-US') + ')</span> — permutations and phases carry ' +
+           'the support, <span class="d">only H can grow it, and cancellation shrinks it back</span>');
+    L.push('<span class="h">width</span>       denom 2^' + s.denom + ' <span class="d">(max 2^' +
+           s.maxDenom + ')</span> · coefficients ' + width + ' bit · BigInt ' +
+           '<span class="d">(' + perAmp + ' B/live amplitude)</span>');
+    L.push('<span class="h">ring</span>        Z[ζ₈] · 4 integers per amplitude · phase step π/4');
+    L.push('<span class="h">time</span>        ' + tRun.toFixed(2) + ' ms · ' +
+           si(s.gates / (tRun / 1000), 'gates/s') + ' · state ' + si(mem, 'B'));
+    L.push('');
+
+    var ent = s.entries(), LIST = 12;
+    var shown = ent.length <= LIST ? ent : ent.slice()
+        .sort(function (p, q) { return s.probFloat(q[0]) - s.probFloat(p[0]); })
+        .slice(0, LIST)
+        .sort(function (p, q) { return p[0] < q[0] ? -1 : (p[0] > q[0] ? 1 : 0); });
+
+    var rows = [], wa = 0, wp = 0;
+    for (i = 0; i < shown.length; i++) {
+        var amp = ampStrRing(shown[i][1]);
+        var pstr = probStrRing(s, shown[i][0], 8);
+        if (amp.length > wa) wa = amp.length;
+        if (pstr.length > wp) wp = pstr.length;
+        rows.push([shown[i][0], amp, pstr, (s.probFloat(shown[i][0]) * 100).toFixed(6) + '%']);
+    }
+    var h1 = '(c₀ + c₁ζ + c₂ζ² + c₃ζ³) / 2^' + s.denom;
+    var h2 = '|amp|² = (S + X√2) / 2^' + (2 * s.denom);
+    var keyw = Math.max(12, Math.min(s.n, 48) + 6);
+    var wA = Math.max(wa + 3, h1.length + 3), wP = Math.max(wp + 3, h2.length + 3);
+    L.push('<span class="h">' + pad('amplitude', keyw) + '</span><span class="d">' +
+           pad(h1, wA) + pad(h2, wP) + padl('probability', 12) + '</span>');
+    for (i = 0; i < rows.length; i++) {
+        L.push('  <span class="b">' + ketOf(rows[i][0], s.n) + '</span>' +
+               ' '.repeat(Math.max(1, keyw - 2 - ketOf(rows[i][0], s.n).length)) +
+               pad(rows[i][1], wA) + pad(rows[i][2], wP) + padl(rows[i][3], 12));
+    }
+    if (ent.length > shown.length)
+        L.push('  <span class="d">… ' + (ent.length - shown.length) +
+               ' more non-zero. Every other amplitude is exactly zero — that is not a ' +
+               'truncation, it is what the sparse form stores.</span>');
+
+    var nrm = s.checkNorm();
+    L.push('  <span class="' + (nrm.ok ? 'ok' : 'err') + '">Σ S = 2^' + (2 * s.denom) +
+           ', Σ X = 0</span> <span class="d">— over the live amplitudes only, and still ' +
+           'exact: the zeros the dense engine sums over contribute nothing</span>');
+    L.push('');
+
+    /* The Section 4.1 fingerprint is defined over all 2^n amplitudes, zeros
+     * included, which is the one thing this backend will not do. Where the
+     * dense engine can still be built, hand back the canonical value; past
+     * that, the sparse form has its own, over the live set. */
+    if (s.n <= 20) {
+        L.push('<span class="h">fingerprint</span> ' + s.toDense(OQ).hash() +
+               ' <span class="d">— the canonical value, identical to the dense engine, ' +
+               'the native C core and the Atari</span>');
+    } else {
+        L.push('<span class="h">fingerprint</span> ' + s.sparseHash() +
+               ' <span class="d">— sparse form (n, denom, then the live amplitudes in ' +
+               'index order). Not the dense fingerprint: that one walks 2^' + s.n +
+               ' amplitudes including the zeros.</span>');
+    }
+    el('out').innerHTML = L.join('\n');
+}
+
+/* |0110…⟩, elided in the middle once the register is wider than the line. */
+function ketOf(key, n) {
+    var b = key.toString(2);
+    if (b.length < n) b = '0'.repeat(n - b.length) + b;
+    if (n > 48) b = b.slice(0, 24) + '…' + b.slice(-23);
+    return '|' + b + '⟩';
+}
+
 function render(prog, s, tRun, ampOps, counts, shots, tShots, done) {
-    var L = [], i, b;
+    var L = synthNotice(prog), i, b;
+    /* A dynamic circuit does not have "a" final state -- it has one per set of
+     * measurement outcomes. Say which one this is before showing it. */
+    if (s.measured) {
+        var cb = [], ci;
+        for (ci = 0; ci < prog.nc; ci++) cb.push(s.cbits[ci] ? 1 : 0);
+        L.push('<span class="h">trajectory</span>  <span class="d">this circuit measures ' +
+               s.measured + ' qubit' + (s.measured > 1 ? 's' : '') + ' mid-flight and branches on ' +
+               'the result, so it has one final state per outcome,\n            not one. Seed ' +
+               (+el('seed').value || 0) + ' took this branch:</span>  <span class="q">' +
+               (cb.length ? cb.join('') : '(no declared bits)') +
+               '</span> <span class="d">(c[0] first)</span>');
+        L.push('');
+    }
     if (done !== undefined && done < prog.gates.length) {
         L.push('<span class="err">stopped after ' + done + ' of ' + prog.gates.length +
                ' gates</span> <span class="d">— the state below is the circuit up to that ' +
@@ -856,10 +1208,21 @@ function render(prog, s, tRun, ampOps, counts, shots, tShots, done) {
     }
 
     var okNorm = normOkRing(s, prog.ring);
+    if (s.measured) {
+        var nrmP = s.normPair();
+        L.push('  <span class="' + (okNorm ? 'ok' : 'err') + '">Σ S = ' +
+               big(nrmP.S, 20) + (nrmP.X === 0n ? '' : ' , Σ X = ' + big(nrmP.X, 20)) +
+               ' over 2^' + (2 * s.denom) + '</span> <span class="d">— not 2^' +
+               (2 * s.denom) + ' any more, and it cannot be: renormalizing means ' +
+               'dividing by √p,\n  and √p is not in the ring. The state is left ' +
+               'unnormalized and every probability above is the exact ratio of two ' +
+               'ring elements.</span>');
+    } else {
     L.push('  <span class="' + (okNorm ? 'ok' : 'err') + '">' +
            (prog.ring === 16 ? 'Σ P = 2·2^' + (2 * s.denom) + ', Σ Q = Σ R = Σ T = 0'
                              : 'Σ S = 2^' + (2 * s.denom) + ', Σ X = 0') +
            '</span> <span class="d">— normalized exactly, not to within epsilon</span>');
+    }
     L.push('');
 
     if (counts) {
@@ -934,6 +1297,15 @@ function probStrRing(s, b, ring) {
  * milliseconds. Above that width it falls back to the exact path. */
 function normOkRing(s, ring) {
     var tot;
+    /* After a mid-circuit measurement the state is deliberately unnormalized:
+     * sum S is the norm it is carrying, not 2^(2d). The equality that still
+     * has to hold is that the carried norm matches what the amplitudes
+     * actually sum to -- that is the check worth making here. */
+    if (s.measured) {
+        tot = s.totalBorn();
+        var nrm = s.normPair();
+        return tot.S === nrm.S && tot.X === nrm.X;
+    }
     if (ring === 8 && s.mode === OQ.MODE_I32 && 2 * s.denom + s.n < 50) {
         var S = 0, X = 0, b, a, c, d, e;
         var k0 = s.c0, k1 = s.c1, k2 = s.c2, k3 = s.c3;
@@ -1134,6 +1506,53 @@ var SUITE = [
     { kind: 'promote', name: 'Grover-8 (denom 76): int32 → BigInt mid-run', n: 8, target: 200, iters: 12 },
     { kind: 'promote', name: 'Grover-9 (denom 124): int32 → BigInt mid-run', n: 9, target: 300, iters: 17 },
 
+    { kind: 'sparse', name: 'sparse == dense on Grover-6', qasm: PRESETS['grover-6'] },
+    { kind: 'sparse', name: 'sparse == dense through a Toffoli', qasm: PRESETS['toffoli'] },
+    { kind: 'sparse', name: 'sparse == dense on Shor 15', qasm: PRESETS['shor 15'] },
+    { kind: 'sparse', name: '434 qubits: (2²¹⁶ − 1) + 1 read back exactly',
+      build: function () { return PRESETS['adder-434']; }, support: 1,
+      sum: function (s) {
+          var k = 216, key = s.entries()[0][0], v = 0n, i;
+          for (i = 0; i < k; i++) if ((key >> BigInt(k + 1 + i)) & 1n) v |= (1n << BigInt(i));
+          if ((key >> BigInt(2 * k + 1)) & 1n) v |= (1n << BigInt(k));
+          return v;
+      }, want: 1n << 216n },
+    { kind: 'sparse', name: '400 qubits: H opens the support, H closes it',
+      build: function () {
+          var s = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[400];\n', i;
+          for (i = 0; i < 8; i++) s += 'h q[' + i + '];\n';
+          for (i = 0; i < 399; i++) s += 'cx q[' + i + '],q[' + (i + 1) + '];\n';
+          for (i = 398; i >= 0; i--) s += 'cx q[' + i + '],q[' + (i + 1) + '];\n';
+          for (i = 7; i >= 0; i--) s += 'h q[' + i + '];\n';
+          return s;
+      }, support: 1 },
+
+    { kind: 'identity', name: 'stdgates: U(π/2,0,π)·gphase(−π/4) == h',
+      p: { a: head(1, 0) + 'h q[0];t q[0];U(pi/2, 0, pi) q[0];gphase(-pi/4);',
+           b: head(1, 0) + 'h q[0];t q[0];h q[0];' } },
+    { kind: 'identity', name: 'stdgates: U(π,0,π)·gphase(−π/2) == x',
+      p: { a: head(1, 0) + 'h q[0];t q[0];U(pi, 0, pi) q[0];gphase(-pi/2);',
+           b: head(1, 0) + 'h q[0];t q[0];x q[0];' } },
+    { kind: 'sparse', name: 'OpenQASM 3 adder, verbatim: 1 + 15 = 16',
+      build: function () { return PRESETS['openqasm 3']; }, support: 1,
+      sum: function (s) {
+          var k = s.entries()[0][0], v = 0n, i;
+          for (i = 0; i < 4; i++) if ((k >> BigInt(5 + i)) & 1n) v |= (1n << BigInt(i));
+          if ((k >> 9n) & 1n) v |= 16n;
+          return v;
+      }, want: 16n },
+
+    { kind: 'dynamic', name: 'teleportation returns the state in every branch',
+      qasm: PRESETS['teleport'], seeds: 24, branches: 4,
+      probe: function (s) {
+          var p = 0, b;
+          for (b = 0; b < s.size; b++) if (!(b & 4)) p += s.probFloat(b);
+          return p;                       /* q[2] back to |0> after undoing prep */
+      } },
+    { kind: 'dynamic', name: 'reset after a gate always lands on |0⟩',
+      qasm: head(1, 1) + 'h q[0];\nt q[0];\nh q[0];\nreset q;\n', seeds: 12,
+      probe: function (s) { return s.probFloat(0); } },
+
     { kind: 'parity', name: 'bell', qasm: PRESETS['bell'], hash: 'a39c021c87831690' },
     { kind: 'parity', name: 'ghz-3', qasm: PRESETS['ghz-3'], hash: '668113609759f491' },
     { kind: 'parity', name: 'h t h', qasm: PRESETS['h t h'], hash: 'e6c507f854fbc17a' },
@@ -1253,6 +1672,64 @@ function runOne(item) {
                  n: prog.n, gates: prog.gates.length, hash: s.hash(), note: 'both paths' };
     }
 
+    /* The sparse backend is a different container for the same statevector,
+     * so the only honest check is that it lands on the same one. Where the
+     * dense engine can still be built, compare the canonical fingerprint;
+     * past that, check the exact normalization and the support bound, which
+     * are the two things a dropped or duplicated amplitude would break. */
+    if (item.kind === 'sparse') {
+        if (item.qasm) {
+            prog = QASM.parse(item.qasm);
+            var sp = OQS.run(prog.gates, prog.n);
+            var dn = OQ.run(prog.gates, prog.n);
+            if (sp.toDense(OQ).hash() !== dn.hash())
+                fault = 'sparse ' + sp.toDense(OQ).hash() + ' vs dense ' + dn.hash();
+            else if (OQS.run(prog.gates, prog.n, undefined, true).toDense(OQ).hash() !== dn.hash())
+                fault = 'the Toffoli fusion moved the state';
+            return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                     n: prog.n, gates: prog.gates.length, hash: dn.hash(),
+                     note: 'support ' + sp.support() + ' of 2^' + prog.n };
+        }
+        prog = QASM.parse(item.build());
+        var big = OQS.run(prog.gates, prog.n);
+        var nrm = big.checkNorm();
+        if (prog.backend !== 'sparse') fault = 'the parser sent this to the dense engine';
+        else if (!nrm.ok) fault = 'Σ S = ' + nrm.S + ', want ' + nrm.want + ', Σ X = ' + nrm.X;
+        else if (big.support() !== item.support)
+            fault = 'support ' + big.support() + ', expected ' + item.support;
+        else if (item.sum && item.sum(big) !== item.want)
+            fault = 'read back ' + item.sum(big) + ', expected ' + item.want;
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length, hash: big.sparseHash(),
+                 note: 'support ' + big.support() + ' of 2^' + prog.n };
+    }
+
+    /* A dynamic circuit has one final state per set of outcomes, so it is
+     * checked ACROSS trajectories: the property has to hold whichever branch
+     * the measurement took. */
+    if (item.kind === 'dynamic') {
+        prog = QASM.parse(item.qasm);
+        var seen = {}, worst = 0, sd, ds, dp, dtot, dnrm, dsum, dbad = 0;
+        for (sd = 1; sd <= item.seeds; sd++) {
+            ds = OQ.run(prog.gates, prog.n, sd);
+            dtot = ds.totalBorn(); dnrm = ds.normPair();
+            if (dtot.S !== dnrm.S || dtot.X !== dnrm.X) dbad++;
+            dsum = 0;
+            for (i = 0; i < ds.size; i++) dsum += ds.probFloat(i);
+            if (Math.abs(dsum - 1) > 1e-12) dbad++;
+            dp = item.probe(ds);
+            worst = Math.max(worst, Math.abs(dp - 1));
+            seen[ds.cbits.slice(0, prog.nc).join('')] = 1;
+        }
+        if (dbad) fault = 'the carried norm or the total probability drifted';
+        else if (worst > 1e-12) fault = 'worst |p - 1| = ' + worst.toExponential(2);
+        else if (item.branches && Object.keys(seen).length !== item.branches)
+            fault = 'saw ' + Object.keys(seen).length + ' branches, expected ' + item.branches;
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length, hash: '',
+                 note: Object.keys(seen).length + ' branches, |p-1| ' + worst.toExponential(0) };
+    }
+
     if (item.kind === 'identity') {
         prog = QASM.parse(item.p.a); s = OQ.run(prog.gates, prog.n);
         var pb = QASM.parse(item.p.b); sb = OQ.run(pb.gates, pb.n);
@@ -1283,6 +1760,8 @@ async function runSelfTest() {
         ring16: 'rings — circuits that only exist above the π/4 lattice',
         hash:    'fingerprint — the machine-word path against the BigInt one',
         promote: 'representation — the int32 fast path against unbounded BigInt',
+        sparse: 'containers — the sparse backend against the dense one, same algebra',
+        dynamic: 'dynamic circuits — collapse, and gates that depend on the outcome',
         parity: 'parity — fingerprints the native C engine prints for the same circuits'
     };
     var seen = {};
@@ -1997,6 +2476,19 @@ function refreshChip() {
     var c = el('chip');
     try {
         var prog = QASM.parse(el('src').value);
+        /* A sparse circuit costs what its support costs, and 2^n is not a
+         * number to print — at n = 434 it is 10^130 and the dense estimate
+         * runs off the end of a double into nonsense. Say what will actually
+         * happen instead. */
+        if (prog.backend === 'sparse') {
+            var sup = prog.supportBound;
+            c.className = 'chip';
+            c.innerHTML = '<b>' + prog.n + ' qubits</b> · <b>sparse</b> · at most ' +
+                sup.toLocaleString('en-US') + ' live amplitude' + (sup > 1 ? 's' : '') +
+                ' of 2^' + prog.n + ' · ' + prog.gates.length + ' gates' +
+                (prog.measures.length ? ' · ' + prog.measures.length + ' measured' : '');
+            return;
+        }
         var amps = Math.pow(2, prog.n), slots = slotsFor(prog.ring);
         var bytes = amps * slots * 4;                 /* int32 path */
         var est = amps * prog.gates.length / rateI32; /* seconds, if it stays on int32 */

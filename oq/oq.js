@@ -72,6 +72,31 @@ function State(n) {
     this.hCount = 0;
     this.phaseCount = 0;
     this.promotions = 0;
+
+    /* ---- dynamic circuits -------------------------------------------- *
+     * A mid-circuit measurement collapses the state, and the surviving
+     * amplitudes are still exactly in the ring -- but their total is no
+     * longer 1, and it cannot be made 1, because renormalizing means dividing
+     * by sqrt(p) and sqrt(p) is not in Z[zeta_8].
+     *
+     * So the state is deliberately left UNNORMALIZED and the norm is carried
+     * alongside it as a ring element (normS + normX*sqrt2) / 2^(2*denom).
+     * Every probability is then a RATIO of two ring elements, which is exact:
+     *
+     *     p(b) = (S_b + X_b sqrt2) / (normS + normX sqrt2)
+     *
+     * Nothing is approximated. What is lost is Section 4.2: sum S = 2^(2d)
+     * stops holding the moment a measurement collapses anything, and a circuit
+     * with feedback has one fingerprint per outcome rather than one. Both are
+     * properties of the execution model, not of this implementation.
+     *
+     * normS === null means nothing has collapsed yet and the norm is exactly
+     * 2^(2*denom), which is the invariant the rest of the engine relies on. */
+    this.cbits = [];                   /* classical register, written by measure */
+    this.measured = 0;                 /* mid-circuit measurements so far */
+    this.normS = null;
+    this.normX = 0n;
+    this.rng = null;
 }
 
 /* Coefficients as BigInt regardless of representation -- everything that
@@ -191,6 +216,16 @@ function gphaseI32(s, k) {
 
 /* Common trailing zeros and widest magnitude in one pass -- normalization has
  * to walk the whole array anyway, so the width tracking rides along free. */
+/* Dividing every coefficient by 2^k divides S and X by 2^(2k) exactly, so a
+ * carried norm stays in step with the state it belongs to. Only runs once
+ * something has collapsed; before that the norm is 2^(2*denom) by definition
+ * and needs no bookkeeping. */
+function scaleNorm(s, k) {
+    if (s.normS === null || k === 0) return;
+    var sh = BigInt(2 * k);
+    s.normS >>= sh; s.normX >>= sh;
+}
+
 function normalizeI32(s) {
     var size = s.size, b, v, acc = 0, wide = 0;
     var c0 = s.c0, c1 = s.c1, c2 = s.c2, c3 = s.c3;
@@ -211,6 +246,7 @@ function normalizeI32(s) {
         }
         s.denom -= k;
         wide >>= k;
+        scaleNorm(s, k);
     }
     s.maxBits = wide === 0 ? 0 : 32 - Math.clz32(wide);
 }
@@ -332,6 +368,7 @@ function normalizeBig(s) {
         c0[b] >>= sh; c1[b] >>= sh; c2[b] >>= sh; c3[b] >>= sh;
     }
     s.denom -= k;
+    scaleNorm(s, k);
 }
 
 /* ---- gates (dispatch) ------------------------------------------------ */
@@ -386,6 +423,12 @@ State.prototype.gphase = function (k) {
  * force a promotion. The check happens before the gate, never during. */
 State.prototype.h = function (q) {
     if (this.mode === MODE_I32 && this.maxBits > SAFE_BITS) this.promote();
+    /* denom going UP re-scales a carried norm, exactly as normalize going down
+     * does. The norm is (normS + normX·sqrt2) / 2^(2·denom) and H does not
+     * change its value, so raising denom by one multiplies both parts by four.
+     * Miss this and the norm marches to zero over a few Hadamards and every
+     * probability afterwards comes out NaN. */
+    if (this.normS !== null) { this.normS <<= 2n; this.normX <<= 2n; }
     if (this.mode === MODE_I32) {
         hI32(this, q);
         this.denom++;
@@ -666,9 +709,69 @@ State.prototype.ampFloat = function (b) {
     };
 };
 
+/* (S + X*sqrt2) / 2^(2*denom) as a double. Only the last step is floating
+ * point, and only so the number can be printed. */
+State.prototype.ringFloat = function (S, X) {
+    var den = 1n << BigInt(2 * this.denom);
+    return ratio(S, den) + ratio(X, den) * SQRT2;
+};
+
 State.prototype.probFloat = function (b) {
     var pr = this.bornPair(b), den = 1n << BigInt(2 * this.denom);
-    return ratio(pr.S, den) + ratio(pr.X, den) * SQRT2;
+    if (this.normS === null)
+        return ratio(pr.S, den) + ratio(pr.X, den) * SQRT2;
+    /* collapsed: a ratio of two ring elements, exact until this division */
+    return this.ringFloat(pr.S, pr.X) / this.ringFloat(this.normS, this.normX);
+};
+
+/* The total (S, X) over every amplitude. Equal to (2^(2d), 0) until something
+ * collapses, which is Section 4.2 restated. */
+State.prototype.totalBorn = function () {
+    var S = 0n, X = 0n, b, pr;
+    for (b = 0; b < this.size; b++) { pr = this.bornPair(b); S += pr.S; X += pr.X; }
+    return { S: S, X: X };
+};
+
+/* The norm this state is carrying, as a ring element over 2^(2*denom). */
+State.prototype.normPair = function () {
+    if (this.normS === null) return { S: 1n << BigInt(2 * this.denom), X: 0n };
+    return { S: this.normS, X: this.normX };
+};
+
+/* ---- mid-circuit measurement -----------------------------------------
+ * Draw an outcome from the exact conditional probability, then project. The
+ * comparison is the same one the shot sampler makes: a uniform rational
+ * k/2^m against a ring element, decided by sqrt2Sign, never by a float.
+ *
+ *   p(1) = (S1 + X1 sqrt2) / (normS + normX sqrt2)
+ *   outcome 1  iff  k/2^m < p(1)
+ *              iff  2^m S1 - k normS + (2^m X1 - k normX) sqrt2 > 0
+ */
+State.prototype.measureQubit = function (q, rng) {
+    var mk = 1 << q, S1 = 0n, X1 = 0n, b, pr;
+    for (b = 0; b < this.size; b++) {
+        if (!(b & mk)) continue;                              /* bit q clear */
+        pr = this.bornPair(b); S1 += pr.S; X1 += pr.X;
+    }
+    var tot = this.normPair();
+    var m = BigInt(2 * this.denom + 64);
+    var k = (rng || this.rng).bits(Number(m));
+    var A = (S1 << m) - k * tot.S, B = (X1 << m) - k * tot.X;
+    var one = sqrt2Sign(A, B) > 0 ? 1 : 0;
+
+    /* project: everything disagreeing with the outcome goes to exactly zero */
+    var z = this.mode === MODE_I32 ? 0 : 0n;
+    for (b = 0; b < this.size; b++) {
+        if (((b & mk) !== 0) === (one === 1)) continue;
+        this.c0[b] = z; this.c1[b] = z; this.c2[b] = z; this.c3[b] = z;
+    }
+    this.normS = one ? S1 : tot.S - S1;
+    this.normX = one ? X1 : tot.X - X1;
+    this.measured++;
+    this.gates++;
+    if (this.normS === 0n && this.normX === 0n)
+        throw new Error('measured a branch with probability exactly zero');
+    return one;
 };
 
 /* Is this basis amplitude exactly zero? Cheap in either representation. */
@@ -681,6 +784,14 @@ State.prototype.isZero = function (b) {
 /* ---- gate list execution -------------------------------------------- */
 
 /* A gate is [op, ...args]; the ops match the C core one to one. */
+/* The classical value a condition reads: the bits it names, least significant
+ * first, as one integer. Unwritten bits read 0. */
+function condValue(s, bits) {
+    var v = 0, i;
+    for (i = 0; i < bits.length; i++) if (s.cbits[bits[i]]) v |= (1 << i);
+    return v;
+}
+
 var GATES = {
     h:      function (s, g) { s.h(g[1]); },
     x:      function (s, g) { s.x(g[1]); },
@@ -688,7 +799,18 @@ var GATES = {
     cx:     function (s, g) { s.cx(g[1], g[2]); },
     mcpow:  function (s, g) { s.mcpow(g[1], g[2]); },
     swap:   function (s, g) { s.swap(g[1], g[2]); },
-    gphase: function (s, g) { s.gphase(g[1]); }
+    gphase: function (s, g) { s.gphase(g[1]); },
+
+    /* ---- dynamic circuits --------------------------------------------- *
+     * measure collapses and writes a classical bit; if reads those bits back
+     * and applies a block or does not. This is the only place in the engine
+     * where what happens next depends on what happened before. */
+    measure: function (s, g) { s.cbits[g[2]] = s.measureQubit(g[1], s.rng); },
+    if:     function (s, g) {
+        if (condValue(s, g[1].bits) !== g[1].value) return;
+        var i;
+        for (i = 0; i < g[2].length; i++) apply(s, g[2][i]);
+    }
 };
 
 function apply(s, g) {
@@ -697,8 +819,12 @@ function apply(s, g) {
     f(s, g);
 }
 
-function run(gates, n) {
+function run(gates, n, seed) {
     var s = new State(n), i;
+    /* A circuit with mid-circuit measurement needs a stream of randomness, and
+     * it has to be seeded: one trajectory per seed, reproducible. A circuit
+     * without one never touches it. */
+    s.rng = new Rng(seed === undefined ? 0 : seed);
     for (i = 0; i < gates.length; i++) apply(s, gates[i]);
     return s;
 }
