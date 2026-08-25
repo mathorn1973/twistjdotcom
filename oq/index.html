@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>oq — Ordinary Quantum</title>
+<meta name="description" content="oq — exact, zero-noise discrete algebra for quantum circuits. Run OpenQASM in the browser over the cyclotomic ring Z[ζ₈]: integer amplitudes, exact Born probabilities, byte-identical statevector on every machine.">
+<meta name="author" content="A. M. Thorn">
+<meta property="og:title" content="oq — Ordinary Quantum">
+<meta property="og:description" content="Exact, zero-noise discrete algebra for quantum circuits. Paste QASM, get exact amplitudes in Z[ζ₈].">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://twistj.com/oq/">
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<script>
+  (function () { var t = localStorage.getItem('twistj-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #f4f1eb;
+    --bg-rgb: 244, 241, 235;
+    --text: #2a2520;
+    --text-bright: #1a1714;
+    --accent: #8b4513;
+    --accent-rgb: 139, 69, 19;
+    --muted: #7a7570;
+    --dim: #a09890;
+    --rule: #ddd8d0;
+    --field: #faf8f5;
+    --ok: #4a7c3f;
+    --err: #a03c22;
+}
+[data-theme="dark"] {
+    --bg: #1c1915;
+    --bg-rgb: 28, 25, 21;
+    --text: #b8b3a8;
+    --text-bright: #d4cfc6;
+    --accent: #b08050;
+    --accent-rgb: 176, 128, 80;
+    --muted: #7a7268;
+    --dim: #605850;
+    --rule: #322d26;
+    --field: #16130f;
+    --ok: #7ba05b;
+    --err: #c67a5c;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+        --bg: #1c1915;
+        --bg-rgb: 28, 25, 21;
+        --text: #b8b3a8;
+        --text-bright: #d4cfc6;
+        --accent: #b08050;
+        --accent-rgb: 176, 128, 80;
+        --muted: #7a7268;
+        --dim: #605850;
+        --rule: #322d26;
+        --field: #16130f;
+        --ok: #7ba05b;
+        --err: #c67a5c;
+    }
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 880px; margin: 0 auto; padding: 56px 22px 34px; }
+
+.back-link {
+    position: fixed; top: 14px; left: 14px; z-index: 50;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    letter-spacing: 0.08em; color: var(--dim); text-decoration: none;
+    background: rgba(var(--bg-rgb), 0.88); backdrop-filter: blur(3px);
+    padding: 6px 10px; border-radius: 13px; transition: color 0.2s;
+}
+.back-link:hover { color: var(--accent); }
+.theme-toggle {
+    position: fixed; top: 12px; right: 16px; z-index: 50;
+    width: 30px; height: 30px; border: 1px solid var(--rule); border-radius: 50%;
+    background: rgba(var(--bg-rgb), 0.88); backdrop-filter: blur(3px);
+    color: var(--dim); cursor: pointer; opacity: 0.7;
+    display: flex; align-items: center; justify-content: center; transition: all 0.25s;
+}
+.theme-toggle:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
+.theme-toggle svg { width: 15px; height: 15px; }
+
+/* ── masthead ── */
+header { text-align: center; margin-bottom: 34px; }
+.mark {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    letter-spacing: 0.55em; color: var(--accent); margin-bottom: 12px;
+}
+h1 {
+    font-size: clamp(27px, 5vw, 40px); font-weight: 300;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--text-bright);
+}
+.thesis {
+    max-width: 640px; margin: 18px auto 0; font-size: 17.5px;
+    line-height: 1.6; color: var(--muted); font-style: italic;
+}
+.thesis b { color: var(--text-bright); font-weight: 400; font-style: normal; }
+
+/* ── the algebra ── */
+.algebra {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 2;
+    margin: 34px 0 40px; padding: 24px 4px; overflow-x: auto;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    color: var(--text-bright);
+}
+.algebra table { border-collapse: collapse; margin: 0 auto; }
+.algebra td { padding: 1px 16px 1px 0; white-space: nowrap; }
+.algebra td.sym { color: var(--accent); text-align: right; padding-right: 18px; width: 1%; }
+.algebra tr.gap td { height: 14px; }
+.algebra .d { color: var(--muted); }
+
+/* ── console ── */
+.console { margin-top: 6px; }
+.row {
+    display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted);
+}
+.row.top { margin-bottom: 8px; }
+.row.bottom { margin-top: 10px; }
+.lbl { letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; color: var(--dim); }
+.spacer { flex: 1; }
+
+textarea, .out {
+    width: 100%; background: var(--field);
+    border: 1px solid var(--rule); border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.72;
+    color: var(--text); padding: 14px 16px;
+}
+textarea { min-height: 216px; resize: vertical; tab-size: 2; }
+textarea:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
+.out { white-space: pre; overflow-x: auto; min-height: 120px; margin-top: 12px; }
+.out .h { color: var(--accent); }
+.out .d { color: var(--muted); }
+.out .ok { color: var(--ok); }
+.out .err { color: var(--err); }
+.out .b { color: var(--text-bright); }
+.out .q { color: var(--accent); font-weight: 500; }
+
+button, input[type="number"] {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    background: var(--field); color: var(--text);
+    border: 1px solid var(--rule); border-radius: 2px; padding: 7px 10px;
+}
+input[type="number"] { width: 84px; }
+input[type="number"]:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
+button.run {
+    color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase;
+    padding: 7px 20px; cursor: pointer; transition: all 0.2s;
+}
+button.run:hover { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.07); }
+button.run:disabled, button.alt:disabled { opacity: 0.45; cursor: default; }
+button.alt {
+    color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 7px 12px; cursor: pointer; transition: all 0.2s;
+}
+button.alt:hover { color: var(--accent); border-color: var(--accent); }
+button.stop { color: var(--err); opacity: 1; }
+button.stop:hover { border-color: var(--err); color: var(--err); }
+button.stop:disabled { opacity: 1; }
+.presets a {
+    color: var(--muted); text-decoration: none; cursor: pointer;
+    border-bottom: 1px dotted var(--rule); transition: all 0.2s;
+}
+.presets a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* live read-out of what is in the editor, before anything is run */
+.chip { color: var(--muted); }
+.chip b { color: var(--accent); font-weight: 500; }
+.chip.bad { color: var(--err); }
+.chip.warn b { color: var(--err); }
+
+/* ── progress ── */
+.prog { height: 2px; background: var(--rule); margin-top: 10px; position: relative; display: none; }
+.prog.on { display: block; }
+.prog i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); transition: width 0.1s linear; }
+.progtext {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
+    margin-top: 6px; min-height: 15px;
+}
+
+.foot {
+    margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim);
+}
+.foot a { color: var(--muted); text-decoration: none; }
+.foot a:hover { color: var(--accent); }
+
+@media (max-width: 640px) {
+    .wrap { padding: 52px 13px 26px; }
+    .algebra { font-size: 10.5px; }
+    .out, textarea { font-size: 11.5px; }
+}
+</style>
+</head>
+<body>
+
+<a href="/" class="back-link">&#8592; twistj.com</a>
+<button class="theme-toggle" id="themeToggle" title="Theme: auto / light / dark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/>
+    </svg>
+</button>
+
+<div class="wrap">
+
+<header>
+    <div class="mark">oq</div>
+    <h1>Ordinary Quantum</h1>
+    <p class="thesis">Exact, <b>zero-noise</b> discrete algebra for quantum circuits — leaving
+    physical noise where it actually belongs: in condensed-matter spectroscopy, not in computation.</p>
+</header>
+
+<div class="algebra">
+<table>
+<tr><td class="sym">ζ</td><td>= e<sup>iπ/4</sup></td><td>ζ⁴ = −1</td><td>√2 = ζ − ζ³</td></tr>
+<tr class="gap"><td></td></tr>
+<tr><td class="sym">amp(b)</td><td>= (c₀ + c₁ζ + c₂ζ² + c₃ζ³) / 2<sup>d</sup></td><td class="d">c<sub>i</sub> ∈ ℤ</td></tr>
+<tr class="gap"><td></td></tr>
+<tr><td class="sym">H</td><td>(a, b) → M(a+b), M(a−b)</td><td class="d">d ← d + 1</td></tr>
+<tr><td class="sym">M</td><td>(c₀,c₁,c₂,c₃) → (c₁−c₃, c₀+c₂, c₁+c₃, c₂−c₀)</td><td></td></tr>
+<tr><td class="sym">ζ<sup>k</sup></td><td>c<sub>i</sub> → ±c<sub>(i+k) mod 4</sub></td><td class="d">d unchanged</td></tr>
+<tr class="gap"><td></td></tr>
+<tr><td class="sym">|amp|²</td><td>= (S + X√2) / 2<sup>2d</sup></td><td></td></tr>
+<tr><td class="sym">S</td><td>= c₀² + c₁² + c₂² + c₃²</td><td class="d">Σ S = 2<sup>2d</sup></td></tr>
+<tr><td class="sym">X</td><td>= c₀c₁ + c₁c₂ + c₂c₃ − c₀c₃</td><td class="d">Σ X = 0</td></tr>
+</table>
+</div>
+
+<div class="console">
+    <div class="row top">
+        <span class="lbl">qasm</span>
+        <span class="presets" id="presets"></span>
+        <span class="spacer"></span>
+        <span class="chip" id="chip"></span>
+    </div>
+
+    <textarea id="src" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+
+    <div class="row bottom">
+        <button class="run" id="runBtn">Run</button>
+        <button class="alt" id="testBtn">Self-test</button>
+        <button class="alt" id="benchBtn">Benchmark</button>
+        <button class="alt" id="workBtn">Workloads</button>
+        <button class="alt stop" id="stopBtn" style="display:none">Stop</button>
+        <span class="lbl">shots</span><input type="number" id="shots" value="1024" min="1" max="100000" step="256">
+        <span class="lbl">seed</span><input type="number" id="seed" value="20260605" min="0" step="1">
+        <span class="spacer"></span>
+        <span class="lbl">ctrl + enter runs</span>
+    </div>
+
+    <div class="prog" id="prog"><i id="progBar"></i></div>
+    <div class="progtext" id="progText"></div>
+
+    <div class="out" id="out"></div>
+</div>
+
+<div class="foot">
+    <span>Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state</span>
+    <span class="spacer"></span>
+    <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
+    <a href="/">twistj.com</a>
+</div>
+
+</div>
+
+<script src="oq.js"></script>
+<script src="oq16.js"></script>
+<script src="qasm.js"></script>
+<script>
+(function () {
+'use strict';
+
+var el = function (id) { return document.getElementById(id); };
+
+/* The parser reports the narrowest ring a circuit is exact in; this hands
+ * back the engine for it. Z[ζ₈] is four integers per amplitude, Z[ζ₁₆] is
+ * eight — twice the memory for half the phase step. */
+function engineFor(ring) { return ring === 16 ? OQ16 : OQ; }
+function ringName(ring) { return ring === 16 ? 'Z[ζ₁₆]' : 'Z[ζ₈]'; }
+function slotsFor(ring) { return ring === 16 ? 8 : 4; }
+
+/* ── theme ────────────────────────────────────────────────────────────── */
+el('themeToggle').addEventListener('click', function () {
+    var cur = document.documentElement.getAttribute('data-theme');
+    var next = cur === 'light' ? 'dark' : (cur === 'dark' ? null : 'light');
+    if (next) { document.documentElement.setAttribute('data-theme', next); localStorage.setItem('twistj-theme', next); }
+    else { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('twistj-theme'); }
+});
+
+/* ── presets ──────────────────────────────────────────────────────────── */
+function head(nq, nc) {
+    return 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[' + nq + '];' +
+           (nc ? '\ncreg c[' + nc + '];' : '') + '\n\n';
+}
+
+function groverQasm(n, target, iters) {
+    var s = head(n, n), q, it, flip = [];
+    for (q = 0; q < n; q++) if (!((target >> q) & 1)) flip.push('x q[' + q + '];');
+    s += '// ' + iters + ' iterations, marking |' + target.toString(2).padStart(n, '0') + '⟩\n';
+    s += 'h q;\n';
+    for (it = 0; it < iters; it++) {
+        s += '\n// ' + (it + 1) + ' — oracle\n';
+        if (flip.length) s += flip.join(' ') + '\n';
+        s += 'mcz q;\n';
+        if (flip.length) s += flip.join(' ') + '\n';
+        s += '// ' + (it + 1) + ' — diffusion\nh q; x q;\nmcz q;\nx q; h q;\n';
+    }
+    return s + '\nmeasure q -> c;\n';
+}
+
+var PRESETS = {
+    'bell': head(2, 2) + 'h q[0];\ncx q[0],q[1];\n\nmeasure q -> c;\n',
+
+    'ghz-3': head(3, 3) + 'h q[0];\ncx q[0],q[1];\ncx q[1],q[2];\n\nmeasure q -> c;\n',
+
+    'h t h': head(1, 0) + '// irrational probabilities, held exactly:\n' +
+             '//   (2 + √2)/4   and   (2 − √2)/4\nh q[0];\nt q[0];\nh q[0];\n',
+
+    'toffoli': head(3, 0) + '// |011⟩ through a 7-T Toffoli\nx q[0];\nx q[1];\n\n' +
+               'h q[2];\ncx q[1],q[2];\ntdg q[2];\ncx q[0],q[2];\nt q[2];\n' +
+               'cx q[1],q[2];\ntdg q[2];\ncx q[0],q[2];\nt q[1];\nt q[2];\n' +
+               'h q[2];\ncx q[0],q[1];\nt q[0];\ntdg q[1];\ncx q[0],q[1];\n',
+
+    'grover-6': groverQasm(6, 42, 6),
+
+    /* Shor, N = 15. The counting register is three qubits, and that is not a
+     * cosmetic choice: QFT over 3 bits needs cp(-pi/2) and cp(-pi/4), which
+     * are S† and T† — both exact here. A fourth bit would call for cp(pi/8),
+     * which has no representative in Z[ζ₈], and oq refuses it rather than
+     * rounding. The modular multiplication by a mod 15 is a permutation, so
+     * controlled-U is Fredkin and CNOT: nothing leaves the ring. */
+    'shor 15': (function () {
+        var a = 7, nc = 3;
+        var sw = [[0,1],[1,2],[2,3]];                  /* y -> 7y mod 15 */
+        var s = head(7, 3) +
+            '// Shor: N = 15, a = 7. Order of 7 mod 15 is r = 4,\n' +
+            '// so the counting register lands on s·8/r = 0, 2, 4, 6\n' +
+            '// with probability 1/4 each — exactly 1/4, not 0.2499…\n' +
+            '// gcd(7^2 ± 1, 15) = 3 and 5.\n\n' +
+            '// counting register in superposition, work register at |1>\n' +
+            'h q[0]; h q[1]; h q[2];\n' +
+            'x q[3];\n';
+        for (var j = 0; j < nc; j++) {
+            s += '\n// controlled-U^' + (1 << j) + '  (U|y> = |7y mod 15>, a permutation)\n';
+            for (var r = 0; r < (1 << j); r++) {
+                for (var k = 0; k < sw.length; k++)
+                    s += 'cswap q[' + j + '],q[' + (3 + sw[k][0]) + '],q[' + (3 + sw[k][1]) + '];\n';
+                for (var w = 0; w < 4; w++) s += 'cx q[' + j + '],q[' + (3 + w) + '];\n';
+            }
+        }
+        return s +
+            '\n// inverse QFT over three bits — cp(-pi/2) is S†, cp(-pi/4) is T†\n' +
+            'swap q[0],q[2];\n' +
+            'h q[0];\n' +
+            'cp(-pi/2) q[0],q[1];\n' +
+            'h q[1];\n' +
+            'cp(-pi/4) q[0],q[2];\n' +
+            'cp(-pi/2) q[1],q[2];\n' +
+            'h q[2];\n\n' +
+            'measure q[0] -> c[0];\n' +
+            'measure q[1] -> c[1];\n' +
+            'measure q[2] -> c[2];\n';
+    })(),
+
+    /* Shor, N = 255, on eleven qubits. Multiplication by 2 mod 255 is a cyclic
+     * rotation of the eight-bit register, because 2^8 = 256 ≡ 1 — so every
+     * controlled-U here is a handful of Fredkin gates and nothing else. The
+     * order of 4 is 4, which is what keeps the counting register at three bits
+     * and the QFT inside the ring. */
+    'shor 255': (function () {
+        /* left rotation by s, decomposed into transpositions cycle by cycle */
+        function rotSwaps(w, s) {
+            var out = [], seen = new Array(w), start, i, cyc, k;
+            for (start = 0; start < w; start++) {
+                if (seen[start]) continue;
+                cyc = []; i = start;
+                do { seen[i] = 1; cyc.push(i); i = (i + s) % w; } while (i !== start);
+                for (k = cyc.length - 1; k > 0; k--) out.push([cyc[k - 1], cyc[k]]);
+            }
+            return out;
+        }
+        var s = head(11, 3) +
+            '// Shor: N = 255, a = 4. Order of 4 mod 255 is r = 4, so the counting\n' +
+            '// register lands on 0, 2, 4, 6 — and gcd(4^2 ∓ 1, 255) = 15 and 17.\n' +
+            '//\n' +
+            '// Multiplication by 2 mod 255 is a cyclic rotation of the 8-bit work\n' +
+            '// register, since 2^8 = 256 ≡ 1 mod 255. So controlled-U is Fredkin\n' +
+            '// gates — no arithmetic circuit, no ancillas, nothing to round.\n' +
+            '//\n' +
+            '// Three counting bits are not a shortcut, they are the ring: an inverse\n' +
+            '// QFT over 3 bits asks for S† and T† only. Taking a = 2 instead would\n' +
+            '// mean r = 8, a 4-bit QFT, and cp(pi/8) — which is not in Z[ζ₈], and oq\n' +
+            '// would refuse it rather than round it.\n\n' +
+            'h q[0]; h q[1]; h q[2];\n' +
+            'x q[3];\n';
+        [[0, 2], [1, 4]].forEach(function (pair) {
+            var ctrl = pair[0], rot = pair[1];
+            s += '\n// controlled-U^' + (1 << ctrl) + ' : y -> ' + Math.pow(2, rot) +
+                 'y mod 255, a rotation by ' + rot + '\n';
+            rotSwaps(8, rot).forEach(function (sw) {
+                s += 'cswap q[' + ctrl + '],q[' + (3 + sw[0]) + '],q[' + (3 + sw[1]) + '];\n';
+            });
+        });
+        return s +
+            '\n// controlled-U^4 : 4^4 = 256 ≡ 1 mod 255 — the identity, so no gates\n' +
+            '\n// inverse QFT over three bits\n' +
+            'swap q[0],q[2];\n' +
+            'h q[0];\n' +
+            'cp(-pi/2) q[0],q[1];\n' +
+            'h q[1];\n' +
+            'cp(-pi/4) q[0],q[2];\n' +
+            'cp(-pi/2) q[1],q[2];\n' +
+            'h q[2];\n\n' +
+            'measure q[0] -> c[0];\n' +
+            'measure q[1] -> c[1];\n' +
+            'measure q[2] -> c[2];\n';
+    })(),
+
+    /* The three lattice-friendly workhorses, small enough to read. The angles
+     * are the ones the exhaustive lattice scan picks (see Workloads). */
+    'qaoa': (function () {
+        var n = 12, chords = [[0, 6], [3, 9], [1, 7]], g = 1, b = 3, e, i;
+        var edges = [];
+        for (i = 0; i < n; i++) edges.push([i, (i + 1) % n]);
+        for (i = 0; i < chords.length; i++) edges.push(chords[i]);
+        var s = head(n, n) +
+            '// QAOA Max-Cut, ring of ' + n + ' with 3 chords, p = 1.\n' +
+            '// exp(-iγ Z⊗Z) is cx · p(2γ) · cx, exp(-iβ X) is h · p(2β) · h,\n' +
+            '// so on the π/4 lattice the whole ansatz is Clifford+T — exact.\n' +
+            '// γ = π/4, β = 3π/4 are what the exhaustive 7×7 scan picks.\n\n' +
+            'h q;\n\n// cost layer\n';
+        for (i = 0; i < edges.length; i++) {
+            e = edges[i];
+            s += 'cx q[' + e[0] + '],q[' + e[1] + ']; p(' + g + '*pi/4) q[' + e[1] +
+                 ']; cx q[' + e[0] + '],q[' + e[1] + '];\n';
+        }
+        s += '\n// mixer layer\n';
+        for (i = 0; i < n; i++) s += 'h q[' + i + ']; p(' + b + '*pi/4) q[' + i + ']; h q[' + i + '];\n';
+        return s + '\nmeasure q -> c;\n';
+    })(),
+
+    'quench': (function () {
+        var n = 12, steps = 4, i, t;
+        var s = head(n, 0) +
+            '// Transverse-field Ising chain, ' + n + ' spins, one flipped in the middle.\n' +
+            '// Each Trotter step is J·Z⊗Z on every bond, then h·X on every site,\n' +
+            '// both at π/4 — the coarsest step the ring allows, and exact at any depth.\n' +
+            '// Hardware loses this after 2–4 steps; here the limit is only 2^n.\n\n' +
+            'x q[6];\n';
+        for (t = 0; t < steps; t++) {
+            s += '\n// step ' + (t + 1) + ' — coupling\n';
+            for (i = 0; i + 1 < n; i++) {
+                s += 'cx q[' + i + '],q[' + (i + 1) + ']; p(1*pi/4) q[' + (i + 1) +
+                     ']; cx q[' + i + '],q[' + (i + 1) + '];\n';
+            }
+            s += '// step ' + (t + 1) + ' — transverse field\n';
+            for (i = 0; i < n; i++) s += 'h q[' + i + ']; p(1*pi/4) q[' + i + ']; h q[' + i + '];\n';
+        }
+        return s;
+    })(),
+
+    'kernel': (function () {
+        var n = 8, xi = [0, 1, 2, 3, 4, 5, 6, 7], xj = [1, 1, 2, 2, 3, 3, 4, 4], q;
+        /* One gate per line, so the dagger is a plain reversal of the list --
+         * reversing lines that hold two gates leaves those two in the wrong
+         * order, which is a quiet way to compute the wrong kernel. */
+        function fmap(x, sign) {
+            var L = [], q;
+            for (q = 0; q < n; q++) L.push('h q[' + q + '];');
+            for (q = 0; q < n; q++) L.push('p(' + (sign * x[q]) + '*pi/4) q[' + q + '];');
+            for (q = 0; q + 1 < n; q++) {
+                L.push('cx q[' + q + '],q[' + (q + 1) + '];');
+                L.push('p(' + (sign * ((x[q] * x[q + 1]) % 8)) + '*pi/4) q[' + (q + 1) + '];');
+                L.push('cx q[' + q + '],q[' + (q + 1) + '];');
+            }
+            return L;
+        }
+        return head(n, 0) +
+            '// Quantum kernel: K(i,j) = |⟨φ(x_i)|φ(x_j)⟩|², the ZZ feature map of QML.\n' +
+            '// Run U(x_i) then U†(x_j) and read the probability of |0…0⟩ — that IS the\n' +
+            '// kernel entry, exactly, with no sampling and no error bar.\n' +
+            '// x_i = [' + xi.join(',') + '], x_j = [' + xj.join(',') + '] in units of π/4.\n\n' +
+            '// U(x_i)\n' + fmap(xi, 1).join('\n') +
+            '\n\n// U†(x_j)\n' + fmap(xj, -1).reverse().join('\n') + '\n';
+    })(),
+
+    /* The one preset that Z[ζ₈] cannot run at all. Every phase here is an odd
+     * multiple of π/8, so the parser reaches for the bigger ring on its own. */
+    'pi/8 qft': (function () {
+        var n = 4, j, k, out = [];
+        var s = head(n, 0) +
+            '// A 4-bit QFT and its inverse. The cp(pi/8) below has no exact' + '\n' + 
+            '// representative in Z[zeta8] — oq moves to Z[zeta16] by itself,' + '\n' + 
+            '// eight integers per amplitude instead of four.' + '\n' + 
+            '// The state returns to |1011> exactly.' + '\n' + '\n'+
+            'x q[0]; x q[1]; x q[3];' + '\n' + '\n';
+        function qft(inv) {
+            var L = [];
+            for (j = n - 1; j >= 0; j--) {
+                L.push('h q[' + j + '];');
+                for (k = j - 1; k >= 0; k--) {
+                    L.push('cp(' + (inv ? '-' : '') + (8 / Math.pow(2, j - k)) +
+                           '*pi/8) q[' + k + '],q[' + j + '];');
+                }
+            }
+            return inv ? L.reverse() : L;
+        }
+        return s + '// QFT' + '\n' +  qft(false).join('\n') + '\n' + '\n' + '// QFT-dagger'+'\n' + qft(true).join('\n') + '\n';
+    })(),
+
+    /* Full algorithmic width: 24 qubits, 16.7 M exact amplitudes, 256 MB. The
+     * band keeps cp down to pi/4 = T, so every gate is Clifford+T and the round
+     * trip has to return the input state with denominator 2^0 — not a small
+     * phase error, none. Around six seconds; the chip tells you before you start. */
+    'qft-24': (function () {
+        var n = 24, band = 3, j, k, e, L = [];
+        var s = head(n, 0) +
+            '// QED-C style banded QFT at full width: 24 qubits.' + '\n' + 
+            '// Band 3 keeps cp(2pi/2^k) down to k=3, which is exactly T,' + '\n' + 
+            '// so the transform stays inside Z[zeta8] at every step.' + '\n' + 
+            '// QFT then QFT-dagger must return |000100100100100100100100> exactly.' + '\n' + 
+            '// 16,777,216 amplitudes, 256 MB, a few seconds.' + '\n' + '\n';
+        for (j = 0; j < n; j += 3) s += 'x q[' + j + '];'+'\n';
+        function qft(inv) {
+            var out = [];
+            for (j = n - 1; j >= 0; j--) {
+                out.push('h q[' + j + '];');
+                for (k = j - 1; k >= 0 && j - k <= band; k--) {
+                    e = 8 / Math.pow(2, j - k);
+                    out.push('cp(' + (inv ? '-' : '') + e + '*pi/4) q[' + k + '],q[' + j + '];');
+                }
+            }
+            return inv ? out.reverse() : out;
+        }
+        return s + '\n' + '// QFT'+'\n' + qft(false).join('\n') + '\n' + '\n' + '// QFT-dagger'+'\n' + qft(true).join('\n') + '\n';
+    })(),
+
+    't-heavy': (function () {
+        var s = head(1, 0) + '// 512 T gates between two Hadamards.\n' +
+                '// Phase gates are units in Z[ζ₈]: the width never moves.\nh q[0];\n', i;
+        for (i = 0; i < 512; i++) s += 't q[0];' + ((i % 16 === 15) ? '\n' : ' ');
+        return s + '\nh q[0];\n';
+    })()
+};
+
+var pbox = el('presets');
+Object.keys(PRESETS).forEach(function (name, i) {
+    if (i) pbox.appendChild(document.createTextNode(' · '));
+    var a = document.createElement('a');
+    a.textContent = name;
+    a.addEventListener('click', function () {
+        el('src').value = PRESETS[name];
+        el('out').innerHTML = '';
+        refreshChip();
+    });
+    pbox.appendChild(a);
+});
+
+/* ── formatting ───────────────────────────────────────────────────────── */
+function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function big(v, cap) {
+    var s = v.toString();
+    if (s.length <= (cap || 26)) return s;
+    var neg = s[0] === '-', d = neg ? s.slice(1) : s;
+    return (neg ? '−' : '') + d.slice(0, 9) + '…' + d.slice(-7) + ' [' + d.length + 'd]';
+}
+
+function pad(s, w) { s = String(s); return s + ' '.repeat(Math.max(0, w - s.length)); }
+function padl(s, w) { s = String(s); return ' '.repeat(Math.max(0, w - s.length)) + s; }
+
+function si(x, unit) {
+    if (!isFinite(x)) return '—';
+    var u = ['', 'K', 'M', 'G', 'T'], i = 0;
+    while (x >= 1000 && i < u.length - 1) { x /= 1000; i++; }
+    return (x >= 100 ? x.toFixed(0) : x.toFixed(1)) + ' ' + (u[i] ? u[i] + ' ' : '') + unit;
+}
+
+function bytes(x) {
+    var u = ['B', 'KiB', 'MiB', 'GiB'], i = 0;
+    while (x >= 1024 && i < u.length - 1) { x /= 1024; i++; }
+    return (x >= 100 ? x.toFixed(0) : x.toFixed(1)) + ' ' + u[i];
+}
+
+/* Fingerprints the native C engine prints for these exact circuits.
+ * If a run lands on one, the browser and the C core agree bit for bit. */
+var KNOWN = {
+    'b49243eb1fcfb839': ['ref2', true],
+    'a39c021c87831690': ['bell', true],
+    '668113609759f491': ['ghz-3', true],
+    'e6c507f854fbc17a': ['h t h', true],
+    'a0921617252eada1': ['toffoli |011⟩', true],
+    '03b90756ef833750': ['grover-4 target 11', true],
+    'b08c7bc17a4e9b3a': ['grover-6 target 42', false],
+    'cf34b6408f73bf23': ['h · 64 t · h', false]
+};
+
+/* ── run ──────────────────────────────────────────────────────────────── */
+var busy = false;
+var stopRequested = false;
+
+/* Measured on this machine, refined by every run, and used to tell the user
+ * what a circuit will cost BEFORE they start it. Seeded from a mid-range
+ * figure so the first estimate is not wild. */
+var rateI32 = 2.0e8, rateBig = 1.5e7;
+
+function setBusy(on) {
+    el('stopBtn').style.display = on ? '' : 'none';
+    if (on) stopRequested = false;
+    busy = on;
+    el('runBtn').disabled = on;
+    el('testBtn').disabled = on;
+    el('benchBtn').disabled = on;
+    el('workBtn').disabled = on;
+    el('stopBtn').disabled = false;
+}
+
+function frame() { return new Promise(function (r) { setTimeout(r, 0); }); }
+
+/* Chrome exposes the heap; elsewhere the benchmark omits the column. */
+function heapMB() {
+    return (performance.memory && performance.memory.usedJSHeapSize)
+        ? performance.memory.usedJSHeapSize / 1048576 : null;
+}
+
+/* Instantaneous throughput, not the running average: what the engine is
+ * doing right now is the interesting number, and it moves as denom grows. */
+function progress(done, total, dAmp, dMs, elapsed, s) {
+    el('progBar').style.width = (done / total * 100).toFixed(1) + '%';
+    el('progText').textContent =
+        'gate ' + done + '/' + total + '  ·  ' + si(dAmp / (dMs / 1000), 'amp/s') +
+        '  ·  denom 2^' + s.denom + '  ·  ' + (elapsed / 1000).toFixed(1) + ' s';
+}
+
+async function execute() {
+    if (busy) return;
+    var src = el('src').value;
+    var out = el('out');
+
+    var prog;
+    try {
+        prog = QASM.parse(src);
+    } catch (e) {
+        if (e.name !== 'QasmError') throw e;
+        out.innerHTML = '<span class="err">line ' + e.line + ': ' + esc(e.message) + '</span>' +
+            (e.hint ? '\n<span class="d">' + esc(e.hint).replace(/\n/g, '\n           ') + '</span>' : '');
+        return;
+    }
+
+    setBusy(true);
+    el('prog').classList.add('on');
+    out.innerHTML = '';
+
+    try {
+        await simulate(prog, out);
+    } catch (e) {
+        /* the honest failure mode at 2^n: the tab runs out of memory */
+        out.innerHTML = '<span class="err">' + esc(e && e.message ? e.message : String(e)) + '</span>' +
+            '\n<span class="d">a dense exact statevector is 2^n amplitudes — ' +
+            'the native engine has the same arithmetic without the tab’s memory ceiling</span>';
+    }
+    el('prog').classList.remove('on');
+    el('progText').textContent = '';
+    setBusy(false);
+}
+
+async function simulate(prog, out) {
+    var ENG = engineFor(prog.ring);
+    var s = new ENG.State(prog.n);
+    var total = prog.gates.length, ampOps = 0, markAmp = 0;
+    var t0 = performance.now(), last = t0, i, now;
+
+    for (i = 0; i < total; i++) {
+        if (stopRequested) break;
+        ENG.apply(s, prog.gates[i]);
+        ampOps += s.size;
+        now = performance.now();
+        if (now - last > 40) {
+            progress(i + 1, total, ampOps - markAmp, now - last, now - t0, s);
+            markAmp = ampOps;
+            await frame();
+            last = performance.now();
+        }
+    }
+    var tRun = performance.now() - t0;
+    if (tRun > 30 && ampOps > 1e6) {
+        if (s.mode === ENG.MODE_I32) rateI32 = ampOps / (tRun / 1000);
+        else rateBig = ampOps / (tRun / 1000);
+    }
+
+    /* measurement */
+    var counts = null, tShots = 0, shots = 0;
+    if (prog.measures.length) {
+        shots = Math.max(1, Math.min(100000, +el('shots').value || 1024));
+        var seed = +el('seed').value || 0;
+        var t1 = performance.now();
+        var draws = s.sample(shots, seed);
+        tShots = performance.now() - t1;
+        counts = {};
+        for (i = 0; i < shots; i++) {
+            var b = draws[i], word = 0, mi;
+            for (mi = 0; mi < prog.measures.length; mi++) {
+                if (b & (1 << prog.measures[mi].q)) word |= (1 << prog.measures[mi].c);
+            }
+            var key = word.toString(2).padStart(Math.max(1, prog.nc), '0');
+            counts[key] = (counts[key] || 0) + 1;
+        }
+    }
+
+    render(prog, s, tRun, ampOps, counts, shots, tShots, i);
+}
+
+function render(prog, s, tRun, ampOps, counts, shots, tShots, done) {
+    var L = [], i, b;
+    if (done !== undefined && done < prog.gates.length) {
+        L.push('<span class="err">stopped after ' + done + ' of ' + prog.gates.length +
+               ' gates</span> <span class="d">— the state below is the circuit up to that ' +
+               'point, and it is exact for that prefix</span>');
+        L.push('');
+    }
+    var perm = s.gates - s.hCount - s.phaseCount;
+    var width = s.widthBits();
+    var k = Math.max(1, Math.ceil((width + 1) / 64));
+    var slots = slotsFor(prog.ring);
+    var perAmp = s.mode === OQ.MODE_I32 ? slots * 4 : slots * (8 + 8 * k);
+    var mem = s.size * perAmp;
+    var rate = ampOps / (tRun / 1000);
+
+    L.push('<span class="h">circuit</span>     <span class="q">' + s.n + ' qubit' + (s.n > 1 ? 's' : '') +
+           '</span> · 2^' + s.n + ' = ' + s.size.toLocaleString('en-US') + ' amplitudes · ' +
+           s.gates + ' gates <span class="d">(' + s.hCount + ' H · ' + s.phaseCount +
+           ' phase · ' + perm + ' permutation)</span>');
+    L.push('<span class="h">width</span>       denom 2^' + s.denom + ' <span class="d">(max 2^' + s.maxDenom +
+           ')</span> · coefficients ' + width + ' bit · ' +
+           (s.mode === OQ.MODE_I32
+             ? 'int32 <span class="d">(' + perAmp + ' B/amplitude)</span>'
+             : 'BigInt <span class="d">(promoted at 28 bits · k = ' + k +
+               ' limb / ' + (k * 64) + '-bit in C)</span>'));
+    L.push('<span class="h">ring</span>        <span class="q">' + ringName(prog.ring) + '</span> · ' +
+           slotsFor(prog.ring) + ' integers per amplitude · phase step ' +
+           (prog.ring === 16 ? 'π/8' : 'π/4') +
+           (prog.ring === 16 ? ' <span class="d">(pulled up by an odd phase — Z[ζ₈] cannot hold it)</span>'
+                             : ' <span class="d">(the narrowest ring this circuit is exact in)</span>'));
+    for (i = 0; i < prog.warnings.length; i++) {
+        L.push('<span class="h">note</span>        <span class="d">' + esc(prog.warnings[i]) + '</span>');
+    }
+    L.push('<span class="h">time</span>        ' + tRun.toFixed(2) + ' ms' +
+           (tRun >= 0.2
+             ? ' · ' + si(s.gates / (tRun / 1000), 'gates/s') + ' · ' + si(rate, 'amp/s') +
+               ' · ' + bytes(ampOps * perAmp / (tRun / 1000)) + '/s'
+             : '') +
+           ' <span class="d">· state ' + bytes(mem) + '</span>');
+    L.push('');
+
+    /* amplitudes, largest first */
+    /* Ranking four million amplitudes through BigInt Born pairs costs more than
+     * the circuit did. On the int32 path the coefficients fit in doubles, so
+     * the sort key is computed there — for Z[ζ₈] it is the exact Born value
+     * S + X√2, for Z[ζ₁₆] the dominant Σc² term. Either way only the ordering
+     * uses it; every number printed is still the exact integer form. */
+    var rank;
+    if (s.mode === OQ.MODE_I32 && s.c0) {
+        var k0 = s.c0, k1 = s.c1, k2 = s.c2, k3 = s.c3, R2 = Math.SQRT2;
+        rank = function (i) {
+            var a = k0[i], c = k1[i], d = k2[i], e = k3[i];
+            return (a*a + c*c + d*d + e*e) + (a*c + c*d + d*e - a*e) * R2;
+        };
+    } else if (s.mode === OQ.MODE_I32 && s.c) {
+        var cs = s.c;
+        rank = function (i) {
+            var t = 0, j, v;
+            for (j = 0; j < cs.length; j++) { v = cs[j][i]; t += v * v; }
+            return t;
+        };
+    } else {
+        rank = function (i) { return s.probFloat(i); };
+    }
+
+    var LIST = 12, nonzero = 0, shown = [], top = [], j2, ins;
+    /* One pass: count the non-zeros and keep the twelve largest. Sorting a
+     * million indices costs several seconds and throws all but twelve away. */
+    for (b = 0; b < s.size; b++) {
+        if (s.isZero(b)) continue;
+        nonzero++;
+        if (top.length < LIST || rank(b) > rank(top[top.length - 1])) {
+            ins = top.length;
+            while (ins > 0 && rank(top[ins - 1]) < rank(b)) ins--;
+            top.splice(ins, 0, b);
+            if (top.length > LIST) top.pop();
+        }
+    }
+    if (nonzero <= LIST) {
+        shown = [];
+        for (b = 0; b < s.size; b++) if (!s.isZero(b)) shown.push(b);
+    } else {
+        shown = top.slice();
+        /* |0…0⟩ is where a kernel overlap, an inverse round trip or an
+         * amplitude estimate keeps its answer — show it even when it is tiny. */
+        if (!s.isZero(0) && shown.indexOf(0) < 0) shown[shown.length - 1] = 0;
+        shown.sort(function (p, q) { return p - q; });
+    }
+
+    var rows = [], wa = 0, wp = 0;
+    for (i = 0; i < shown.length; i++) {
+        b = shown[i];
+        var amp = ampStrRing(coeffsOf(s, b));
+        var pstr = probStrRing(s, b, prog.ring);
+        if (amp.length > wa) wa = amp.length;
+        if (pstr.length > wp) wp = pstr.length;
+        rows.push([b, amp, pstr, (s.probFloat(b) * 100).toFixed(6) + '%']);
+    }
+    var h1 = prog.ring === 16
+        ? '(c₀ + c₁ζ + … + c₇ζ⁷) / 2^' + s.denom
+        : '(c₀ + c₁ζ + c₂ζ² + c₃ζ³) / 2^' + s.denom;
+    var h2 = prog.ring === 16
+        ? '2|amp|² = (P + Q√2 + R·s + T√2s) / 2^' + (2 * s.denom)
+        : '|amp|² = (S + X√2) / 2^' + (2 * s.denom);
+    var keyw = Math.max(12, s.n + 6);
+    var wA = Math.max(wa + 3, h1.length + 3), wP = Math.max(wp + 3, h2.length + 3);
+    L.push('<span class="h">' + pad('amplitude', keyw) + '</span><span class="d">' +
+           pad(h1, wA) + pad(h2, wP) + padl('probability', 12) + '</span>');
+    for (i = 0; i < rows.length; i++) {
+        var ket = '|' + rows[i][0].toString(2).padStart(s.n, '0') + '⟩';
+        L.push('  <span class="b">' + ket + '</span>' + ' '.repeat(Math.max(1, keyw - 2 - ket.length)) +
+               pad(rows[i][1], wA) + pad(rows[i][2], wP) + padl(rows[i][3], 12));
+    }
+    if (nonzero > shown.length) {
+        L.push('  <span class="d">… ' + (nonzero - shown.length) + ' more non-zero, ' +
+               (s.size - nonzero) + ' exactly zero</span>');
+    } else if (s.size > nonzero) {
+        L.push('  <span class="d">' + (s.size - nonzero) + ' amplitudes exactly zero</span>');
+    }
+
+    var okNorm = normOkRing(s, prog.ring);
+    L.push('  <span class="' + (okNorm ? 'ok' : 'err') + '">' +
+           (prog.ring === 16 ? 'Σ P = 2·2^' + (2 * s.denom) + ', Σ Q = Σ R = Σ T = 0'
+                             : 'Σ S = 2^' + (2 * s.denom) + ', Σ X = 0') +
+           '</span> <span class="d">— normalized exactly, not to within epsilon</span>');
+    L.push('');
+
+    if (counts) {
+        var keys = Object.keys(counts).sort(function (p, q) { return counts[q] - counts[p] || (p < q ? -1 : 1); });
+        L.push('<span class="h">counts</span>      ' + shots + ' shots · seed ' + (+el('seed').value || 0) +
+               ' · ' + tShots.toFixed(2) + ' ms <span class="d">· draw ' + (2 * s.denom + (prog.ring === 16 ? 65 : 64)) + ' exact bits</span>');
+        for (i = 0; i < Math.min(keys.length, 12); i++) {
+            var c = counts[keys[i]];
+            L.push('  <span class="b">' + keys[i] + '</span>  ' + padl(c, 7) + '  ' +
+                   padl((c / shots * 100).toFixed(2) + '%', 8) + '  <span class="d">' +
+                   '▏'.repeat(1) + '█'.repeat(Math.round(c / shots * 34)) + '</span>');
+        }
+        if (keys.length > 12) L.push('  <span class="d">… ' + (keys.length - 12) + ' more outcomes</span>');
+        L.push('');
+    }
+
+    var h = s.hash(), known = KNOWN[h];
+    L.push('<span class="h">fingerprint</span> <span class="b">' + h + '</span>' +
+           (known ? '  <span class="ok">= native C engine' + (known[1] ? ' = Atari int16 engine' : '') +
+                    '</span> <span class="d">(' + known[0] + ')</span>' : ''));
+
+    el('out').innerHTML = L.join('\n');
+}
+
+function absv(v) { return v < 0n ? -v : v; }
+
+/* Both engines expose amp(), but Z[ζ₈] returns four named slots and Z[ζ₁₆] an
+ * array of eight. Everything downstream works on the array form. */
+function coeffsOf(s, b) {
+    var a = s.amp(b);
+    return Array.isArray(a) ? a : [a.c0, a.c1, a.c2, a.c3];
+}
+
+var ZETA_LABEL = ['', 'ζ', 'ζ²', 'ζ³', 'ζ⁴', 'ζ⁵', 'ζ⁶', 'ζ⁷'];
+
+function ampStrRing(cs) {
+    var out = '', i, v, sign, body;
+    for (i = 0; i < cs.length; i++) {
+        if (cs[i] === 0n) continue;
+        v = big(absv(cs[i]), 14);
+        sign = cs[i] < 0n ? '−' : '+';
+        body = (v === '1' && i > 0) ? ZETA_LABEL[i] : v + ZETA_LABEL[i];
+        out += out ? ' ' + sign + ' ' + body : (sign === '−' ? '−' + body : body);
+    }
+    return out || '0';
+}
+
+/* |amp|² written in the ring's own basis: two terms in Z[ζ₈], four in Z[ζ₁₆]. */
+function probStrRing(s, b, ring) {
+    var t, parts = [], q;
+    function term(c, label) {
+        if (c === 0n) return;
+        var sign = c < 0n ? ' − ' : ' + ';
+        var mag = absv(c);
+        var body = (mag === 1n && label) ? label : big(mag, 18) + label;
+        parts.push(parts.length ? sign + body : (c < 0n ? '−' + body : body));
+    }
+    if (ring === 16) {
+        q = s.bornQuad(b);
+        term(q.P, ''); term(q.Q, '√2'); term(q.R, 's'); term(q.T, '√2s');
+    } else {
+        t = s.bornPair(b);
+        term(t.S, ''); term(t.X, '√2');
+    }
+    return parts.length ? parts.join('') : '0';
+}
+
+/* The normalization invariant, in whichever ring is running.
+ * Σ S is exactly 2^(2·denom), so while 2·denom + n stays under 53 bits the
+ * whole sum fits in a double and can be checked without touching BigInt —
+ * which at a million amplitudes is the difference between 3 seconds and 20
+ * milliseconds. Above that width it falls back to the exact path. */
+function normOkRing(s, ring) {
+    var tot;
+    if (ring === 8 && s.mode === OQ.MODE_I32 && 2 * s.denom + s.n < 50) {
+        var S = 0, X = 0, b, a, c, d, e;
+        var k0 = s.c0, k1 = s.c1, k2 = s.c2, k3 = s.c3;
+        for (b = 0; b < s.size; b++) {
+            a = k0[b]; c = k1[b]; d = k2[b]; e = k3[b];
+            S += a * a + c * c + d * d + e * e;
+            X += a * c + c * d + d * e - a * e;
+        }
+        return S === Math.pow(2, 2 * s.denom) && X === 0;
+    }
+    if (ring === 16) {
+        tot = s.bornTotals();
+        return tot.P === 2n * (1n << BigInt(2 * s.denom)) &&
+               tot.Q === 0n && tot.R === 0n && tot.T === 0n;
+    }
+    tot = s.bornTotals();
+    return tot.S === (1n << BigInt(2 * s.denom)) && tot.X === 0n;
+}
+
+function ampStr(a) {
+    var names = ['', 'ζ', 'ζ²', 'ζ³'], cs = [a.c0, a.c1, a.c2, a.c3], out = '', i, v, sign, body;
+    for (i = 0; i < 4; i++) {
+        if (cs[i] === 0n) continue;
+        v = big(absv(cs[i]), 14);
+        sign = cs[i] < 0n ? '−' : '+';
+        body = (v === '1' && i > 0) ? names[i] : v + names[i];
+        out += out ? ' ' + sign + ' ' + body : (sign === '−' ? '−' + body : body);
+    }
+    return out || '0';
+}
+
+/* ── self-test suite ──────────────────────────────────────────────────── *
+ * Every circuit here has an answer that mathematics fixes in advance, so the
+ * suite needs no reference implementation to compare against. Three kinds:
+ * ring identities (two circuits that must produce the same state), structural
+ * circuits whose non-zero amplitudes are known exactly, and parity against the
+ * fingerprints the native C engine prints — the only external numbers on this
+ * page, and the reason they are worth having. */
+
+var DAGGER = { h: 'h', x: 'x', cx: 'cx', t: 'tdg', tdg: 't', s: 'sdg', sdg: 's', sx: 'sxdg', sxdg: 'sx' };
+
+function invertLines(lines) {
+    return lines.slice().reverse().map(function (l) {
+        var g = l.split(' ')[0];
+        return DAGGER[g] + ' ' + l.slice(g.length + 1);
+    });
+}
+
+/* A reference state with phases on both qubits: identities are checked on it,
+ * not on |00>, so a gate that is wrong on a phase cannot hide. */
+var PREP2 = 'h q[0];\nt q[0];\nh q[1];\ns q[1];\n';
+
+function ringPair(gates, equiv) {
+    return { a: head(2, 0) + PREP2 + gates, b: head(2, 0) + PREP2 + equiv };
+}
+
+function bvQasm(key, n) {
+    var s = head(n + 1, 0) + 'x q[' + n + '];\nh q[' + n + '];\n', i;
+    for (i = 0; i < n; i++) s += 'h q[' + i + '];\n';
+    for (i = 0; i < n; i++) if ((key >> i) & 1) s += 'cx q[' + i + '],q[' + n + '];\n';
+    for (i = 0; i < n; i++) s += 'h q[' + i + '];\n';
+    return s + 'h q[' + n + '];\nx q[' + n + '];\n';       /* ancilla back to |0> */
+}
+
+function ghzQasm(n) {
+    var s = head(n, 0) + 'h q[0];\n', i;
+    for (i = 0; i + 1 < n; i++) s += 'cx q[' + i + '],q[' + (i + 1) + '];\n';
+    return s;
+}
+
+/* QFT, band-limited to the phases that exist in this ring. Over 3 bits the
+ * band is the whole transform; over 8 bits it is not a QFT any more — but a
+ * circuit followed by its own inverse is the identity either way, which is
+ * exactly what the test asserts. */
+function qftLines(n, band, inv) {
+    var L = [], j, m, k;
+    for (j = n - 1; j >= 0; j--) {
+        L.push('h q[' + j + '];');
+        for (m = j - 1; m >= 0 && j - m <= band; m--) {
+            k = 8 / Math.pow(2, j - m);
+            L.push('cp(' + (inv ? '-' : '') + (k / 4) + '*pi) q[' + m + '],q[' + j + '];');
+        }
+    }
+    return inv ? L.slice().reverse() : L;
+}
+
+function qftRoundQasm(n, band, prep) {
+    return head(n, 0) + prep +
+           qftLines(n, band, false).join('\n') + '\n' +
+           qftLines(n, band, true).join('\n') + '\n';
+}
+
+function roundTripQasm(n, depth, seed) {
+    var rng = new OQ.Rng(seed), kinds = ['h', 't', 'tdg', 's', 'sdg', 'x', 'cx'], L = [], i, k, a, b;
+    for (i = 0; i < depth; i++) {
+        k = kinds[Number(rng.next() % BigInt(kinds.length))];
+        a = Number(rng.next() % BigInt(n));
+        if (k === 'cx') {
+            b = Number(rng.next() % BigInt(n - 1));
+            if (b >= a) b++;
+            L.push('cx q[' + a + '],q[' + b + '];');
+        } else L.push(k + ' q[' + a + '];');
+    }
+    return head(n, 0) + L.join('\n') + '\n' + invertLines(L).join('\n') + '\n';
+}
+
+/* ---- checkers: read the coefficient arrays directly ---- */
+
+function nonZero(s) {
+    var out = [], b, a;
+    for (b = 0; b < s.size; b++) {
+        a = s.amp(b);
+        if (a.c0 || a.c1 || a.c2 || a.c3) out.push(b);
+    }
+    return out;
+}
+
+/* The invariant every state must satisfy, checked in integers: Σ S is exactly
+ * 2^(2·denom) and the √2 part cancels to exactly zero. */
+function normFault(s) {
+    var tot = s.bornTotals(), want = 1n << BigInt(2 * s.denom);
+    if (tot.S !== want) return 'Σ S = ' + tot.S + ', expected 2^' + (2 * s.denom);
+    if (tot.X !== 0n) return 'Σ X = ' + tot.X + ', expected 0';
+    return null;
+}
+
+function singlePeak(idx) {
+    return function (s) {
+        var nz = nonZero(s);
+        if (nz.length !== 1) return nz.length + ' non-zero amplitudes, expected 1';
+        if (nz[0] !== idx) return 'peak at ' + nz[0] + ', expected ' + idx;
+        if (s.probFloat(nz[0]) !== 1) return 'peak probability is not exactly 1';
+        return null;
+    };
+}
+
+function ghzPair(n) {
+    return function (s) {
+        var nz = nonZero(s), top = s.size - 1, a, b;
+        if (nz.length !== 2 || nz[0] !== 0 || nz[1] !== top)
+            return 'non-zero at [' + nz.join(',') + '], expected [0,' + top + ']';
+        a = s.amp(0); b = s.amp(top);
+        if (a.c0 !== b.c0 || a.c1 !== b.c1 || a.c2 !== b.c2 || a.c3 !== b.c3)
+            return 'the two amplitudes differ';
+        /* (ζ − ζ³)/2 = 1/√2 : the ring writes 1/√2 without a square root */
+        if (!(a.c0 === 0n && a.c1 === 1n && a.c2 === 0n && a.c3 === -1n && s.denom === 1))
+            return 'amplitude is not (ζ − ζ³)/2';
+        return null;
+    };
+}
+
+var SUITE = [
+    { kind: 'identity', name: 'T⁸ = I', p: ringPair('t q[0];\n'.repeat(8), '') },
+    { kind: 'identity', name: 'T² = S', p: ringPair('t q[0];\nt q[0];\n', 's q[0];\n') },
+    { kind: 'identity', name: 'S² = Z', p: ringPair('s q[0];\ns q[0];\n', 'z q[0];\n') },
+    { kind: 'identity', name: 'T† T = I', p: ringPair('tdg q[0];\nt q[0];\n', '') },
+    { kind: 'identity', name: 'H X H = Z', p: ringPair('h q[0];\nx q[0];\nh q[0];\n', 'z q[0];\n') },
+    { kind: 'identity', name: 'H Z H = X', p: ringPair('h q[0];\nz q[0];\nh q[0];\n', 'x q[0];\n') },
+    { kind: 'identity', name: 'S T = T S', p: ringPair('s q[0];\nt q[0];\n', 't q[0];\ns q[0];\n') },
+    { kind: 'identity', name: 'SX = H S H', p: ringPair('sx q[0];\n', 'h q[0];\ns q[0];\nh q[0];\n') },
+    { kind: 'identity', name: 'SWAP = CX·CX·CX', p: ringPair('swap q[0],q[1];\n',
+        'cx q[0],q[1];\ncx q[1],q[0];\ncx q[0],q[1];\n') },
+    { kind: 'identity', name: 'CCX = H·CCZ·H', p: {
+        a: head(3, 0) + 'h q[0];\nt q[0];\nh q[1];\ns q[1];\nccx q[0],q[1],q[2];\n',
+        b: head(3, 0) + 'h q[0];\nt q[0];\nh q[1];\ns q[1];\nh q[2];\nccz q[0],q[1],q[2];\nh q[2];\n' } },
+
+    { kind: 'check', name: 'inverse: 400 Clifford+T gates, 3 qubits → |000⟩',
+      qasm: roundTripQasm(3, 400, 11), check: singlePeak(0) },
+    { kind: 'check', name: 'inverse: 600 Clifford+T gates, 6 qubits → |0⁶⟩',
+      qasm: roundTripQasm(6, 600, 12), check: singlePeak(0) },
+    { kind: 'check', name: 'Bernstein–Vazirani, key 10110100 → |180⟩',
+      qasm: bvQasm(180, 8), check: singlePeak(180) },
+    { kind: 'check', name: 'Bernstein–Vazirani, key 01010101 → |85⟩',
+      qasm: bvQasm(85, 8), check: singlePeak(85) },
+    { kind: 'check', name: 'GHZ-8: |0⁸⟩ and |1⁸⟩ at (ζ − ζ³)/2',
+      qasm: ghzQasm(8), check: ghzPair(8) },
+    { kind: 'check', name: 'QFT-3 round trip on |101⟩',
+      qasm: qftRoundQasm(3, 3, 'x q[0];\nx q[2];\n'), check: singlePeak(5) },
+    { kind: 'check', name: 'banded QFT-8 round trip on |13⟩',
+      qasm: qftRoundQasm(8, 2, 'x q[0];\nx q[2];\nx q[3];\n'), check: singlePeak(13) },
+
+    { kind: 'ring', name: 'Z[ζ₁₆] reproduces Z[ζ₈] on ref2 (same fingerprint)',
+      qasm: 'OPENQASM 2.0;\nqreg q[2];\nh q[0];\nh q[1];\nt q[0];\ns q[1];\nt q[1];\n' },
+    { kind: 'ring', name: 'Z[ζ₁₆] reproduces Z[ζ₈] on Grover-6', qasm: PRESETS['grover-6'] },
+    { kind: 'ring16', name: 'p(π/8)¹⁶ = I — the gate Z[ζ₈] cannot hold',
+      qasm: 'OPENQASM 2.0;\nqreg q[1];\nh q[0];\n' + 'p(pi/8) q[0];\n'.repeat(16),
+      same: 'OPENQASM 2.0;\nqreg q[1];\nh q[0];\np(pi/8) q[0];\np(-pi/8) q[0];\n' },
+    { kind: 'ring16', name: 'p(π/8)² = T',
+      qasm: 'OPENQASM 2.0;\nqreg q[1];\nh q[0];\np(pi/8) q[0];\np(pi/8) q[0];\n',
+      same: 'OPENQASM 2.0;\nqreg q[1];\nh q[0];\np(pi/4) q[0];\np(pi/8) q[0];\np(-pi/8) q[0];\n' },
+    { kind: 'ring16', name: '4-bit QFT round trip on |1011⟩ — needs cp(π/8)',
+      qasm: qft4Round(),
+      same: 'OPENQASM 2.0;\nqreg q[4];\nx q[0];\nx q[1];\nx q[3];\np(pi/8) q[0];\np(-pi/8) q[0];\n' },
+
+    { kind: 'hash', name: 'fast int32 fingerprint == the BigInt one', qasm: PRESETS['grover-6'] },
+    { kind: 'hash', name: 'fast fingerprint holds with negative coefficients', qasm: PRESETS['qaoa'] },
+
+    { kind: 'promote', name: 'Grover-8 (denom 76): int32 → BigInt mid-run', n: 8, target: 200, iters: 12 },
+    { kind: 'promote', name: 'Grover-9 (denom 124): int32 → BigInt mid-run', n: 9, target: 300, iters: 17 },
+
+    { kind: 'parity', name: 'bell', qasm: PRESETS['bell'], hash: 'a39c021c87831690' },
+    { kind: 'parity', name: 'ghz-3', qasm: PRESETS['ghz-3'], hash: '668113609759f491' },
+    { kind: 'parity', name: 'h t h', qasm: PRESETS['h t h'], hash: 'e6c507f854fbc17a' },
+    { kind: 'parity', name: 'toffoli |011⟩', qasm: PRESETS['toffoli'], hash: 'a0921617252eada1' },
+    { kind: 'parity', name: 'grover-6 target 42', qasm: PRESETS['grover-6'], hash: 'b08c7bc17a4e9b3a' },
+    { kind: 'parity', name: 'h · 512 t · h', qasm: PRESETS['t-heavy'], hash: 'cf34b6408f73bf23' }
+];
+
+/* A four-bit QFT round trip. The cp(π/8) in it is exactly what Z[ζ₈] refuses
+ * and Z[ζ₁₆] holds, so this circuit is the smaller ring's ceiling made
+ * concrete: it returns to |1011⟩ exactly, but only on the bigger ring. */
+function qft4Round() {
+    var n = 4, j, k;
+    var head = 'OPENQASM 2.0;\nqreg q[4];\nx q[0];\nx q[1];\nx q[3];\n';
+    function qft(inv) {
+        var out = [];
+        for (j = n - 1; j >= 0; j--) {
+            out.push('h q[' + j + '];');
+            for (k = j - 1; k >= 0; k--) {
+                out.push('cp(' + (inv ? '-' : '') + (8 / Math.pow(2, j - k)) +
+                         '*pi/8) q[' + k + '],q[' + j + '];');
+            }
+        }
+        return inv ? out.reverse() : out;
+    }
+    return head + qft(false).join('\n') + '\n' + qft(true).join('\n') + '\n';
+}
+
+/* Grover as a gate list, for the promotion tests. */
+function groverGates(n, target, iters) {
+    var g = [], q, it, all = (1 << n) - 1;
+    for (q = 0; q < n; q++) g.push(['h', q]);
+    for (it = 0; it < iters; it++) {
+        for (q = 0; q < n; q++) if (!((target >> q) & 1)) g.push(['x', q]);
+        g.push(['mcpow', all, 4]);
+        for (q = 0; q < n; q++) if (!((target >> q) & 1)) g.push(['x', q]);
+        for (q = 0; q < n; q++) g.push(['h', q]);
+        for (q = 0; q < n; q++) g.push(['x', q]);
+        g.push(['mcpow', all, 4]);
+        for (q = 0; q < n; q++) g.push(['x', q]);
+        for (q = 0; q < n; q++) g.push(['h', q]);
+    }
+    return g;
+}
+
+function runOne(item) {
+    var t0 = performance.now(), fault = null, s, sb, prog, i;
+
+    /* Cross-ring: run the same circuit on Z[ζ₁₆] and check it lands on the
+     * state Z[ζ₈] reaches — same amplitudes, and the same fingerprint, since a
+     * state with empty odd slots IS a Z[ζ₈] state and hashes as one. */
+    if (item.kind === 'ring') {
+        prog = QASM.parse(item.qasm);
+        if (prog.ring !== 8) return { ok: false, fault: 'expected this circuit to stay in Z[ζ₈]',
+                                      ms: performance.now() - t0, n: prog.n, gates: prog.gates.length };
+        s = OQ.run(prog.gates, prog.n);
+        sb = OQ16.run(OQ16.widen(prog.gates), prog.n);
+        if (s.hash() !== sb.hash()) fault = 'Z[ζ₈] ' + s.hash() + ' vs Z[ζ₁₆] ' + sb.hash();
+        if (!fault && !sb.inZ8()) fault = 'the Z[ζ₁₆] state has non-empty odd slots';
+        if (!fault) {
+            for (i = 0; i < s.size; i++) {
+                if (Math.abs(s.probFloat(i) - sb.probFloat(i)) > 1e-12) {
+                    fault = 'probabilities differ at basis state ' + i; break;
+                }
+            }
+        }
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length, hash: s.hash(), note: 'both rings' };
+    }
+
+    /* Circuits that only exist on the bigger ring: two spellings that must
+     * produce the identical state. */
+    if (item.kind === 'ring16') {
+        prog = QASM.parse(item.qasm);
+        var pb = QASM.parse(item.same);
+        if (prog.ring !== 16) return { ok: false, fault: 'expected Z[ζ₁₆], parser chose Z[ζ' + prog.ring + ']',
+                                       ms: performance.now() - t0, n: prog.n, gates: prog.gates.length };
+        s = OQ16.run(prog.gates, prog.n);
+        sb = OQ16.run(pb.ring === 16 ? pb.gates : OQ16.widen(pb.gates), pb.n);
+        if (!s.equals(sb)) fault = 'states differ: ' + s.hash() + ' vs ' + sb.hash();
+        if (!fault) {
+            var tot = s.bornTotals();
+            if (tot.P !== 2n * (1n << BigInt(2 * s.denom)) || tot.Q !== 0n || tot.R !== 0n || tot.T !== 0n) {
+                fault = 'Σ P = ' + tot.P + ', expected 2·2^' + (2 * s.denom);
+            }
+        }
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length, hash: s.hash(), note: 'Z[ζ₁₆]' };
+    }
+
+    /* The engine starts on int32 and switches to BigInt when the coefficients
+     * outgrow it. Running the same circuit both ways must land on the very
+     * same state — otherwise the fast path is not a fast path, it is a lie. */
+    if (item.kind === 'promote') {
+        var gates = groverGates(item.n, item.target, item.iters);
+        s = new OQ.State(item.n);
+        for (i = 0; i < gates.length; i++) OQ.apply(s, gates[i]);
+        sb = new OQ.State(item.n).promote();
+        for (i = 0; i < gates.length; i++) OQ.apply(sb, gates[i]);
+        if (!s.equals(sb)) fault = 'auto ' + s.hash() + ' vs forced-BigInt ' + sb.hash();
+        else if (!s.promotions) fault = 'expected a promotion, none happened';
+        if (!fault) fault = normFault(s);
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: item.n, gates: gates.length, hash: s.hash(),
+                 note: 'denom 2^' + s.denom + ', ' + s.widthBits() + ' bit' };
+    }
+
+    /* The int32 fingerprint takes a machine-word shortcut through FNV; it has
+     * to agree with the plain BigInt computation byte for byte, or the whole
+     * cross-platform claim rests on an optimization nobody checked. */
+    if (item.kind === 'hash') {
+        prog = QASM.parse(item.qasm);
+        s = OQ.run(prog.gates, prog.n);
+        if (s.mode !== OQ.MODE_I32) fault = 'expected the int32 path for this circuit';
+        else if (s.hash() !== s.hashBig()) fault = 'fast ' + s.hash() + ' vs BigInt ' + s.hashBig();
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length, hash: s.hash(), note: 'both paths' };
+    }
+
+    if (item.kind === 'identity') {
+        prog = QASM.parse(item.p.a); s = OQ.run(prog.gates, prog.n);
+        var pb = QASM.parse(item.p.b); sb = OQ.run(pb.gates, pb.n);
+        if (!s.equals(sb)) fault = 'states differ: ' + s.hash() + ' vs ' + sb.hash();
+    } else {
+        prog = QASM.parse(item.qasm); s = OQ.run(prog.gates, prog.n);
+        if (item.kind === 'parity' && s.hash() !== item.hash)
+            fault = 'fingerprint ' + s.hash() + ', native C prints ' + item.hash;
+        if (item.kind === 'check') fault = item.check(s);
+    }
+    if (!fault) fault = normFault(s);                  /* the invariant, every time */
+    return { ok: !fault, fault: fault, ms: performance.now() - t0,
+             n: prog.n, gates: prog.gates.length, hash: s.hash() };
+}
+
+async function runSelfTest() {
+    if (busy) return;
+    setBusy(true);
+    var L = ['<span class="h">self-test</span>   <span class="d">circuits whose answer is fixed by ' +
+             'mathematics, not by a reference run</span>', ''];
+    var pass = 0, fail = 0, t0 = performance.now(), i, r, tag;
+    el('out').innerHTML = L.join('\n');
+
+    var HEADS = {
+        identity: 'ring identities — two circuits that must land on the same state',
+        check:  'structure — circuits whose non-zero amplitudes are known in advance',
+        ring:   'rings — Z[ζ₁₆] against Z[ζ₈] where both are exact',
+        ring16: 'rings — circuits that only exist above the π/4 lattice',
+        hash:    'fingerprint — the machine-word path against the BigInt one',
+        promote: 'representation — the int32 fast path against unbounded BigInt',
+        parity: 'parity — fingerprints the native C engine prints for the same circuits'
+    };
+    var seen = {};
+
+    for (i = 0; i < SUITE.length; i++) {
+        if (!seen[SUITE[i].kind]) {
+            seen[SUITE[i].kind] = 1;
+            if (i) L.push('');
+            L.push('  <span class="d">' + HEADS[SUITE[i].kind] + '</span>');
+        }
+        r = runOne(SUITE[i]);
+        if (r.ok) pass++; else fail++;
+        tag = SUITE[i].kind === 'parity' ? SUITE[i].hash + '  ' : (r.note || '');
+        L.push('  <span class="' + (r.ok ? 'ok' : 'err') + '">[' + (r.ok ? 'PASS' : 'FAIL') + ']</span>  ' +
+               pad(SUITE[i].name, 54) + pad(tag, tag ? 20 : 0) +
+               padl(r.ms.toFixed(2) + ' ms', 9) +
+               (r.ok ? '' : '\n         <span class="err">' + esc(r.fault) + '</span>'));
+        el('out').innerHTML = L.join('\n');
+        el('progText').textContent = 'test ' + (i + 1) + '/' + SUITE.length;
+        await frame();
+    }
+
+    L.push('');
+    L.push('  <span class="d">every state above also checked in integers: Σ S = 2^2d exactly, Σ X = 0</span>');
+    L.push('<span class="h">result</span>      <span class="' + (fail ? 'err' : 'ok') + '">' +
+           pass + ' passed, ' + fail + ' failed</span> · ' +
+           (performance.now() - t0).toFixed(1) + ' ms');
+    el('out').innerHTML = L.join('\n');
+    el('progText').textContent = '';
+    setBusy(false);
+}
+
+/* ── benchmark ────────────────────────────────────────────────────────── *
+ * The engine is memory-bandwidth-bound, so the number that matters is bytes
+ * moved per second, and how it holds as 2^n grows. */
+
+function benchQasm(n, layers) {
+    var s = head(n, 0), i, q;
+    for (i = 0; i < layers; i++) {
+        for (q = 0; q < n; q++) s += 'h q[' + q + '];\n';
+        for (q = 0; q < n; q++) s += 't q[' + q + '];\n';
+        for (q = 0; q + 1 < n; q++) s += 'cx q[' + q + '],q[' + (q + 1) + '];\n';
+    }
+    return s;
+}
+
+async function runBenchmark() {
+    if (busy) return;
+    setBusy(true);
+
+    var L = ['<span class="h">benchmark</span>   <span class="d">dense exact statevector, ' +
+             'four layers of H · T · CX chain</span>', '',
+             '  <span class="d">' + pad('qubits', 9) + pad('amplitudes', 13) + pad('gates', 8) +
+             padl('time', 10) + padl('gates/s', 11) + padl('amp/s', 11) + padl('throughput', 13) +
+             padl('denom', 8) + padl('width', 8) + padl('repr', 9) + padl('heap', 9) + '</span>'];
+    el('out').innerHTML = L.join('\n');
+
+    var sizes = [8, 12, 16, 18, 20], i, prog, s, t0, ms, k, ampOps;
+    for (i = 0; i < sizes.length; i++) {
+        prog = QASM.parse(benchQasm(sizes[i], 4));
+        var heap0 = heapMB();
+        t0 = performance.now();
+        s = OQ.run(prog.gates, prog.n);
+        ms = performance.now() - t0;
+        var heap1 = heapMB();
+        k = s.limbs();
+        var perAmpB = s.mode === OQ.MODE_I32 ? 16 : 4 * (8 + 8 * k);
+        ampOps = prog.gates.length * s.size;
+        L.push('  ' + pad(sizes[i], 9) + pad(s.size.toLocaleString('en-US'), 13) +
+               pad(prog.gates.length, 8) + padl(ms.toFixed(1) + ' ms', 10) +
+               padl(si(prog.gates.length / (ms / 1000), ''), 11) +
+               padl(si(ampOps / (ms / 1000), ''), 11) +
+               padl(bytes(ampOps * perAmpB / (ms / 1000)) + '/s', 13) +
+               padl('2^' + s.maxDenom, 8) + padl(s.widthBits() + ' b', 8) +
+               padl(s.mode === OQ.MODE_I32 ? 'int32' : 'BigInt', 9) +
+               padl(heap1 === null ? '' : (heap1 - heap0).toFixed(0) + ' MB', 9));
+        el('out').innerHTML = L.join('\n');
+        el('progText').textContent = 'n = ' + sizes[i];
+        await frame();
+    }
+
+    /* what the bigger ring costs, measured rather than asserted */
+    L.push('');
+    L.push('  <span class="d">the same circuit on both rings — Z[ζ₁₆] is eight integers per amplitude ' +
+           'instead of four</span>');
+    for (i = 0; i < 3; i++) {
+        var nn = [10, 12, 14][i];
+        prog = QASM.parse(benchQasm(nn, 4));
+        t0 = performance.now();
+        s = OQ.run(prog.gates, prog.n);
+        var ms8 = performance.now() - t0;
+        t0 = performance.now();
+        var s16 = OQ16.run(OQ16.widen(prog.gates), prog.n);
+        var ms16 = performance.now() - t0;
+        ampOps = prog.gates.length * s.size;
+        L.push('  ' + pad(nn, 9) + pad(s.size.toLocaleString('en-US'), 13) + pad(prog.gates.length, 8) +
+               padl(ms8.toFixed(1) + ' / ' + ms16.toFixed(1) + ' ms', 18) +
+               padl(si(ampOps / (ms8 / 1000), '') + ' / ' + si(ampOps / (ms16 / 1000), ''), 20) +
+               padl((ms16 / ms8).toFixed(1) + '× slower', 14) +
+               padl(s.hash() === s16.hash() ? 'same state' : 'DIFFERS', 13));
+        el('out').innerHTML = L.join('\n');
+        await frame();
+    }
+
+    /* phase gates are units in the ring: cost without width */
+    L.push('');
+    var counts = [512, 4096], j, sp, tp;
+    L.push('  <span class="d">phase-only chains — T is a permutation of (c₀,c₁,c₂,c₃), so nothing widens</span>');
+    for (j = 0; j < counts.length; j++) {
+        prog = QASM.parse(head(1, 0) + 'h q[0];\n' + 't q[0];\n'.repeat(counts[j]) + 'h q[0];\n');
+        tp = performance.now();
+        sp = OQ.run(prog.gates, prog.n);
+        ms = performance.now() - tp;
+        L.push('  ' + pad('1', 9) + pad('2', 13) + pad(prog.gates.length, 8) +
+               padl(ms.toFixed(1) + ' ms', 10) + padl(si(prog.gates.length / (ms / 1000), ''), 11) +
+               padl('', 11) + padl('', 13) + padl('2^' + sp.maxDenom, 8) + padl(sp.widthBits() + ' b', 8));
+        el('out').innerHTML = L.join('\n');
+        await frame();
+    }
+    el('out').innerHTML = L.join('\n');
+    el('progText').textContent = '';
+    setBusy(false);
+}
+
+/* ── workloads ────────────────────────────────────────────────────────── *
+ * The three things a 24-qubit machine gets published for, run here exactly.
+ * All three fit in Z[ζ₈] because their building blocks do: the ZZ coupling
+ * exp(-iγ Z⊗Z) is cx · p(2γ) · cx, and the transverse field exp(-iβX) is
+ * h · p(2β) · h. On the π/4 lattice both are Clifford+T, so every number
+ * below is exact — no shot noise, no variance, no error bars.
+ *
+ * What does NOT fit, and is not pretended to: VQE over a UCCSD ansatz. Its
+ * whole point is a continuous θ, and continuous θ has no representative in
+ * this ring. The parser refuses it rather than rounding, which is the honest
+ * answer even though it is the less impressive one. */
+
+/* Exact <Z_i> for every qubit in one pass: still an element of Z[√2]/2^2d,
+ * so the magnetization is a number, not an estimate. */
+function magnetization(s) {
+    var out = new Array(s.n), Sacc = new Array(s.n), Xacc = new Array(s.n), i, b, pr;
+    for (i = 0; i < s.n; i++) { Sacc[i] = 0n; Xacc[i] = 0n; }
+    for (b = 0; b < s.size; b++) {
+        pr = s.bornPair(b);
+        if (pr.S === 0n && pr.X === 0n) continue;
+        for (i = 0; i < s.n; i++) {
+            if (b & (1 << i)) { Sacc[i] -= pr.S; Xacc[i] -= pr.X; }
+            else              { Sacc[i] += pr.S; Xacc[i] += pr.X; }
+        }
+    }
+    var den = 1n << BigInt(2 * s.denom);
+    for (i = 0; i < s.n; i++) out[i] = OQ.ratio(Sacc[i], den) + OQ.ratio(Xacc[i], den) * Math.SQRT2;
+    return out;
+}
+
+/* Shots a physical machine would need for the same precision on a probability
+ * p, from the binomial standard error: N = p(1-p)/σ². */
+function shotsFor(p, sigma) {
+    if (p <= 0 || p >= 1) return 0;
+    return Math.ceil(p * (1 - p) / (sigma * sigma));
+}
+
+/* RZZ(2γ) = cx · p(2γ) · cx, RX(2β) = h · p(2β) · h, angles in π/4 units. */
+function qaoaGates(n, edges, gk, bk) {
+    var g = [], l, e, q;
+    for (q = 0; q < n; q++) g.push(['h', q]);
+    for (l = 0; l < gk.length; l++) {
+        for (e = 0; e < edges.length; e++) {
+            g.push(['cx', edges[e][0], edges[e][1]],
+                   ['zpow', edges[e][1], gk[l]],
+                   ['cx', edges[e][0], edges[e][1]]);
+        }
+        for (q = 0; q < n; q++) g.push(['h', q], ['zpow', q, bk[l]], ['h', q]);
+    }
+    return g;
+}
+
+function ringGraph(n, chords) {
+    var e = [], i;
+    for (i = 0; i < n; i++) e.push([i, (i + 1) % n]);
+    for (i = 0; i < chords.length; i++) e.push(chords[i]);
+    return e;
+}
+
+function isingGates(n, steps, jk, hk, flips) {
+    var g = [], t, i;
+    for (i = 0; i < flips.length; i++) g.push(['x', flips[i]]);
+    for (t = 0; t < steps; t++) {
+        for (i = 0; i + 1 < n; i++) g.push(['cx', i, i + 1], ['zpow', i + 1, jk], ['cx', i, i + 1]);
+        for (i = 0; i < n; i++) g.push(['h', i], ['zpow', i, hk], ['h', i]);
+    }
+    return g;
+}
+
+/* ZZ feature map, the standard QML encoding, with features on the lattice. */
+function featureGates(n, x, dagger) {
+    var g = [], q;
+    for (q = 0; q < n; q++) g.push(['h', q]);
+    for (q = 0; q < n; q++) g.push(['zpow', q, x[q]]);
+    for (q = 0; q + 1 < n; q++) {
+        g.push(['cx', q, q + 1], ['zpow', q + 1, (x[q] * x[q + 1]) % 8], ['cx', q, q + 1]);
+    }
+    if (!dagger) return g;
+    var inv = [], i, e;
+    for (i = g.length - 1; i >= 0; i--) {
+        e = g[i].slice();
+        if (e[0] === 'zpow') e[2] = -e[2];
+        inv.push(e);
+    }
+    return inv;
+}
+
+var SHADE = [' ', '·', ':', '-', '=', '+', '*', '#', '%', '@'];
+
+/* Porter–Thomas heavy-output fraction for a scrambled state: (1 + ln2)/2. */
+var PORTER_THOMAS = (1 + Math.log(2)) / 2;
+
+/* A random two-qubit Clifford+T block — the discrete counterpart of the
+ * Haar-random SU(4) the QV protocol calls for. */
+function ctBlock(rng, a, b) {
+    var g = [], p = function () { return Number(rng.next() % 8n); };
+    g.push(['h', a], ['zpow', a, p()], ['h', b], ['zpow', b, p()]);
+    g.push(['cx', a, b], ['zpow', b, p()], ['cx', a, b]);
+    g.push(['zpow', a, p()], ['h', a], ['zpow', b, p()], ['h', b]);
+    return g;
+}
+
+function shuffled(rng, n) {
+    var perm = [], i, j, t;
+    for (i = 0; i < n; i++) perm.push(i);
+    for (i = n - 1; i > 0; i--) {
+        j = Number(rng.next() % BigInt(i + 1));
+        t = perm[i]; perm[i] = perm[j]; perm[j] = t;
+    }
+    return perm;
+}
+
+function cliffordTBlocks(n, depth, seed) {
+    var rng = new OQ.Rng(seed), g = [], d, perm, i, blk, k;
+    for (d = 0; d < depth; d++) {
+        perm = shuffled(rng, n);
+        for (i = 0; i + 1 < n; i += 2) {
+            blk = ctBlock(rng, perm[i], perm[i + 1]);
+            for (k = 0; k < blk.length; k++) g.push(blk[k]);
+        }
+    }
+    return g;
+}
+
+/* Exact heavy-output: every probability, the exact median, the exact weight
+ * above it. On the int32 path the magnitudes fit in doubles, so this is one
+ * pass and no BigInt. */
+function heavyOutput(s) {
+    var size = s.size, p = new Float64Array(size), b, a, c, d, e, tot = 0, support = 0;
+    var k0 = s.c0, k1 = s.c1, k2 = s.c2, k3 = s.c3, R2 = Math.SQRT2;
+    for (b = 0; b < size; b++) {
+        a = k0[b]; c = k1[b]; d = k2[b]; e = k3[b];
+        p[b] = (a*a + c*c + d*d + e*e) + (a*c + c*d + d*e - a*e) * R2;
+        tot += p[b];
+        if (p[b] > 0) support++;
+    }
+    var sorted = Float64Array.from(p).sort();
+    var median = (sorted[(size >> 1) - 1] + sorted[size >> 1]) / 2;
+    var heavy = 0;
+    for (b = 0; b < size; b++) if (p[b] > median) heavy += p[b];
+    return { heavy: heavy / tot, median: median, support: support };
+}
+
+/* Mirror RB (Proctor et al.): random Clifford layers, a random Pauli, then
+ * the exact inverse of the layers. Nothing continuous anywhere in it. */
+function cliffordLayer(rng, n) {
+    var g = [], q, pick, perm, i;
+    for (q = 0; q < n; q++) {
+        pick = Number(rng.next() % 4n);
+        if (pick === 0) g.push(['h', q]);
+        else if (pick === 1) g.push(['zpow', q, 2]);
+        else if (pick === 2) g.push(['h', q], ['zpow', q, 2]);
+    }
+    perm = shuffled(rng, n);
+    for (i = 0; i + 1 < n; i += 2) g.push(['cx', perm[i], perm[i + 1]]);
+    return g;
+}
+
+function invertGates(gates) {
+    var out = [], i, g;
+    for (i = gates.length - 1; i >= 0; i--) {
+        g = gates[i].slice();
+        if (g[0] === 'zpow' || g[0] === 'mcpow') g[2] = -g[2];
+        else if (g[0] === 'gphase') g[1] = -g[1];
+        out.push(g);
+    }
+    return out;
+}
+
+function mirrorCircuit(n, depth, seed) {
+    var rng = new OQ.Rng(seed), fwd = [], d, lay, i, q, pa;
+    for (d = 0; d < depth; d++) {
+        lay = cliffordLayer(rng, n);
+        for (i = 0; i < lay.length; i++) fwd.push(lay[i]);
+    }
+    var mid = [];
+    for (q = 0; q < n; q++) {
+        pa = Number(rng.next() % 4n);
+        if (pa === 1) mid.push(['x', q]);
+        else if (pa === 2) mid.push(['zpow', q, 4]);
+        else if (pa === 3) mid.push(['x', q], ['zpow', q, 4]);
+    }
+    return fwd.concat(mid).concat(invertGates(fwd));
+}
+
+/* Banded QFT: keep only the phases the ring holds, cp(2π/2^k) for k ≤ band.
+ * At band 3 the smallest is cp(π/4) = T, so the whole transform is Clifford+T. */
+function bandedQftGates(n, band, inv) {
+    var g = [], j, k, e;
+    for (j = n - 1; j >= 0; j--) {
+        g.push(['h', j]);
+        for (k = j - 1; k >= 0 && j - k <= band; k--) {
+            e = 8 / Math.pow(2, j - k);
+            g.push(['mcpow', (1 << k) | (1 << j), inv ? -e : e]);
+        }
+    }
+    return inv ? g.slice().reverse() : g;
+}
+
+/* Inverse QFT over m bits. Returns null when it needs a phase the ring does
+ * not have — which happens at m = 4: cp(π/8) is already outside Z[ζ₈]. That
+ * is the ceiling on phase estimation here, and it is the ring's, not the
+ * implementation's. */
+function iqftGates(m, base, ring) {
+    var unit = (ring || 8) / 2;                      /* 4 eighths, or 8 sixteenths */
+    var g = [], i, j, k, kk;
+    for (i = 0; i < Math.floor(m / 2); i++) g.push(['swap', base + i, base + m - 1 - i]);
+    for (j = 0; j < m; j++) {
+        for (k = 0; k < j; k++) {
+            kk = -unit / Math.pow(2, j - k);         /* -π/2^(j-k) in this ring's units */
+            if (!Number.isInteger(kk)) return null;
+            g.push(['mcpow', (1 << (base + k)) | (1 << (base + j)), kk]);
+        }
+        g.push(['h', base + j]);
+    }
+    return g;
+}
+
+/* Textbook QPE: counting register 0..m-1, system above it. */
+function qpeGates(m, prep, controlledU, ring) {
+    var g = [], i, j, r, e;
+    for (i = 0; i < m; i++) g.push(['h', i]);
+    for (i = 0; i < prep.length; i++) g.push(prep[i]);
+    for (j = 0; j < m; j++) {
+        for (r = 0; r < (1 << j); r++) {
+            e = controlledU(j);
+            for (i = 0; i < e.length; i++) g.push(e[i]);
+        }
+    }
+    var q = iqftGates(m, 0, ring);
+    return q ? g.concat(q) : null;
+}
+
+function countingMarginal(s, m) {
+    var out = new Array(1 << m).fill(0), b, mask = (1 << m) - 1;
+    for (b = 0; b < s.size; b++) out[b & mask] += s.probFloat(b);
+    return out;
+}
+
+async function runWorkloads() {
+    if (busy) return;
+    setBusy(true);
+    el('prog').classList.add('on');
+
+    var L = ['<span class="h">workloads</span>   <span class="d">the jobs a 24-qubit machine gets ' +
+             'published for, computed exactly</span>', ''];
+    var show = function () { el('out').innerHTML = L.join('\n'); };
+    show();
+
+    var i, j, t, b, prog, s, t0, ms;
+
+    /* ---- 1. QAOA Max-Cut, exhaustive over the whole angle lattice ---- */
+    var N1 = 16, edges = ringGraph(N1, [[0, 8], [2, 11], [5, 13], [3, 9], [6, 14]]);
+    var cuts = new Int8Array(1 << N1), bestCut = 0, cutCount = 0;
+    for (b = 0; b < (1 << N1); b++) {
+        var c = 0;
+        for (i = 0; i < edges.length; i++) {
+            if (((b >> edges[i][0]) & 1) !== ((b >> edges[i][1]) & 1)) c++;
+        }
+        cuts[b] = c;
+        if (c > bestCut) { bestCut = c; cutCount = 1; } else if (c === bestCut) cutCount++;
+    }
+
+    L.push('<span class="h">1 · qaoa</span>    Max-Cut on ' + N1 + ' nodes, ' + edges.length +
+           ' edges <span class="d">· 2^' + N1 + ' = ' + (1 << N1).toLocaleString('en-US') + ' cuts</span>');
+    L.push('  <span class="d">classical optimum ' + bestCut + ' (' + cutCount +
+           ' optimal cuts) · random guess ' + (edges.length / 2).toFixed(1) + '</span>');
+    L.push('  <span class="d">the π/4 lattice makes the QAOA angle space FINITE — 8×8 = 64 pairs at ' +
+           'p = 1, so there is no optimizer here, just all of them</span>');
+    show();
+    await frame();
+
+    var t1 = performance.now(), scanned = 0, bestG = 0, bestB = 0, bestExp = -1, bestPopt = 0;
+    for (var gk = 0; gk <= 7; gk++) {
+        for (var bk = 0; bk <= 7; bk++) {
+            s = OQ.run(qaoaGates(N1, edges, [gk], [bk]), N1);
+            var expCut = 0, pOpt = 0, pr;
+            for (b = 0; b < s.size; b++) {
+                pr = s.probFloat(b);
+                expCut += pr * cuts[b];
+                if (cuts[b] === bestCut) pOpt += pr;
+            }
+            if (expCut > bestExp) { bestExp = expCut; bestG = gk; bestB = bk; bestPopt = pOpt; }
+            scanned++;
+            el('progBar').style.width = (scanned / 64 * 100).toFixed(0) + '%';
+            el('progText').textContent = 'qaoa lattice scan ' + scanned + '/64  ·  γ=' + gk + 'π/4 β=' + bk + 'π/4';
+            if (scanned % 8 === 0) await frame();
+        }
+    }
+    var qaoaMs = performance.now() - t1;
+    L.push('  best angles <span class="b">γ = ' + bestG + '·π/4, β = ' + bestB + '·π/4</span>' +
+           '  ⟨cut⟩ = <span class="b">' + bestExp.toFixed(4) + '</span>' +
+           '  P(optimum) = <span class="b">' + (bestPopt * 100).toFixed(3) + '%</span>');
+    L.push('  <span class="d">64 full statevector runs in ' + (qaoaMs / 1000).toFixed(2) + ' s · ' +
+           'to resolve that probability to ±0.01% a real machine needs ~' +
+           shotsFor(bestPopt, 0.0001).toLocaleString('en-US') + ' shots — per angle pair</span>');
+    L.push('');
+    show();
+    await frame();
+
+    /* ---- 2. Ising quench: a light cone, by difference of two exact runs ---- */
+    var N2 = 14, MID = 7, STEPS = 10;
+    L.push('<span class="h">2 · quench</span>  transverse-field Ising chain, ' + N2 +
+           ' spins, J = π/4, h = π/4');
+    L.push('  <span class="d">|⟨Z_i⟩ with one flipped spin − ⟨Z_i⟩ without| — the light cone of the ' +
+           'perturbation, shaded per row</span>');
+    L.push('   <span class="d">t  ' + Array.from({ length: N2 }, function (_, k) { return String(k % 10); }).join(' ') +
+           '        peak    denom  repr</span>');
+    show();
+
+    var t2 = performance.now();
+    for (t = 0; t <= STEPS; t++) {
+        var sa = OQ.run(isingGates(N2, t, 1, 1, [MID]), N2);
+        var sb = OQ.run(isingGates(N2, t, 1, 1, []), N2);
+        var ma = magnetization(sa), mb = magnetization(sb), row = [], peak = 0;
+        for (i = 0; i < N2; i++) {
+            row.push(Math.abs(ma[i] - mb[i]));
+            if (row[i] > peak) peak = row[i];
+        }
+        var cells = row.map(function (v) {
+            return SHADE[peak > 0 ? Math.min(9, Math.round(v / peak * 9)) : 0];
+        });
+        L.push('  ' + padl(t, 2) + '  <span class="b">' + cells.join(' ') + '</span>   ' +
+               padl(peak.toFixed(4), 8) + padl('2^' + sa.denom, 8) +
+               padl(sa.mode === OQ.MODE_I32 ? 'int32' : 'BigInt', 8));
+        el('progBar').style.width = (t / STEPS * 100).toFixed(0) + '%';
+        el('progText').textContent = 'quench step ' + t + '/' + STEPS;
+        show();
+        await frame();
+    }
+    L.push('  <span class="d">' + (STEPS + 1) * 2 + ' runs in ' +
+           ((performance.now() - t2) / 1000).toFixed(2) + ' s · hardware loses this signal to ' +
+           'decoherence after 2–4 Trotter steps</span>');
+    L.push('');
+    show();
+
+    /* ---- 3. Quantum kernel: an exact Gram matrix ---- */
+    var N3 = 8;
+    var data = [[0,1,2,3,4,5,6,7], [1,1,2,2,3,3,4,4], [7,6,5,4,3,2,1,0],
+                [0,0,0,0,0,0,0,0], [2,4,6,0,2,4,6,0], [3,1,4,1,5,2,6,5]];
+    L.push('<span class="h">3 · kernel</span>  ZZ feature map, ' + N3 + ' features, ' + data.length +
+           ' data points');
+    L.push('  <span class="d">K(i,j) = |⟨φ(x_i)|φ(x_j)⟩|² read straight off amplitude 0 of ' +
+           'U†(x_j)U(x_i)|0⟩ — one run per entry, no sampling</span>');
+    show();
+
+    var t3 = performance.now(), K = [], runs = 0;
+    for (i = 0; i < data.length; i++) {
+        K.push(new Array(data.length).fill(0));
+    }
+    for (i = 0; i < data.length; i++) {
+        for (j = i; j < data.length; j++) {
+            s = OQ.run(featureGates(N3, data[i], false).concat(featureGates(N3, data[j], true)), N3);
+            K[i][j] = K[j][i] = s.probFloat(0);
+            runs++;
+            el('progText').textContent = 'kernel entry ' + runs + '/' + (data.length * (data.length + 1) / 2);
+        }
+        await frame();
+    }
+    for (i = 0; i < data.length; i++) {
+        L.push('  <span class="b">' + K[i].map(function (v) { return v.toFixed(4); }).join('  ') + '</span>');
+    }
+    L.push('  <span class="d">' + runs + ' runs in ' + ((performance.now() - t3) / 1000).toFixed(2) +
+           ' s · diagonal is exactly 1, and the matrix is exactly symmetric — neither is a ' +
+           'coincidence, and on hardware neither is ever quite true</span>');
+    L.push('');
+    show();
+    await frame();
+
+    /* ---- 4. Phase estimation: the spectral answer, not the variational one ---- */
+    var M = 3, SYS = M;
+    L.push('<span class="h">4 · qpe</span>     phase estimation, ' + M + ' counting bits');
+    L.push('  <span class="d">not variational: no ansatz, no optimizer, no gradient. When an eigenphase ' +
+           'sits on the lattice, QPE projects onto the eigenvector exactly.</span>');
+    show();
+
+    var t4 = performance.now();
+    var cases = [
+        { u: 'U = SX = √X', phase: 'eigenphases 0 and 2/8',
+          runs: [['|+⟩ eigenvector', []], ['|−⟩ eigenvector', [['x', SYS], ['h', SYS]]],
+                 ['|0⟩ = both at once', []]],
+          cU: function (j) { return [['h', SYS], ['mcpow', (1 << j) | (1 << SYS), 2], ['h', SYS]]; },
+          prepFix: function (idx) { return idx === 0 ? [['h', SYS]] : null; } },
+        { u: 'U = T', phase: 'eigenphases 0 and 1/8',
+          runs: [['|1⟩ eigenvector', [['x', SYS]]], ['|+⟩ = both at once', [['h', SYS]]]],
+          cU: function (j) { return [['mcpow', (1 << j) | (1 << SYS), 1]]; },
+          prepFix: function () { return null; } }
+    ];
+
+    for (i = 0; i < cases.length; i++) {
+        L.push('  <span class="b">' + cases[i].u + '</span>  <span class="d">' + cases[i].phase +
+               ' — on the lattice</span>');
+        for (j = 0; j < cases[i].runs.length; j++) {
+            var prep = cases[i].prepFix(j) || cases[i].runs[j][1];
+            s = OQ.run(qpeGates(M, prep, cases[i].cU), M + 1);
+            var marg = countingMarginal(s, M), bins = [];
+            for (b = 0; b < marg.length; b++) {
+                if (marg[b] > 1e-12) bins.push('bin ' + b + ' = ' + (marg[b] * 100).toFixed(3) + '%');
+            }
+            L.push('    ' + pad(cases[i].runs[j][0], 22) + '<span class="b">' + bins.join('   ') + '</span>');
+        }
+        show();
+        await frame();
+    }
+
+    /* an operator whose spectrum does not land on the lattice */
+    var S2 = M;
+    function cIsing(j) {
+        return [['cx', S2, S2 + 1], ['mcpow', (1 << j) | (1 << (S2 + 1)), 1], ['cx', S2, S2 + 1],
+                ['h', S2], ['mcpow', (1 << j) | (1 << S2), 1], ['h', S2],
+                ['h', S2 + 1], ['mcpow', (1 << j) | (1 << (S2 + 1)), 1], ['h', S2 + 1]];
+    }
+    s = OQ.run(qpeGates(M, [], cIsing), M + 2);
+    var margI = countingMarginal(s, M), binsI = [];
+    for (b = 0; b < margI.length; b++) binsI.push(b + ':' + (margI[b] * 100).toFixed(2) + '%');
+    L.push('  <span class="b">U = Ising Trotter step</span>  <span class="d">eigenphases NOT multiples of 1/8</span>');
+    L.push('    ' + pad('|00⟩ start', 22) + '<span class="b">' + binsI.join('  ') + '</span>');
+    L.push('  <span class="d">the spread is real, and every digit of it is exact — a machine would be ' +
+           'estimating this histogram from shots, and its error bars would be wider than the ' +
+           'structure it is trying to resolve</span>');
+    L.push('  <span class="d">' + ((performance.now() - t4) / 1000).toFixed(2) + ' s · in Z[ζ₈] a FOURTH ' +
+           'counting bit is refused outright: the inverse QFT would need cp(π/8). Three bits is that ' +
+           'ring’s ceiling on phase resolution — so take the next ring up.</span>');
+    L.push('');
+
+    /* ---- 4 counting bits, only possible one ring up ---- */
+    var M4 = 4, SYS4 = M4;
+    L.push('<span class="h">5 · qpe¹⁶</span>  the same estimator on Z[ζ₁₆], four counting bits');
+    L.push('  <span class="d">eight integers per amplitude instead of four buys the π/8 phase, and the ' +
+           'π/8 phase buys the bit: resolution 1/16 instead of 1/8</span>');
+    show();
+
+    var t5 = performance.now();
+    var qpe16 = [
+        ['U = p(π/8) on |1⟩', [['x', SYS4]], 1, 'eigenphase 1/16 — invisible to Z[ζ₈]'],
+        ['U = T on |1⟩',      [['x', SYS4]], 2, 'eigenphase 2/16 = 1/8'],
+        ['U = S on |1⟩',      [['x', SYS4]], 4, 'eigenphase 4/16 = 1/4']
+    ];
+    for (i = 0; i < qpe16.length; i++) {
+        (function (k) {
+            var gates = qpeGates(M4, qpe16[i][1], function (j) {
+                return [['mcpow', (1 << j) | (1 << SYS4), k]];
+            }, 16);
+            var st16 = OQ16.run(gates, M4 + 1);
+            var marg = new Array(1 << M4).fill(0), mask = (1 << M4) - 1, bb;
+            for (bb = 0; bb < st16.size; bb++) marg[bb & mask] += st16.probFloat(bb);
+            var hits = [];
+            for (bb = 0; bb < marg.length; bb++) {
+                if (marg[bb] > 1e-12) hits.push('bin ' + bb + '/16 = ' + (marg[bb] * 100).toFixed(3) + '%');
+            }
+            L.push('    ' + pad(qpe16[k === 1 ? 0 : (k === 2 ? 1 : 2)][0], 22) +
+                   '<span class="b">' + hits.join('   ') + '</span>   <span class="d">' +
+                   qpe16[k === 1 ? 0 : (k === 2 ? 1 : 2)][3] + '</span>');
+        })(qpe16[i][2]);
+        show();
+        await frame();
+    }
+    L.push('  <span class="d">' + ((performance.now() - t5) / 1000).toFixed(2) +
+           ' s · the first line is the point: a phase of π/8 has no representative in Z[ζ₈] at all, ' +
+           'so that estimate simply cannot be made on the smaller ring — at any depth, with any ' +
+           'number of shots</span>');
+    L.push('');
+    L.push('');
+    /* ---- 6. Exact Clifford+T volume: heavy output against Porter-Thomas ---- */
+    L.push('<span class="h">6 · volume</span>  exact Clifford+T volume — random two-qubit blocks, depth = width');
+    L.push('  <span class="d">the shape of the QV protocol, but NOT QV: that one integrates over Haar-random ' +
+           'SU(4), a continuous Lie group no cyclotomic ring contains. This is its discrete counterpart, ' +
+           'over the gate set fault-tolerant hardware will actually run.</span>');
+    L.push('  <span class="d">the heavy-output fraction is computed from the exact amplitudes — no shots, ' +
+           'no sampling error, no confidence interval. Porter–Thomas gives (1+ln2)/2 = ' +
+           PORTER_THOMAS.toFixed(4) + '.</span>');
+    L.push('   <span class="d">' + pad('width', 8) + pad('depth', 8) + pad('gates', 8) + padl('run', 10) +
+           padl('support', 16) + padl('HOG', 11) + padl('vs P–T', 12) + '</span>');
+    show();
+
+    var t6 = performance.now();
+    for (i = 0; i < 4; i++) {
+        var nv = [8, 10, 12, 14][i];
+        var gv = cliffordTBlocks(nv, nv, 424242 + nv);
+        t0 = performance.now();
+        s = OQ.run(gv, nv);
+        ms = performance.now() - t0;
+        var hg = heavyOutput(s);
+        L.push('   ' + pad(nv, 8) + pad(nv, 8) + pad(gv.length, 8) + padl(ms.toFixed(0) + ' ms', 10) +
+               padl(hg.support + '/' + s.size, 16) +
+               padl((hg.heavy * 100).toFixed(3) + '%', 11) +
+               padl(hg.support < s.size * 0.9
+                    ? 'degenerate' : ((hg.heavy - PORTER_THOMAS) * 100).toFixed(2) + ' pts', 12));
+        if (hg.support < s.size * 0.9) {
+            L.push('           <span class="err">this seed collapses onto a stabilizer-like support</span>' +
+                   ' <span class="d">— half the amplitudes are exactly zero, so the median sits at zero ' +
+                   'and the heavy fraction is 100% for a trivial reason. Worth showing rather than ' +
+                   'hiding: it is what a Clifford-heavy block draw does, and shots would never reveal it.</span>');
+        }
+        show();
+        await frame();
+    }
+    L.push('  <span class="d">' + ((performance.now() - t6) / 1000).toFixed(2) + ' s · where the blocks do ' +
+           'scramble, the discrete gate set lands within a third of a point of the continuous ' +
+           'Porter–Thomas value</span>');
+    L.push('');
+    show();
+    await frame();
+
+    /* ---- 7. Mirror randomized benchmarking (Proctor et al., Sandia) ---- */
+    L.push('<span class="h">7 · mirror</span>  mirror randomized benchmarking — Clifford layers, a Pauli, the exact inverse');
+    L.push('  <span class="d">Sandia’s replacement for QV, and fully discrete by design: no continuous ' +
+           'angle appears anywhere in it. Polarization is what hardware loses with depth.</span>');
+    L.push('   <span class="d">' + pad('width', 8) + pad('depth', 8) + pad('gates', 9) + padl('run', 10) +
+           padl('non-zero', 11) + padl('polarization', 15) + padl('denom', 9) + '</span>');
+    show();
+
+    var t7 = performance.now();
+    for (i = 0; i < 4; i++) {
+        var nm = [6, 8, 10, 12][i], dm = [50, 100, 200, 500][i];
+        var gm = mirrorCircuit(nm, dm, 777 + dm);
+        t0 = performance.now();
+        s = OQ.run(gm, nm);
+        ms = performance.now() - t0;
+        var nzm = 0, atm = -1;
+        for (b = 0; b < s.size; b++) if (!s.isZero(b)) { nzm++; atm = b; }
+        L.push('   ' + pad(nm, 8) + pad(dm, 8) + pad(gm.length, 9) + padl(ms.toFixed(0) + ' ms', 10) +
+               padl(nzm, 11) +
+               padl(nzm === 1 ? s.probFloat(atm).toFixed(6) : 'spread over ' + nzm, 15) +
+               padl('2^' + s.denom, 9));
+        show();
+        await frame();
+    }
+    L.push('  <span class="d">' + ((performance.now() - t7) / 1000).toFixed(2) + ' s · seventeen thousand ' +
+           'gates deep and the state is back on one basis vector with probability exactly 1, denominator ' +
+           'back to 2^0. A machine reports this number falling; here it cannot fall.</span>');
+    L.push('');
+    show();
+    await frame();
+
+    /* ---- 8. QED-C style algorithmic depth: banded QFT at width ---- */
+    L.push('<span class="h">8 · qed-c</span>   banded QFT round trip — algorithmic depth at full width');
+    L.push('  <span class="d">the band keeps only cp(2π/2^k) down to k = 3, which is T — so the whole ' +
+           'transform is Clifford+T and the round trip must return the input state exactly, with zero ' +
+           'phase deviation.</span>');
+    L.push('   <span class="d">' + pad('width', 8) + pad('gates', 8) + padl('run', 10) + padl('state', 11) +
+           padl('non-zero', 11) + padl('returned to input', 24) + '</span>');
+    show();
+
+    var t8 = performance.now();
+    for (i = 0; i < 4; i++) {
+        var nq = [12, 16, 18, 20][i];
+        var prep = [], targetB = 0, qq;
+        for (qq = 0; qq < nq; qq += 3) { prep.push(['x', qq]); targetB |= (1 << qq); }
+        var gq = prep.concat(bandedQftGates(nq, 3, false)).concat(bandedQftGates(nq, 3, true));
+        t0 = performance.now();
+        s = OQ.run(gq, nq);
+        ms = performance.now() - t0;
+        var nzq = 0, atq = -1;
+        for (b = 0; b < s.size; b++) if (!s.isZero(b)) { nzq++; atq = b; }
+        var exact = nzq === 1 && atq === targetB && s.denom === 0;
+        L.push('   ' + pad(nq, 8) + pad(gq.length, 8) + padl(ms.toFixed(0) + ' ms', 10) +
+               padl(bytes(s.size * 16), 11) + padl(nzq, 11) +
+               padl(exact ? '✓ exact, 0 deviation' : '✗ ' + nzq + ' non-zero', 24));
+        show();
+        await frame();
+    }
+    L.push('  <span class="d">' + ((performance.now() - t8) / 1000).toFixed(2) + ' s · the full 24-qubit ' +
+           'version is in the presets as “qft-24”: 16.7 M amplitudes, 256 MB, about six seconds, and it ' +
+           'lands back on the input state with the denominator at 2^0 — phase deviation is not small, ' +
+           'it is absent.</span>');
+    L.push('');
+    show();
+    await frame();
+
+    L.push('<span class="h">not here</span>   <span class="d">VQE over a UCCSD ansatz. Its parameters are ' +
+           'continuous by construction — the search happens BETWEEN lattice points — so no exact ' +
+           'representative exists at any lattice spacing. Going up to Z[ζ₃₂] or Z[ζ₆₄] halves the ' +
+           'step each time and never reaches a general θ; the only honest route is lattice synthesis, ' +
+           'a Clifford+T word of length O(log 1/ε) whose operator sits near θ — exact arithmetic on ' +
+           'a deliberately chosen neighbour, which is a different claim from exact θ.</span>');
+    show();
+
+    el('prog').classList.remove('on');
+    el('progText').textContent = '';
+    setBusy(false);
+}
+
+/* ── live read-out ────────────────────────────────────────────────────── *
+ * Parse on every keystroke so the size of the thing is on screen before it
+ * runs: 2^n is the number that decides whether this is instant or hopeless. */
+function refreshChip() {
+    var c = el('chip');
+    try {
+        var prog = QASM.parse(el('src').value);
+        var amps = Math.pow(2, prog.n), slots = slotsFor(prog.ring);
+        var bytes = amps * slots * 4;                 /* int32 path */
+        var est = amps * prog.gates.length / rateI32; /* seconds, if it stays on int32 */
+        var heavy = bytes > 200 * 1048576 || est > 20;
+        c.className = 'chip' + (heavy ? ' warn' : '');
+        c.innerHTML = '<b>' + prog.n + ' qubit' + (prog.n > 1 ? 's' : '') + '</b> · 2^' + prog.n +
+            ' = ' + amps.toLocaleString('en-US') + ' amplitudes · ' + prog.gates.length + ' gates' +
+            (prog.ring === 16 ? ' · <b>Z[ζ₁₆]</b>' : '') +
+            ' · <b>' + fmtBytes(bytes) + '</b> · ~<b>' + fmtTime(est) + '</b>' +
+            (prog.measures.length ? ' · ' + prog.measures.length + ' measured' : '');
+    } catch (e) {
+        c.className = 'chip bad';
+        c.textContent = e.name === 'QasmError' ? 'line ' + e.line + ': ' + e.message : String(e);
+    }
+}
+
+function fmtBytes(x) {
+    var u = ['B', 'KiB', 'MiB', 'GiB'], i = 0;
+    while (x >= 1024 && i < u.length - 1) { x /= 1024; i++; }
+    return (x >= 100 ? x.toFixed(0) : x.toFixed(1)) + ' ' + u[i];
+}
+
+function fmtTime(sec) {
+    if (sec < 0.001) return '<1 ms';
+    if (sec < 1) return Math.round(sec * 1000) + ' ms';
+    if (sec < 90) return sec.toFixed(1) + ' s';
+    return Math.round(sec / 60) + ' min';
+}
+
+/* ── wiring ───────────────────────────────────────────────────────────── */
+el('runBtn').addEventListener('click', execute);
+el('testBtn').addEventListener('click', runSelfTest);
+el('benchBtn').addEventListener('click', runBenchmark);
+el('workBtn').addEventListener('click', runWorkloads);
+el('stopBtn').addEventListener('click', function () {
+    stopRequested = true;
+    el('progText').textContent = 'stopping…';
+});
+el('src').addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); execute(); }
+});
+var chipTimer = null;
+el('src').addEventListener('input', function () {
+    try { localStorage.setItem('oq-src', el('src').value); } catch (e) {}
+    clearTimeout(chipTimer);
+    chipTimer = setTimeout(refreshChip, 180);
+});
+
+var saved = null;
+try { saved = localStorage.getItem('oq-src'); } catch (e) {}
+el('src').value = saved || PRESETS['shor 15'];
+refreshChip();
+
+/* Run on load only when it is cheap. Coming back to a tab that still holds a
+ * 20-qubit circuit should not cost twenty seconds before you have touched
+ * anything — the estimate is right there in the chip, and Run is one click. */
+(function () {
+    try {
+        var prog = QASM.parse(el('src').value);
+        var est = Math.pow(2, prog.n) * prog.gates.length / rateI32;
+        if (est < 1.5) execute();
+        else el('out').innerHTML = '<span class="d">circuit loaded — ' +
+            'estimated ' + fmtTime(est) + ', so it is waiting for you to press Run</span>';
+    } catch (e) { /* the chip already shows the parse error */ }
+})();
+})();
+</script>
+
+</body>
+</html>
