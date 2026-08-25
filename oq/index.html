@@ -665,24 +665,29 @@ var PRESETS = {
      * bit by bit, register slices, and both spellings of measure.
      * 1 + 15 = 16, exactly, and the support never leaves 1. */
     /* Dynamic: mid-circuit measurement, collapse, and gates that depend on
-     * the outcome. The collapse is exact -- see the note under the state. */
+     * the outcome. The state arrives on q[2] with its irrational Born
+     * probabilities intact -- that is the thing to look at. */
     'teleport': head(3, 2) + [
-        '// Quantum teleportation. The state on q[0] is moved to q[2] using one',
-        '// Bell pair and two classical bits -- and the corrections at the end',
-        '// depend on what the measurement gave, so the circuit is not fixed',
-        '// before it runs. Change the seed to take a different branch.',
+        '// Teleportation. |psi> starts on q[0] and ends up on q[2], carried there',
+        '// by one Bell pair and two classical bits -- and the corrections depend on',
+        '// what the measurement gave, so the circuit is not fixed before it runs.',
         '//',
-        '// The last two lines undo the preparation on q[2]. If the protocol is',
-        '// exact, q[2] comes back to |0> at probability exactly 1, whichever of',
-        '// the four outcomes came up.',
+        '// |psi> = H T H |0> is chosen so you can SEE it arrive: its probabilities',
+        '// are (2 + sqrt2)/4 and (2 - sqrt2)/4, irrational, and they show up on',
+        '// q[2] exactly -- read them off the |amp|^2 column, in the ring.',
+        '//',
+        '// q[0] and q[1] are consumed by the measurement, so the two surviving',
+        '// amplitudes differ only in q[2]. Counts below are one trajectory each:',
+        '// all four Bell outcomes at 25%, and every one of them lands the state.',
         '',
         'h q[0];',
-        't q[0];        // |psi> = T H |0>',
+        't q[0];',
+        'h q[0];        // |psi> on q[0]',
         '',
         'h q[1];        // Bell pair on q[1], q[2]',
         'cx q[1],q[2];',
         '',
-        'cx q[0],q[1];  // Bell measurement on q[0], q[1]',
+        'cx q[0],q[1];  // Bell measurement',
         'h q[0];',
         'measure q[0] -> c[0];',
         'measure q[1] -> c[1];',
@@ -690,10 +695,7 @@ var PRESETS = {
         'if(c==2) x q[2];   // corrections, read off the outcome',
         'if(c==1) z q[2];',
         'if(c==3) x q[2];',
-        'if(c==3) z q[2];',
-        '',
-        'tdg q[2];      // undo the preparation',
-        'h q[2];'
+        'if(c==3) z q[2];'
     ].join(String.fromCharCode(10)),
 
     'openqasm 3': [
@@ -908,7 +910,32 @@ async function simulate(prog, out) {
 
     /* measurement */
     var counts = null, tShots = 0, shots = 0;
-    if (prog.measures.length) {
+
+    /* ---- a dynamic circuit is sampled by RE-RUNNING it -----------------
+     * Sampling the finished state is right for a circuit that measures only
+     * at the end. It is badly wrong for one that measures in flight: that
+     * state has already collapsed, so drawing a thousand shots from it
+     * reports a single outcome at 100% when the real distribution is spread
+     * over every branch. Shots here mean trajectories. */
+    if (prog.dynamic) {
+        shots = Math.max(1, Math.min(20000, +el('shots').value || 1024));
+        var seed0 = +el('seed').value || 0, tr, st, word, ci, t2 = performance.now();
+        counts = {};
+        for (tr = 0; tr < shots; tr++) {
+            if (stopRequested) { shots = tr; break; }
+            st = tr === 0 ? s : ENG.run(prog.gates, prog.n, seed0 + tr);
+            word = 0;
+            for (ci = 0; ci < prog.nc; ci++) if (st.cbits[ci]) word |= (1 << ci);
+            var key2 = word.toString(2).padStart(Math.max(1, prog.nc), '0');
+            counts[key2] = (counts[key2] || 0) + 1;
+            if ((tr & 63) === 63 && performance.now() - last > 40) {
+                el('progText').textContent = 'trajectory ' + (tr + 1) + '/' + shots;
+                await frame();
+                last = performance.now();
+            }
+        }
+        tShots = performance.now() - t2;
+    } else if (prog.measures.length) {
         shots = Math.max(1, Math.min(100000, +el('shots').value || 1024));
         var seed = +el('seed').value || 0;
         var t1 = performance.now();
@@ -1227,8 +1254,14 @@ function render(prog, s, tRun, ampOps, counts, shots, tShots, done) {
 
     if (counts) {
         var keys = Object.keys(counts).sort(function (p, q) { return counts[q] - counts[p] || (p < q ? -1 : 1); });
-        L.push('<span class="h">counts</span>      ' + shots + ' shots · seed ' + (+el('seed').value || 0) +
-               ' · ' + tShots.toFixed(2) + ' ms <span class="d">· draw ' + (2 * s.denom + (prog.ring === 16 ? 65 : 64)) + ' exact bits</span>');
+        L.push('<span class="h">counts</span>      ' + shots +
+               (prog.dynamic ? ' trajectories' : ' shots') + ' · seed ' +
+               (+el('seed').value || 0) + ' · ' + tShots.toFixed(2) + ' ms <span class="d">· ' +
+               (prog.dynamic
+                 ? 'the whole circuit re-run once per trajectory — sampling the state above ' +
+                   'would report this one branch at 100%'
+                 : 'draw ' + (2 * s.denom + (prog.ring === 16 ? 65 : 64)) + ' exact bits') +
+               '</span>');
         for (i = 0; i < Math.min(keys.length, 12); i++) {
             var c = counts[keys[i]];
             L.push('  <span class="b">' + keys[i] + '</span>  ' + padl(c, 7) + '  ' +
@@ -1542,12 +1575,14 @@ var SUITE = [
           return v;
       }, want: 16n },
 
-    { kind: 'dynamic', name: 'teleportation returns the state in every branch',
+    { kind: 'dynamic', name: 'teleportation lands (2+√2)/4 on q[2], every branch',
       qasm: PRESETS['teleport'], seeds: 24, branches: 4,
       probe: function (s) {
+          /* |psi> = H T H |0> has p(0) = (2 + sqrt2)/4. If the protocol worked,
+           * q[2] carries exactly that -- whichever Bell outcome came up. */
           var p = 0, b;
           for (b = 0; b < s.size; b++) if (!(b & 4)) p += s.probFloat(b);
-          return p;                       /* q[2] back to |0> after undoing prep */
+          return p / ((2 + Math.SQRT2) / 4);
       } },
     { kind: 'dynamic', name: 'reset after a gate always lands on |0⟩',
       qasm: head(1, 1) + 'h q[0];\nt q[0];\nh q[0];\nreset q;\n', seeds: 12,
