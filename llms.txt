@@ -1,6 +1,6 @@
 # TWIST-J
 
-> TWIST-J tests whether physical reality can be modeled as a closed, exact, deterministic integer system whose continuum, geometry, probability, and fields are readings. Its single algebraic axiom is J = 1 + j². A discrete architecture is declared separately; the checkpoint space, five kernel generators, selector, and decoder are not claimed to be uniquely derived from J. The decoder is typed and partial; totality, uniqueness, and completeness remain open. The declared architecture contains no fitted dimensionless parameter; its one SI calibration anchor is the electron mass.
+> TWIST-J tests whether physical reality can be modeled as a closed, exact, deterministic integer system whose continuum, geometry, probability, and fields are readings. Its single algebraic axiom is J = 1 + j². A discrete architecture is declared separately; the checkpoint space, five kernel generators, selector, and decoder are not claimed to be uniquely derived from J. The decoder is typed and partial. One axiom does not require one globally unique physical reading: the public theory may admit a typed family of readings. Totality, classification of the admissible reading family, compatibility on overlaps, and physical completeness remain open. The declared architecture contains no fitted dimensionless parameter; its one SI calibration anchor is the electron mass.
 
 Author: A. M. Thorn. ORCID: https://orcid.org/0009-0008-5463-278X
 Hub: https://twistj.com
@@ -17,7 +17,11 @@ The twist unit is j = ζ₅ = exp(2πi/5), j⁵ = 1. In the basis (1, j, j², j�
 
 The discrete architecture is declared separately. Its complete autonomous state is Omega = N_0 x F_5^6, with theta_n = s_2(n) mod 2, z_6(psi) = sum_k psi_k mod 5, U(n,psi) = (n+1,g_(z_6(psi)+2 theta_n mod 5)(psi)), and (g_0,...,g_4) = (a,b,c,d,e). N_0 is the forward orbit of zero under the 2-adic odometer. The finite checkpoint psi is not the whole state, and log streams are derived orbit records.
 
-For K the set of forward U-orbits, the decoder is a typed partial interface ordered matter, then geometry, then clock. Decoder outputs never feed back into U. READING-SPLIT [D] is a dictionary at its registered legs, not a completeness theorem; totality, uniqueness, and completeness remain open. The ansatz says that a successful complete decoder should be forced by the declared architecture, not selected by fit; that forcing and uniqueness are not yet proved.
+For K the set of forward U-orbits, the decoder is a typed partial interface ordered matter, then geometry, then clock. Decoder outputs never feed back into U. READING-SPLIT [D] is a dictionary at its registered legs, not a completeness theorem.
+
+One primitive axiom may admit more than one typed physical reading. Completeness of a reading family does not mean cardinality one: it means that every output-relevant admitted alternative is classified and that no undeclared choice remains. Distinct readings may be equivalent, complementary, or context-scoped. If overlapping readings in the same declared physical context give inequivalent physical outputs, the theory must supply an independently fixed relation, selection or occurrence rule, prove them physically equivalent at the claimed scope, or leave the physical conclusion open. A reading may never be selected after inspection of the target measurement or result it is meant to explain.
+
+Global decoder uniqueness is therefore not a program requirement. Scoped uniqueness and nonuniqueness claims remain exactly local to their registered class, equivalence relation and status.
 
 - COSMOLOGY-REGISTER [D] commits w = -14/15 as a target and consistency witness. DE-CONFORMAL-WEIGHT [O] owns the still-open typed selection of its density character.
 - PHOTON-KAPPA-LEMMA [F] and PHOTON-WINDOW-PROOF [F] falsify the necessary universal occupancy conjunct and the frozen compound route. Roughening was not reached; no Coulomb, continuum, propagator, or physical-photon conclusion follows.
