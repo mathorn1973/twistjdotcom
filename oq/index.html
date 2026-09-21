@@ -160,12 +160,18 @@ textarea:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
 .out .b { color: var(--text-bright); }
 .out .q { color: var(--accent); font-weight: 500; }
 
-button, input[type="number"] {
+button, select, input[type="number"], input[type="text"] {
     font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
     background: var(--field); color: var(--text);
     border: 1px solid var(--rule); border-radius: 2px; padding: 7px 10px;
 }
 input[type="number"] { width: 84px; }
+select, input[type="text"] { max-width: 100%; }
+.mode-row { margin: 12px 0; }
+.rank-controls { margin: 10px 0; }
+.rank-controls[hidden] { display: none; }
+.rank-controls input { width: 250px; }
+.mode-note { font: 11.5px/1.65 'JetBrains Mono', monospace; color: var(--muted); margin: 8px 0; }
 input[type="number"]:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
 button.run {
     color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase;
@@ -260,6 +266,25 @@ button.stop:disabled { opacity: 1; }
         <span class="chip" id="chip"></span>
     </div>
 
+    <div class="row mode-row">
+        <label class="lbl" for="runMode">mode</label>
+        <select id="runMode">
+            <option value="statevector">Statevector — amplitudes &amp; sampling</option>
+            <option value="compressed">Compressed — Pauli observables</option>
+        </select>
+    </div>
+    <div id="rankControls" class="rank-controls" hidden>
+        <div class="row">
+            <label class="lbl" for="rankQubits">P(qubit = 1)</label>
+            <input type="text" id="rankQubits" placeholder="0, 1, 5-7; blank = first 8" aria-label="Qubits for individual probabilities">
+            <label class="lbl" for="rankPaulis">Pauli products</label>
+            <input type="text" id="rankPaulis" value="Z0" placeholder="X0 X1; Z0 Z1" aria-label="Pauli products separated by semicolons">
+        </div>
+        <p class="mode-note">Exact expectations and individual probabilities for Clifford+T circuits.
+        Up to 64 qubits per readout and 16 Pauli products. No joint samples, physical-basis amplitudes or state fingerprint.
+        Observables are evaluated before terminal measurements.
+        Runtime grows with 2<sup>r</sup>; active rank r is limited to 16 here.</p>
+    </div>
     <textarea id="src" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
 
     <div class="row bottom">
@@ -282,7 +307,7 @@ button.stop:disabled { opacity: 1; }
 </div>
 
 <div class="foot">
-    <span>Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state</span>
+    <span id="modeFoot">Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state</span>
     <span class="spacer"></span>
     <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
     <a href="/">twistj.com</a>
@@ -294,14 +319,16 @@ button.stop:disabled { opacity: 1; }
 <script src="oq16.js"></script>
 <script src="oqsparse.js"></script>
 <script src="oqsynth.js"></script>
-<script src="qasm.js"></script>
+<script src="oqopt.js?v=rank-1"></script>
+<script src="oqrank.js?v=rank-1"></script>
+<script src="qasm.js?v=rank-1"></script>
 <script>
 (function () {
 'use strict';
 
 var el = function (id) { return document.getElementById(id); };
 
-/* The four engine modules are separate files, loaded by relative src. Open the
+/* The engine modules are separate files, loaded by relative src. Open the
  * page somewhere that has no base URL to resolve them against -- a data: URI,
  * an inlined preview, a copy of the HTML on its own -- and none of them
  * arrive, and the first thing that touches one dies on a name that is not
@@ -312,6 +339,8 @@ var el = function (id) { return document.getElementById(id); };
     if (typeof OQ   === 'undefined') missing.push('oq.js');
     if (typeof OQ16 === 'undefined') missing.push('oq16.js');
     if (typeof OQS  === 'undefined') missing.push('oqsparse.js');
+    if (typeof OQOPT === 'undefined') missing.push('oqopt.js');
+    if (typeof OQRANK === 'undefined') missing.push('oqrank.js');
     /* oqsynth.js is optional: without it the approximate box just stays off */
     if (typeof QASM === 'undefined') missing.push('qasm.js');
     if (!missing.length) return;
@@ -325,7 +354,7 @@ var el = function (id) { return document.getElementById(id); };
     var out = el('out');
     if (out) out.innerHTML =
         '<span class="err">the engine did not load: ' + missing.join(', ') + '</span>\n\n' +
-        '<span class="d">oq is this page plus four JavaScript files beside it, loaded by\n' +
+        '<span class="d">oq is this page plus six JavaScript files beside it, loaded by\n' +
         'relative path. ' +
         (noBase
           ? 'This copy is running from a ' + location.protocol + ' URL, which has no base\n' +
@@ -333,7 +362,7 @@ var el = function (id) { return document.getElementById(id); };
             'Open the directory itself — serve it over http and go to /oq/, or use\n' +
             'https://twistj.com/oq/.'
           : 'They are not beside this copy of the page, so the requests for\nthem failed.\n\n' +
-            'Keep index.html, oq.js, oq16.js, oqsparse.js and qasm.js in one directory,\n' +
+            'Keep index.html, oq.js, oq16.js, oqsparse.js, oqopt.js, oqrank.js and qasm.js in one directory,\n' +
             'or use https://twistj.com/oq/.') +
         '\n\nNothing is wrong with the circuit you pasted — none of the arithmetic is here\n' +
         'to run it with.</span>';
@@ -789,14 +818,41 @@ var PRESETS = {
     ].join(String.fromCharCode(10))
 };
 
+/* A four-qubit non-Clifford core with a Clifford encoding across 100 wires.
+ * The final H layer makes its physical-basis support large; active rank is 4. */
+PRESETS['rank-100'] = (function () {
+    var text = head(100, 0) + '// Compressed mode: a structured 100-qubit circuit with active rank 4.\n';
+    var q, j;
+    for (q = 0; q < 4; q++) text += 'h q[' + q + ']; t q[' + q + '];\n';
+    for (j = 0; j < 32; j++) {
+        q = j % 4;
+        text += 'h q[' + q + ']; s q[' + ((q + 1) % 4) + ']; ' +
+            'cx q[' + q + '],q[' + ((q + 1) % 4) + ']; t q[' + q + '];\n';
+    }
+    for (q = 4; q < 100; q++) text += 'cx q[' + (q % 4) + '],q[' + q + '];\n';
+    text += 'h q;\n';
+    return text;
+})();
+
 var pbox = el('presets');
 Object.keys(PRESETS).forEach(function (name, i) {
     if (i) pbox.appendChild(document.createTextNode(' · '));
     var a = document.createElement('a');
     a.textContent = name;
     a.addEventListener('click', function () {
+        if (busy) return;
         el('src').value = PRESETS[name];
         el('out').innerHTML = '';
+        if (name === 'rank-100') {
+            el('runMode').value = 'compressed';
+            el('rankQubits').value = '0-3, 98-99';
+            el('rankPaulis').value = 'X0 X4; Z0 Z4';
+            syncMode();
+        } else if (compressedMode()) {
+            el('rankQubits').value = '';
+            el('rankPaulis').value = 'Z0';
+        }
+        try { localStorage.setItem('oq-src', el('src').value); } catch (e) {}
         refreshChip();
     });
     pbox.appendChild(a);
@@ -860,7 +916,25 @@ function setBusy(on) {
     el('testBtn').disabled = on;
     el('benchBtn').disabled = on;
     el('workBtn').disabled = on;
+    el('runMode').disabled = on;
+    el('rankQubits').disabled = on;
+    el('rankPaulis').disabled = on;
     el('stopBtn').disabled = false;
+}
+
+function compressedMode() { return el('runMode').value === 'compressed'; }
+
+function syncMode() {
+    var compressed = compressedMode();
+    el('rankControls').hidden = !compressed;
+    el('shots').disabled = compressed;
+    el('seed').disabled = compressed;
+    el('synth').disabled = compressed;
+    el('synthEps').disabled = compressed;
+    el('modeFoot').textContent = compressed
+        ? 'Z[ζ₈] Clifford frame + 2^r active coefficients · exact Pauli expectations'
+        : 'Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state';
+    try { localStorage.setItem('oq-mode', el('runMode').value); } catch (e) {}
 }
 
 function frame() { return new Promise(function (r) { setTimeout(r, 0); }); }
@@ -890,10 +964,10 @@ async function execute() {
         /* Synthesis is opt-in and stays off unless the box is ticked. With it
          * off, an angle that is not in the ring is refused, which is the
          * default the whole page argues for. */
-        var wantSynth = el('synth').checked && typeof OQSYNTH !== 'undefined';
+        var wantSynth = !compressedMode() && el('synth').checked && typeof OQSYNTH !== 'undefined';
         prog = QASM.parse(src, wantSynth
             ? { synth: OQSYNTH, eps: parseFloat(el('synthEps').value) || 1e-3 }
-            : undefined);
+            : { mode: el('runMode').value });
     } catch (e) {
         if (e.name !== 'QasmError') throw e;
         out.innerHTML = '<span class="err">line ' + e.line + ': ' + esc(e.message) + '</span>' +
@@ -910,8 +984,9 @@ async function execute() {
     } catch (e) {
         /* the honest failure mode at 2^n: the tab runs out of memory */
         out.innerHTML = '<span class="err">' + esc(e && e.message ? e.message : String(e)) + '</span>' +
+            (prog.backend === 'compressed' ? '' :
             '\n<span class="d">a dense exact statevector is 2^n amplitudes — ' +
-            'the native engine has the same arithmetic without the tab’s memory ceiling</span>';
+            'the native engine has the same arithmetic without the tab’s memory ceiling</span>');
     }
     el('prog').classList.remove('on');
     el('progText').textContent = '';
@@ -924,6 +999,7 @@ async function execute() {
  * phases with a few Hadamards on top. The parser decides — it is the only
  * place that has seen the whole gate list. */
 async function simulate(prog, out) {
+    if (prog.backend === 'compressed') return simulateCompressed(prog, out);
     if (prog.backend === 'sparse') return simulateSparse(prog, out);
     var ENG = engineFor(prog.ring);
     var s = new ENG.State(prog.n);
@@ -1026,6 +1102,107 @@ function synthNotice(prog) {
     return L;
 }
 
+function runNotices(prog) {
+    var L = synthNotice(prog), opt = prog.optimization;
+    if (opt && opt.removedGates > 0) {
+        L.push('<span class="h">simplified</span>  ' + opt.removedGates.toLocaleString('en-US') +
+               ' redundant gate' + (opt.removedGates === 1 ? '' : 's') +
+               ' removed <span class="d">· exact circuit rewrite, including global phase</span>');
+        L.push('');
+    }
+    return L;
+}
+
+/* ── compressed observables ──────────────────────────────────────────── */
+
+function rankQubitSelection(text, n) {
+    text = text.trim();
+    if (!text) return Array.from({ length: Math.min(n, 8) }, function (_, i) { return i; });
+    if (text.toLowerCase() === 'all') {
+        if (n > 64) throw new Error('Select at most 64 readout qubits, for example 0-7, 99.');
+        return Array.from({ length: n }, function (_, i) { return i; });
+    }
+    var result = [], seen = new Set();
+    text.split(/[\s,]+/).forEach(function (part) {
+        var m = /^(\d+)(?:-(\d+))?$/.exec(part);
+        if (!m) throw new Error('Use qubit indices or ranges, for example 0, 1, 5-7.');
+        var a = Number(m[1]), b = m[2] === undefined ? a : Number(m[2]);
+        if (!Number.isSafeInteger(a) || !Number.isSafeInteger(b) || a > b || b >= n)
+            throw new Error('Readout qubits must be between 0 and ' + (n - 1) + '.');
+        if (b - a >= 64) throw new Error('Select at most 64 readout qubits per run.');
+        for (var q = a; q <= b; q++) {
+            if (!seen.has(q)) { seen.add(q); result.push(q); }
+            if (result.length > 64) throw new Error('Select at most 64 readout qubits per run.');
+        }
+    });
+    return result;
+}
+
+async function simulateCompressed(prog, out) {
+    var qubits = rankQubitSelection(el('rankQubits').value, prog.n);
+    var names = el('rankPaulis').value.split(';').map(function (s) { return s.trim(); }).filter(Boolean);
+    if (names.length > 16) throw new Error('Select at most 16 Pauli products per run.');
+    var observables = names.map(function (s) { return OQRANK.parseObservable(s, prog.n); });
+    var t0 = performance.now();
+    var plan = OQRANK.plan(prog.gates, prog.n, { maxRank: 16 });
+    el('progText').textContent = 'active rank ' + plan.rank + ' · ' + plan.size + ' coefficients';
+    await frame();
+    if (stopRequested) { out.textContent = 'Stopped before simulation; no final readout.'; return; }
+    var s = OQRANK.create(plan), last = performance.now();
+    while (s.done < s.tCount) {
+        if (stopRequested) break;
+        s.step();
+        if (performance.now() - last > 40) {
+            el('progBar').style.width = (100 * s.done / Math.max(1, s.tCount)) + '%';
+            el('progText').textContent = 'phase step ' + s.done + '/' + s.tCount +
+                ' · rank ' + s.rank + ' · denom 2^' + s.denom;
+            await frame(); last = performance.now();
+        }
+    }
+    if (stopRequested) {
+        out.textContent = 'Stopped after ' + s.done + '/' + s.tCount + ' phase steps; no final readout.';
+        return;
+    }
+    el('progBar').style.width = '100%';
+    el('progText').textContent = 'computing exact observables';
+    await frame();
+    if (stopRequested) { out.textContent = 'Stopped before readout.'; return; }
+    var norm = s.checkNorm();
+    if (!norm.ok) throw new Error('Compressed-state normalization check failed.');
+    var lines = runNotices(prog), i;
+    lines.push('<span class="h">mode</span>        <span class="q">compressed observables</span> · ' + prog.n + ' qubits');
+    lines.push('<span class="h">active</span>      rank r = ' + s.rank + ' · 2^r = <span class="q">' + s.size.toLocaleString('en-US') +
+        '</span> coefficient tuples · ' + (4 * s.size).toLocaleString('en-US') + ' integers');
+    lines.push('<span class="d">            Clifford frame stored separately; physical 2^' + prog.n + ' amplitudes are not expanded</span>');
+    lines.push('<span class="h">circuit</span>     ' + prog.gates.length + ' gates · ' + s.tCount + ' non-Clifford phase steps');
+    lines.push('<span class="h">width</span>       denom 2^' + s.denom + ' · peak coefficient width ' + s.peakBits + ' bits');
+    lines.push('<span class="ok">norm</span>        Σ |a|² = 1 exactly');
+    lines.push('');
+    lines.push('<span class="h">readout</span>     exact value <span class="d">· decimal values are display approximations</span>');
+    for (i = 0; i < qubits.length + observables.length; i++) {
+        if (stopRequested) { out.textContent = 'Stopped during readout; results not presented as complete.'; return; }
+        var value, label, decimal;
+        if (i < qubits.length) {
+            value = s.probabilityOne(qubits[i]);
+            label = 'P(q' + qubits[i] + '=1)';
+            decimal = (OQRANK.toNumber(value) * 100).toFixed(6) + '%';
+        } else {
+            var oi = i - qubits.length;
+            value = s.expectation(observables[oi]);
+            label = '⟨' + names[oi] + '⟩';
+            decimal = OQRANK.toNumber(value).toFixed(9);
+        }
+        lines.push('  ' + esc(pad(label, 18)) + esc(OQRANK.toString(value)) + '  <span class="d">≈ ' + decimal + '</span>');
+        if (performance.now() - last > 40) { await frame(); last = performance.now(); }
+    }
+    lines.push('');
+    lines.push('<span class="h">time</span>        ' + (performance.now() - t0).toFixed(2) + ' ms, including planning and readout');
+    lines.push('<span class="d">Individual probabilities are marginals, not independent joint samples.</span>');
+    if (prog.measures.length) lines.push('<span class="d">Observables describe the state before terminal measurements.</span>');
+    lines.push('<span class="d">This mode returns no physical-basis amplitudes or state fingerprint.</span>');
+    out.innerHTML = lines.join('\n');
+}
+
 /* ── sparse run ───────────────────────────────────────────────────────── */
 
 async function simulateSparse(prog, out) {
@@ -1051,7 +1228,7 @@ async function simulateSparse(prog, out) {
 }
 
 function renderSparse(prog, s, tRun, done, total) {
-    var L = synthNotice(prog), i;
+    var L = runNotices(prog), i;
     if (done < total) {
         L.push('<span class="err">stopped after ' + done + ' of ' + total +
                ' gates</span> <span class="d">— the state below is the circuit up to that ' +
@@ -1144,7 +1321,7 @@ function ketOf(key, n) {
 }
 
 function render(prog, s, tRun, ampOps, counts, shots, tShots, done) {
-    var L = synthNotice(prog), i, b;
+    var L = runNotices(prog), i, b;
     /* A dynamic circuit does not have "a" final state -- it has one per set of
      * measurement outcomes. Say which one this is before showing it. */
     if (s.measured) {
@@ -1554,6 +1731,23 @@ function ghzPair(n) {
 }
 
 var SUITE = [
+    { kind: 'compressed', name: 'Bell: correlated ZZ, half-probability marginals',
+      qasm: head(2, 0) + 'h q[0]; cx q[0],q[1];', rank: 0,
+      observable: 'Z0 Z1', exact: [1n, 0n, 0n, 0n], denominatorExp: 0, half: true },
+    { kind: 'compressed', name: 'T phase: Y sign and irrational expectation',
+      qasm: head(1, 0) + 'h q[0]; t q[0];', rank: 1,
+      observable: 'Y0', exact: [0n, 1n, 0n, -1n], denominatorExp: 1 },
+    { kind: 'compressed', name: '100-qubit encoded core uses 16 coefficients',
+      qasm: PRESETS['rank-100'], rank: 4,
+      observable: 'X0 X4', exact: [1n, 0n, 0n, 0n], denominatorExp: 0 },
+    { kind: 'optimizer', name: 'affine phases cancel across CX and SWAP',
+      qasm: head(3, 0) + PREP3 +
+          't q[0];\ncx q[0],q[1];\nswap q[0],q[2];\ntdg q[2];\n', minRemoved: 2 },
+    { kind: 'optimizer', name: 'complemented phase keeps its global phase',
+      qasm: head(2, 0) + PREP2 + 't q[0];\nx q[0];\nt q[0];\nx q[0];\n', minRemoved: 2 },
+    { kind: 'optimizer', name: 'p(π/8)² narrows the execution ring to Z[ζ₈]',
+      qasm: head(1, 0) + 'h q[0];\np(pi/8) q[0];\np(pi/8) q[0];\n',
+      minRemoved: 1, ring: 8 },
     { kind: 'identity', name: 'T⁸ = I', p: ringPair('t q[0];\n'.repeat(8), '') },
     { kind: 'identity', name: 'T² = S', p: ringPair('t q[0];\nt q[0];\n', 's q[0];\n') },
     { kind: 'identity', name: 'S² = Z', p: ringPair('s q[0];\ns q[0];\n', 'z q[0];\n') },
@@ -1743,14 +1937,54 @@ function groverGates(n, target, iters) {
     return g;
 }
 
+/* Engine identities and throughput tests must exercise their original gates,
+ * rather than ask the optimizer to prove them before the engine runs. */
+function parseRaw(src) { return QASM.parse(src, { optimize: false }); }
+
 function runOne(item) {
     var t0 = performance.now(), fault = null, s, sb, prog, i;
+
+    if (item.kind === 'compressed') {
+        prog = QASM.parse(item.qasm, { mode: 'compressed' });
+        s = OQRANK.run(prog.gates, prog.n);
+        var observed = s.expectation(OQRANK.parseObservable(item.observable, prog.n));
+        if (s.rank !== item.rank) fault = 'unexpected active rank ' + s.rank;
+        else if (!s.checkNorm().ok) fault = 'norm is not exactly 1';
+        else if (observed.denominatorExp !== item.denominatorExp ||
+                 observed.numerator.some(function (v, j) { return v !== item.exact[j]; }))
+            fault = 'wrong exact expectation: ' + OQRANK.toString(observed);
+        if (!fault && item.half) {
+            for (i = 0; i < prog.n; i++) {
+                var marginal = s.probabilityOne(i);
+                if (marginal.denominatorExp !== 1 || marginal.numerator[0] !== 1n ||
+                    marginal.numerator.slice(1).some(function (v) { return v !== 0n; }))
+                    fault = 'Bell marginal is not exactly 1/2';
+            }
+        }
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length,
+                 note: 'rank ' + s.rank + ', ' + s.size + ' coefficients, exact readout' };
+    }
+
+    if (item.kind === 'optimizer') {
+        prog = QASM.parse(item.qasm);
+        var raw = parseRaw(item.qasm);
+        s = OQ16.run(prog.ring === 16 ? prog.gates : OQ16.widen(prog.gates), prog.n);
+        sb = OQ16.run(raw.ring === 16 ? raw.gates : OQ16.widen(raw.gates), raw.n);
+        if (!s.equals(sb) || s.hash() !== sb.hash()) fault = 'exact state or fingerprint changed';
+        else if (!prog.optimization || prog.optimization.removedGates < item.minRemoved)
+            fault = 'expected at least ' + item.minRemoved + ' redundant gates removed';
+        else if (item.ring && prog.ring !== item.ring) fault = 'ring did not narrow';
+        return { ok: !fault, fault: fault, ms: performance.now() - t0,
+                 n: prog.n, gates: prog.gates.length, hash: s.hash(),
+                 note: raw.gates.length + ' → ' + prog.gates.length + ' gates, full state identical' };
+    }
 
     /* Cross-ring: run the same circuit on Z[ζ₁₆] and check it lands on the
      * state Z[ζ₈] reaches — same amplitudes, and the same fingerprint, since a
      * state with empty odd slots IS a Z[ζ₈] state and hashes as one. */
     if (item.kind === 'ring') {
-        prog = QASM.parse(item.qasm);
+        prog = parseRaw(item.qasm);
         if (prog.ring !== 8) return { ok: false, fault: 'expected this circuit to stay in Z[ζ₈]',
                                       ms: performance.now() - t0, n: prog.n, gates: prog.gates.length };
         s = OQ.run(prog.gates, prog.n);
@@ -1771,8 +2005,8 @@ function runOne(item) {
     /* Circuits that only exist on the bigger ring: two spellings that must
      * produce the identical state. */
     if (item.kind === 'ring16') {
-        prog = QASM.parse(item.qasm);
-        var pb = QASM.parse(item.same);
+        prog = parseRaw(item.qasm);
+        var pb = parseRaw(item.same);
         if (prog.ring !== 16) return { ok: false, fault: 'expected Z[ζ₁₆], parser chose Z[ζ' + prog.ring + ']',
                                        ms: performance.now() - t0, n: prog.n, gates: prog.gates.length };
         s = OQ16.run(prog.gates, prog.n);
@@ -1809,7 +2043,7 @@ function runOne(item) {
      * to agree with the plain BigInt computation byte for byte, or the whole
      * cross-platform claim rests on an optimization nobody checked. */
     if (item.kind === 'hash') {
-        prog = QASM.parse(item.qasm);
+        prog = parseRaw(item.qasm);
         s = OQ.run(prog.gates, prog.n);
         if (s.mode !== OQ.MODE_I32) fault = 'expected the int32 path for this circuit';
         else if (s.hash() !== s.hashBig()) fault = 'fast ' + s.hash() + ' vs BigInt ' + s.hashBig();
@@ -1824,7 +2058,7 @@ function runOne(item) {
      * are the two things a dropped or duplicated amplitude would break. */
     if (item.kind === 'sparse') {
         if (item.qasm) {
-            prog = QASM.parse(item.qasm);
+            prog = parseRaw(item.qasm);
             var sp = OQS.run(prog.gates, prog.n);
             var dn = OQ.run(prog.gates, prog.n);
             if (sp.toDense(OQ).hash() !== dn.hash())
@@ -1835,7 +2069,7 @@ function runOne(item) {
                      n: prog.n, gates: prog.gates.length, hash: dn.hash(),
                      note: 'support ' + sp.support() + ' of 2^' + prog.n };
         }
-        prog = QASM.parse(item.build());
+        prog = parseRaw(item.build());
         var big = OQS.run(prog.gates, prog.n);
         var nrm = big.checkNorm();
         if (prog.backend !== 'sparse') fault = 'the parser sent this to the dense engine';
@@ -1853,7 +2087,7 @@ function runOne(item) {
      * checked ACROSS trajectories: the property has to hold whichever branch
      * the measurement took. */
     if (item.kind === 'dynamic') {
-        prog = QASM.parse(item.qasm);
+        prog = parseRaw(item.qasm);
         var seen = {}, worst = 0, sd, ds, dp, dtot, dnrm, dsum, dbad = 0;
         for (sd = 1; sd <= item.seeds; sd++) {
             ds = OQ.run(prog.gates, prog.n, sd);
@@ -1876,11 +2110,11 @@ function runOne(item) {
     }
 
     if (item.kind === 'identity') {
-        prog = QASM.parse(item.p.a); s = OQ.run(prog.gates, prog.n);
-        var pb = QASM.parse(item.p.b); sb = OQ.run(pb.gates, pb.n);
+        prog = parseRaw(item.p.a); s = OQ.run(prog.gates, prog.n);
+        var pb = parseRaw(item.p.b); sb = OQ.run(pb.gates, pb.n);
         if (!s.equals(sb)) fault = 'states differ: ' + s.hash() + ' vs ' + sb.hash();
     } else {
-        prog = QASM.parse(item.qasm); s = OQ.run(prog.gates, prog.n);
+        prog = parseRaw(item.qasm); s = OQ.run(prog.gates, prog.n);
         if (item.kind === 'parity' && s.hash() !== item.hash)
             fault = 'fingerprint ' + s.hash() + ', native C prints ' + item.hash;
         if (item.kind === 'check') fault = item.check(s);
@@ -1899,6 +2133,8 @@ async function runSelfTest() {
     el('out').innerHTML = L.join('\n');
 
     var HEADS = {
+        compressed: 'compressed observables — exact correlations without expanding the state',
+        optimizer: 'exact simplification — full state and fingerprint match the original circuit',
         identity: 'ring identities — two circuits that must land on the same state',
         check:  'structure — circuits whose non-zero amplitudes are known in advance',
         ring:   'rings — Z[ζ₁₆] against Z[ζ₈] where both are exact',
@@ -1966,7 +2202,7 @@ async function runBenchmark() {
 
     var sizes = [8, 12, 16, 18, 20], i, prog, s, t0, ms, k, ampOps;
     for (i = 0; i < sizes.length; i++) {
-        prog = QASM.parse(benchQasm(sizes[i], 4));
+        prog = parseRaw(benchQasm(sizes[i], 4));
         var heap0 = heapMB();
         t0 = performance.now();
         s = OQ.run(prog.gates, prog.n);
@@ -1994,7 +2230,7 @@ async function runBenchmark() {
            'instead of four</span>');
     for (i = 0; i < 3; i++) {
         var nn = [10, 12, 14][i];
-        prog = QASM.parse(benchQasm(nn, 4));
+        prog = parseRaw(benchQasm(nn, 4));
         t0 = performance.now();
         s = OQ.run(prog.gates, prog.n);
         var ms8 = performance.now() - t0;
@@ -2016,7 +2252,7 @@ async function runBenchmark() {
     var counts = [512, 4096], j, sp, tp;
     L.push('  <span class="d">phase-only chains — T is a permutation of (c₀,c₁,c₂,c₃), so nothing widens</span>');
     for (j = 0; j < counts.length; j++) {
-        prog = QASM.parse(head(1, 0) + 'h q[0];\n' + 't q[0];\n'.repeat(counts[j]) + 'h q[0];\n');
+        prog = parseRaw(head(1, 0) + 'h q[0];\n' + 't q[0];\n'.repeat(counts[j]) + 'h q[0];\n');
         tp = performance.now();
         sp = OQ.run(prog.gates, prog.n);
         ms = performance.now() - tp;
@@ -2620,7 +2856,15 @@ async function runWorkloads() {
 function refreshChip() {
     var c = el('chip');
     try {
-        var prog = QASM.parse(el('src').value);
+        var prog = QASM.parse(el('src').value, { mode: el('runMode').value });
+        if (prog.backend === 'compressed') {
+            var plan = OQRANK.plan(prog.gates, prog.n, { maxRank: 16 });
+            c.className = 'chip';
+            c.innerHTML = '<b>' + prog.n + ' qubits</b> · <b>compressed</b> · rank ' +
+                plan.rank + ' · <b>' + plan.size.toLocaleString('en-US') +
+                ' coefficient tuples</b> + Clifford frame · ' + plan.tCount + ' non-Clifford phase steps';
+            return;
+        }
         /* A sparse circuit costs what its support costs, and 2^n is not a
          * number to print — at n = 434 it is 10^130 and the dense estimate
          * runs off the end of a double into nonsense. Say what will actually
@@ -2668,6 +2912,11 @@ el('runBtn').addEventListener('click', execute);
 el('testBtn').addEventListener('click', runSelfTest);
 el('benchBtn').addEventListener('click', runBenchmark);
 el('workBtn').addEventListener('click', runWorkloads);
+el('runMode').addEventListener('change', function () {
+    syncMode();
+    el('out').textContent = 'Mode changed — press Run to compute this readout.';
+    refreshChip();
+});
 el('stopBtn').addEventListener('click', function () {
     stopRequested = true;
     el('progText').textContent = 'stopping…';
@@ -2685,6 +2934,10 @@ el('src').addEventListener('input', function () {
 var saved = null;
 try { saved = localStorage.getItem('oq-src'); } catch (e) {}
 el('src').value = saved || PRESETS['shor 15'];
+try {
+    if (localStorage.getItem('oq-mode') === 'compressed') el('runMode').value = 'compressed';
+} catch (e) {}
+syncMode();
 refreshChip();
 
 /* Run on load only when it is cheap. Coming back to a tab that still holds a
@@ -2692,6 +2945,10 @@ refreshChip();
  * anything — the estimate is right there in the chip, and Run is one click. */
 (function () {
     try {
+        if (compressedMode()) {
+            el('out').textContent = 'Compressed circuit loaded — press Run to compute observables.';
+            return;
+        }
         var prog = QASM.parse(el('src').value);
         var est = Math.pow(2, prog.n) * prog.gates.length / rateI32;
         if (est < 1.5) execute();

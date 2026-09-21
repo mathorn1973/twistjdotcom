@@ -10,10 +10,11 @@
  * ring, and rounding it would be the first lie in a chain of them.
  */
 (function (root, factory) {
-    var api = factory();
+    var api = factory(typeof module === 'object' && module.exports
+        ? require('./oqopt.js') : root.OQOPT);
     if (typeof module === 'object' && module.exports) module.exports = api;
     else root.QASM = api;
-})(typeof self !== 'undefined' ? self : this, function () {
+})(typeof self !== 'undefined' ? self : this, function (OPT) {
 'use strict';
 
 function QasmError(line, message, hint) {
@@ -1466,7 +1467,7 @@ function sparsePlan(gates, n) {
     return Math.min(Math.pow(2, h), Math.pow(2, n));
 }
 
-function parse2(src) {
+function parse2(src, opts) {
     var stmts = statements(stripComments(src));
     var qregs = {}, cregs = {}, nq = 0, nc = 0;
     var gates = [], measures = [], warnings = [], si, st;
@@ -1727,6 +1728,60 @@ function parse2(src) {
     if (nq === 0) throw new QasmError(1, 'no qreg declared',
         'start with: OPENQASM 2.0; include "qelib1.inc"; qreg q[2];');
 
+    var compressed = opts && opts.mode === 'compressed';
+    if (compressed) {
+        if (dynamic) throw new QasmError(1,
+            'compressed observables require a circuit without measurement feedback or reset',
+            'choose Statevector for dynamic circuits');
+        /* Only terminal readout is meaningful here. Do this before rewriting:
+         * a measurement followed by cancelling gates is still intermediate. */
+        var seenReadout = false;
+        for (var mi = 0; mi < gates.length; mi++) {
+            if (gates[mi][0] === 'measure') seenReadout = true;
+            else if (seenReadout && gates[mi][0] !== 'gphase') throw new QasmError(1,
+                'compressed observables support measurements only at the end',
+                'move readout to the end of a unitary circuit');
+        }
+    }
+
+    /* Phases still use pi/8 units here. Simplify before choosing the ring
+     * and container: cancelled odd phases may no longer need Z[zeta_16],
+     * and cancelled Hadamards must not inflate the sparse support bound.
+     * The rewrite preserves the entire unitary, including global phase.
+     * Tests and raw-kernel benchmarks can explicitly opt out. */
+    var optimization = null;
+    if (OPT && (!opts || opts.optimize !== false)) {
+        var simplified = OPT.optimize(gates, nq, 16);
+        gates = simplified.gates;
+        optimization = simplified.stats;
+    }
+
+    if (compressed) {
+        var observableGates = [], ignoredGlobalPhases = 0;
+        for (var ci = 0; ci < gates.length; ci++) {
+            var cg = gates[ci];
+            if (cg[0] === 'measure') continue;
+            /* Global phase cancels in every observable. In particular an
+             * odd global phase alone must not require the larger ring. */
+            if (cg[0] === 'gphase') { ignoredGlobalPhases++; continue; }
+            if (cg[0] === 'zpow' || cg[0] === 'mcpow') {
+                if (cg[2] % 2 !== 0) throw new QasmError(1,
+                    'compressed observables currently require phases on the pi/4 lattice',
+                    'choose Statevector for relative pi/8 phases');
+                cg = cg.slice(); cg[2] /= 2;
+            }
+            observableGates.push(cg);
+        }
+        /* This mode never allocates the physical 2^n state. Its own backend
+         * validates the gate set and active rank before allocating 2^r. */
+        return {
+            n: nq, nc: nc, qregs: qregs, cregs: cregs, ring: 8,
+            gates: observableGates, measures: measures, warnings: warnings,
+            backend: 'compressed', supportBound: null, dynamic: false,
+            optimization: optimization, ignoredGlobalPhases: ignoredGlobalPhases
+        };
+    }
+
     /* Which ring does this circuit actually need? Phases are counted in
      * sixteenths above; if every one of them is even, the circuit lives in
      * Z[ζ₈] and the exponents are halved so the smaller, faster engine can
@@ -1836,7 +1891,7 @@ function parse2(src) {
         n: nq, nc: nc, qregs: qregs, cregs: cregs, ring: ring,
         gates: gates, measures: measures, warnings: warnings,
         backend: backend, supportBound: bound,
-        dynamic: dynamic
+        dynamic: dynamic, optimization: optimization
     };
 }
 
@@ -1854,10 +1909,10 @@ function parse(src, opts) {
     var mine = SYNTH;
     try {
         var r;
-        if (!q3Detect(src)) r = parse2(src);
+        if (!q3Detect(src)) r = parse2(src, opts);
         else {
             var tr = q3Translate(src);
-            try { r = parse2(tr.text); }
+            try { r = parse2(tr.text, opts); }
             catch (e) {
                 if (e.name === 'QasmError' && tr.map[e.line - 1] !== undefined)
                     e.line = tr.map[e.line - 1];
