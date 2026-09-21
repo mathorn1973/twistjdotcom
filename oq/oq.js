@@ -787,8 +787,8 @@ State.prototype.isZero = function (b) {
 /* The classical value a condition reads: the bits it names, least significant
  * first, as one integer. Unwritten bits read 0. */
 function condValue(s, bits) {
-    var v = 0, i;
-    for (i = 0; i < bits.length; i++) if (s.cbits[bits[i]]) v |= (1 << i);
+    var v = 0n, i;
+    for (i = 0; i < bits.length; i++) if (s.cbits[bits[i]]) v |= (1n << BigInt(i));
     return v;
 }
 
@@ -807,9 +807,16 @@ var GATES = {
      * where what happens next depends on what happened before. */
     measure: function (s, g) { s.cbits[g[2]] = s.measureQubit(g[1], s.rng); },
     if:     function (s, g) {
-        if (condValue(s, g[1].bits) !== g[1].value) return;
-        var i;
-        for (i = 0; i < g[2].length; i++) apply(s, g[2][i]);
+        var condition = g[1], take;
+        if (typeof condition.constant === 'boolean') take = condition.constant;
+        else {
+            take = condValue(s, condition.bits) === BigInt(condition.value);
+            if (condition.negate) take = !take;
+        }
+        /* Select once. A branch may measure into a bit used by its own
+         * condition without changing which remaining statements execute. */
+        var body = take ? g[2] : (g[3] || []);
+        for (var i = 0; i < body.length; i++) apply(s, body[i]);
     }
 };
 

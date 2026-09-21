@@ -113,6 +113,6 @@ ones, against an independent contraction of OQ's dense amplitudes: 3,456
 Pauli expectations and 394 marginals match exactly. It also checks 142 norms,
 100-qubit rank-four storage, signed Y products, nonorthogonal binary bases,
 resource guards, incomplete-state readout and eight parser cases. The browser
-Self-test passes 59 checks, including Bell correlations, an irrational Y
+Self-test passes 63 checks, including Bell correlations, an irrational Y
 expectation and the 100-qubit preset. Existing optimizer regression tests
 continue to pass.

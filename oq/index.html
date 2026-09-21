@@ -309,19 +309,20 @@ button.stop:disabled { opacity: 1; }
 <div class="foot">
     <span id="modeFoot">Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state</span>
     <span class="spacer"></span>
+    <a href="https://github.com/mathorn1973/twistjdotcom/blob/main/oq/QASM3.md" target="_blank" rel="noopener">QASM 3 support</a>
     <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
     <a href="/">twistj.com</a>
 </div>
 
 </div>
 
-<script src="oq.js"></script>
+<script src="oq.js?v=qasm3-2"></script>
 <script src="oq16.js"></script>
 <script src="oqsparse.js"></script>
 <script src="oqsynth.js"></script>
 <script src="oqopt.js?v=rank-1"></script>
 <script src="oqrank.js?v=rank-1"></script>
-<script src="qasm.js?v=rank-1"></script>
+<script src="qasm.js?v=qasm3-2"></script>
 <script>
 (function () {
 'use strict';
@@ -834,6 +835,29 @@ PRESETS['rank-100'] = (function () {
     return text;
 })();
 
+PRESETS['if / else'] = [
+    'OPENQASM 3.0;',
+    'include "stdgates.inc";',
+    'qubit[3] q;',
+    'bit[2] result;',
+    'let pair = q[1:1] ++ q[2:2];',
+    '',
+    'h q[0];',
+    'bit syndrome = measure q[0];',
+    '',
+    '// The branch is chosen once, even when its body rewrites syndrome.',
+    'if (syndrome != 0) {',
+    '    x q[0];',
+    '    syndrome = measure q[0];',
+    '    x pair;',
+    '} else {',
+    '    z pair;',
+    '}',
+    '',
+    '// The pair is 00 or 11; syndrome is always 0.',
+    'result = measure pair;'
+].join('\n');
+
 var pbox = el('presets');
 Object.keys(PRESETS).forEach(function (name, i) {
     if (i) pbox.appendChild(document.createTextNode(' · '));
@@ -847,6 +871,9 @@ Object.keys(PRESETS).forEach(function (name, i) {
             el('runMode').value = 'compressed';
             el('rankQubits').value = '0-3, 98-99';
             el('rankPaulis').value = 'X0 X4; Z0 Z4';
+            syncMode();
+        } else if (name === 'if / else') {
+            el('runMode').value = 'statevector';
             syncMode();
         } else if (compressedMode()) {
             el('rankQubits').value = '';
@@ -1327,10 +1354,10 @@ function render(prog, s, tRun, ampOps, counts, shots, tShots, done) {
     if (s.measured) {
         var cb = [], ci;
         for (ci = 0; ci < prog.nc; ci++) cb.push(s.cbits[ci] ? 1 : 0);
-        L.push('<span class="h">trajectory</span>  <span class="d">this circuit measures ' +
-               s.measured + ' qubit' + (s.measured > 1 ? 's' : '') + ' mid-flight and branches on ' +
-               'the result, so it has one final state per outcome,\n            not one. Seed ' +
-               (+el('seed').value || 0) + ' took this branch:</span>  <span class="q">' +
+        L.push('<span class="h">trajectory</span>  <span class="d">this run performed ' +
+               s.measured + ' measurement' + (s.measured > 1 ? 's' : '') + '. The state below ' +
+               'belongs to one sequence of outcomes.\n            Seed ' +
+               (+el('seed').value || 0) + ' produced classical bits:</span>  <span class="q">' +
                (cb.length ? cb.join('') : '(no declared bits)') +
                '</span> <span class="d">(c[0] first)</span>');
         L.push('');
@@ -1731,6 +1758,19 @@ function ghzPair(n) {
 }
 
 var SUITE = [
+    { kind: 'qasm3', name: 'measurement initializer executes before feedback',
+      qasm: head3(2) + 'x q[0]; bit c = measure q[0]; if(c) x q[1];',
+      peak: 3, measured: 1, bit: 1 },
+    { kind: 'qasm3', name: 'if body can rewrite its condition without changing branch',
+      qasm: head3(2) + 'x q[0]; bit c = measure q[0]; ' +
+          'if(c) { x q[0]; c = measure q[0]; x q[1]; } else { x q[0]; }',
+      peak: 2, measured: 2, bit: 0 },
+    { kind: 'qasm3', name: 'const bool chooses the else branch',
+      qasm: head3(2) + 'const bool enabled = false; if(enabled) x q[0]; else x q[1];',
+      peak: 2, measured: 0 },
+    { kind: 'qasm3', name: 'concatenated aliases retain physical-qubit order',
+      qasm: head3(5) + 'let joined = q[{2,0}] ++ q[3:4]; ' +
+          'x joined[0]; cx joined[0],joined[2];', peak: 12, measured: 0 },
     { kind: 'compressed', name: 'Bell: correlated ZZ, half-probability marginals',
       qasm: head(2, 0) + 'h q[0]; cx q[0],q[1];', rank: 0,
       observable: 'Z0 Z1', exact: [1n, 0n, 0n, 0n], denominatorExp: 0, half: true },
@@ -2118,6 +2158,11 @@ function runOne(item) {
         if (item.kind === 'parity' && s.hash() !== item.hash)
             fault = 'fingerprint ' + s.hash() + ', native C prints ' + item.hash;
         if (item.kind === 'check') fault = item.check(s);
+        if (item.kind === 'qasm3') {
+            fault = singlePeak(item.peak)(s);
+            if (!fault && s.measured !== item.measured) fault = 'measurement count changed';
+            if (!fault && item.bit !== undefined && s.cbits[0] !== item.bit) fault = 'wrong classical bit';
+        }
     }
     if (!fault) fault = normFault(s);                  /* the invariant, every time */
     return { ok: !fault, fault: fault, ms: performance.now() - t0,
@@ -2133,6 +2178,7 @@ async function runSelfTest() {
     el('out').innerHTML = L.join('\n');
 
     var HEADS = {
+        qasm3: 'OpenQASM 3 — measurement initializers, branch semantics and register aliases',
         compressed: 'compressed observables — exact correlations without expanding the state',
         optimizer: 'exact simplification — full state and fingerprint match the original circuit',
         identity: 'ring identities — two circuits that must land on the same state',

@@ -81,5 +81,6 @@ The run passed 1,624 full-state comparisons, 64 dynamic trajectories,
 16 sparse comparisons and seven parser cases. This includes 16 trajectories
 through the legacy lossy fallback, checked against a manually written exact
 circuit as well as the original measurement probabilities. The browser Self-test passed
-59/59 checks, including three optimizer checks, three compressed-observable
-checks and the original engine suite.
+63/63 checks, including three optimizer checks, three compressed-observable
+checks, four QASM 3 checks and the original engine suite. See
+[QASM3.md](QASM3.md) for the additional parser and dynamic-circuit coverage.

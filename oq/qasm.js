@@ -1,13 +1,12 @@
 /*
- * qasm.js -- OpenQASM 2.0 front end for the OQ browser engine.
+ * qasm.js -- OpenQASM 2.0 and a supported OpenQASM 3 subset for OQ.
  *
  * (c) Marek Spanel 2026  All rights reserved.
  *
- * Compiles QASM text into the engine's gate list. Everything that closes in
- * Z[zeta_8] is accepted; anything that does not is refused by name, with the
- * reason, rather than silently approximated. That refusal is the product:
- * an angle that is not a multiple of pi/4 has no exact representative in this
- * ring, and rounding it would be the first lie in a chain of them.
+ * Compiles the supported gate and control constructs into OQ's gate list.
+ * Exact phase steps are pi/4 in Z[zeta_8] and pi/8 in Z[zeta_16]. Unsupported
+ * instructions and angles receive explicit diagnostics. Approximate gate
+ * synthesis is a separate opt-in path and is reported as a changed circuit.
  */
 (function (root, factory) {
     var api = factory(typeof module === 'object' && module.exports
@@ -277,7 +276,10 @@ function invertGates(list, line) {
         case 'zpow':   out.push(['zpow', g[1], mod16(-g[2])]); break;
         case 'mcpow':  out.push(['mcpow', g[1], mod16(-g[2]), g[3]]); break;
         case 'gphase': out.push(['gphase', mod16(-g[1])]); break;
-        case 'if':     out.push(['if', g[1], invertGates(g[2], line)]); break;
+        case 'if':
+            var inverseBranch = ['if', g[1], invertGates(g[2], line)];
+            if (g[3]) inverseBranch.push(invertGates(g[3], line));
+            out.push(inverseBranch); break;
         default: throw new QasmError(line,
             'inv @ cannot invert a ' + g[0] + ' — it is not a unitary',
             'measurement and reset destroy information, so there is nothing to run ' +
@@ -323,7 +325,10 @@ function controlGates(list, cq, line) {
             ctrlX([g[1]], g[2]);
             out.push(['cx', g[2], g[1]]);
             break;
-        case 'if': out.push(['if', g[1], controlGates(g[2], cq, line)]); break;
+        case 'if':
+            var controlledBranch = ['if', g[1], controlGates(g[2], cq, line)];
+            if (g[3]) controlledBranch.push(controlGates(g[3], cq, line));
+            out.push(controlledBranch); break;
         default: throw new QasmError(line,
             'ctrl @ cannot control a ' + g[0],
             'a measurement is not a unitary, so there is no controlled form of it.');
@@ -707,29 +712,51 @@ var SCRATCH_BASE = 4096;
  * or a bare bit. The bits come back least significant first, matching the way
  * an integer is read off a register everywhere else here. */
 function parseCond(src, cregs, line) {
-    var t = src.trim(), m, bits, val;
+    var t = src.trim(), m, bits, val, negate = false;
+    var booleanCast = /\bbool\s*\(/.test(t);
     t = t.replace(/\b(u?int|bit|bool)\s*(\[\s*\d*\s*\])?\s*\(/g, '(');
-    m = /^\(?(.+?)\)?\s*(==|!=)\s*(\d+)$/.exec(t);
+    function unwrap(value) {
+        value = value.trim();
+        while (value[0] === '(') {
+            var depth = 0, end = -1;
+            for (var i = 0; i < value.length; i++) {
+                if (value[i] === '(') depth++;
+                else if (value[i] === ')' && --depth === 0) { end = i; break; }
+            }
+            if (end !== value.length - 1) break;
+            value = value.slice(1, -1).trim();
+        }
+        return value;
+    }
+    t = unwrap(t);
+    while (t[0] === '!') { negate = !negate; t = unwrap(t.slice(1)); }
+    if (/^(true|false)$/i.test(t)) return { constant: (t.toLowerCase() === 'true') !== negate };
+    m = /^(.+?)\s*(==|!=)\s*(\d+|true|false)$/i.exec(t);
     if (m) {
-        bits = resolve(m[1].replace(/^\(|\)$/g, '').trim(), cregs, line);
-        val = parseInt(m[3], 10);
-        if (m[2] === '!=') throw new QasmError(line,
-            'only == is supported in a classical condition',
-            'write the equalities you want as separate if statements');
+        bits = resolve(unwrap(m[1]), cregs, line);
+        if ((booleanCast || negate) && bits.length !== 1)
+            throw new QasmError(line, 'Boolean casts and negation currently require a single classical bit',
+                'compare a register directly, for example c != 0');
+        val = /^true$/i.test(m[3]) ? 1 : /^false$/i.test(m[3]) ? 0 : Number(m[3]);
+        if (!Number.isSafeInteger(val)) throw new QasmError(line, 'classical comparison literal exceeds the safe integer range');
         if (val >= Math.pow(2, bits.length)) throw new QasmError(line,
             'condition compares ' + bits.length + ' bit(s) against ' + val +
             ', which does not fit');
-        return { bits: bits, value: val };
+        var equality = { bits: bits, value: val };
+        if (negate !== (m[2] === '!=')) equality.negate = true;
+        return equality;
     }
-    m = /^\(?([A-Za-z_][A-Za-z0-9_]*(\[\s*\d+\s*\])?)\)?$/.exec(t);
+    m = /^([A-Za-z_][A-Za-z0-9_]*(\[\s*\d+\s*\])?)$/.exec(t);
     if (m) {
         bits = resolve(m[1], cregs, line);
         if (bits.length !== 1) throw new QasmError(line,
             'a bare classical condition needs a single bit, not a register');
-        return { bits: bits, value: 1 };
+        var single = { bits: bits, value: 1 };
+        if (negate) single.negate = true;
+        return single;
     }
     throw new QasmError(line, 'cannot read the condition "' + src.trim() + '"',
-        'supported: if (c == 3), if (c0 == 1), if (int[2](syn) == 1), if (c0)');
+        'supported: equality or inequality to a literal, a single bit, !bit, bool(bit), true or false');
 }
 
 function resolve(arg, regs, line) {
@@ -770,41 +797,84 @@ function q3Detect(src) {
 /* Brace-aware statement split. Returns simple statements and block
  * statements ({head, body}) with the line each one started on. */
 function q3Split(src, base) {
-    var out = [], buf = '', line = base || 1, start = line, depth, i, ch, head, bodyStart, br = 0;
-    for (i = 0; i < src.length; i++) {
-        ch = src[i];
-        if (ch === '\n') line++;
-        /* An index set lives inside brackets — "q[{2*i, 2*i+1}]" — so a { is
-         * only a block opener at bracket depth zero. Without this the
-         * statement splitter cuts "let bp = q[" off from its own subscript. */
-        if (ch === '[' || ch === '(') br++;
-        else if (ch === ']' || ch === ')') { if (br > 0) br--; }
-        if (br > 0) { buf += ch; continue; }
-        if (ch === ';') {
-            if (buf.trim()) out.push({ text: buf.trim(), line: start });
-            buf = ''; start = line;
-            continue;
-        }
-        if (ch === '{') {
-            head = buf.trim(); buf = '';
-            depth = 1; i++; bodyStart = line;
-            var body = '';
-            for (; i < src.length && depth > 0; i++) {
-                if (src[i] === '\n') line++;
-                if (src[i] === '{') depth++;
-                else if (src[i] === '}') { depth--; if (!depth) break; }
-                body += src[i];
-            }
-            if (depth > 0) throw new QasmError(start, 'unbalanced { in "' + head + '"');
-            out.push({ text: head, line: start, body: body, bodyLine: bodyStart });
-            start = line;
-            continue;
-        }
-        if (ch === '}') throw new QasmError(line, 'unmatched }');
-        if (!buf.trim() && /\s/.test(ch)) { start = line; continue; }
-        buf += ch;
+    var out = [], at = 0, line = base || 1;
+    function advance() { if (src[at] === '\n') line++; at++; }
+    function space() { while (at < src.length && /\s/.test(src[at])) advance(); }
+    function keyword(word) {
+        return src.slice(at, at + word.length).toLowerCase() === word &&
+               !/[A-Za-z0-9_]/.test(src[at + word.length] || '');
     }
-    if (buf.trim()) out.push({ text: buf.trim(), line: start });
+    function balanced(open, close) {
+        var start = at, startLine = line, depth = 0, quote = false;
+        if (src[at] !== open) throw new QasmError(line, 'expected ' + open);
+        do {
+            var ch = src[at];
+            if (ch === '"' && src[at - 1] !== '\\') quote = !quote;
+            if (!quote) {
+                if (ch === open) depth++;
+                else if (ch === close) depth--;
+            }
+            advance();
+        } while (at < src.length && depth);
+        if (depth) throw new QasmError(startLine, 'unbalanced ' + open);
+        return src.slice(start + 1, at - 1);
+    }
+    function clause() {
+        space();
+        var start = at, startLine = line;
+        if (src[at] === '{') return { body: balanced('{', '}'), line: startLine };
+        if (at >= src.length) throw new QasmError(line, 'if/else needs a body');
+        statement();
+        return { body: src.slice(start, at), line: startLine };
+    }
+    function statement() {
+        space();
+        var start = at, startLine = line;
+        /* Read the whole branch recursively. This is what associates an
+         * unbraced else with the nearest unmatched if, and what keeps a
+         * runtime condition from being re-read for each gate in its body. */
+        if (keyword('if')) {
+            at += 2; space();
+            var condition = balanced('(', ')'), yes = clause();
+            var result = { text: 'if (' + condition + ')', line: startLine,
+                           body: yes.body, bodyLine: yes.line };
+            space();
+            if (keyword('else')) {
+                at += 4;
+                var no = clause();
+                result.elseBody = no.body; result.elseLine = no.line;
+            }
+            return result;
+        }
+        var depth = 0, quote = false;
+        while (at < src.length) {
+            var ch = src[at];
+            if (ch === '"' && src[at - 1] !== '\\') quote = !quote;
+            if (!quote) {
+                if (ch === '[' || ch === '(') depth++;
+                else if (ch === ']' || ch === ')') depth--;
+                if (depth < 0) throw new QasmError(line, 'unmatched ' + ch);
+                if (depth === 0 && ch === ';') {
+                    var text = src.slice(start, at).trim(); advance();
+                    return { text: text, line: startLine };
+                }
+                if (depth === 0 && ch === '{') {
+                    var head = src.slice(start, at).trim(), bodyLine = line;
+                    return { text: head, line: startLine, body: balanced('{', '}'), bodyLine: bodyLine };
+                }
+                if (depth === 0 && ch === '}') throw new QasmError(line, 'unmatched }');
+            }
+            advance();
+        }
+        if (depth || quote) throw new QasmError(startLine, 'unbalanced statement');
+        return { text: src.slice(start, at).trim(), line: startLine };
+    }
+    while (at < src.length) {
+        space();
+        if (at >= src.length) break;
+        var st = statement();
+        if (st.text) out.push(st);
+    }
     return out;
 }
 
@@ -819,12 +889,61 @@ function q3Num(expr, env, line, what) {
     });
     t = t.replace(/\bbool\s*\(/g, '(').replace(/\b(u?int|float)\s*(\[\s*\d+\s*\])?\s*\(/g, '(');
     t = t.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b/g, function (m) {
+        if (m === 'true') return '1';
+        if (m === 'false') return '0';
         if (m === 'pi' || m === 'tau' || m === 'euler') return m;
         if (m in env) return String(env[m]);
         throw new QasmError(line, 'cannot evaluate "' + expr.trim() + '" at translation time',
             '"' + m + '" is not a compile-time constant here. ' + (what || ''));
     });
     return evalAngle(t, line);
+}
+
+/* Compile-time Boolean expressions only. Runtime bit conditions remain a
+ * deliberately smaller grammar in parseCond; this never evaluates JS. */
+function q3Bool(expr, env, line) {
+    var t = expr.trim(), depth, i;
+    while (t[0] === '(') {
+        depth = 0;
+        for (i = 0; i < t.length; i++) {
+            if (t[i] === '(') depth++;
+            else if (t[i] === ')' && --depth === 0) break;
+        }
+        if (i !== t.length - 1) break;
+        t = t.slice(1, -1).trim();
+    }
+    var levels = [['||'], ['&&'], ['==', '!=', '<=', '>=', '<', '>']];
+    for (var level = 0; level < levels.length; level++) {
+        depth = 0;
+        for (i = 0; i < t.length; i++) {
+            if (t[i] === '(' || t[i] === '[') { depth++; continue; }
+            if (t[i] === ')' || t[i] === ']') { depth--; continue; }
+            if (depth) continue;
+            for (var j = 0; j < levels[level].length; j++) {
+                var op = levels[level][j];
+                if (t.slice(i, i + op.length) !== op) continue;
+                var left = t.slice(0, i), right = t.slice(i + op.length);
+                if (op === '||') return q3Bool(left, env, line) || q3Bool(right, env, line);
+                if (op === '&&') return q3Bool(left, env, line) && q3Bool(right, env, line);
+                function comparisonValue(value) {
+                    if (/^\s*(?:!|bool\s*\()/.test(value)) return q3Bool(value, env, line) ? 1 : 0;
+                    return q3Num(value, env, line);
+                }
+                var a = comparisonValue(left), b = comparisonValue(right);
+                if (op === '==') return a === b;
+                if (op === '!=') return a !== b;
+                if (op === '<=') return a <= b;
+                if (op === '>=') return a >= b;
+                if (op === '<') return a < b;
+                return a > b;
+            }
+        }
+    }
+    if (t[0] === '!') return !q3Bool(t.slice(1), env, line);
+    var cast = splitCall(t);
+    if (cast && cast.name === 'bool' && cast.params !== undefined && !cast.operands.trim())
+        return q3Bool(cast.params, env, line);
+    return q3Num(t, env, line) !== 0;
 }
 
 function q3Int(expr, env, line, what) {
@@ -841,13 +960,60 @@ function q3Int(expr, env, line, what) {
  * and indexes exactly like a register does — the only difference is that its
  * elements name the qubits of whatever it was cut from. Everything below the
  * translator therefore never learns that aliases exist. */
-function q3Operand(arg, regs, env, line, alias) {
+function q3Operand(arg, regs, env, line, alias, allowConcat, nesting) {
     arg = arg.trim();
+    nesting = nesting || 0;
+    if (nesting > 32) throw new QasmError(line, 'alias expression nested more than 32 deep');
+    /* ++ belongs to an alias expression, not to a gate operand. Split only
+     * outside index expressions; resolve aliases before checking overlap. */
+    var pieces = [], level = 0, from = 0, outerEnd = -1;
+    for (var ci = 0; ci < arg.length; ci++) {
+        var ch = arg[ci];
+        if (ch === '(' || ch === '[' || ch === '{') level++;
+        else if (ch === ')' || ch === ']' || ch === '}') {
+            level--;
+            if (level < 0) throw new QasmError(line, 'unbalanced brackets in operand "' + arg + '"');
+            if (level === 0 && arg[0] === '(' && outerEnd < 0) outerEnd = ci;
+        }
+        if (level === 0 && ch === '+' && arg[ci + 1] === '+') {
+            pieces.push(arg.slice(from, ci).trim()); from = ci + 2; ci++;
+        }
+    }
+    if (level !== 0) throw new QasmError(line, 'unbalanced brackets in operand "' + arg + '"');
+    if (pieces.length) {
+        if (!allowConcat) throw new QasmError(line, 'register concatenation belongs in a let alias',
+            'write let joined = a ++ b; then apply a gate to joined');
+        pieces.push(arg.slice(from).trim());
+        var joined = [], used = new Set();
+        for (ci = 0; ci < pieces.length; ci++) {
+            if (!pieces[ci]) throw new QasmError(line, 'missing register beside ++');
+            var segment = q3Operand(pieces[ci], regs, env, line, alias, true, nesting + 1);
+            if (!segment) throw new QasmError(line, 'unknown register in alias: "' + pieces[ci] + '"');
+            for (var sj = 0; sj < segment.length; sj++) {
+                if (used.has(segment[sj])) throw new QasmError(line,
+                    'concatenated registers overlap at ' + segment[sj],
+                    'a register cannot be concatenated with any part of itself');
+            }
+            segment.forEach(function (q) { used.add(q); });
+            joined = joined.concat(segment);
+            if (joined.length > 4096) throw new QasmError(line, 'an alias selects more than 4096 qubits');
+        }
+        return joined;
+    }
+    if (allowConcat && arg[0] === '(' && outerEnd === arg.length - 1)
+        return q3Operand(arg.slice(1, -1), regs, env, line, alias, true, nesting + 1);
     var m = /^([A-Za-z_][A-Za-z0-9_]*)\s*\[\s*([^\]]*)\s*\]$/.exec(arg), nm, i, out = [], elems;
+    function index(expr) {
+        var v = q3Int(expr, env, line);
+        if (!Number.isSafeInteger(v)) throw new QasmError(line, 'register index or step must be a finite safe integer');
+        return v;
+    }
     function elemsOf(name) {
         var k, e;
         if (alias && Object.prototype.hasOwnProperty.call(alias, name)) return alias[name];
         if (!(name in regs)) return null;
+        if (!Number.isSafeInteger(regs[name]) || regs[name] < 1 || regs[name] > 4096)
+            throw new QasmError(line, 'register size must be an integer from 1 to 4096');
         e = [];
         for (k = 0; k < regs[name]; k++) e.push(name + '[' + k + ']');
         return e;
@@ -870,15 +1036,24 @@ function q3Operand(arg, regs, env, line, alias) {
         if (inner.charAt(inner.length - 1) !== '}') throw new QasmError(line,
             'unbalanced { in "' + arg + '"');
         var set = inner.slice(1, -1).split(',');
-        for (i = 0; i < set.length; i++) if (set[i].trim()) out.push(at(q3Int(set[i], env, line)));
+        if (set.length > 1 && !set[set.length - 1].trim()) set.pop();
+        for (i = 0; i < set.length; i++) {
+            if (!set[i].trim()) throw new QasmError(line, 'an index set cannot contain an empty element');
+            out.push(at(index(set[i])));
+        }
         return out;
     }
     var parts = inner.split(':');
-    if (parts.length === 1) return [at(q3Int(parts[0], env, line))];
-    var a = q3Int(parts[0], env, line);
-    var step = parts.length === 3 ? q3Int(parts[1], env, line) : 1;
-    var b = q3Int(parts[parts.length - 1], env, line);
+    if (parts.length === 1) return [at(index(parts[0]))];
+    if (parts.length > 3) throw new QasmError(line, 'a slice must have the form start:end or start:step:end');
+    if (parts.some(function (p) { return !p.trim(); })) throw new QasmError(line,
+        'open-ended slices are not supported here', 'supply explicit start, optional step, and inclusive end indices');
+    var a = index(parts[0]);
+    var step = parts.length === 3 ? index(parts[1]) : 1;
+    var b = index(parts[parts.length - 1]);
     if (step === 0) throw new QasmError(line, 'a slice step of 0 never ends');
+    if ((step > 0 && a > b) || (step < 0 && a < b))
+        throw new QasmError(line, 'a register cannot be indexed by an empty range');
     for (i = a; step > 0 ? i <= b : i >= b; i += step) out.push(at(i));
     return out;
 }
@@ -911,7 +1086,7 @@ function q3Translate(src) {
     var out = [], map = [], gdefs = {}, ddefs = {}, qregs = {}, cregs = {}, env = {}, fenv = {};
     var qalias = {};
     var problems = [];
-    var order = [], measured = {}, warnings = [], anyGate = false;
+    var order = [], measured = {}, warnings = [], anyGate = false, runtimeDepth = 0, branchDepth = 0;
 
     function push(text, line) { out.push(text); map.push(line); }
 
@@ -959,18 +1134,37 @@ function q3Translate(src) {
         });
     }
 
+    function distinctOperands(operands, name, line) {
+        var seen = new Set();
+        for (var i = 0; i < operands.length; i++) {
+            if (seen.has(operands[i])) throw new QasmError(line,
+                name + ' uses the same qubit twice (' + operands[i] + ')',
+                'each gate-call instance must use distinct qubits, including controls and aliased operands');
+            seen.add(operands[i]);
+        }
+    }
+
     function emitCall(name, params, operands, line, depth) {
         if (depth > 32) throw new QasmError(line, 'gate definitions nested more than 32 deep');
         var g = gdefs[name], i, j, sub, argNames, args = [], flat;
         if (!g) return false;
         /* operands may be registers; broadcast the way the gate layer does */
-        argNames = operands.split(',').map(function (a) { return q3Operand(a, qregs, env, line, qalias) || [a.trim()]; });
+        argNames = splitTop(operands).map(function (a) { return q3Operand(a, qregs, env, line, qalias) || [a.trim()]; });
+        if (argNames.length !== g.args.length) throw new QasmError(line,
+            name + ' takes ' + g.args.length + ' qubit operand(s), got ' + argNames.length);
         var width = 1;
-        for (i = 0; i < argNames.length; i++) if (argNames[i].length > 1) width = argNames[i].length;
+        for (i = 0; i < argNames.length; i++) if (argNames[i].length > 1) {
+            if (width > 1 && width !== argNames[i].length) throw new QasmError(line,
+                'operands of different widths cannot be broadcast together');
+            width = argNames[i].length;
+        }
         var pv = params === undefined || !params.trim() ? [] : splitTop(params);
         if (pv.length !== g.params.length) throw new QasmError(line,
             name + ' takes ' + g.params.length + ' parameter(s), got ' + pv.length);
         for (var w = 0; w < width; w++) {
+            distinctOperands(argNames.map(function (operand) {
+                return operand.length === 1 ? operand[0] : operand[w];
+            }), name, line);
             sub = {};
             for (i = 0; i < g.args.length; i++)
                 sub[g.args[i]] = argNames[i].length === 1 ? argNames[i][0] : argNames[i][w];
@@ -988,7 +1182,8 @@ function q3Translate(src) {
             });
         }
         return { text: one(st.text), body: st.body === undefined ? undefined : one(st.body),
-                 line: st.line };
+                 elseBody: st.elseBody === undefined ? undefined : one(st.elseBody),
+                 line: st.line, bodyLine: st.bodyLine, elseLine: st.elseLine };
     }
 
     /* ---- gate modifiers ------------------------------------------------ *
@@ -1094,8 +1289,15 @@ function q3Translate(src) {
             if (argv.length - C !== g.args.length) throw new QasmError(line,
                 call.name + ' takes ' + g.args.length + ' qubit operand(s), got ' + (argv.length - C));
             var width = 1;
-            for (i = C; i < argv.length; i++) if (argv[i].length > 1) width = argv[i].length;
+            for (i = C; i < argv.length; i++) if (argv[i].length > 1) {
+                if (width > 1 && width !== argv[i].length) throw new QasmError(line,
+                    'operands of different widths cannot be broadcast together');
+                width = argv[i].length;
+            }
             for (w = 0; w < width; w++) {
+                distinctOperands(ctrlSel.concat(argv.slice(C).map(function (operand) {
+                    return operand.length === 1 ? operand[0] : operand[w];
+                })), call.name, line);
                 var sub = {}, body = [], j;
                 for (i = 0; i < g.args.length; i++)
                     sub[g.args[i]] = argv[C + i].length === 1 ? argv[C + i][0] : argv[C + i][w];
@@ -1138,6 +1340,13 @@ function q3Translate(src) {
         if (/^include\b/i.test(text)) return;                 /* stdgates is the table below */
         if (/^barrier\b/i.test(text)) return;
 
+        if (runtimeDepth && /^(?:(?:const)\s+)?(?:qubit|bit|bool|int|uint|float|angle|let|gate|def)\b/i.test(text))
+            throw new QasmError(line, 'declarations inside a runtime branch are not supported',
+                'declare registers and constants before the branch; its body may contain gates, measurements and nested conditions');
+        if (branchDepth && /^(?:const\s+)?(?:qubit|bit|qreg|creg)\b/i.test(text))
+            throw new QasmError(line, 'register declarations inside an if/else branch are not supported',
+                'declare quantum and classical registers before the branch; block-local register names require separate storage');
+
         /* declarations */
         m = /^(?:const\s+)?qubit\s*(?:\[\s*([^\]]+)\s*\])?\s+([A-Za-z_][A-Za-z0-9_]*)$/i.exec(text);
         if (m) {
@@ -1147,15 +1356,27 @@ function q3Translate(src) {
             push('qreg ' + m[2] + '[' + qs + '];', line);
             return;
         }
-        m = /^(?:const\s+)?bit\s*(?:\[\s*([^\]]+)\s*\])?\s+([A-Za-z_][A-Za-z0-9_]*)(?:\s*=.*)?$/i.exec(text);
+        m = /^(?:const\s+)?bit\s*(?:\[\s*([^\]]+)\s*\])?\s+([A-Za-z_][A-Za-z0-9_]*)(?:\s*=\s*(.+))?$/i.exec(text);
         if (m) {
             var cs = m[1] === undefined ? 1 : q3Int(m[1], env, line);
             /* An inlined subroutine declares its own local bit register, and
              * the binding has already aliased it to the caller's. Declaring it
              * again would shadow the alias. */
-            if (cregs[m[2]] !== undefined) return;
-            cregs[m[2]] = cs;
-            push('creg ' + m[2] + '[' + cs + '];', line);
+            if (cregs[m[2]] === undefined) {
+                cregs[m[2]] = cs;
+                push('creg ' + m[2] + '[' + cs + '];', line);
+            }
+            if (m[3] !== undefined) {
+                if (/^const\b/i.test(text) || !/^measure\s+/i.test(m[3]))
+                    throw new QasmError(line, 'only a measurement initializer is supported for bit declarations',
+                        'use bit c = measure q; other classical initializers are not silently ignored');
+                walk({ text: m[2] + ' = ' + m[3], line: line }, line, depth);
+            }
+            return;
+        }
+        m = /^(?:const\s+)?bool\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/i.exec(text);
+        if (m) {
+            env[m[1]] = q3Bool(m[2], env, line) ? 1 : 0;
             return;
         }
         /* Compile-time classical constants. int and uint become numbers the
@@ -1191,7 +1412,7 @@ function q3Translate(src) {
          * iteration re-points "io" at the qubit the state just moved to. */
         m = /^let\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/i.exec(text);
         if (m) {
-            var alias = q3Operand(m[2], qregs, env, line, qalias);
+            var alias = q3Operand(m[2], qregs, env, line, qalias, true);
             if (!alias) throw new QasmError(line,
                 'let ' + m[1] + ' = "' + m[2].trim() + '" — that is not a qubit register, ' +
                 'slice or index set',
@@ -1321,41 +1542,54 @@ function q3Translate(src) {
             return;
         }
 
-        /* if: a compile-time condition is unrolling, a measured one is feedback */
+        /* A runtime branch stays a block all the way to the executor. The
+         * condition is evaluated once, even when its body measures into the
+         * very bit used by the condition. */
         var q3if = splitIf(text);
         if (q3if) {
             var cond = q3if.cond, taken;
             m = [null, q3if.cond, q3if.rest];
-            try { taken = q3Int(cond, env, line) !== 0; }
+            function walkBranch(body, bodyLine) {
+                /* A selected compile-time branch still has lexical scope.
+                 * Its constants, aliases and definitions may shadow outer
+                 * names, but must not affect translation after the branch.
+                 * Entries are immutable values or replaced as a whole. */
+                var previous = { env: env, fenv: fenv, qalias: qalias, gdefs: gdefs, ddefs: ddefs };
+                env = Object.assign({}, env); fenv = Object.assign({}, fenv);
+                qalias = Object.assign({}, qalias); gdefs = Object.assign({}, gdefs); ddefs = Object.assign({}, ddefs);
+                branchDepth++;
+                try {
+                    var statements = q3Split(body, bodyLine || line);
+                    for (var bi = 0; bi < statements.length; bi++) walk(statements[bi], line, depth);
+                } finally {
+                    branchDepth--;
+                    env = previous.env; fenv = previous.fenv; qalias = previous.qalias;
+                    gdefs = previous.gdefs; ddefs = previous.ddefs;
+                }
+            }
+            try { taken = q3Bool(cond, env, line); }
             catch (e) {
-                /* Not a compile-time condition, so it reads something a
-                 * measurement wrote: emit it as a RUNTIME branch. Each
-                 * statement of the block gets the condition prefixed on its
-                 * own, which is the same thing -- classical bits do not change
-                 * inside the block. */
-                var mark = out.length, bi, blk2;
-                if (st.body !== undefined) {
-                    blk2 = q3Split(st.body, st.bodyLine || line);
-                    for (bi = 0; bi < blk2.length; bi++) walk(blk2[bi], line, depth);
-                } else if (m[2].trim()) walk({ text: m[2].trim(), line: line }, line, depth);
-                for (bi = mark; bi < out.length; bi++)
-                    out[bi] = 'if (' + cond.trim() + ') ' + out[bi];
+                if (e.name !== 'QasmError') throw e;
+                push('if (' + cond.trim() + ') {', line);
+                runtimeDepth++;
+                try {
+                    if (st.body !== undefined) walkBranch(st.body, st.bodyLine);
+                    else if (m[2].trim()) walk({ text: m[2].trim(), line: line }, line, depth);
+                    push('}', line);
+                    if (st.elseBody !== undefined) {
+                        push('else {', st.elseLine || line);
+                        walkBranch(st.elseBody, st.elseLine);
+                        push('}', st.elseLine || line);
+                    }
+                } finally { runtimeDepth--; }
                 return;
             }
-            if (false) {
-                refuse(line,
-                    'classical control on a measurement is not supported yet',
-                    'this branch depends on a bit a measurement wrote, so the circuit is ' +
-                    'not fixed before it runs. oq applies the whole circuit and reads the ' +
-                    'exact state at the end; feeding an outcome back in mid-circuit is a ' +
-                    'different execution model. A condition on compile-time constants ' +
-                    'does work — it is unrolled.');
+            if (!taken) {
+                if (st.elseBody !== undefined) walkBranch(st.elseBody, st.elseLine);
+                return;
             }
-            if (!taken) return;
-            if (st.body !== undefined) {
-                var blk = q3Split(st.body, st.bodyLine || line);
-                for (i = 0; i < blk.length; i++) walk(blk[i], line, depth);
-            } else if (m[2].trim()) walk({ text: m[2].trim(), line: line }, line, depth);
+            if (st.body !== undefined) walkBranch(st.body, st.bodyLine);
+            else if (m[2].trim()) walk({ text: m[2].trim(), line: line }, line, depth);
             return;
         }
 
@@ -1468,7 +1702,7 @@ function sparsePlan(gates, n) {
 }
 
 function parse2(src, opts) {
-    var stmts = statements(stripComments(src));
+    var stmts = q3Split(stripComments(src), 1);
     var qregs = {}, cregs = {}, nq = 0, nc = 0;
     var gates = [], measures = [], warnings = [], si, st;
     var dynamic = false, scratchBits = 0;
@@ -1476,7 +1710,7 @@ function parse2(src, opts) {
     /* One statement, emitted into a gate list. Pulled out of the loop so an
      * if-block can run it too: classical control applies the same statement
      * machinery, only conditionally. */
-    function doStatement(text, line, gates) {
+    function doStatement(text, line, gates, block) {
         var m, i;
 
             if (/^OPENQASM\b/i.test(text) || /^include\b/i.test(text)) return;
@@ -1517,10 +1751,24 @@ function parse2(src, opts) {
              * the point of a dynamic circuit, and the reason the state it
              * produces belongs to one trajectory rather than to the circuit. */
             var iff = splitIf(text);
-            if (iff && iff.rest) {
-                var cnd = parseCond(iff.cond, cregs, line), sub = [];
-                doStatement(iff.rest, line, sub);
-                if (sub.length) gates.push(['if', cnd, sub]);
+            if (iff && (iff.rest || (block && block.body !== undefined))) {
+                var cnd = parseCond(iff.cond, cregs, line), sub = [], otherwise = [];
+                function branch(body, baseLine, target) {
+                    var parts = q3Split(body, baseLine || line);
+                    for (var bi = 0; bi < parts.length; bi++) {
+                        if (/^(?:qreg|creg)\b/i.test(parts[bi].text))
+                            throw new QasmError(parts[bi].line, 'register declarations inside a runtime branch are not supported');
+                        doStatement(parts[bi].text, parts[bi].line, target, parts[bi]);
+                    }
+                }
+                if (block && block.body !== undefined) branch(block.body, block.bodyLine, sub);
+                else doStatement(iff.rest, line, sub);
+                if (block && block.elseBody !== undefined) branch(block.elseBody, block.elseLine, otherwise);
+                if (sub.length || otherwise.length) {
+                    var conditional = ['if', cnd, sub];
+                    if (block && block.elseBody !== undefined) conditional.push(otherwise);
+                    gates.push(conditional);
+                }
                 dynamic = true;
                 return;
             }
@@ -1722,16 +1970,26 @@ function parse2(src, opts) {
 
     for (si = 0; si < stmts.length; si++) {
         st = stmts[si];
-        doStatement(st.text, st.line, gates);
+        doStatement(st.text, st.line, gates, st);
     }
 
     if (nq === 0) throw new QasmError(1, 'no qreg declared',
         'start with: OPENQASM 2.0; include "qelib1.inc"; qreg q[2];');
 
+    /* A measurement can be deferred only in the terminal measurement suffix.
+     * Classical feedback is not the sole reason to collapse: H; measure; H
+     * is a mixture, not H; H followed by a final measurement. Decide before
+     * optimization so an exact unitary rewrite cannot erase this boundary. */
+    var sawMeasurement = false;
+    for (var di = 0; di < gates.length; di++) {
+        if (gates[di][0] === 'measure') sawMeasurement = true;
+        else if (sawMeasurement) dynamic = true;
+    }
+
     var compressed = opts && opts.mode === 'compressed';
     if (compressed) {
         if (dynamic) throw new QasmError(1,
-            'compressed observables require a circuit without measurement feedback or reset',
+            'compressed observables require a circuit without intermediate measurement, feedback or reset',
             'choose Statevector for dynamic circuits');
         /* Only terminal readout is meaningful here. Do this before rewriting:
          * a measurement followed by cancelling gates is still intermediate. */
@@ -1798,7 +2056,7 @@ function parse2(src, opts) {
         var gi, ge;
         for (gi = 0; gi < list.length; gi++) {
             ge = list[gi];
-            if (ge[0] === 'if') { scanPhases(ge[2]); continue; }
+            if (ge[0] === 'if') { scanPhases(ge[2]); if (ge[3]) scanPhases(ge[3]); continue; }
             if (ge[0] === 'zpow' || ge[0] === 'mcpow') { if (ge[2] % 2 !== 0) oddPhase = true; }
             else if (ge[0] === 'gphase') { if (ge[1] % 2 !== 0) oddGlobal = true; }
         }
@@ -1813,7 +2071,11 @@ function parse2(src, opts) {
         (function dropOddGlobal(list) {
             var gi;
             for (gi = list.length - 1; gi >= 0; gi--) {
-                if (list[gi][0] === 'if') { dropOddGlobal(list[gi][2]); continue; }
+                if (list[gi][0] === 'if') {
+                    dropOddGlobal(list[gi][2]);
+                    if (list[gi][3]) dropOddGlobal(list[gi][3]);
+                    continue;
+                }
                 if (list[gi][0] === 'gphase' && list[gi][1] % 2 !== 0) list.splice(gi, 1);
             }
         }(gates));
@@ -1843,7 +2105,7 @@ function parse2(src, opts) {
         var gi, ge;
         for (gi = 0; gi < list.length; gi++) {
             ge = list[gi];
-            if (ge[0] === 'if') { halvePhases(ge[2]); continue; }
+            if (ge[0] === 'if') { halvePhases(ge[2]); if (ge[3]) halvePhases(ge[3]); continue; }
             if (ge[0] === 'zpow' || ge[0] === 'mcpow') ge[2] = ge[2] / 2;
             else if (ge[0] === 'gphase') ge[1] = ge[1] / 2;
         }
@@ -1856,7 +2118,9 @@ function parse2(src, opts) {
      * the dense cap, take sparse or refuse with the reason. */
     var backend = 'dense', bound = Infinity;
     if (ring === 8) {
-        bound = sparsePlan(gates, nq);
+        /* SparseState has no collapse or classical register. A dynamic
+         * circuit stays on the dense backend even with very small support. */
+        bound = dynamic ? Math.pow(2, nq) : sparsePlan(gates, nq);
         if (nq > MAX_QUBITS) {
             if (bound > SPARSE_CAP) throw new QasmError(1,
                 nq + ' qubits with a superposition up to 2^' +
