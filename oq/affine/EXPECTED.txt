@@ -1,0 +1,6 @@
+Pinned Matematyka interface: all five normalized source hashes match
+C-OQ-AFFINE-PHASE-N exact acceptance
+{"circuits":116,"amplitudes":512,"events":652,"histograms":1164,"dimensions":1164,"cnfHistograms":108,"originalHistograms":54,"rankQueries":80,"hybridQueries":1168,"exhaustiveCNFs":24,"guards":42,"wide":4,"newerParser":4,"browserSmoke":1}
+WITNESSES [{"name":"H-layer-128","h":128,"rho":128,"amplitudeFree":0,"eventFree":127,"phaseRank":0,"evaluations":"1"},{"name":"H-layer-4096","h":4096,"rho":4096,"amplitudeFree":0,"eventFree":4095,"phaseRank":0,"evaluations":"1"},{"name":"HT-32","h":32,"r":1,"chi":62,"selected":"rank-projector"}]
+DIGEST 964501178c5064a0639c3aa3e765363fe10efde16346ee837dc149743a452f17
+PASS: exact finite tests only; general acceleration remains H

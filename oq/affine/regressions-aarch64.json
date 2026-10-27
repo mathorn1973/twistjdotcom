@@ -1,0 +1,38 @@
+{
+  "architecture": "aarch64",
+  "node": "v22.22.2",
+  "runs": [
+    {
+      "command": "python3 oq/test-count-matematyka.py",
+      "exit": 0,
+      "stdout_bytes": 774,
+      "stdout_sha256": "887b27b4b260fbbfdbee6660b6f176919a13922e3429d563b0b5532266659644",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "node oq/test-optimizer.js",
+      "exit": 0,
+      "stdout_bytes": 928,
+      "stdout_sha256": "5a443b33fa1f7cd8f52ccb1a60312976469a48c657c98ce2479f81dd9ac1bbbe",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "node oq/test-qasm3.js",
+      "exit": 0,
+      "stdout_bytes": 2474,
+      "stdout_sha256": "dffe2da03806b3ef7411116510de72855aa60c921fa643b35e8d2576a4a638e5",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "node oq/test-rank.js",
+      "exit": 0,
+      "stdout_bytes": 742,
+      "stdout_sha256": "58fe968c0cfcf318a44f8e8df18716d65300c21d498c3995a8f18a3bcdd238c3",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
