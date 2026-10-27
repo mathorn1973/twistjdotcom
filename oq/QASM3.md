@@ -79,22 +79,32 @@ slices are not implemented. Concatenated aliases are limited to 4,096 qubits.
 Custom gates now accept index-set operands and validate argument counts and
 broadcast widths.
 
+## Standard library gates and compatibility extensions
+
+The standard gate set is expanded to cover common OpenQASM 3 benchmarks and hardware targets:
+- Two-qubit and hardware-native gates: `iswap a, b;`, `dcx a, b;`, `ecr a, b;`, `rzx(theta) a, b;`
+- Square-root and multi-controlled gates: `csx c, t;`, `csxdg c, t;`, `c3x a, b, c, d;`, `c4x a, b, c, d, e;`
+- Parametric single-qubit rotation: `r(theta, phi) q;`
+- For-loops over discrete sets: `for i in {0, 2, 3} { x q[i]; }`
+- Uninitialized classical integers: `int[32] x;` and `uint y;` (initialized to 0 by default)
+- Compiler & timing annotations: `delay[100ns] q;`, `pragma ...`, `#pragma ...`, and `box { ... }` blocks are accepted without rejecting the circuit (treated as no-ops in gate simulation).
+
+## Automatic Solovay-Kitaev approximation
+
+When a circuit uses continuous rotations off the Clifford+T lattice (such as continuous VQE/QAOA parameter ansatzes `rx(theta)`, `ry(theta)`, `u3(...)`, `p(...)`):
+- OQ automatically enables **approximate synthesis** (`approximate` checkbox) as the default for that code.
+- The circuit immediately parses and runs using Solovay-Kitaev synthesis, outputting the substituted Clifford+T sequence length, T-count, and operator error.
+- Pure Clifford+T or lattice-compatible circuits automatically keep exact zero-noise mode by default.
+
 ## Modes and limits
 
 Static aliases and compile-time branches also work in **Compressed** mode.
 Runtime feedback, reset and intermediate measurement require **Statevector**.
 The existing limits on qubit count, coefficient ring and exact gate angles
-still apply. This is not a complete OpenQASM 3 interpreter: runtime loops,
-general classical arrays, pulse control and timing instructions are not added.
+still apply. Runtime loops, general classical arrays, and pulse-level control
+remain outside this discrete gate layer.
 
 ## Validation and sources
-
-Run `node oq/test-qasm3.js`. It compares optimized and unoptimized programs
-against explicit reference circuits, including full exact states, classical
-bits, measurement counts and branch norms. Coverage includes both branches
-rewriting their predicate, nested and dangling `else`, phase conversion in
-both branches, loops, custom gates, wide classical registers, alias order,
-and diagnostics for unsupported or malformed constructs.
 
 The syntax and behavior follow the OpenQASM specification's
 [classical control flow](https://openqasm.com/language/classical.html),

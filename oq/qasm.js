@@ -610,6 +610,20 @@ var TABLE = {
     mcx: [-1, 0, function (g, q) {
         var tgt = q[q.length - 1];
         g.push(['h', tgt], mcpow(q, 8), ['h', tgt]);
+    }],
+    c3x: [-1, 0, function (g, q) { TABLE.mcx[2](g, q); }],
+    c4x: [-1, 0, function (g, q) { TABLE.mcx[2](g, q); }],
+    dcx: [2, 0, function (g, q) { g.push(['cx', q[0], q[1]], ['cx', q[1], q[0]]); }],
+    iswap: [2, 0, function (g, q) {
+        g.push(['zpow', q[0], 4], ['zpow', q[1], 4], ['h', q[0]], ['cx', q[0], q[1]], ['cx', q[1], q[0]], ['h', q[1]]);
+    }],
+    csx: [2, 0, function (g, q) { g.push(['h', q[1]], mcpow(q, 4), ['h', q[1]]); }],
+    csxdg: [2, 0, function (g, q) { g.push(['h', q[1]], mcpow(q, 12), ['h', q[1]]); }],
+    ecr: [2, 0, function (g, q) {
+        /* ecr = rzx(pi/4) · (X ⊗ I) · rzx(-pi/4) */
+        g.push(['h', q[1]], ['cx', q[0], q[1]], ['zpow', q[1], 2], ['cx', q[0], q[1]], ['h', q[1]],
+               ['x', q[0]],
+               ['h', q[1]], ['cx', q[0], q[1]], ['zpow', q[1], 14], ['cx', q[0], q[1]], ['h', q[1]]);
     }]
 };
 
@@ -675,6 +689,15 @@ var REWRITE = {
         var q = twoq(o, line, 'ryy');
         return ['rx(pi/2) ' + q[0], 'rx(pi/2) ' + q[1]].concat(REWRITE.rzz(p, o, line),
                ['rx(-pi/2) ' + q[0], 'rx(-pi/2) ' + q[1]]);
+    },
+    rzx: function (p, o, line) {
+        var q = twoq(o, line, 'rzx');
+        return ['h ' + q[1], 'cx ' + q[0] + ',' + q[1], 'rz(' + p + ') ' + q[1], 'cx ' + q[0] + ',' + q[1], 'h ' + q[1]];
+    },
+    r: function (p, o, line) {
+        var a = p.trim() ? splitTop(p).map(function (s) { return s.trim(); }) : [];
+        if (a.length !== 2) throw new QasmError(line, 'r takes 2 angles (theta, phi), got ' + a.length);
+        return ['U(' + a[0] + ', (' + a[1] + ') - pi/2, -(' + a[1] + ') + pi/2) ' + o];
     }
 };
 
@@ -859,7 +882,12 @@ function q3Split(src, base) {
                     return { text: text, line: startLine };
                 }
                 if (depth === 0 && ch === '{') {
-                    var head = src.slice(start, at).trim(), bodyLine = line;
+                    var headPrefix = src.slice(start, at);
+                    if (/\bfor\s+.*\bin\s*$/i.test(headPrefix.trim())) {
+                        balanced('{', '}');
+                        continue;
+                    }
+                    var head = headPrefix.trim(), bodyLine = line;
                     return { text: head, line: startLine, body: balanced('{', '}'), bodyLine: bodyLine };
                 }
                 if (depth === 0 && ch === '}') throw new QasmError(line, 'unmatched }');
@@ -1066,15 +1094,12 @@ var Q3_NO = {
     cal: ['pulse-level calibration', 'oq simulates the gate layer; there is no pulse, no channel and no waveform under it'],
     duration: ['timing', 'the state here advances by gates, not by seconds — there is no clock to hang a duration on'],
     stretch: ['timing', 'the state here advances by gates, not by seconds — there is no clock to hang a duration on'],
-    delay: ['timing', 'the state here advances by gates, not by seconds — there is no clock to hang a duration on'],
-    box: ['a timing box', 'the state here advances by gates, not by seconds'],
     barrier_: [null, null],
     array: ['classical arrays', 'oq compiles a circuit, it does not run a classical program alongside it'],
     /* def is handled by inlining now -- see q3Translate. */
     extern: ['external classical functions', 'nothing outside the circuit can be called from inside it'],
     input: ['runtime input parameters', 'the circuit has to be fully determined before it runs — bind the value in the source'],
     output: ['runtime output parameters', 'read the state out of the panel instead'],
-    pragma: ['pragmas', 'nothing here is backend-specific'],
     while: ['unbounded loops', 'a while loop cannot be unrolled without knowing the measurement outcomes']
 };
 
@@ -1338,7 +1363,12 @@ function q3Translate(src) {
 
         if (/^OPENQASM\b/i.test(text)) return;
         if (/^include\b/i.test(text)) return;                 /* stdgates is the table below */
-        if (/^barrier\b/i.test(text)) return;
+        if (/^(?:#\s*pragma|pragma|barrier|delay)\b/i.test(text)) return;
+        if (/^box\b/i.test(text) && st.body !== undefined) {
+            var bst = q3Split(st.body, st.bodyLine || line);
+            for (i = 0; i < bst.length; i++) walk(bst[i], line, depth);
+            return;
+        }
 
         if (runtimeDepth && /^(?:(?:const)\s+)?(?:qubit|bit|bool|int|uint|float|angle|let|gate|def)\b/i.test(text))
             throw new QasmError(line, 'declarations inside a runtime branch are not supported',
@@ -1383,10 +1413,10 @@ function q3Translate(src) {
          * loop and index arithmetic can use; angle and float are kept as the
          * EXPRESSION the user wrote and substituted back verbatim, so 3*pi/8
          * reaches the lattice check as 3*pi/8 and not as 1.178. */
-        m = /^(?:const\s+)?(u?int|float|angle)\s*(?:\[\s*[^\]]*\s*\])?\s+([\p{L}_][\p{L}\p{N}_]*)\s*=\s*(.+)$/iu.exec(text);
+        m = /^(?:(?:const|input|output)\s+)?(u?int|float|angle)\s*(?:\[\s*[^\]]*\s*\])?\s+([\p{L}_][\p{L}\p{N}_]*)(?:\s*=\s*(.+))?$/iu.exec(text);
         if (m) {
-            if (/^u?int$/i.test(m[1])) env[m[2]] = q3Int(m[3], env, line);
-            else fenv[m[2]] = '(' + substConst(m[3]) + ')';
+            if (/^u?int$/i.test(m[1])) env[m[2]] = m[3] !== undefined ? q3Int(m[3], env, line) : 0;
+            else if (m[3] !== undefined) fenv[m[2]] = '(' + substConst(m[3]) + ')';
             return;
         }
         /* An angle register with no value exists to be WRITTEN while the
@@ -1525,18 +1555,28 @@ function q3Translate(src) {
             }
         }
 
-        /* for uint i in [a:b] { } and [a:step:b] */
-        m = /^for\s+(?:\w+(?:\[[^\]]*\])?\s+)?([A-Za-z_][A-Za-z0-9_]*)\s+in\s*\[\s*([^\]]+)\s*\]$/i.exec(text);
+        /* for uint i in [a:b] { } and [a:step:b], or for i in {a, b, c} { } */
+        m = /^for\s+(?:\w+(?:\[[^\]]*\])?\s+)?([A-Za-z_][A-Za-z0-9_]*)\s+in\s*(?:\[\s*([^\]]+)\s*\]|\{\s*([^}]+)\s*\})$/i.exec(text);
         if (m && st.body !== undefined) {
-            var pr = m[2].split(':');
-            var a = q3Int(pr[0], env, line);
-            var stp = pr.length === 3 ? q3Int(pr[1], env, line) : 1;
-            var b = q3Int(pr[pr.length - 1], env, line);
-            if (stp === 0) throw new QasmError(line, 'a for-loop step of 0 never ends');
             var inner = q3Split(st.body, st.bodyLine || line), had = m[1] in env, old = env[m[1]];
-            for (var v = a; stp > 0 ? v <= b : v >= b; v += stp) {
-                env[m[1]] = v;
-                for (i = 0; i < inner.length; i++) walk(inner[i], line, depth);
+            if (m[2] !== undefined) {
+                var pr = m[2].split(':');
+                var a = q3Int(pr[0], env, line);
+                var stp = pr.length === 3 ? q3Int(pr[1], env, line) : 1;
+                var b = q3Int(pr[pr.length - 1], env, line);
+                if (stp === 0) throw new QasmError(line, 'a for-loop step of 0 never ends');
+                for (var v = a; stp > 0 ? v <= b : v >= b; v += stp) {
+                    env[m[1]] = v;
+                    for (i = 0; i < inner.length; i++) walk(inner[i], line, depth);
+                }
+            } else if (m[3] !== undefined) {
+                var items = m[3].split(',');
+                for (var j = 0; j < items.length; j++) {
+                    var it = items[j].trim();
+                    if (!it) continue;
+                    env[m[1]] = q3Int(it, env, line);
+                    for (i = 0; i < inner.length; i++) walk(inner[i], line, depth);
+                }
             }
             if (had) env[m[1]] = old; else delete env[m[1]];
             return;
@@ -1739,7 +1779,7 @@ function parse2(src, opts) {
                 return;
             }
 
-            if (/^barrier\b/i.test(text)) return;
+            if (/^(?:#\s*pragma|pragma|barrier|delay)\b/i.test(text)) return;
 
             if (/^(gate|opaque)\b/i.test(text)) throw new QasmError(line,
                 'custom gate definitions are not supported yet',
