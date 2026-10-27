@@ -1,0 +1,44 @@
+{
+  "source": "Matematyka Kvantovy kasar OQ prototype",
+  "publication": "not established; prototype explicitly excluded from deployment",
+  "base_repository": "mathorn1973/twistjdotcom",
+  "base_commit": "cadcafb0e3dd1d4799f7f2db0dc1b8082cac1a72",
+  "normalization": "CRLF to LF only",
+  "files": {
+    "oq.js": {
+      "source_sha256": "6ce4002cb8831c2ae39a8a4b7d2c2128d5a4c82ce968e26d787bc0314a366a18",
+      "source_bytes": 33763,
+      "source_lf_sha256": "14e40b0f617ad8c8a56f8d9db6f1341189503a696211e45cbf1e5da58c0246fd",
+      "base_lf_sha256": "14e40b0f617ad8c8a56f8d9db6f1341189503a696211e45cbf1e5da58c0246fd",
+      "same_after_lf_normalization": true
+    },
+    "oq16.js": {
+      "source_sha256": "c7b3618f66b9f717ae3369b56cdc911f1e35cc545c531c74e5d968ad26497089",
+      "source_bytes": 19739,
+      "source_lf_sha256": "c4583774fdcdd9395900f8f773ef6b2bc9ac3c0ecbc0eb1fcb1bd68bd43597d7",
+      "base_lf_sha256": "c4583774fdcdd9395900f8f773ef6b2bc9ac3c0ecbc0eb1fcb1bd68bd43597d7",
+      "same_after_lf_normalization": true
+    },
+    "oqopt.js": {
+      "source_sha256": "db62de9b1f3b9bfa3b298a3634b4a1ed794a7900396cb7411c790ff8f4cb0baf",
+      "source_bytes": 7732,
+      "source_lf_sha256": "856b14f780843cca91c3e47aea64ef555f5ea07a1b6b8b36c5e58f0f7b88637c",
+      "base_lf_sha256": "856b14f780843cca91c3e47aea64ef555f5ea07a1b6b8b36c5e58f0f7b88637c",
+      "same_after_lf_normalization": true
+    },
+    "oqrank.js": {
+      "source_sha256": "4bf25121d2a4f27bd549fa8c035813ff71accf57b7149e20245f4aea0edaad08",
+      "source_bytes": 19861,
+      "source_lf_sha256": "88000512f5a213e09b5ed88d15ae34c2a3190f0c0a7f2cd713f733cf6153fbf7",
+      "base_lf_sha256": "88000512f5a213e09b5ed88d15ae34c2a3190f0c0a7f2cd713f733cf6153fbf7",
+      "same_after_lf_normalization": true
+    },
+    "qasm.js": {
+      "source_sha256": "baa6b7113febf13f7ffa72c970fa29f60182ea78d23d6acbaa6d31e53897e0b7",
+      "source_bytes": 116967,
+      "source_lf_sha256": "8336152fa2662d33e619020e2eb3d3c72c75ac3c564450292cd4fc67188fc56c",
+      "base_lf_sha256": "6e9c4c944ef87589ecf2797e4e515e04afd1f9a37e9eb43cf874ef046bd18d88",
+      "same_after_lf_normalization": false
+    }
+  }
+}
