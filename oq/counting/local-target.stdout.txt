@@ -1,0 +1,8 @@
+OQ-PATHCOUNT finite exact regression: PASS
+{"circuits":109,"amplitudes":464,"probabilities":436,"histograms":900,"tinyCNFs":8,"genericCNFs":54,"guards":27,"qasmPrograms":3,"newerQasmPrograms":6,"wide":2}
+evidence-sha256 aaa8afcd2010b6f29d32af328d1fc7ea3f7bcb1db644b584099d5390f223e99e
+source oq.js 6ce4002cb8831c2ae39a8a4b7d2c2128d5a4c82ce968e26d787bc0314a366a18
+source oq16.js c7b3618f66b9f717ae3369b56cdc911f1e35cc545c531c74e5d968ad26497089
+source oqopt.js db62de9b1f3b9bfa3b298a3634b4a1ed794a7900396cb7411c790ff8f4cb0baf
+source qasm.js baa6b7113febf13f7ffa72c970fa29f60182ea78d23d6acbaa6d31e53897e0b7
+Status: finite engineering evidence only; acceleration H; reference DPLL exponential; no deployment.

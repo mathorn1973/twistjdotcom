@@ -1,0 +1,54 @@
+{
+  "test-optimizer.js": {
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stdout_sha256": "5a443b33fa1f7cd8f52ccb1a60312976469a48c657c98ce2479f81dd9ac1bbbe",
+    "summary": {
+      "status": "passed",
+      "seed": 20260921,
+      "optimizerCases": 219,
+      "randomCircuits": 192,
+      "fullStateComparisons": 1624,
+      "basisInputsChecked": 1560,
+      "dynamicTrajectories": 64,
+      "sparseComparisons": 16,
+      "parserCases": 7,
+      "lossyFallbackTrajectories": 16,
+      "lossyFallbackHashDifferences": 16
+    }
+  },
+  "test-qasm3.js": {
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stdout_sha256": "dffe2da03806b3ef7411116510de72855aa60c921fa643b35e8d2576a4a638e5",
+    "summary": {
+      "status": "passed",
+      "programs": 63,
+      "parserVariants": 126,
+      "exactTrajectoryComparisons": 1326,
+      "deterministicBasisChecks": 802,
+      "rejectedInputs": 38
+    }
+  },
+  "test-rank.js": {
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stdout_sha256": "58fe968c0cfcf318a44f8e8df18716d65300c21d498c3995a8f18a3bcdd238c3",
+    "summary": {
+      "status": "passed",
+      "seed": 20260921,
+      "denseCircuits": 140,
+      "randomCircuits": 120,
+      "expectationComparisons": 3456,
+      "probabilityComparisons": 394,
+      "normChecks": 142,
+      "stepExecutions": 734,
+      "analyticChecks": 26,
+      "validationChecks": 23,
+      "parserChecks": 8,
+      "largeRegisterQubits": 100,
+      "largeRegisterRank": 4,
+      "largeRegisterStoredAmplitudes": 16
+    }
+  }
+}
