@@ -103,6 +103,33 @@ function validate(program,o){
     }
     return {n,input,gates,h,sourceGates:program.gates.length};
 }
+/* Cancel exact inverse pairs across gates on disjoint wires. Full phase is retained.
+ * Per-wire live stacks prove that a removed pair commutes past every intervening gate. */
+function reduceCircuit(gates,n,o){
+    const out=[],history=Array.from({length:n},()=>[]);let global=0;
+    const last=q=>history[q][history[q].length-1];
+    for(const source of gates){
+        abort(o);let g=source;
+        if(g[0]==='gphase'){global=mod(global+g[1],8);continue;}
+        const wires=g[0]==='cx'?[g[1],g[2]]:[g[1]];
+        while(g){
+            const previous=last(wires[0]),p=previous===undefined?null:out[previous];
+            const samePrevious=p&&wires.every(q=>last(q)===previous);
+            const inversePair=samePrevious&&p[0]===g[0]&&
+                ((g[0]==='h'&&p[1]===g[1])||
+                 (g[0]==='cx'&&p[1]===g[1]&&p[2]===g[2]));
+            const phasePair=samePrevious&&p[0]==='zpow'&&g[0]==='zpow'&&p[1]===g[1];
+            if(inversePair||phasePair){
+                for(const q of wires)history[q].pop();out[previous]=null;
+                const k=phasePair?mod(p[2]+g[2],8):0;
+                g=k?['zpow',g[1],k]:null;
+            }else{
+                const index=out.length;out.push(g);for(const q of wires)history[q].push(index);break;
+            }
+        }
+    }
+    const result=out.filter(g=>g!==null);if(global)result.push(['gphase',global]);return result;
+}
 function prepare(program,options){
     const o=options||{};abort(o);const p=validate(program,o);
     const maxRank=limit(o,'maxRank',20,0,20);
@@ -117,10 +144,12 @@ function prepare(program,options){
         if(gates.length+block.gates.length>maxActiveGates)throw new LimitError('active gate limit exceeded');
         for(const g of block.gates)gates.push(g);
     }
-    const activeProgram=freezeProgram(n,gates);
+    const activeProgram=freezeProgram(n,reduceCircuit(gates,n,o));
     const stats=Object.freeze({physicalQubits:p.n,activeRank:planner.rank,activeQubits:n,
         originalGates:p.sourceGates,originalHadamards:p.h,nonCliffordRotations:planner.tCount,
-        activeGates:gates.length,activeHadamards:gates.filter(g=>g[0]==='h').length,
+        rawActiveGates:gates.length,activeGates:activeProgram.gates.length,
+        rawActiveHadamards:gates.filter(g=>g[0]==='h').length,
+        activeHadamards:activeProgram.gates.filter(g=>g[0]==='h').length,
         activeStatevectorAllocated:false,physicalStatevectorAllocated:false,
         ignoredPhysicalGlobalPhases:planner.ignoredGlobalPhases,performanceStatus:'H'});
     const prepared=Object.freeze({schema:'oq-active-v1',stats,activeProgram});
@@ -142,7 +171,7 @@ function query(prepared,observable,options){
     if(d.target===null)return Object.freeze({kind:'constant',value:scalar(d.sign),reason:'scalar on active code'});
     const gates=prepared.activeProgram.gates.concat(d.gates);
     if(gates.length>limit(o,'maxQueryGates',100000,0,1000000))throw new LimitError('active query gate limit exceeded');
-    const program=freezeProgram(prepared.activeProgram.n,gates);
+    const program=freezeProgram(prepared.activeProgram.n,reduceCircuit(gates,prepared.activeProgram.n,o));
     // The original basis input is ALREADY in the frame; active state starts at zero.
     const affine=AFFINE.probability(program,1n<<BigInt(d.target),0n,Object.assign({},o,{input:0n}));
     const result=Object.freeze({kind:'affine-probability',sign:d.sign,query:affine,
