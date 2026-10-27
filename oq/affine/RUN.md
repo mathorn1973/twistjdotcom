@@ -36,3 +36,10 @@ Unchanged regression commands and exact aarch64 output hashes are recorded
 in regressions-aarch64.json. `EXPECTED.txt` is the actual target-acceptance
 stdout, not a manually invented expected result. Later documentation-only
 commits do not change the implementation/test pin.
+
+The x86 runner's SSH key was read-only, so its attempted evidence push changed
+no remote ref. Its exact run-record bytes were placed in Git blob
+69f958544aec6d2ed8d687ae79760bc0075b938d through the authorized connector.
+The coordinator fetched that Git blob, checked its Git object hash, all four
+implementation hashes and the acceptance stdout hash, then committed the
+unchanged record with the ordinary author identity.
