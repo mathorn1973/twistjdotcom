@@ -38,7 +38,11 @@ def main() -> int:
                 raise ValueError(f"Matematyka source mismatch: {name}")
         env = dict(os.environ, OQ_ENGINE_DIR=str(target / "oq"), OQ_REQUIRE_MATEMATYKA="1")
         print("Pinned Matematyka interface: all five normalized source hashes match", flush=True)
-        return subprocess.run(["node", str(ROOT / "oq/test-active.js")], env=env, cwd=ROOT).returncode
+        for test in ("oq/test-active.js", "oq/test-active-stress.js"):
+            result = subprocess.run(["node", str(ROOT / test)], env=env, cwd=ROOT)
+            if result.returncode:
+                return result.returncode
+        return 0
 
 
 if __name__ == "__main__":

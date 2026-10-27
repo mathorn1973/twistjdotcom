@@ -60,6 +60,7 @@ for(let n=1;n<=3;n++)for(const p of allPaulis(n))for(let k=0;k<8;k++){
     }
 }
 /* Any accidental call by the new backend to the 2^r state allocator is fatal. */
+const referenceCreate=RREF.create;
 const saved={create:originalRank.create,run:originalRank.run};
 originalRank.create=()=>{throw Error('FORBIDDEN active-vector allocation');};
 originalRank.run=()=>{throw Error('FORBIDDEN rank statevector execution');};
@@ -80,7 +81,7 @@ let cnfRemaining=16,histRemaining=12;
 function circuit(program,input=0n){
     const reference=dense(program.gates,program.n,input);
     // RREF is separately loaded from the frozen target directory by the target runner.
-    const rankState=RREF.create(RREF.plan(refGates(program,input),program.n));while(rankState.step()){}
+    const rankState=referenceCreate(RREF.plan(refGates(program,input),program.n));while(rankState.step()){}
     const prepared=ACTIVE.prepare(program,{input});total.circuits++;total.allocationGuards++;
     const active=dense(prepared.activeProgram.gates,prepared.activeProgram.n);
     assert.equal(prepared.stats.activeRank,rankState.rank);
