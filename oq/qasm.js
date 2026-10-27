@@ -1107,13 +1107,19 @@ var Q3_NO = {
  * parameters theta, lambda and phi in the alphabet those letters came from. */
 var Q3_IDENT = /[\p{L}_][\p{L}\p{N}_]*/gu;
 
-function q3Translate(src) {
+function q3Translate(src, opts) {
+    var maxStatements = opts && opts.mode === 'exact-query' ? 10000 : 0;
     var out = [], map = [], gdefs = {}, ddefs = {}, qregs = {}, cregs = {}, env = {}, fenv = {};
     var qalias = {};
     var problems = [];
     var order = [], measured = {}, warnings = [], anyGate = false, runtimeDepth = 0, branchDepth = 0;
 
-    function push(text, line) { out.push(text); map.push(line); }
+    function push(text, line) {
+        if (maxStatements && out.length >= maxStatements) throw new QasmError(line,
+            'exact-query expansion exceeds 10000 QASM3 statements',
+            'reduce the loop or circuit size; the Worker is not an unbounded compiler');
+        out.push(text); map.push(line);
+    }
 
     /* A circuit can be out of reach for more than one reason, and reporting
      * only the one the translator happened to reach first is how you send
@@ -1746,6 +1752,7 @@ function parse2(src, opts) {
     var qregs = {}, cregs = {}, nq = 0, nc = 0;
     var gates = [], measures = [], warnings = [], si, st;
     var dynamic = false, scratchBits = 0;
+    var exactGateLimit = opts && opts.mode === 'exact-query' ? 10000 : 0;
 
     /* One statement, emitted into a gate list. Pulled out of the loop so an
      * if-block can run it too: classical control applies the same statement
@@ -2011,6 +2018,9 @@ function parse2(src, opts) {
     for (si = 0; si < stmts.length; si++) {
         st = stmts[si];
         doStatement(st.text, st.line, gates, st);
+        if (exactGateLimit && gates.length > exactGateLimit) throw new QasmError(st.line,
+            'exact-query compilation exceeds 10000 gates',
+            'reduce circuit repetition; no full statevector or sampling is attempted');
     }
 
     if (nq === 0) throw new QasmError(1, 'no qreg declared',
@@ -2231,7 +2241,7 @@ function parse(src, opts) {
         var r;
         if (!q3Detect(src)) r = parse2(src, opts);
         else {
-            var tr = q3Translate(src);
+            var tr = q3Translate(src, opts);
             try { r = parse2(tr.text, opts); }
             catch (e) {
                 if (e.name === 'QasmError' && tr.map[e.line - 1] !== undefined)

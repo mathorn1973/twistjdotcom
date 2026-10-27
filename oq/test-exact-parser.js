@@ -32,4 +32,8 @@ check(measurement,{mode:'exact-query',optimize:false},p=>{
 });
 assert.throws(()=>Q.parse('OPENQASM 3.0; qubit q; h q; bit c=measure q; x q;',{mode:'exact-query'}),/intermediate measurement|reset/);checks++;
 assert.throws(()=>Q.parse('OPENQASM 3.0; qubit[4097] q; h q[0];',{mode:'exact-query'}),/4096/);checks++;
+assert.throws(()=>Q.parse('OPENQASM 3.0; qubit q; for int k in [0:10020] { h q; }',
+    {mode:'exact-query',optimize:false}),/10000 QASM3 statements/);checks++;
+assert.throws(()=>Q.parse('OPENQASM 2.0; qreg q[4096]; h q; h q; h q;',
+    {mode:'exact-query',optimize:false}),/10000 gates/);checks++;
 console.log('PASS exact-query QASM parser: '+checks+' scoped checks; other modes unchanged');

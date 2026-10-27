@@ -18,7 +18,7 @@ const LIMITS = Object.freeze({
 const SCHEMA = 'oq-exact-ui-v1';
 let started = false;
 function basisWord(source, label) {
-    if (typeof source !== 'string' || source.length > 1230 ||
+    if (typeof source !== 'string' || source.length > 5000 ||
         !/^(?:0|[1-9][0-9]*|0[bB][01]+|0[xX][a-fA-F0-9]+)$/.test(source.trim()))
         throw new TypeError(label + ' must be a nonnegative decimal, 0b binary or 0x hexadecimal integer');
     return BigInt(source.trim());

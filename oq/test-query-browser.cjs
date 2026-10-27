@@ -22,7 +22,7 @@ const server=http.createServer((req,res)=>{
     fs.createReadStream(file).pipe(res);
 });
 const counters={nativeResults:0,uiRuns:0,exactComparisons:0,bigIndex:0,rejected:0,
-    stopped:0,timeout:0,workerFailure:0,noAuto:0,oldModes:0,staleReply:0};
+    stopped:0,timeout:0,workerFailure:0,noAuto:0,oldModes:0,staleReply:0,nativeStop:0,mobile:0};
 const digest=crypto.createHash('sha256');
 function logData(v){digest.update(JSON.stringify(v)+'\n');}
 async function workerQuery(page,msg){
@@ -146,6 +146,10 @@ async function drive(page,{src,kind='probability',method='auto',input='0',qubits
         const high16='OPENQASM 3.0; qubit[24] q; p(pi/8) q[23];';
         const high16R=await workerQuery(page,{source:high16,kind:'amplitude',method:'count',input:'0x800000',output:'0x800000'});
         sameResult(high16R,['0','1','0','0','0','0','0','0'],0,'24 qubit ring16 selected amp');counters.bigIndex++;
+        const endWord='0b1'+'0'.repeat(4095);
+        const high4096=await workerQuery(page,{source:'OPENQASM 3.0; qubit[4096] q; p(pi/8) q[4095];',
+            kind:'amplitude',method:'count',input:endWord,output:endWord});
+        sameResult(high4096,['0','1','0','0','0','0','0','0'],0,'4096 qubit exact single amplitude');counters.bigIndex++;
         const rejects=[
             {source:ring16,kind:'pauli',pauli:'Z0',message:/ring8/i},
             {source:ring16,kind:'amplitude',method:'active',message:/Physical amplitudes/i},
@@ -153,7 +157,8 @@ async function drive(page,{src,kind='probability',method='auto',input='0',qubits
             {source:bell,qubits:'0,1',outcome:'0',message:/exactly 2 binary digits/i},
             {source:bell,qubits:'0,0',outcome:'00',message:/once/i},
             {source:bell,input:'-1',message:/nonnegative/i},
-            {source:bell,method:'garbage',message:/Unknown exact method/i}
+            {source:bell,method:'garbage',message:/Unknown exact method/i},
+            {source:'OPENQASM 3.0; qubit q; for int k in [0:10020] { h q; }',message:/10000 QASM3 statements/i}
         ];
         for(const x of rejects){const r=await workerQuery(page,x);assert.equal(r.type,'error',JSON.stringify(r));assert.match(r.message,x.message);counters.rejected++;}
         // Stop without work continuing: a deliberately nonresponsive Worker object.
@@ -203,6 +208,21 @@ async function drive(page,{src,kind='probability',method='auto',input='0',qubits
         await page.locator('#runBtn').click();
         await page.waitForFunction(()=>!document.querySelector('#runBtn').disabled,{timeout:15000});
         assert.match(await page.locator('#out').innerText(),/exact query/i);
+        // Terminate a REAL Worker during an intentionally expensive path-count run.
+        const hard='OPENQASM 2.0; qreg q[1]; '+('h q[0]; t q[0]; ').repeat(160);
+        await page.locator('#src').fill(hard);
+        await page.locator('#queryKind').selectOption('probability');
+        await page.locator('#queryMethod').selectOption('count');
+        await page.locator('#runBtn').click();
+        await page.locator('#stopBtn').click();
+        await page.waitForFunction(()=>!document.querySelector('#runBtn').disabled);
+        assert.match(await page.locator('#out').innerText(),/Stopped.*No partial/i);
+        counters.nativeStop++;
+        await page.locator('#src').fill(hth);
+        await page.locator('#queryMethod').selectOption('affine');
+        await page.locator('#runBtn').click();
+        await page.waitForFunction(()=>!document.querySelector('#runBtn').disabled,{timeout:15000});
+        assert.match(await page.locator('#out').innerText(),/c0 = 2/);
         // Exact query persisted in storage must NOT spawn an expensive worker at boot.
         const context2=await browser.newContext();
         await context2.addInitScript(()=>{
@@ -218,6 +238,21 @@ async function drive(page,{src,kind='probability',method='auto',input='0',qubits
         assert.equal(await page2.evaluate(()=>window.__workersConstructed),0);
         assert.match(await page2.locator('#out').innerText(),/press Run/i);
         counters.noAuto++;
+        const mobileContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+        await mobileContext.route(/^https:\/\/(?:fonts\.googleapis\.com|fonts\.gstatic\.com)\//,r=>r.abort());
+        const mobile=await mobileContext.newPage();
+        mobile.on('pageerror',e=>errors.push('mobile: '+e.message));
+        await mobile.goto(origin+'/oq/',{waitUntil:'domcontentloaded'});
+        await mobile.locator('#src').fill(hth);
+        await mobile.locator('#runMode').selectOption('exact-query');
+        await mobile.locator('#queryKind').selectOption('probability');
+        await mobile.locator('#runBtn').click();
+        await mobile.waitForFunction(()=>!document.querySelector('#runBtn').disabled);
+        assert.match(await mobile.locator('#out').innerText(),/c0 = 2/);
+        assert.equal(await mobile.locator('#queryControls').isVisible(),true);
+        assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true,'mobile viewport horizontal overflow');
+        counters.mobile++;
+        await mobileContext.close();
         assert.deepEqual(errors,[],`page errors: ${errors.join(' | ')}`);
         logData(counters);
         console.log('OQ_EXACT_UI_BROWSER PASS '+JSON.stringify(counters));
