@@ -1,0 +1,9 @@
+Pinned Matematyka interface: all four normalized source hashes match
+OQ-PATHCOUNT finite exact regression: PASS
+{"circuits":109,"amplitudes":464,"probabilities":436,"histograms":900,"tinyCNFs":8,"genericCNFs":54,"guards":27,"qasmPrograms":3,"newerQasmPrograms":6,"wide":2}
+evidence-sha256 aaa8afcd2010b6f29d32af328d1fc7ea3f7bcb1db644b584099d5390f223e99e
+source oq.js 14e40b0f617ad8c8a56f8d9db6f1341189503a696211e45cbf1e5da58c0246fd
+source oq16.js c4583774fdcdd9395900f8f773ef6b2bc9ac3c0ecbc0eb1fcb1bd68bd43597d7
+source oqopt.js 856b14f780843cca91c3e47aea64ef555f5ea07a1b6b8b36c5e58f0f7b88637c
+source qasm.js 8336152fa2662d33e619020e2eb3d3c72c75ac3c564450292cd4fc67188fc56c
+Status: finite engineering evidence only; acceleration H; reference DPLL exponential; no deployment.
