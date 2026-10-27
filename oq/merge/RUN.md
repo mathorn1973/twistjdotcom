@@ -19,7 +19,7 @@ Commands were executed in the isolated checkout with Node v22.23.4:
 
 | Command after `node` or `python3` | exit | stdout bytes | stdout SHA-256 | stderr bytes |
 |---|---:|---:|---|---:|
-| `node oq/test-matematyka-gates.js` | 0 | 110 | `22bd9ca152482c8c40e77792ecf3530f25dbe60868d08e85f0f44c925b4a2625` | 0 |
+| `node oq/test-matematyka-gates.js` | 0 | 152 | `22bd9ca152482c8c40e77792ecf3530f25dbe60868d08e85f0f44c925b4a2625` | 0 |
 | `node oq/test-optimizer.js` | 0 | see local transcript | `5a443b33fa1f7cd8f52ccb1a60312976469a48c657c98ce2479f81dd9ac1bbbe` | 0 |
 | `node oq/test-qasm3.js` | 0 | see local transcript | `dffe2da03806b3ef7411116510de72855aa60c921fa643b35e8d2576a4a638e5` | 0 |
 | `node oq/test-rank.js` | 0 | see local transcript | `58fe968c0cfcf318a44f8e8df18716d65300c21d498c3995a8f18a3bcdd238c3` | 0 |

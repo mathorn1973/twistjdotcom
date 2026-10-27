@@ -24,7 +24,7 @@ These are scoped declared-gate tests, not complete OpenQASM3 certification.
 
 Fractal x86_64 and independent aarch64 execution: **PASS** with identical
 parser-test digest `a44599cd7ccc4670aea09bd9dd444f9ad8c434d0e9f0434a810ea5cdfd172c84`.
-The x86_64 test stdout has 110 bytes, SHA-256
+The x86_64 test stdout has 152 bytes, SHA-256
 `22bd9ca152482c8c40e77792ecf3530f25dbe60868d08e85f0f44c925b4a2625`.
 Both report 16 optimized/unoptimized gate scenarios, 184 basis checks,
 11,968 exact coefficient comparisons, 96 controlled-X cases and 4 syntax checks.
