@@ -1,0 +1,20 @@
+{
+  "architecture": "aarch64",
+  "platform": "Linux",
+  "node": "v22.22.2",
+  "python": "3.11.2",
+  "implementation_commit": "462ee0c3fb956b0c07219f29278f16ac59640583",
+  "command": "python3 oq/test-affine-matematyka.py",
+  "exit_code": 0,
+  "stdout_bytes": 776,
+  "stdout_sha256": "d1cc4168a616301f5711b70aebddfb8f0863302ea27615676d1a8e4b84e06bd4",
+  "stderr_bytes": 0,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "files": {
+    "oq/oqaffine.js": "1290e59fd7b3638bbe8f5f03be2dbcac346a061826d983c819398dc5f5fa8c98",
+    "oq/oqhybrid.js": "2685b9dd9d7e77be7703e41e5a9c99020ec1ee674188aaa304b53bd3d5826263",
+    "oq/test-affine.js": "60e89580372bad68ac09a5108a126bacc17655822a70a67c0045ac020312b644",
+    "oq/test-affine-matematyka.py": "9fc20c0ac3c5aa43351c6df320c58c6e69bf6d366a226b3d5a828748f6ef6474"
+  },
+  "status": "candidate-C; reproduction, not independent confirmation"
+}
