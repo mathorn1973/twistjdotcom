@@ -2027,6 +2027,12 @@ function parse2(src, opts) {
     }
 
     var compressed = opts && opts.mode === 'compressed';
+    /* Scalar exact queries never allocate a physical statevector. Preserve the
+     * original gates and global phase, but reject nonunitary trajectories. */
+    var exactQuery = opts && opts.mode === 'exact-query';
+    if (exactQuery && dynamic) throw new QasmError(1,
+        'exact scalar queries do not support intermediate measurement or reset',
+        'select a static unitary circuit with terminal measurements only');
     if (compressed) {
         if (dynamic) throw new QasmError(1,
             'compressed observables require a circuit without intermediate measurement, feedback or reset',
@@ -2132,7 +2138,7 @@ function parse2(src, opts) {
      * does not. */
     /* The bigger ring doubles the state, so the qubit ceiling comes down with
      * it — 2^24 amplitudes at 32 bytes each is over half a gigabyte. */
-    if (ring === 16 && nq > 22) throw new QasmError(1,
+    if (!exactQuery && ring === 16 && nq > 22) throw new QasmError(1,
         nq + ' qubits in Z[ζ₁₆] — the bigger ring caps at 22',
         'Z[ζ₁₆] carries eight integers per amplitude, so 2^' + nq + ' of them is ' +
         Math.round(Math.pow(2, nq) * 32 / 1048576) + ' MB. Keep the phases on the π/4 ' +
@@ -2151,6 +2157,16 @@ function parse2(src, opts) {
         }
     }
     if (ring === 8) halvePhases(gates);
+
+    /* This path returns the SAME unitary gate list and exact ring as ordinary
+     * parsing. Only the storage-dependent dense/sparse caps are omitted. The
+     * worker enforces gate and counting resource budgets before computing. */
+    if (exactQuery) return {
+        n: nq, nc: nc, qregs: qregs, cregs: cregs, ring: ring,
+        gates: gates.filter(function (g) { return g[0] !== 'measure'; }),
+        measures: measures, warnings: warnings, backend: 'exact-query',
+        supportBound: null, dynamic: false, optimization: optimization
+    };
 
     /* Which container? Dense stores 2^n amplitudes whatever the circuit does
      * with them; sparse stores only the non-zero ones and pays BigInt prices

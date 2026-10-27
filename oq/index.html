@@ -171,6 +171,12 @@ select, input[type="text"] { max-width: 100%; }
 .rank-controls { margin: 10px 0; }
 .rank-controls[hidden] { display: none; }
 .rank-controls input { width: 250px; }
+.query-controls { margin: 10px 0 14px; padding: 12px 13px; border: 1px solid var(--rule); border-radius: 3px; }
+.query-controls[hidden], .query-fields[hidden] { display: none; }
+.query-controls .row { margin: 2px 0 9px; gap: 7px 10px; }
+.query-controls input { width: 106px; }
+.query-controls #queryQubits, .query-controls #queryPauli { width: min(250px, 100%); }
+.query-controls .mode-note { margin-bottom: 0; }
 .mode-note { font: 11.5px/1.65 'JetBrains Mono', monospace; color: var(--muted); margin: 8px 0; }
 input[type="number"]:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
 button.run {
@@ -271,6 +277,7 @@ button.stop:disabled { opacity: 1; }
         <select id="runMode">
             <option value="statevector">Statevector — amplitudes &amp; sampling</option>
             <option value="compressed">Compressed — Pauli observables</option>
+            <option value="exact-query">Exact query — one result, no full statevector (experimental)</option>
         </select>
     </div>
     <div id="rankControls" class="rank-controls" hidden>
@@ -284,6 +291,42 @@ button.stop:disabled { opacity: 1; }
         Up to 64 qubits per readout and 16 Pauli products. No joint samples, physical-basis amplitudes or state fingerprint.
         Observables are evaluated before terminal measurements.
         Runtime grows with 2<sup>r</sup>; active rank r is limited to 16 here.</p>
+    </div>
+    <div id="queryControls" class="query-controls" hidden>
+        <div class="row">
+            <label class="lbl" for="queryKind">readout</label>
+            <select id="queryKind">
+                <option value="probability">Born probability (joint bit event)</option>
+                <option value="amplitude">One computational-basis amplitude</option>
+                <option value="pauli">Physical Pauli expectation</option>
+            </select>
+            <label class="lbl" for="queryMethod">method</label>
+            <select id="queryMethod">
+                <option value="auto">Auto (structural estimate)</option>
+                <option value="count">Path counts (#3SAT, bounded)</option>
+                <option value="affine">Affine phase sum (bounded)</option>
+                <option value="active">Active Clifford space (ring8)</option>
+            </select>
+            <label class="lbl" for="queryInput">input |x⟩</label>
+            <input id="queryInput" type="text" value="0" aria-label="Input computational basis number, decimal or 0b binary">
+        </div>
+        <div class="row query-fields" data-query-kind="probability">
+            <label class="lbl" for="queryQubits">measured qubits</label>
+            <input id="queryQubits" type="text" value="0" aria-label="Measured qubits in listed order, for example 0,2">
+            <label class="lbl" for="queryOutcome">outcome bits</label>
+            <input id="queryOutcome" type="text" value="0" aria-label="Binary outcomes corresponding to measured qubit order">
+        </div>
+        <div class="row query-fields" data-query-kind="amplitude" hidden>
+            <label class="lbl" for="queryOutput">output |y⟩</label>
+            <input id="queryOutput" type="text" value="0" aria-label="Output computational basis number, decimal or 0b binary">
+        </div>
+        <div class="row query-fields" data-query-kind="pauli" hidden>
+            <label class="lbl" for="queryPauli">Pauli product</label>
+            <input id="queryPauli" type="text" value="Z0" aria-label="One Hermitian Pauli product such as Z0 or X0 Z1">
+        </div>
+        <p class="mode-note">One exact scalar result only. Qubit 0 is the least significant bit; outcome bits follow the listed measured-qubit order.
+        All parsing and counting run in an isolated Worker with a 30-second limit. Stop terminates it.
+        No full-state amplitudes, sampling, fingerprint or general speedup guarantee. The active route supports ring8 only.</p>
     </div>
     <textarea id="src" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
 
@@ -322,7 +365,8 @@ button.stop:disabled { opacity: 1; }
 <script src="oqsynth.js"></script>
 <script src="oqopt.js?v=rank-1"></script>
 <script src="oqrank.js?v=rank-1"></script>
-<script src="qasm.js?v=qasm3-2"></script>
+<script src="qasm.js?v=qasm3-exact-1"></script>
+<script src="oqqueryui.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -946,19 +990,25 @@ function setBusy(on) {
     el('runMode').disabled = on;
     el('rankQubits').disabled = on;
     el('rankPaulis').disabled = on;
+    if (typeof exactUI !== 'undefined' && exactUI) exactUI.sync();
     el('stopBtn').disabled = false;
 }
 
 function compressedMode() { return el('runMode').value === 'compressed'; }
+function exactMode() { return el('runMode').value === 'exact-query'; }
 
 function syncMode() {
-    var compressed = compressedMode();
+    var compressed = compressedMode(), exact = exactMode();
     el('rankControls').hidden = !compressed;
-    el('shots').disabled = compressed;
-    el('seed').disabled = compressed;
-    el('synth').disabled = compressed;
-    el('synthEps').disabled = compressed;
-    el('modeFoot').textContent = compressed
+    el('queryControls').hidden = !exact;
+    el('shots').disabled = compressed || exact;
+    el('seed').disabled = compressed || exact;
+    el('synth').disabled = compressed || exact;
+    el('synthEps').disabled = compressed || exact;
+    if (typeof exactUI !== 'undefined' && exactUI) exactUI.sync();
+    el('modeFoot').textContent = exact
+        ? 'Experimental exact scalar queries · bounded Worker · no full statevector · acceleration H'
+        : compressed
         ? 'Z[ζ₈] Clifford frame + 2^r active coefficients · exact Pauli expectations'
         : 'Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state';
     try { localStorage.setItem('oq-mode', el('runMode').value); } catch (e) {}
@@ -983,6 +1033,7 @@ function progress(done, total, dAmp, dMs, elapsed, s) {
 
 async function execute() {
     if (busy) return;
+    if (exactMode()) return exactUI.run();
     var src = el('src').value;
     var out = el('out');
 
@@ -2901,6 +2952,11 @@ async function runWorkloads() {
  * runs: 2^n is the number that decides whether this is instant or hopeless. */
 function refreshChip() {
     var c = el('chip');
+    if (exactMode()) {
+        c.className = 'chip';
+        c.textContent = exactUI.chip();
+        return; /* Parsing an exact query belongs in the Worker, not on input. */
+    }
     try {
         var prog = QASM.parse(el('src').value, { mode: el('runMode').value });
         if (prog.backend === 'compressed') {
@@ -2954,6 +3010,10 @@ function fmtTime(sec) {
 }
 
 /* ── wiring ───────────────────────────────────────────────────────────── */
+var exactUI = typeof OQQUERYUI !== 'undefined'
+    ? OQQUERYUI.create({el:el,setBusy:setBusy,isBusy:function(){return busy;}})
+    : {run:function(){el('out').textContent='Exact-query controls are not available: oqqueryui.js did not load.';},
+       sync:function(){},stop:function(){return false;},chip:function(){return 'Exact-query UI module missing';}};
 el('runBtn').addEventListener('click', execute);
 el('testBtn').addEventListener('click', runSelfTest);
 el('benchBtn').addEventListener('click', runBenchmark);
@@ -2965,6 +3025,7 @@ el('runMode').addEventListener('change', function () {
 });
 el('stopBtn').addEventListener('click', function () {
     stopRequested = true;
+    if (exactUI.stop()) return; /* terminate Worker; never show partial counts */
     el('progText').textContent = 'stopping…';
 });
 el('src').addEventListener('keydown', function (e) {
@@ -2981,7 +3042,8 @@ var saved = null;
 try { saved = localStorage.getItem('oq-src'); } catch (e) {}
 el('src').value = saved || PRESETS['shor 15'];
 try {
-    if (localStorage.getItem('oq-mode') === 'compressed') el('runMode').value = 'compressed';
+    var savedMode = localStorage.getItem('oq-mode');
+    if (savedMode === 'compressed' || savedMode === 'exact-query') el('runMode').value = savedMode;
 } catch (e) {}
 syncMode();
 refreshChip();
@@ -2991,8 +3053,10 @@ refreshChip();
  * anything — the estimate is right there in the chip, and Run is one click. */
 (function () {
     try {
-        if (compressedMode()) {
-            el('out').textContent = 'Compressed circuit loaded — press Run to compute observables.';
+        if (compressedMode() || exactMode()) {
+            el('out').textContent = exactMode()
+                ? 'Experimental exact-query mode ready — press Run. No automatic counting on page load.'
+                : 'Compressed circuit loaded — press Run to compute observables.';
             return;
         }
         var prog = QASM.parse(el('src').value);
