@@ -1,0 +1,20 @@
+{
+  "architecture": "aarch64",
+  "platform": "Linux",
+  "node": "v22.22.2",
+  "python": "3.11.2",
+  "implementation_test_commit": "2dff922a1d10a9dd07b2c717c34fcdc3fc49fba9",
+  "command": "python3 oq/test-active-matematyka.py",
+  "exit_code": 0,
+  "stdout_bytes": 1431,
+  "stdout_sha256": "5906ce19b6f5b7d68837666988ed746bdd37eaa0a063f0051ae5cae8a3a7d5e0",
+  "stderr_bytes": 0,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "files": {
+    "oq/oqactive.js": "a2234902c0ba5b2d89720e1a50a638f9bb04bb90d0925598039e94e6b0d6b444",
+    "oq/test-active.js": "21c0f03615e4db16820ad0400e8b74b6d279e4c6ad2ae29767145ffb3882cc6d",
+    "oq/test-active-stress.js": "b9dad5285024ec8d6846964980af3e937649f4ae1f8fd15a1023d0591d10e16a",
+    "oq/test-active-matematyka.py": "a918100283e45efd9e6578a0e67b2fe501c46de18ac229cbdd65877d8121fed2"
+  },
+  "status": "candidate-C; cross-architecture reproduction, not independent agent review"
+}

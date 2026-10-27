@@ -1,0 +1,11 @@
+Pinned Matematyka interface: all five normalized source hashes match
+C-OQ-ACTIVE-PHASE-N exact acceptance
+{"rotationBases":9344,"rotationEntries":69888,"circuits":40,"activeAmplitudes":84,"physicalExpectations":2312,"jointEvents":200,"cnfQueries":16,"phaseHistograms":12,"scalarQueries":2102,"guards":38,"wide":3,"parserPrograms":4,"allocationGuards":40,"browserSmoke":1}
+WITNESSES [{"name":"Clifford-graph-128","q":128,"r":1,"originalH":256,"activeH":2,"chi":2,"evaluated":"4","joint":{"ring":8,"numerator":["1","0","0","0"],"denominatorExp":2}},{"name":"Clifford-graph-4096","q":4096,"r":1,"originalH":8192,"activeH":2,"chi":2,"evaluated":"4","joint":{"ring":8,"numerator":["1","0","0","0"],"denominatorExp":2}},{"name":"HT-32-unfavorable","r":1,"chi":62,"refusedAssignments":"4611686018427387904"}]
+DIGEST 90c77fdb11065d32f98b582036b577b623f1c57205152cb23a24d31de2f08766
+PASS: exact finite composition; general acceleration remains H
+C-OQ-ACTIVE-PHASE-N adversarial high-rank acceptance
+{"highRankCircuits":4,"expectations":1280,"events":48,"amplitudes":48,"queries":1280,"counterChecks":8,"guards":10}
+WITNESSES [{"n":3,"input":"0","rank":3,"maxChi":14},{"n":3,"input":"7","rank":3,"maxChi":14},{"n":4,"input":"0","rank":4,"maxChi":19},{"n":4,"input":"15","rank":4,"maxChi":19}]
+DIGEST 828b8afd1c8d43fbb6e87d64cd52dcc7ebd81c6392947eb143320af609e4a6a6
+PASS: signed observables, nonorthogonal bases and explicit unfavorable case
