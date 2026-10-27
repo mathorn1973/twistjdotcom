@@ -15,11 +15,11 @@ function state(n,program,input){
  for(const g of program.gates)O.apply(s,g);
  return s;
 }
-function amps(s){return Array.from({length:s.size},(_,y)=>{const a=s.amp(y);return [a.c0,a.c1,a.c2,a.c3].map(BigInt);});}
+function amps(s){return Array.from({length:s.size},(_,y)=>{const a=s.amp(y);return (Array.isArray(a)?a:[a.c0,a.c1,a.c2,a.c3]).map(BigInt);});}
 function checkBasis(s,expected,label,den=0){
  for(let y=0;y<s.size;y++){
-  const a=amps(s)[y],v=expected[y]||[0n,0n,0n,0n];
-  for(let k=0;k<4;k++){
+  const a=amps(s)[y],v=expected[y]||Array(a.length).fill(0n);
+  for(let k=0;k<a.length;k++){
    assert.equal(a[k]*(1n<<BigInt(den)),v[k]*(1n<<BigInt(s.denom)),`${label} at ${y} coefficient ${k}`);
    amplitudeComparisons++;
   }
@@ -71,7 +71,9 @@ for(const opt of [false,true]){
  const reference=parse(2,'rzx(pi/4) q[0],q[1]; x q[0]; rzx(-pi/4) q[0],q[1];',opt);
  for(let input=0;input<4;input++){
   const s=state(2,actual,input),t=state(2,reference,input);
-  assert.equal(s.ring,t.ring);checkBasis(s,Object.fromEntries(amps(t).map((v,i)=>[i,v])),`ECR:${opt}:${input}`,t.denom);
+  assert.equal(actual.ring,8);assert.equal(reference.ring,16);
+  const ref8=amps(t).map((v)=>{for(const j of [1,3,5,7])assert.equal(v[j],0n,'ECR lies in ring8 subfield');return [v[0],v[2],v[4],v[6]];});
+  checkBasis(s,Object.fromEntries(ref8.map((v,i)=>[i,v])),`ECR:${opt}:${input}`,t.denom);
  }
 }
 // RZX(pi/4) is H(target) CX Rz(pi/4)(target) CX H(target).
