@@ -61,6 +61,7 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 - [Home](https://twistj.com/): the algebraic axiom, declared architecture, typed partial decoder, and selected ledger claims
 - [The kernel](https://twistj.com/core/): starting identities, the matrix, the step rule
 - [Manifest](https://twistj.com/manifest/): the public commitment of the method, twelve rules, English (Czech at /manifest/cs/)
+- [Logos](https://twistj.com/logos/): a working reading of the Canon, what one number and one step give for space, time, energy, matter and light and what is still missing; NON-CANONICAL, every sentence labelled, plain markdown at /logos/logos.md
 - [Public Canon](https://twistj.com/canon/): the active public ledger
 - [Code](https://github.com/mathorn1973/twist-j): verify it yourself
 

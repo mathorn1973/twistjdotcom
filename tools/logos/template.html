@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos · {{TITLE}} · TWIST-J</title>
+    <meta name="description" content="{{TITLE}}. A working document of the TWIST-J program: what one number J = 1 + j² and one step give for space, time, energy, matter and light, what is dictionary, and what is still missing. NON-CANONICAL.">
+    <meta name="author" content="A. M. Thorn">
+    <meta property="og:title" content="Logos · {{TITLE}}">
+    <meta property="og:description" content="A working document of the TWIST-J program. Every sentence carries its status. NON-CANONICAL.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://twistj.com/logos/">
+    <meta property="og:locale" content="en_US">
+    <link rel="canonical" href="https://twistj.com/logos/">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true}],throwOnError:false});"></script>
+    <style>
+        :root {
+            --bg: #f4f1eb; --text: #2a2520; --text-bright: #1a1714;
+            --accent: #8b4513; --muted: #7a7570; --dim: #999;
+            --rule: #d4cfc7; --link: #6b6560; --link-hover: #8b4513; --panel: #faf8f4;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1c1915; --text: #b8b3a8; --text-bright: #d4cfc6;
+                --accent: #b08050; --muted: #7a7268; --dim: #605850;
+                --rule: #38332c; --link: #9a9488; --link-hover: #b08050; --panel: #221e19;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.22rem; font-weight: 400; line-height: 1.62;
+        }
+        .page { max-width: 42em; margin: 0 auto; padding: 4rem 1.4rem 3rem; }
+        .eyebrow { font-size: .82rem; letter-spacing: .34em; text-transform: uppercase; color: var(--accent); text-align: center; }
+        h1 { font-weight: 500; font-size: 2.3rem; line-height: 1.15; text-align: center; color: var(--text-bright); margin: .5rem 0 .7rem; }
+        .byline { text-align: center; color: var(--muted); font-size: 1.02rem; font-style: italic; }
+        .version { text-align: center; color: var(--dim); font-size: .92rem; margin-top: .2rem; }
+        .note { max-width: 34em; margin: .9rem auto 2.4rem; color: var(--dim); font-size: .9rem; line-height: 1.6; text-align: center; }
+        h2 {
+            font-weight: 500; font-size: .92rem; letter-spacing: .22em; text-transform: uppercase;
+            color: var(--accent); margin: 2.2rem 0 .7rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+        }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: .3rem; }
+        table { border-collapse: collapse; width: 100%; margin: 1rem 0 1.4rem; font-size: .98rem; line-height: 1.4; }
+        th, td { border-top: 1px solid var(--rule); padding: .4rem .5rem; text-align: left; vertical-align: top; }
+        th { font-weight: 600; color: var(--text-bright); border-top: none; border-bottom: 1px solid var(--text); }
+        tr:last-child td { border-bottom: 1px solid var(--rule); }
+        pre { background: var(--panel); border: 1px solid var(--rule); padding: .7rem .9rem; overflow: auto; font-size: .82rem; line-height: 1.45; margin: 0 0 1rem; }
+        code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+        .math { text-align: center; margin: .8rem 0 1.2rem; overflow-x: auto; font-size: 1.05rem; }
+        figure { margin: 1.4rem 0 1.8rem; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem .6rem .4rem; background: var(--panel); }
+        figure svg { width: 100%; height: auto; display: block; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+        figcaption { color: var(--muted); font-size: .92rem; margin-top: .4rem; text-align: center; font-style: italic; }
+        .st { color: var(--muted); font-size: .94em; }
+        a { color: var(--link); text-decoration: none; border-bottom: 1px solid var(--rule); }
+        a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
+        .foot { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); text-align: center; color: var(--muted); font-size: 1rem; }
+        @media (max-width: 600px) { body { font-size: 1.1rem; } h1 { font-size: 1.8rem; } .page { padding: 2.4rem 1rem 2.5rem; } }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{{TITLE}}",
+      "author": [ { "@type": "Person", "name": "A. M. Thorn" } ],
+      "url": "https://twistj.com/logos/",
+      "inLanguage": "en",
+      "dateModified": "{{DATE}}",
+      "description": "A working document of the TWIST-J program, NON-CANONICAL: what one number and one step give for space, time, energy, matter and light, and what is still missing."
+    }
+    </script>
+</head>
+<body>
+    <div class="page">
+        <div class="eyebrow">TWIST-J &middot; Logos</div>
+        <h1>{{TITLE}}</h1>
+        <div class="byline">A. M. Thorn</div>
+        <div class="version">Working document &middot; NON-CANONICAL &middot; synced {{DATE}}</div>
+        <div class="note">{{NOTE}}</div>
+
+{{BODY}}
+
+        <div class="foot">
+            The Canon is the ledger. This page is a working reading of it and carries no authority.<br>
+            <a href="/canon/">Public Canon</a> &middot; <a href="/logos/logos.md">plain markdown</a> &middot; <a href="/">twistj.com</a>
+        </div>
+    </div>
+</body>
+</html>
