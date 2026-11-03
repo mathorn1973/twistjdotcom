@@ -24,7 +24,8 @@ lives in the scheduled task, not here.
            python3 tools/logos/pipeline.py plan WORK/source.md WORK/pending.json
    The plan lists the text blocks without English and the state of every figure.
 4  Figures. For each figure the plan lists: take its node id from WORK/export.html, read the node's
-   code, save it to WORK/figN.jsx. If the plan says "known" and sha256 of that file equals the
+   code, save it to WORK/figN.jsx exactly as returned followed by one newline (the recorded jsx_sha
+   values are taken that way). If the plan says "known" and sha256 of that file equals the
    recorded jsx_sha, nothing to do. Otherwise write the English SVG to logos/<file>: convert the JSX
    to a static SVG exactly as the existing logos/fig-*.svg files are built (colours ink #1c1c1c,
    quiet #6a6a6a, edge #454545, grid #c4c4c4, accent #b4532a; camelCase attributes to SVG names;
