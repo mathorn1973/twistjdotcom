@@ -6,7 +6,7 @@ Twist-J builds physics out of one number J = 1 + j² and one step. It reads spac
 
 ## How to read this
 
-The document rests on Public Canon v107 (tag canon-v107). The registry has 598 claims: 454 T, 59 D, 39 C, 2 H, 25 O and 19 F. Live H and O rows number 27. The results on the rhythm of contact are outside the Canon: in a NON-CANONICAL note on public main (PR #1855, merged 2 November 2026, main 0c33e2b2) and in the working project.
+The document rests on Public Canon v109 (tag canon-v109). The registry has 609 claims: 465 T, 59 D, 40 C, 2 H, 24 O and 19 F. Live H and O rows number 26. Since v108 the rhythm of contact has four general theorems in the Canon, and the common contact instrument for two inputs is a theorem since v108. V109 added the renewal of the working core for any number of inputs fixed in advance. Further results on contact are outside the Canon: in NON-CANONICAL notes on public main, in the unmerged PRs #1857, #1862, #1865, #1867 and #1869, and in the working project.
 
 Every sentence carries, in square brackets, how far to trust it:
 
@@ -26,10 +26,234 @@ Which rule each thing comes from. The layers share one arithmetic, but their dyn
 | --- | --- | --- |
 | Arithmetic of J | the integer step, the fifth-of-a-turn phase, golden scaling, the discrete ladder of boosts | that this boost changes measured space and time |
 | The original rule U | an exactly analysed run and the limits of the steady dynamics | a lasting interaction derived from the run |
-| Contact C and the chain F = C₂₃C₁₂ | conservation of accounts, gate switching, the classification of rhythms, limits of reading | a derivation of contact from U and a finished instrument |
+| Contact C and the chain F = C₂₃C₁₂ | conservation of accounts, gate switching, the classification of rhythms, limits of reading | a derivation of contact from U and a physical instrument |
 | The Dirac step and small models | the mass shell, the ladder of energy and momentum, the walker's speed | that the same relations come out of the integer contact world |
 
 The falsifier of the document: any sentence in it stronger than the row it rests on.
+
+## The two guards the five
+
+The world measured from inside, under a stroboscope. The author's reading of the contact law, version 3.
+
+I think this is the important thing, more important than any single number. That three motions are enough, rotation, shrinking and stretching, one touch between neighbours and one coin, and out of it start to crawl time, energy, light, matter, space and finally memory too. Not as a metaphor. As equations that can be recomputed on paper. One example that is enough for paper is in the middle. How much of it is proved and how much is still only reading, I write in brackets beside each piece.
+
+### Stroboscope
+
+Between two ticks nothing happens. The world does not move smoothly, the world switches. The counter says which tick it is, and that is all we have about time at the start. It is a stroboscope: flash, dark, flash. A wheel that turns by two fifths between flashes you see jumping over five points. After the fifth flash it is back where it started.
+
+The stroboscope sees points, not motion. And it sees them only when it flashes. That will matter for chance.
+
+### The arrow and the golden ratio inside out
+
+Values in the model are arrows in the plane. Multiplying by the number j turns an arrow by a fifth of the circle; five turns are the whole circle. The number J is something else: take an arrow, turn a copy of it by two fifths and add the two. Out comes a shorter arrow, 1/φ of the original length, turned by a fifth. φ is the golden ratio, so J is the golden ratio inside out, the ratio of a pentagon's side to its diagonal. [T]
+
+$$
+J = 1 + j^2 = \frac{j}{\varphi},\qquad j^5 = 1,\qquad J^5 = \varphi^{-5}.
+$$
+
+Multiplying by J turns and shrinks at the same time. After five steps the arrow points where it did at the start, only shorter. And now the essential part. You can walk the five points on the circle neighbour by neighbour, as a pentagon, or skipping one, as a pentagram. The same five points, two orders. In one reading J shortens the arrow, in the other it lengthens it, by a factor of φ. The model does not say which reading is ours. It turns in both; shrinking or stretching is a choice nobody has made for us. [T] This undecidability is the smallest possible bit. [reading] Hence the proposal to read gravity in the change of scale and electromagnetism in the turning. [D]
+
+### Touch
+
+Two neighbouring slots, each holding one arrow, x and y. They touch only when they are in step: the difference of their arrows must be divisible by two. That is decided by the state of both slots, not of one. If yes, the sum of the two arrows stays and the difference turns by two fifths. If not, both stand still. [T]
+
+$$
+x' = \frac{J\,x + (2-J)\,y}{2},\qquad y' = \frac{(2-J)\,x + J\,y}{2},\qquad \left(x \equiv y \pmod 2\right) .
+$$
+
+The two in the denominator is the coin. The numerator can be divided by two exactly when the difference is even, because Jx + (2−J)y = J(x−y) + 2y and J has an inverse in the integers of the model. The gate and the rule are one equation. The two guards the five: parity decides whether the rotation happens at all. The dictionary of the Canon divides the work the same way: the five writes, the two reads. [D]
+
+An example for paper. Put (2, 0) on two slots. After n undisturbed touches there is exactly
+
+$$
+(x_n,\;y_n) = \left(1 + j^{2n},\; 1 - j^{2n}\right).
+$$
+
+After the first touch (J, 2 − J). After the fifth (2, 0) again, the neighbour is empty. [T] Almost everything that follows can be seen in this single example.
+
+### Diagonal and twist
+
+The same in other words. Instead of x and y follow their sum s and their difference d. Then the touch is transparent. [T]
+
+$$
+s' = s,\qquad d' = j^2\, d .
+$$
+
+The sum holds. The difference turns. Whoever knows the picture of “how the components of a tensor transform” recognises it: the matrix of the touch has the trace on the diagonal and the twist off it, and the basis of sum and difference is exactly the one turned by 45°.
+
+$$
+C = \frac12\begin{pmatrix} J & 2-J\\ 2-J & J\end{pmatrix},\qquad \operatorname{tr} C = J,\qquad \det C = j^2 .
+$$
+
+J is the trace of the touch, j² its determinant. But careful with that trace. Five touches are the identity, so the trace of five touches is 2, whereas the fifth power of the trace of one touch is φ⁻⁵. The trace does not multiply. [T]
+
+$$
+C^5 = I,\qquad \operatorname{tr}\left(C^5\right) = 2,\qquad \left(\operatorname{tr} C\right)^5 = \varphi^{-5}.
+$$
+
+So the touch by itself never shrinks the pair as a whole. J sits in it only as the sum of two eigenvalues, 1 and j², and both have length one.
+
+### Energy
+
+The touch lengthens and shortens the individual arrows; from (2, 0) it makes (J, 2 − J). But it leaves the lengths of the sum and of the difference. The sum of the squared lengths of the two arrows therefore does not move, and it does not move separately for the sum and separately for the difference. [T]
+
+$$
+|x'|^2+|y'|^2 = |x|^2+|y|^2 = \frac{|s|^2+|d|^2}{2}.
+$$
+
+That is the budget. Half the square of the sum belongs to the motion of the whole, half the square of the difference to the inner turning. On the example (2, 0) → (J, 2 − J) the budget can be recomputed in two ways and both are exact. A reader of squared lengths in a single complex plane shows the shares
+
+$$
+\left|\frac J2\right|^2 = \frac{3-\sqrt5}{8},\qquad \left|\frac{2-J}{2}\right|^2 = \frac{5+\sqrt5}{8}.
+$$
+
+The integer account adds the squares over both conjugate planes, that is over both readings, the pentagon and the pentagram. It splits the same deposit of eight units into 3 and 5:
+
+$$
+\operatorname{Tr}|J|^2 = \varphi^{-2} + \varphi^{2} = 3,\qquad \operatorname{Tr}|2-J|^2 = (2+\varphi) + (3-\varphi) = 5,\qquad \operatorname{Tr}|2|^2 = 4 + 4 = 8 .
+$$
+
+Two accounts, one deposit. [T] The square root of five cancels in the sum of the two readings. The difference between the accounts is that bit from above: the first already knows which plane it stands in, the second need not know it, and that is why it comes out in integers. [reading] Which account measures energy and which predicts the frequency of hits cannot be chosen by which one we like better. The instrument and its physical reading must decide that. [O]
+
+### Time
+
+The counter only counts. A clock needs something that returns. The smallest clock is a pair in touch: its difference turns by two fifths every tick and is back after five ticks. [T]
+
+$$
+d_n = j^{2n} d_0,\qquad d_5 = d_0 .
+$$
+
+For the pair alone the tick and the position of the hand coincide. In a larger machine they no longer do. Take three slots (4, 0, 2) and for one tick the left touch and after it the right one. The state in which both differences are even returns every five ticks, the whole state only after 25. Five equal marks, five different phases. [T] Whoever sees only the mark has a clock with period five and knows nothing of the phase. The Canon also has a pair of states with the same accounts, the same sum and the same whole history of marks, and yet one returns after five ticks and the other after 25. [T] That is why the counter and the clock stay two things and time is not one number. It is a counter plus a hand.
+
+### Chance
+
+The stroboscope a second time. The wheel turns exactly, two fifths per tick. Flash every fifth tick and you see a single position. Flash every second one and you see all five positions equally often. Flash irregularly, at ticks 5k² + 1, and you always see the same position. [T] The wheel did not change once. What changed is when you read it off.
+
+$$
+5k^2 + 1 \equiv 1 \pmod 5 .
+$$
+
+So frequency is not a property of the wheel. It is a property of the pair wheel and readout. Whoever does not know the phase must also know when his instrument takes its readings. A proposal for what chance is: a deterministic clock plus a schedule of readouts that does not keep step with it. [H] We pay for chance with time in this sense: whoever pays the ticks and aligns the readout with the wheel sees no chance. Here the hypothesis can be tested. The falsifier: an instrument that knows the phase and reads in step with the wheel, and still sees a spread. In the model that cannot happen. In nature an experiment will decide, once it is clear what the phase is there.
+
+Bell's inequalities bound it. The hidden phase is a hidden variable, and the schedule of readouts, that is when and how the instrument reads, is its setting. When the outcome at one slot depends only on the phase and on the schedule there, and the schedule is chosen independently of the phase, experiments with Bell's inequalities refute such chance. The hypothesis must therefore be nonlocal, or it must tie the schedule to the phase. Which way to go is open. [O]
+
+And the model offers the first numbers right away: they are the two accounts from the example (2, 0). If the square of the length is read as a frequency, which is the Born rule and in the program a candidate for the passage between relation and event, the first account gives the shares (3−√5)/8 and (5+√5)/8, the second 3/8 and 5/8. [T for the numbers] The Canon so far has the Born rule only as a chosen dictionary in one chain of measurement, not derived. [D] Which of the accounts a real instrument writes, and what the readout leaves behind, is not derived. [O]
+
+### Light
+
+Every touch is a pure rotation. It never changes the length of the pair as a whole; it turns the difference by two fifths and nothing more. Hence the proposal to read electromagnetism in the turning of phase. [D] Shrinking does not act in the touch at all. J is only the trace there, and the trace does not multiply; five touches are the identity. The step “multiply by J”, which shortens the arrow, is another operation. Whether shrinking emerges from many touches and gates by coarse-graining, or is a separate rule, is open. [O] Here is the hole between light and gravity.
+
+### Matter
+
+A body is a process that holds together even when it moves as a whole. [reading] The smallest such process is a pair in touch. The sum stands, that is the centre of mass. The length of the difference stands, that is the bond. The phase of the difference runs, that is the internal clock. The energy of the bond is locked in the turning on the spot, that is rest energy: matter is energy that circles and goes nowhere.
+
+A lone pair does not let go: once an even difference, always an even difference. [T] A third slot can break it. On the triple (4, 0, 2) both differences are even. The left touch goes through and the right one right after it changes the parity of the middle slot, so the left difference stops being even. [T] It is the same triple as for the clock: both differences are even only every fifth tick, in between at least one bond is broken. So a bond is not a thing. It is a state of the neighbourhood.
+
+And the price. A pair holds two slots, but a third slot does not always break it. It is decided at the moment of the touch, not before it. After the left touch the middle slot has a new arrow y'. The right touch goes through when the third slot is in step with it, that is congruent modulo 2. It leaves the bond only when it is congruent one floor deeper too, modulo 4; then it merely exchanges part of the budget with the pair. When it is congruent only modulo 2, it breaks the bond. [T]
+
+$$
+x' - y'' \equiv J\cdot\frac{z - y'}{2} \pmod 2 .
+$$
+
+On (4, 0, 2) it breaks. On (4, 0, 4) it breaks too, even though the third slot was congruent with the middle one modulo 4 before the touch; after the left touch it no longer is. On (8, 0, 0) it goes through and the bond holds. A slot with a bound pair may be shared only by one who is in step with it one floor deeper as well, and at the moment of touching. For matter we perhaps pay with space, more precisely with that extra floor. [reading]
+
+What can be measured: in another model, where the bound pair can also propagate, model W in the Canon, the mean velocity of its centre after a weak kick gives the response mass, in units of the model. [T in the given model]
+
+$$
+\frac{\bar v}{\Delta P} \;\longrightarrow\; \frac{\sqrt{16\varphi+7}}{20},\qquad m = \frac{20}{\sqrt{16\varphi+7}} .
+$$
+
+It becomes a number about nature once the decoder determines which real pair it is, and what the unit of length and time is. The electron mass gives one anchor. [O]
+
+### Space
+
+Three slots, two touches, left and right. Now the order matters, but only when the gates let through. Both orders pass both touches exactly when all three arrows are equal modulo 4. The proof is short: the first touch of each order wants agreement modulo 2, the second wants J times half the difference to be even, and J is a unit modulo 2, so the difference must be divisible by four. [T, proof in the text; no row of its own in the registry] The order can even decide the gate itself: on the triple (0, 2, 2 + J) the right touch goes through only if the left one ran before it. [T] On the triple (0, 1, 0) both gates stay closed and the difference of the orders is zero. On the triple (4, 0, 0) not:
+
+Left, then right:
+
+$$
+(4,0,0) \to (2J,\; 4-2J,\; 0) \to \left(2J,\; 2J - J^2,\; (1-j^2)^2\right)
+$$
+
+Right, then left:
+
+$$
+(4,0,0) \to (4,0,0) \to (2J,\; 4-2J,\; 0)
+$$
+
+The third slot ends once with (1 − j²)², the other time with zero. The sum is 4 in both cases. The third slot can tell in which order the touches happened. A reader of the sum cannot. [T] The measuring device is part of the picture of the world here: what can be told apart depends on which slot reads.
+
+With open gates the difference of the two orders is linear and comes out exactly, with a plus sign; v is the triple of arrows: [T]
+
+$$
+[C_{12},C_{23}]\,v = +\left(\frac{2-J}{2}\right)^2 (1,1,1)\times v .
+$$
+
+It is a vector product with the axis (1, 1, 1). In ordinary space such a product generates rotation about that axis, here about the direction in which the total sum is held. The size is the twist squared, the off-diagonal term of the touch. With a closed gate the formula does not hold; that is the example (0, 1, 0): the left side zero, the right side not.
+
+Space here is not a box that things are put into. Space is what arises when it matters what happened earlier, and when a third is present who writes it down. A shift is the difference of two orders. [D] In the core of the Canon the spatial reading is tied to another pair of operations, a and c. [D] This three-point example is a laboratory, not the Canon.
+
+### What a touch does not change
+
+The account of a slot, the integer one from Energy, can be written directly from the coordinates of the arrow in the basis 1, j, j², j³:
+
+$$
+Q(x) = \tfrac12 \operatorname{Tr}_{K/\mathbb Q}\left(x\bar x\right) = \frac{5\sum a_i^2 - \left(\sum a_i\right)^2}{2}.
+$$
+
+The half matters: the trace runs over all four embeddings. Besides its arrow every slot also has a mark: the residue r = x mod λ, where λ = 1 − j is the prime above five. It is one number from 0 to 4, the sum of the coordinates modulo five. And the touch never changes it. The rule gives x' − x = (1 − j²)(y − x)/2 and 1 − j² = λ(1 + j), so x' ≡ x mod λ, and likewise y' ≡ y. [T]
+
+$$
+x' - x = \lambda\,(1+j)\,\frac{y-x}{2},\qquad x' \equiv x \pmod{\lambda}.
+$$
+
+Because 1 + j is a unit, the change of an arrow can be any element of λZ[j], given a suitable neighbour. So the mark captures exactly everything that must stay the same on one arrow under every possible touch, and nothing more. In this exact arithmetic sense it is a local charge, and everything that flows is neutral. [T] Whether it has anything to do with electric charge is open. [O]
+
+The mark governs the account too. From the coordinate formula follows Q(x) ≡ 2r² mod 5, and every mark has its own smallest possible account:
+
+| mark r | Q mod 5 | smallest account | where |
+| --- | --- | --- | --- |
+| 0 | 0 | 0 | x = 0 (otherwise at least 5, e.g. x = λ) |
+| ±1 | 2 | 2 | x = ±1 |
+| ±2 | 3 | 3 | x = ±(1 + j), also ±J |
+
+So only a slot with mark zero has an account that is a multiple of five. And from the account of a single slot one can read which quadratic class its nonzero mark belongs to: residue 2 means χ₅(r) = +1, residue 3 means χ₅(r) = −1. The account does not tell the mark r from −r. That is the Legendre bit, this time read from one slot. [T]
+
+The five is exact as the size of a transfer too. Take any integer k and the pair (k + 1, k − 1). The difference is two, the gate opens every time and a single touch makes
+
+$$
+(k+1,\;k-1)\longmapsto\left(k+j^2,\;k-j^2\right),\qquad \left(\Delta Q_1,\;\Delta Q_2\right)=(-5k,\;+5k).
+$$
+
+Every multiple of five can pass in a single touch. The pair (2, 0) makes the smallest nonzero transfer: from the accounts (8, 0) it makes (3, 5), and the first slot is left with exactly the minimum for its mark 2. [T]
+
+Six such contact slots have six constant marks. The original six-tuple of the kernel follows another rule and changes at the tick; the contact law is a narrower thing. [T, scope of the contact law]
+
+Briefly, for the picture: an empty slot can carry five units of account after a touch and still have charge zero. Its neighbour handed it part of its account. Both slots kept their marks. The two guards whether the touch happens. The five sets by how much the account can move. And precisely in how much went where, a record can remain. [T in the contact model]
+
+### Record
+
+Go back to (4, 0, 0). Nobody needs to count flashes to tell later in which order the touches happened. The order is not in the counter. It is stored in a slot. Memory is a commutator that was left lying. A reader of the sum does not see it, because the sum is exactly what the touch protects. Only someone who looks at the slot where nothing should have been sees it. And that slot keeps its mark zero: a new record arises without its mark changing. That is why the account of a record is always a multiple of five.
+
+And a record is not free. The integer account gives the deposit (4, 0, 0) thirty-two units. After the order left, right they are split into 12, 5 and 15. After the order right, left into 12, 20 and 0. [T]
+
+$$
+32 = 12 + 5 + 15,\qquad 32 = 12 + 20 + 0 .
+$$
+
+The record of the order on the third slot weighs 15 out of 32 and took them from the middle slot, which dropped from 20 to 5. The sum holds. But the fact that someone remembers cost moving almost half the deposit to the one who remembers. For memory we pay with energy. [reading] The Canon has the general price computed: in the contact alphabet every retained output costs at least four slots and 12 units of account. [T]
+
+Here mathematics becomes physics. Everything before was accounts that we choose: which plane, which square, when to flash. This the machine wrote by itself. Zero, or nonzero on the third slot, without knowing the phase and without a schedule of readouts. It is the first datum in the whole text that an instrument can leave without our telling it how to read. So what to look at in an experiment: not the sum, which is conserved and blind. At the third one, who should have stayed empty and did not. [reading] Whether one can derive from such a record also which outcome is written and how often, that is whether this gets around at least part of the port, is open. [O]
+
+### What it costs
+
+Three motions, one touch, one coin. Time is the hand of the pair plus the counter. Energy is the sum of squares, in two accounts. Light is the rotation of the difference. Matter is a pair that does not let go until someone breaks it. Space is the difference of two orders, seen by the third slot. The mark of a slot does not change, the account moves in fives. Memory is the third slot where that difference was left lying. For chance we pay with time, more precisely with the schedule of readouts. For matter perhaps with space, more precisely with the floor of agreement with the neighbours. For memory with energy. Whether that is the price of a bit, I do not know.
+
+An instrument that reads, writes and renews itself on one carrier the Canon has for two inputs since v108, and since v109 for any number of inputs fixed in advance. [T] The working core returns to readiness after every input, the records remain: every input leaves two permanent archives behind. What the machine does not yet give is the port out: which account the instrument writes, which outcome and how often, and what the model unit of length and time is. [O] And the schedule by which it reads we still supply from outside. Until that is there, all the numbers above are about the machine. They will start to speak about nature only with the port.
+
+Marks in this section: [T] proof in the given model, [D] physical reading, that is a dictionary with no claim to uniqueness, [H] hypothesis with a falsifier, [O] open, [reading] interpretation with no claim to proof. T and D rest on a registry row or on a proof right in the text; H and reading are not in the registry.
+
+References, Public Canon v109, canon/REGISTRY.tsv: the contact law and the parity gate RELATIVE-CONTACT-INTEGRAL-LAW; the rhythm RELATIVE-CONTACT-RHYTHM-CLASSIFICATION; the hidden fivefold phase and the pair of states with periods five and 25 RELATIVE-CONTACT-RHYTHM-FIVEFOLD-PHASE; the response mass in model W CONTACT-W-BOUND-PAIR-RESPONSE; the price of a record RELATIVE-CONTACT-RETAINED-BANK-CAPACITY; the instrument for two inputs RELATIVE-CONTACT-COMMON-APPARATUS-OPEN and for k inputs RELATIVE-CONTACT-FINITE-WORKBANK-REUSE; all T. The accounts of the triple (4, 0, 0) are computed in the proof of the contact law, notes/C-J-INTEGRAL-RELATIVE-CONTACT-N/PROOF.md, section 7. The half-trace canon/CANON.md lines 13544 to 13562, the scope of the contact law lines 13616 to 13635; the Legendre bit from one slot is a proof in the text. The dictionary AXIOM-PROJECTION-DICTIONARY, the spatial reading on the pair a, c TIME-CUT-READING and the Born rule QDD-SELECTED-BORN are D. The three-point commutator formula and the modulo 4 criterion as a general theorem have no row of their own.
 
 ## One number J
 
@@ -148,17 +372,19 @@ The residue the contact does not see. Put j = 1 and count modulo 5: z gives the 
 
 A record costs readiness. The task: split a six from one slot into four threes, 6 → 3, 3, 3, 3. The lengths fit, because 6² = 4 · 3². The residues do not: the six has residue 1, the threes residue 3. The contact does not manufacture residues, so an auxiliary bank of four slots has to bring them. The cheapest such bank has account 27. With a sign, 6 → −3, 3, 3, 3, account 12 suffices. [T, RELATIVE-CONTACT-FOUR-SLOT-MINIMUM]
 
-For N separated known inputs and N retained results the bank needs an account of at least 12N. As long as the result lasts, the bank does not return to its original state. Reversing the whole procedure returns the bank, but the result disappears. [T, RELATIVE-CONTACT-RETAINED-BANK-CAPACITY] So the conserved account is not consumed. What is consumed is readiness, an ordered supply of residues. Whoever wants a record pays in readiness. [reading]
+For N separated known inputs and N retained results the bank needs at least 4N slots and an account of at least 12N. As long as the result lasts, the bank does not return to its original state. Reversing the whole procedure returns the bank, but the result disappears. [T, RELATIVE-CONTACT-RETAINED-BANK-CAPACITY] So the conserved account is not consumed. What is consumed is readiness, an ordered supply of residues. Whoever wants a record pays in readiness. [reading]
 
 Energy as an angle. For a given contact step W there is a bounded generator H with exp(−iH) = W and its spectrum has two gaps. [T, CONTACT-W-SPECTRAL-READING] An eigenstate only turns in one step, and the angle of that turn is read as energy. [reading] But W is given from outside, not derived from U.
 
 Where to get contact in the original U? Nowhere in the steady run. The only coupling between coordinates in U is the shear in the letter c. From every state U reaches the steady sheet within 9 ticks at most, and c fires at most seven times, then never again. [candidate-T, census of the transient phase] In U, interaction is preparation, not a lasting process. [reading] The total energy of the plenum, zero say, does not figure in the registry as a claim.
 
+Carry in the original U. V109 added three theorems on the first tick of the original U and on the carry. The actual first receiver gives exactly s = q + r + 2, and among affine maps it is the only possibility; no nonempty common clock word of bits makes that port double, s ↦ 2s. [T, U-FIRST-TICK-AFFINE-TRACE-TRANSFER] The carries of two mutually inverse two-digit multiplications pair exactly, and the signs of the quadratic character on them are set by χ(2) = −1. [T, J-MARKED-CARRY-MIRROR] A reader of the carry modulo λ² tells J from J⁻¹ without any further datum, a reader modulo λ does not. [T, J-FIXED-INPUT-CARRY-PRECISION] A finite circuit on 62 cells carries this out for all 500 admissible preparations. [C, U-CARRY-MIRROR-FINITE-CIRCUIT] The contact carrier and the native carrier keep separate laws and interfaces.
+
 ## The rhythm of contact
 
-Three slots in a row and two contacts give the first picture of interaction in time. Rhythm, event and measurement are all governed by one thing: how many times the difference of neighbours can be divided by two. [candidate-T, PR #1855 and the working project]
+Three slots in a row and two contacts give the first picture of interaction in time. Rhythm, event and measurement are all governed by one thing: how many times the difference of neighbours can be divided by two. [T for the rhythm, RELATIVE-CONTACT-RHYTHM-CLASSIFICATION; for event and measurement candidate-T]
 
-The model. Take three slots with numbers a, b, c. One tick is F: first the contact of a with b, then the contact of b with c. The contact is the law from the section Energy, the order is given from outside. [model] The sum S = a + b + c is conserved, so is the account E = q(a) + q(b) + q(c) and the difference account M = q(a − b) + q(b − c) + q(a − c). On every account level there are only finitely many states and the step can be undone. Every orbit is therefore a closed circle. [candidate-T]
+The model. Take three slots with numbers a, b, c. One tick is F: first the contact of a with b, then the contact of b with c. The contact is the law from the section Energy, the order is given from outside. [model] The sum S = a + b + c is conserved, so is the account E = q(a) + q(b) + q(c) and the difference account M = q(a − b) + q(b − c) + q(a − c). On every account level there are only finitely many states and the step can be undone. Every orbit is therefore a closed circle. [T, RELATIVE-CONTACT-RHYTHM-CLASSIFICATION]
 
 Depth. The number z₀ + z₁j + z₂j² + z₃j³ is even when all four coefficients are even. The gate of a contact asks whether the difference of neighbours is even. The depth d of a state says how many times both neighbour differences can be divided by two at once. Along an orbit the depth changes and its largest value decides.
 
@@ -168,7 +394,7 @@ $$
 F^{\,1+4r(y)}(2y) = 2F(y), \qquad P' = P + 4R, \qquad R' = 4R
 $$
 
-Here P is the period of the orbit and R the number of refusals per period. [candidate-T, two independent proofs; C on 88 075 triples and on all pairs of neighbour differences with M ≤ 64] What looks like "nothing happened" on the coarse scale is a whole circuit one floor down. [reading]
+Here P is the period of the orbit and R the number of refusals per period. [T, RELATIVE-CONTACT-RHYTHM-CLASSIFICATION; C on 88 075 triples and on all pairs of neighbour differences with M ≤ 64] What looks like "nothing happened" on the coarse scale is a whole circuit one floor down. [reading]
 
 Three classes. Every orbit, except the complete agreement of all three slots, belongs to one of three classes. The largest depth d decides, and the shape that remains after d divisions by two. With the shorthand
 
@@ -184,7 +410,7 @@ we get:
 | II | both contacts refuse | 2A(d) − 1 | 1 | 9 | 41 | 169 | 4 · 4ᵈ |
 | III | one pair turns, the other contact refuses | 5A(d) | 5 | 25 | 105 | 425 | 12 · 4ᵈ |
 
-[candidate-T, note PR #1855; the author accepted an independent review with one correction of wording] Periods 13, 17 and 37 do not exist.
+[T, RELATIVE-CONTACT-RHYTHM-CLASSIFICATION; smallest M: T, RELATIVE-CONTACT-RHYTHM-ACCOUNT-BOUNDS] Periods 13, 17 and 37 do not exist.
 
 Interaction. An orbit interacts when some gate on it opens at one time and closes at another. Such orbits have period P = 4D + 5, where D is the number of ticks in which both contacts happen. The period is therefore at least 9 and never divides 10. [candidate-T]
 
@@ -194,7 +420,7 @@ The step J does not change the rhythm. Multiply the whole state by J, by φ or b
 
 Boost and clock. Read multiplication by J as a golden boost of the object. The rhythm of contact stays the same, and the account of the concentrated preparation (4, 0, 0) grows exactly as 16(Cₙ² − 2), with the square of the energy Cₙ from the section Matter below. [candidate-T, elementary; C for n ≤ 6] The contact clock thus behaves like the proper time of the object. [reading] Whoever keeps the original counter as laboratory time gets no time dilation. The Lorentz rate would be dτ/dt = 2/Cₙ = 1/cosh(n log φ). So the boost must also act on the reading of time and space; relabelling the state alone is not enough. [reading] In exact integers the period can only lengthen by a rational factor. γ = Cₙ/2 is rational exactly on an even step, where γ = Lₙ/2, that is 3/2, 7/2, 9 and so on. [candidate-T, elementary]
 
-The account bounds the rhythm but does not determine it. (4, 0, 0) and (12, 0, 0) have the same period 21 and accounts 32 and 288. Away from complete agreement we always have 3P ≤ 2M − 5. [candidate-T] A long rhythm needs a large account; a short one can be had with an account as large as you like. The reading "the account is energy and the rhythm is frequency" therefore fails on this chain. [reading]
+The account bounds the rhythm but does not determine it. (4, 0, 0) and (12, 0, 0) have the same period 21 and accounts 32 and 288. Away from complete agreement we always have 3P ≤ 2M − 5. [T, RELATIVE-CONTACT-RHYTHM-ACCOUNT-BOUNDS] A long rhythm needs a large account; a short one can be had with an account as large as you like. The reading "the account is energy and the rhythm is frequency" therefore fails on this chain. [reading]
 
 ## Event and measurement
 
@@ -202,7 +428,7 @@ An event is a return to the floor of the orbit, and measurement needs the gate t
 
 An event is the floor. On the shell E = 32 and S = 4 lie 2895 states. The mark "the whole account in one slot" lights on only three of them: (4, 0, 0), (0, 4, 0) and (0, 0, 4). Exactly: the mark lights exactly when both neighbour differences are divisible by four. [candidate-T] The gate reads the difference modulo 2, the mark modulo 4. (4, 0, 0) and (0, 0, 4) tick with period 21, (0, 4, 0) with period 41, each with one mark per circuit. [C, complete census of the shell] In general an event is a return into the deepest binary layer of the orbit. [reading]
 
-The event does not carry the whole rhythm. In class III the deepest layer returns five times per circuit. Take w = 1 − j and v = 2 − j − j². The states X = (6w, 0, 0) and Y = (2w + 2v, 2w − 2v, 2w) have the same account 180, the same sum, the same difference account 360 and the same residues of all slots modulo (1 − j). They even have the same depth history: the floor every 5 ticks. They differ, say, in how the account is distributed among the slots, (180, 0, 0) against (140, 20, 20), and in the residues of the coefficients modulo 5. Yet X has period 5 and Y has period 25. Whoever sees only the events does not learn the whole period. [candidate-T, PR #1855]
+The event does not carry the whole rhythm. In class III the deepest layer returns five times per circuit. Take w = 1 − j and v = 2 − j − j². The states X = (6w, 0, 0) and Y = (2w + 2v, 2w − 2v, 2w) have the same account 180, the same sum, the same difference account 360 and the same residues of all slots modulo (1 − j). They even have the same depth history: the floor every 5 ticks. They differ, say, in how the account is distributed among the slots, (180, 0, 0) against (140, 20, 20), and in the residues of the coefficients modulo 5. Yet X has period 5 and Y has period 25. Whoever sees only the events does not learn the whole period. [T, RELATIVE-CONTACT-RHYTHM-FIVEFOLD-PHASE]
 
 Knowing and measuring are not the same. Whoever knows the shell in advance distinguishes all 63 classes of mark history after 42 samples. Whoever waits for two real marks waits, at period 41, until tick 81. [C, census of the shell]
 
@@ -210,7 +436,7 @@ Measurement needs switching. When two inputs pass through the same sequence of a
 
 A record is paid in fives. The residue σ of every slot modulo (1 − j) does not change under contact, and 2q ≡ −σ² (mod 5). A slot prepared at zero keeps σ = 0. When it stops being zero, its account is therefore divisible by five, at least 5. A record in an apparatus made of zeros costs at least 5, with the sum of the data conserved at least 10. An apparatus with an account of its own needs at least 4. [candidate-T] Motion and event speak in twos; the price of a record is set by the five. [reading]
 
-Finite resolution suffices. With the sum S and the difference account M known, the state is fixed by the residues of its coefficients modulo m as soon as 3m² > M. On the shell E = 32, S = 4, m = 5 suffices. [candidate-T]
+Finite resolution suffices. With the sum S and the difference account M known, the state is fixed by the residues of its coefficients modulo m as soon as 3m² > M. On the shell E = 32, S = 4, m = 5 suffices. [T, RELATIVE-CONTACT-COEFFICIENT-READ-INJECTIVITY]
 
 A clock from the same contact. The pair (1, −1) turns with period 5 and the triple (0, 2, 0) ticks with period 9. They do not touch, so together they tick with period 45 and account 12. An interval Δ of up to 41 ticks can be computed from two snapshots:
 
@@ -234,7 +460,15 @@ A stopwatch with two stamps. On the same 31 slots with account 82 the nine-posit
 
 What the stopwatch teaches. The dial reads the interval only modulo its period, so the gaps 1 and 6 would coincide. The result therefore holds only for the prescribed pair of gaps 1 and 8. [C] A tick is not a contact: the same gaps last 804 and 4011 contacts, not 535 and 4280, because the two reading windows lie at different places in the word. The clock counts only whole ticks. [C] The mark does not sit in one slot but in the pair (g, h). Inside the active reading g passes through zero six more times while the pair is (0, 2), still switched on. Only (0, w) is switched off. My falsifier showed this: it predicted the opposite and fell. [C] The record is a phase, not a residue: all ten preparations and endings have the same residue vector modulo (1 − j). So the construction does not violate the fixed-word theorem and need not change the residues that the bank capacity theorem counts with. [C; reading] Three marks are the most that works. For source phase 0 the fourth mark writes into an already written pair and breaks the control. [C, exploration]
 
-What is missing. On 2 November the author decided three questions of interpretation: the phase of the instrument's own clock is an admissible input, retention at word boundaries suffices, and the contract suffices for three marks. He accepted the construction as a candidate for the positive closure of the O row in its exact scope. [interpretation of the contract, L1, author] For public closure one frozen common contract is missing, with one construction and one family of inputs, and the prescribed public probe: reservation, preregistration and verifier pinned before the run, a run on two architectures with identical output, and the merge. The stopwatch contract still lacks the capacity-bound theorem and the fingerprint of the binding word. [judgment] The reading word of the original mark holds on one orbit; on the whole shell it reads 2562 of 2895 states correctly. [O, RELATIVE-CONTACT-COMMON-APPARATUS-OPEN]
+Two independent inputs. The probe P-RELATIVE-CONTACT-INDEPENDENT-RELOAD-1 (PR #1871, merged on 3 November) joined two stopwatches in sequence on one carrier with 56 slots and account 156. The fixed program has 10700 contacts and five slot exchanges. First ten steps of the stopwatch run. Then five exchanges load the second, prepared input and set the first aside. Finally ten steps of the same stopwatch run on fresh banks. Meanwhile the reading core returns to readiness by itself, and the records of the first measurement stay unchanged at their addresses. From the four final records both inputs are read, for all 100 pairs, and the whole instrument can be reversed exactly. Since v108 this is a theorem, with one common preparation of account 128 on the 46 auxiliary coordinates. [T, RELATIVE-CONTACT-COMMON-APPARATUS-OPEN] The boundary of the result is explicit. Both inputs are prepared in advance and the exchange of slots is a separate declared step, not a contact. Fresh memory falls from four sets to zero, while the account of each set stays 30. What is renewed is the readiness of the core, not the used memory; neither regeneration of memory nor preparation from a raw input is proved. [reading]
+
+Any number of inputs fixed in advance. V109 added three theorems on the work bank. A fixed word P_k of contacts and exchanges on 26 + 25k slots accepts all 10ᵏ sequences of k inputs from the same family, with one common preparation of 26 + 20k auxiliary slots. Every cycle writes two records, copies them into fresh archives and reverses the whole working core of 31 slots. That restores the same bank addresses, the prepared source and the clock. The archives alone decode the whole sequence of inputs, and a finished archive stays untouched to the end of the word. The total account is 68 + 74k. [T, RELATIVE-CONTACT-FINITE-WORKBANK-REUSE] A copy into a fresh bank is made by a fixed word of 60 contacts on two banks of ten slots each [T, RELATIVE-CONTACT-POSITIONAL-BANK-COPY], whereas on four slots no fixed word makes the same literal copy in the given code. [T, RELATIVE-CONTACT-FOUR-PLACE-COPY-OBSTRUCTION] The row explicitly does not assert one finite carrier with unlimited history, regeneration of occupied archives, an own schedule or a physical interpretation.
+
+Division by two. Two new notes (PR #1865 and #1867, unmerged) show that the contact gate itself divides by two. A contact with a zero port goes through exactly when the number is even. When it goes through, it divides it by two with the turn J and stores the half in the port. A row of zero ports thus writes the 2-adic depth of the number in unary, as the number of written ports. From the given source two contacts create the numerator 3n + 1, and fifteen contacts write the depth and the odd part. [candidate-T; candidate-C, checked by my code in another representation] With the four Galois maps every division shifts the code U_e to U_(2e). The depth thus also appears in the orientation of the result, and the output is the first port of the next source. The residual obstruction disappears for q = 3, exactly for the class q ≡ 3 (mod 5). [C; reading] But the three and the one are supplied by the source, so J does not select the rule 3n + 1. Every step costs at least 75 units of record account. A finite supply therefore gives a finite horizon, and the remaining ports of the source do not renew themselves. [T by the proof; reading]
+
+Renewal of the source from a supply. The note in PR #1869 (unmerged) shows that the two remaining ports of the source can be renewed after division by native contacts, when the supply is delivered in advance. On the whole cylinder of inputs n₀ = 64h + 3 two steps with depths 1 and 4 run; for h = 0 this is the orbit 3 → 5 → 1. One fixed word with 85 contacts on 33 slots suffices. The four donors are fixed affine functions of h. After every pass they overwrite two occupied ports with the prepared source of the next step and keep the rest. Both archives of depths stay literally, and the whole state can be reversed. The supply grows quadratically with h, B(h) = 5422160h² + 555480h + 14368. For h = 0 the first pair of donors pays exactly 4535, the earlier necessary bound. [candidate-T by the proof; my symbolic computation confirmed it for all integer h, candidate-C on one architecture] Every finite sequence of depths given in advance is translated the same way. But the instrument does not choose that sequence; the word and the donors are computed for it in advance. [candidate-T by the proof; candidate-C, by my code on 13 sequences; reading] Earlier already, PR #1862 translated two Collatz steps for the odd inputs 1 to 15 into one finite word with 18280 contacts on 49 slots. [candidate-C, checked by my code]
+
+What is missing. The O row on the common instrument is closed positively since v108, in an exact scope: two consecutive experiments, inputs prepared in advance and five declared exchanges of whole slots. [T, RELATIVE-CONTACT-COMMON-APPARATUS-OPEN] V109 extended the renewal of the working core to any number of inputs fixed in advance. [T, RELATIVE-CONTACT-FINITE-WORKBANK-REUSE] A stronger contract would need regeneration of used memory, preparation from a raw input, the instrument's own choice of the next input and operation without a horizon fixed in advance; none of this is in the Canon. [judgment] The physical instrument remains open. [O, QDD-INSTRUMENT-APPARATUS] The reading word of the original mark holds on one orbit; on the whole shell it reads 2562 of 2895 states correctly. [C]
 
 ## Matter
 
@@ -281,7 +515,7 @@ The photon in the Canon. The Canon has the photon lane as a construction on the 
 
 ## What is missing
 
-The physics of the program is not yet closed. We have exact arithmetic, a concrete contact dynamics and substantial parts of measurement. What is missing is one law from which motion, inertia and measured time come out together. The original rule U does not choose by itself: it gives neither contact in the steady run nor a law of the single event. The table shows all 27 live rows of Canon v107.
+The physics of the program is not yet closed. We have exact arithmetic, a concrete contact dynamics and substantial parts of measurement. What is missing is one law from which motion, inertia and measured time come out together. The original rule U does not choose by itself: it gives neither contact in the steady run nor a law of the single event. The table shows all 26 live rows of Canon v109.
 
 | Pillar | What is missing | Rows |
 | --- | --- | --- |
@@ -290,7 +524,7 @@ The physics of the program is not yet closed. We have exact arithmetic, a concre
 | Time | Why exactly the minimal reading. The choice of the reading coin β₁ is an agreement, not a consequence of the architecture. | MINIMAL-READ-DERIVATION [O] |
 | Time | How long a tick is in seconds: the canonical choice of scale and the SI theorem. | METRO-EDGE-SCALE [O] |
 | Energy | A contact derived from the original U, not given from outside. An exact reading of the steady U without a counter does not reach interaction in the chain of three slots. | QUADRATIC-MEMORY-NATIVE-CONTACT [O] |
-| Energy | One instrument that, for at least two inputs, prepares, responds, writes and renews itself. The candidate on 31 slots is verified, the stopwatch with variable arrivals gives a second record with a new datum, and the author decided three questions of interpretation. One frozen contract and a public probe are missing. | RELATIVE-CONTACT-COMMON-APPARATUS-OPEN [O]; QDD-INSTRUMENT-APPARATUS [O] |
+| Energy | The physical instrument: a complete instrument contract independent of the target, realisation of the effects and of the law of occurrence. The contact instrument for two inputs is a theorem since v108 and for a number of inputs fixed in advance since v109, but the physical instrument does not follow from it. | QDD-INSTRUMENT-APPARATUS [O] |
 | Energy | The law of the single event: what picks one out of many possibilities. | QDD-TERMINAL-EVENT-SEMANTICS [O]; QDD-INSTRUMENT-CLASS-COMPLETENESS [O] |
 | Energy | A physical realisation of the Larmor and Schwinger gates. The arithmetic target 1/(2π) is done. | QUANT-SUBSTRATE [O] |
 | Matter | The number of generations, the proton as QCD, the neutron delta, the running of the strong coupling, the colour measure. | GENERATIONS-L3, PROTON-RESIDUAL-IS-QCD, NEUTRON-DELTA-EM, ALPHA-S-RUNNING, COLOR-MEASURE-SELECTION [O] |
@@ -302,24 +536,34 @@ The physics of the program is not yet closed. We have exact arithmetic, a concre
 
 ## Where next
 
-A small common contact instrument with a fixed schedule already stands on one orbit, see the section Event and measurement. That an external controller is necessary is not proved. A fixed sequence of contacts knows about its input, because the gates react to the input: the same sequence gives different histories of acceptance and refusal on (4, 0, 0) and (0, 4, 0). [C] The fixed-word theorem constrains only the residues modulo (1 − j): those the sequence rearranges the same way for every input. [T, RELATIVE-CONTACT-FIXED-WORD-RESIDUE-BOUNDARY]
+The common contact instrument with a fixed program is a theorem for two inputs since v108 and for any number of inputs fixed in advance since v109, see the section Event and measurement. That an external controller is necessary is not proved. A fixed sequence of contacts knows about its input, because the gates react to the input: the same sequence gives different histories of acceptance and refusal on (4, 0, 0) and (0, 4, 0). [C] The fixed-word theorem constrains only the residues modulo (1 − j): those the sequence rearranges the same way for every input. [T, RELATIVE-CONTACT-FIXED-WORD-RESIDUE-BOUNDARY]
 
-1. Close the O row publicly. On 31 slots with account 82 stand both the clock with a mark (a word of 264 contacts) and the stopwatch with variable arrivals (a word of 535 contacts). [candidate-C, two sessions] The author decided three questions of interpretation and accepted the construction as a candidate. The row needs one construction: choose one build and one family of inputs, freeze the common contract with all the fields of the row RELATIVE-CONTACT-COMMON-APPARATUS-OPEN and pass the public probe with a computation on two architectures. I recommend the stopwatch with the whole frozen family of ten inputs, because there the input distinguishes both uses. [judgment] Then read the mark on the whole shell E = 32, S = 4. The gate reads the difference modulo 2, the mark modulo 4, and the price of a record is set by the residue modulo (1 − j). The falsifier of every step: none in the finite class of sequences delimited in advance.
-2. Coupling in the steady run. Three routes: let the letter c act on the sheet too, which changes U; repeated preparation, and then the question is what triggers it; or a contact between different objects supplied from outside. Each route is a different law. The step J does not change the rhythm of interaction. [candidate-T] Any route must therefore change the binary class of the state, that is its depth or its primitive shape, not just its scale. [reading] The decision is the author's.
-3. Contact from U. Derive the contact step W from the original U, not the other way round. The rows MINIMAL-READ-DERIVATION and QUADRATIC-MEMORY-NATIVE-CONTACT already have exact conditions for both positive and negative closure.
-4. A boost that also changes the reading. Find how the golden boost should act on the reading of time and space so that the same law gives the speed of the packet, the response to an impulse and a readable internal tick. Multiplying the state by J alone is not enough; it does not change the rhythm of contact. The falsifier of the proposed reading: on an even step n the laboratory period of the contact clock does not lengthen by exactly Lₙ/2.
-5. The photon. Build the massless phase only after the action and the normalisation are frozen. The empty integer cone suggests that the candidate for masslessness should live in the phase, not in the length. [reading]
+1. The port out. The contact instrument can read, write and renew itself, but it does not say which account it writes, which outcome and how often, nor what the model unit of length and time is. [O, QDD-INSTRUMENT-APPARATUS; O, QDD-TERMINAL-EVENT-SEMANTICS; O, METRO-EDGE-SCALE] The reading The two guards the five shows where to begin: the record of the order on the third slot is written by the machine itself, without knowing the phase and without a schedule of readouts, and its account is a multiple of five. [T for the computation; reading] The question is whether the frequency of outcomes also comes out of such records. The condition of every answer: an instrument contract frozen independently of the target, not a reading chosen by the outcome.
+2. Memory that renews itself. The O row is closed since v108, and since v109 the working core can be renewed for any number of inputs fixed in advance. The next construction goal is regeneration of used memory without loss of the record, preparation of the input from the raw state, and the instrument's own choice of the next input. [judgment] Then read the mark on the whole shell E = 32, S = 4. The gate reads the difference modulo 2, the mark modulo 4, and the price of a record is set by the residue modulo (1 − j). The falsifier of every step: none in the finite class of sequences delimited in advance.
+3. Contact from U. V109 has the first tick of the original U exactly: the receiver gives s = q + r + 2, and the carries of two mutually inverse multiplications pair exactly. [T, U-FIRST-TICK-AFFINE-TRACE-TRANSFER; T, J-MARKED-CARRY-MIRROR] In the steady run coupling is still missing, and the contact and native carriers have separate laws. Three routes: let the letter c act on the sheet too, which changes U; repeated preparation, and then the question is what triggers it; or a contact between different objects supplied from outside. Each route is a different law, and the decision is the author's. The step J does not change the rhythm of interaction. [candidate-T] Any route must therefore change the binary class of the state, that is its depth or its primitive shape, not just its scale. [reading] The rows QUADRATIC-MEMORY-NATIVE-CONTACT and MINIMAL-READ-DERIVATION have exact conditions for both positive and negative closure. [O]
+4. Chance and Bell. The hypothesis that chance is a schedule of readouts that does not keep step with the clock must be nonlocal, or it must tie the schedule to the phase; the local version with a schedule independent of the phase is already refuted by experiments with Bell's inequalities. [H] The next step is to write it on two distant slots of the contact model and decide which way it goes. The falsifier: an instrument that knows the phase and reads in step with the wheel, and still sees a spread.
+5. A boost that also changes the reading. Find how the golden boost should act on the reading of time and space so that the same law gives the speed of the packet, the response to an impulse and a readable internal tick. Multiplying the state by J alone is not enough; it does not change the rhythm of contact. The falsifier of the proposed reading: on an even step n the laboratory period of the contact clock does not lengthen by exactly Lₙ/2.
+6. The photon. Build the massless phase only after the action and the normalisation are frozen. The empty integer cone suggests that the candidate for masslessness should live in the phase, not in the length. [reading]
 
-Since 2 November PR #1855 is merged into main as a NON-CANONICAL note. The author accepted an independent review from another session, with its own code, but not blind, and the single correction of wording: the range of indices in equation (20). The statuses remain candidate-T and candidate-C. For a computational T the probe on two architectures is missing, and inclusion in the Canon is the author's decision.
+Since 2 November PR #1855 is merged into main as a NON-CANONICAL note. V108 took from it four general theorems with proofs in the text: the complete classification of the rhythm of three slots, sharp account bounds, the unresolved fivefold phase and a sufficient bound for reading the coefficients. [T, RELATIVE-CONTACT-RHYTHM-CLASSIFICATION, RELATIVE-CONTACT-RHYTHM-ACCOUNT-BOUNDS, RELATIVE-CONTACT-RHYTHM-FIVEFOLD-PHASE, RELATIVE-CONTACT-COEFFICIENT-READ-INJECTIVITY] The shell censuses and the numerical searches for the smallest modulus are not promoted and remain C. The other results of the note are still candidate-T.
 
 ## Sources
 
-- [STATUS.md](https://github.com/mathorn1973/twist-j/blob/main/STATUS.md): Public Canon v107, tag canon-v107, the Canon fingerprints.
-- [Registry v107](https://github.com/mathorn1973/twist-j/blob/main/canon/REGISTRY.tsv): the statuses of all cited rows.
-- [Frontier v107](https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md): the 27 live H and O rows.
-- [Contact C-J-INTEGRAL-RELATIVE-CONTACT-N](https://github.com/mathorn1973/twist-j/tree/main/notes/C-J-INTEGRAL-RELATIVE-CONTACT-N): the definition of contact and the proof.
+- [STATUS.md](https://github.com/mathorn1973/twist-j/blob/main/STATUS.md): Public Canon v109, tag canon-v109, the Canon fingerprints.
+- [Registry v109](https://github.com/mathorn1973/twist-j/blob/main/canon/REGISTRY.tsv): the statuses of all cited rows.
+- [Frontier v109](https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md): the 26 live H and O rows.
+- [Contact C-J-INTEGRAL-RELATIVE-CONTACT-N](https://github.com/mathorn1973/twist-j/tree/main/notes/C-J-INTEGRAL-RELATIVE-CONTACT-N): the definition of contact and the proof, including the accounts of the triple (4, 0, 0).
 - [Probe P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1](https://github.com/mathorn1973/twist-j/tree/main/probes/P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1): the account formula q, the minima 12 and 27, the bank capacity.
 - [Probe P-DIGON-TRIANGLE-J-MODE-1, PR #1733](https://github.com/mathorn1973/twist-j/pull/1733): the digon and triangle cell.
-- [PR #1855, C-RELATIVE-CONTACT-RHYTHM-CLASSIFICATION-N](https://github.com/mathorn1973/twist-j/pull/1855): the classification of periods, sharp account bounds, the hidden phase and the limits of reading. Merged into main on 2 November as a NON-CANONICAL note, with the acceptance of the review in REVIEW-ACCEPTANCE.md.
+- [PR #1855, C-RELATIVE-CONTACT-RHYTHM-CLASSIFICATION-N](https://github.com/mathorn1973/twist-j/pull/1855): the classification of periods, sharp account bounds, the hidden phase and the limits of reading. Merged into main on 2 November as a NON-CANONICAL note, with the acceptance of the review in REVIEW-ACCEPTANCE.md. V108 took four general theorems from it.
 - [Issue #1854](https://github.com/mathorn1973/twist-j/issues/1854): the reservation of the same candidate.
-- The TWIST J project, folder claude/: cathedral builds 1 and 2, the note on the bridge from U to contact, the census of the transient phase, small universe builds 1 and 2, C-GATE-RHYTHM-NATIVE-CLOCK-1 with its addendum, the reviews of the depth spectrum, of the mark and the clock, of PR #1855 and of the small contact instrument, the contract C-CONTACT-TIME-ARCHIVE-1 with its preregistration and result, the review of the barrier and reversibility, the review of the two-bank switch, the review of joining the clock to the switch, and the review of the stopwatch with variable arrivals with the author's decision on the O row. All candidate-T or candidate-C.
+- [PR #1857, probe P-RELATIVE-CONTACT-VARIABLE-ARRIVAL-1](https://github.com/mathorn1973/twist-j/pull/1857): the public replay of the stopwatch with ten inputs, reservation #1856. [Check run 41502786472](https://github.com/mathorn1973/twist-j/actions/runs/41502786472) on x86_64 and aarch64 finished successfully. Not merged.
+- [PR #1871, probe P-RELATIVE-CONTACT-INDEPENDENT-RELOAD-1](https://github.com/mathorn1973/twist-j/pull/1871): two independent inputs on 56 slots, reservation #1870. [Check run 41592761170](https://github.com/mathorn1973/twist-j/actions/runs/41592761170) on x86_64 and aarch64 finished successfully. Merged on 3 November; with it v108 closed the row RELATIVE-CONTACT-COMMON-APPARATUS-OPEN as T.
+- [PR #1873, C-COMMON-APPARATUS-TWO-INPUT-REVIEW-N](https://github.com/mathorn1973/twist-j/pull/1873): the review of #1871 from another session, its own code and a CI audit. A NON-CANONICAL note, on main since v108.
+- [PR #1879, probe P-RELATIVE-CONTACT-WORKBANK-REUSE-1](https://github.com/mathorn1973/twist-j/pull/1879): renewal of the working core for any number of inputs fixed in advance, the bank copy and the obstruction on four slots. Independent reviews in PRs #1881, #1882 and #1886. Merged on 3 November, the basis of three theorems in v109.
+- [PR #1884, probe P-NATIVE-RECEIVER-CARRY-MIRROR-1](https://github.com/mathorn1973/twist-j/pull/1884): the first tick of the original U, the carry mirror and the finite circuit on 62 cells. Independent review in PR #1887. Merged on 3 November.
+- [PR #1890](https://github.com/mathorn1973/twist-j/pull/1890): activation of Public Canon v109.
+- [PR #1865](https://github.com/mathorn1973/twist-j/pull/1865) and [PR #1867](https://github.com/mathorn1973/twist-j/pull/1867), C-CONTACT-AFFINE-NUMERATOR-CASCADE-N and C-CONTACT-FOUR-CHART-RENEWAL-N: division by two, four maps and the limits of source renewal. Unmerged NON-CANONICAL notes.
+- [PR #1869, C-CONTACT-FUNDED-TWO-PASS-RENEWAL-N](https://github.com/mathorn1973/twist-j/pull/1869): renewal of the source from a supply on the cylinder 64h + 3 and a translator of finite sequences of depths. An unmerged NON-CANONICAL note.
+- [PR #1862, C-COLLATZ-CONTACT-STEP-RECORD-N](https://github.com/mathorn1973/twist-j/pull/1862): two Collatz steps as a finite contact word. An unmerged NON-CANONICAL note.
+- The TWIST J project, folder claude/: cathedral builds 1 and 2, the note on the bridge from U to contact, the census of the transient phase, small universe builds 1 and 2, C-GATE-RHYTHM-NATIVE-CLOCK-1 with its addendum, the reviews of the depth spectrum, of the mark and the clock, of PR #1855 and of the small contact instrument, the contract C-CONTACT-TIME-ARCHIVE-1 with its preregistration and result, the review of the barrier and reversibility, the review of the two-bank switch, the review of joining the clock to the switch, the review of the stopwatch with variable arrivals with the author's decision on the O row, the review of the news in the repository from the night to 3 November, the review of the probe with two independent inputs, the check of everything from 3 November with a field-by-field analysis of the O row, and the reading The two guards the five in versions 2 and 3 with its checking scripts. All candidate-T or candidate-C.
