@@ -1,17 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{LANG}}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logos · {{TITLE}} · TWIST-J</title>
-    <meta name="description" content="{{TITLE}}. A working document of the TWIST-J program: what one number J = 1 + j² and one step give for space, time, energy, matter and light, what is dictionary, and what is still missing. NON-CANONICAL.">
-    <meta name="author" content="A. M. Thorn">
-    <meta property="og:title" content="Logos · {{TITLE}}">
-    <meta property="og:description" content="A working document of the TWIST-J program. Every sentence carries its status. NON-CANONICAL.">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://twistj.com/logos/">
-    <meta property="og:locale" content="en_US">
-    <link rel="canonical" href="https://twistj.com/logos/">
+{{HEAD}}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
@@ -19,10 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true}],throwOnError:false});"></script>
+{{KATEX}}
     <style>
         :root {
             --bg: #f4f1eb; --text: #2a2520; --text-bright: #1a1714;
@@ -71,32 +60,20 @@
         .foot { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); text-align: center; color: var(--muted); font-size: 1rem; }
         @media (max-width: 600px) { body { font-size: 1.1rem; } h1 { font-size: 1.8rem; } .page { padding: 2.4rem 1rem 2.5rem; } }
     </style>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "{{TITLE}}",
-      "author": [ { "@type": "Person", "name": "A. M. Thorn" } ],
-      "url": "https://twistj.com/logos/",
-      "inLanguage": "en",
-      "dateModified": "{{DATE}}",
-      "description": "A working document of the TWIST-J program, NON-CANONICAL: what one number and one step give for space, time, energy, matter and light, and what is still missing."
-    }
-    </script>
+{{JSONLD}}
 </head>
 <body>
     <div class="page">
-        <div class="eyebrow">TWIST-J &middot; Logos</div>
+        <div class="eyebrow">{{EYEBROW}}</div>
         <h1>{{TITLE}}</h1>
-        <div class="byline">A. M. Thorn</div>
-        <div class="version">Working document &middot; NON-CANONICAL &middot; synced {{DATE}}</div>
+        <div class="byline">{{BYLINE}}</div>
+        <div class="version">{{VERSION}}</div>
         <div class="note">{{NOTE}}</div>
 
 {{BODY}}
 
         <div class="foot">
-            The Canon is the ledger. This page is a working reading of it and carries no authority.<br>
-            <a href="/canon/">Public Canon</a> &middot; <a href="/logos/logos.md">plain markdown</a> &middot; <a href="/">twistj.com</a>
+            {{FOOT}}
         </div>
     </div>
 </body>

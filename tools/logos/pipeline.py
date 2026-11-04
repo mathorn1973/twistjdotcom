@@ -18,6 +18,13 @@ Subcommands (run from anywhere; paths are resolved against the repository root):
                                     the figure whose Czech caption hashes to S
   build SOURCE.md --rev REV         write logos/logos.md, logos/index.html, logos/SOURCE.json
   check SOURCE.md                   verify the English against the Czech source, exit 1 on failure
+  jsx2svg JSXFILE OUT.svg           convert a figure's JSX code (as read from the source document) into
+                                    a static SVG with the fixed colours; translate its labels afterwards
+  build-cs SOURCE.md --rev REV --figs DIR --out DIR
+                                    render the Czech source itself as one static page OUT/index.html,
+                                    with the Czech figures DIR/<file>.svg inlined (the file names are
+                                    those of memory.json). Nothing of this is committed: the page is
+                                    republished to the owner's private static copy, see RUNBOOK step 10
 
 Exact text, no network, Python standard library plus the markdown package for the HTML step.
 """
@@ -284,7 +291,9 @@ def cmd_build(a):
     md = "# %s\n\n%s\n\n%s" % (title, note, body_md)
     OUT.mkdir(exist_ok=True)
     (OUT / "logos.md").write_text(md, encoding="utf-8")
-    page = render_html(title, note, body_md, mem)
+    figs = [{"file": f["file"], "svg": (OUT / f["file"]).read_text(encoding="utf-8"), "caption": f["en_caption"]}
+            for f in mem["figures"].values()]
+    page = render_html(title, note, body_md, figs, "en", a.rev)
     (OUT / "index.html").write_text(page, encoding="utf-8")
     src = {"doc_rev": a.rev, "source_sha256": sha(source), "blocks": len(blocks),
            "synced": today(), "memory_blocks": len(mem["blocks"]), "figures": len(mem["figures"])}
@@ -295,12 +304,57 @@ def cmd_build(a):
     return 0
 
 
-def render_html(title, note, body_md, mem):
+STRINGS = {
+    "en": {
+        "lang": "en",
+        "head": """    <title>Logos · {{TITLE}} · TWIST-J</title>
+    <meta name="description" content="{{TITLE}}. A working document of the TWIST-J program: what one number J = 1 + j² and one step give for space, time, energy, matter and light, what is dictionary, and what is still missing. NON-CANONICAL.">
+    <meta name="author" content="A. M. Thorn">
+    <meta property="og:title" content="Logos · {{TITLE}}">
+    <meta property="og:description" content="A working document of the TWIST-J program. Every sentence carries its status. NON-CANONICAL.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://twistj.com/logos/">
+    <meta property="og:locale" content="en_US">
+    <link rel="canonical" href="https://twistj.com/logos/">""",
+        "eyebrow": "TWIST-J &middot; Logos",
+        "byline": "A. M. Thorn",
+        "version": "Working document &middot; NON-CANONICAL &middot; synced {{DATE}}",
+        "foot": """The Canon is the ledger. This page is a working reading of it and carries no authority.<br>
+            <a href="/canon/">Public Canon</a> &middot; <a href="/logos/logos.md">plain markdown</a> &middot; <a href="/">twistj.com</a>""",
+        "labels": r"T|D|C|H|O|F|candidate-T|candidate-C|reading|model|judgment|probe|interpretation|boost",
+        "jsonld": True,
+        "katex": """    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true}],throwOnError:false});"></script>""",
+    },
+    "cs": {
+        "lang": "cs",
+        "head": """    <title>{{TITLE}} · TWIST-J</title>
+    <meta name="robots" content="noindex">""",
+        "eyebrow": "TWIST-J &middot; pracovní dokument",
+        "byline": "",
+        "version": "Statická kopie zdrojového dokumentu &middot; revize {{REV}} &middot; obnoveno {{DATE}}",
+        "foot": """Statická kopie pracovního dokumentu, NON-CANONICAL. Nic tady není silnější než řádek registru, o který se opírá.<br>
+            <a href="https://twistj.com/logos/">anglická verze na twistj.com/logos</a> &middot; <a href="https://twistj.com/canon/">Public Canon</a>""",
+        "labels": r"T|D|C|H|O|F|candidate-T|candidate-C|čtení|model|úsudek|sonda|výklad|boost",
+        "jsonld": False,
+        # the artifact viewer admits no outside stylesheet: native MathML output, no KaTeX CSS or fonts
+        "katex": """    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true}],output:'mathml',throwOnError:false});"></script>""",
+    },
+}
+
+
+def render_html(title, note, body_md, figs, lang="en", rev=""):
+    """figs: list of {"file", "svg", "caption"}; each ![caption](file) in body_md becomes an inline figure."""
     try:
         import markdown  # noqa
     except ImportError:
         raise SystemExit("python package 'markdown' missing: pip install --break-system-packages markdown")
     import markdown
+    S = STRINGS[lang]
     # keep $$ blocks away from the markdown parser
     maths = []
     def stash(m):
@@ -311,26 +365,120 @@ def render_html(title, note, body_md, mem):
         body = body.replace("<p>MATHBLOCK%d</p>" % i, '<div class="math">$$\n%s\n$$</div>' % html.escape(tex))
     assert "MATHBLOCK" not in body
     # quieter status labels, text nodes only (before the figures go in, so SVG text stays untouched)
-    label = re.compile(r"\[(T|D|C|H|O|F|candidate-T|candidate-C|reading|model|judgment|probe|interpretation|boost)(?=[\]\s,:])[^\]]*\]")
+    label = re.compile(r"\[(%s)(?=[\]\s,:;])[^\]]*\]" % S["labels"])
     parts = re.split(r"(<[^>]+>)", body)
     body = "".join(p if p.startswith("<") else label.sub(lambda m: '<span class="st">%s</span>' % m.group(0), p)
                    for p in parts)
     # figures: inline SVG with the page's colour variables
-    for fig in mem["figures"].values():
-        svg = (OUT / fig["file"]).read_text(encoding="utf-8")
+    for fig in figs:
+        svg = fig["svg"]
         for hexc, var in FIG_COLOURS:
             svg = svg.replace(hexc, var)
         pat = re.compile(r'<p><img alt="[^"]*" src="%s"\s*/?></p>' % re.escape(fig["file"]))
         assert len(pat.findall(body)) == 1, fig["file"]
         body = pat.sub(lambda m: '<figure>%s<figcaption>%s</figcaption></figure>' % (
-            svg.replace("\\", "\\\\"), html.escape(fig["en_caption"])), body)
+            svg.replace("\\", "\\\\"), html.escape(fig["caption"])), body)
     tpl = TEMPLATE.read_text(encoding="utf-8")
-    return (tpl.replace("{{TITLE}}", html.escape(title)).replace("{{NOTE}}", html.escape(note))
-            .replace("{{DATE}}", today()).replace("{{BODY}}", body))
+    jsonld = ""
+    if S["jsonld"]:
+        jsonld = ("""    <script type="application/ld+json">
+    {"@context": "https://schema.org", "@type": "Article", "headline": "{{TITLE}}",
+     "author": [ { "@type": "Person", "name": "A. M. Thorn" } ], "url": "https://twistj.com/logos/",
+     "inLanguage": "en", "dateModified": "{{DATE}}",
+     "description": "A working document of the TWIST-J program, NON-CANONICAL: what one number and one step give for space, time, energy, matter and light, and what is still missing."}
+    </script>""")
+    page = (tpl.replace("{{LANG}}", S["lang"]).replace("{{HEAD}}", S["head"]).replace("{{JSONLD}}", jsonld)
+            .replace("{{EYEBROW}}", S["eyebrow"]).replace("{{BYLINE}}", S["byline"]).replace("{{VERSION}}", S["version"])
+            .replace("{{FOOT}}", S["foot"]).replace("{{KATEX}}", S["katex"])
+            .replace("{{NOTE}}", html.escape(note)).replace("{{BODY}}", body))
+    page = page.replace("{{TITLE}}", html.escape(title)).replace("{{DATE}}", today()).replace("{{REV}}", html.escape(str(rev)))
+    page = page.replace('        <div class="byline"></div>\n', "")
+    assert "{{" not in page, re.findall(r"{{[A-Z]+}}", page)
+    return page
 
 
 FIG_COLOURS = [("#1c1c1c", "var(--text-bright)"), ("#6a6a6a", "var(--muted)"),
                ("#454545", "var(--text)"), ("#c4c4c4", "var(--rule)"), ("#b4532a", "var(--accent)")]
+
+JSX_COLOURS = {"ink": "#1c1c1c", "quiet": "#6a6a6a", "edge": "#454545", "grid": "#c4c4c4", "accent": "#b4532a"}
+JSX_ATTRS = {"fontSize": "font-size", "fontWeight": "font-weight", "strokeWidth": "stroke-width",
+             "strokeDasharray": "stroke-dasharray", "markerEnd": "marker-end", "textAnchor": "text-anchor",
+             "fillOpacity": "fill-opacity", "strokeLinecap": "stroke-linecap", "strokeLinejoin": "stroke-linejoin"}
+
+
+def jsx_to_svg(code: str) -> str:
+    """The figure nodes of the source document are small JSX modules returning one <svg>. Make a static SVG:
+    colour variables become the fixed colours, `const` numbers are evaluated, camelCase attributes renamed."""
+    consts = {}
+    for name, val in re.findall(r"\b([a-zA-Z_]\w*)\s*=\s*(-?\d+(?:\.\d+)?)", code.split("return")[0]):
+        consts[name] = float(val) if "." in val else int(val)
+    body = code[code.index("<svg"):code.rindex("</svg>") + len("</svg>")]
+    def expr(m):
+        e = m.group(1).strip()
+        if e in JSX_COLOURS:
+            return '"%s"' % JSX_COLOURS[e]
+        if e[:1] in "'\"":
+            return '"%s"' % e.strip("'\"")
+        if not re.fullmatch(r"[\w\s+\-*/().]+", e):
+            raise SystemExit("unsupported JSX expression: {%s}" % e)
+        val = eval(e, {"__builtins__": {}}, dict(consts))  # arithmetic on the declared constants only
+        return '"%s"' % (int(val) if float(val).is_integer() else val)
+    body = re.sub(r"=\{([^}]*)\}", lambda m: "=" + expr(m), body)
+    for k, v in JSX_ATTRS.items():
+        body = re.sub(r"\b%s=" % k, v + "=", body)
+    body = re.sub(r"\s+data-claude-[a-z-]+='[^']*'", "", body)
+    body = body.replace("'", '"')
+    if "xmlns=" not in body[:200]:
+        body = body.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ', 1)
+    return body + "\n"
+
+
+def cmd_jsx2svg(a):
+    svg = jsx_to_svg(Path(a.jsx).read_text(encoding="utf-8"))
+    import xml.dom.minidom
+    xml.dom.minidom.parseString(svg)  # well-formed or raise
+    Path(a.out).write_text(svg, encoding="utf-8")
+    print("%s -> %s (%d bytes)" % (a.jsx, a.out, len(svg)))
+    return 0
+
+
+def cmd_build_cs(a):
+    source = Path(a.source).read_text(encoding="utf-8")
+    blocks = split_blocks(source)
+    mem = load_memory()
+    figdir, outdir = Path(a.figs), Path(a.out)
+    parts, figs = [], []
+    title = None
+    for b in blocks:
+        if b["kind"] == "byline":
+            continue
+        if b["kind"] == "title":
+            title = b["cs"][2:].strip(); continue
+        if b["kind"] == "figure":
+            cap = FIGURE.match(b["cs"]).group(1)
+            fig = mem["figures"].get(sha(cap))
+            if not fig:
+                raise SystemExit("figure not in memory: %s" % cap)
+            svg_path = figdir / fig["file"]
+            if not svg_path.exists():
+                raise SystemExit("Czech figure missing: %s (make it with jsx2svg from the node code)" % svg_path)
+            svg = svg_path.read_text(encoding="utf-8")
+            figs.append({"file": fig["file"], "svg": svg, "caption": cap})
+            parts.append("![%s](%s)" % (cap, fig["file"]))
+        else:
+            parts.append(b["cs"])
+    if not title:
+        raise SystemExit("no title block")
+    body_md = "\n\n".join(parts) + "\n"
+    note = ("Pracovní dokument programu TWIST-J, NON-CANONICAL. Statická kopie zdrojového dokumentu v jeho "
+            "revizi %s, obnovovaná automaticky spolu s anglickou verzí na twistj.com/logos. "
+            "Nic tady není silnější než řádek registru, o který se opírá." % a.rev)
+    page = render_html(title, note, body_md, figs, "cs", a.rev)
+    outdir.mkdir(parents=True, exist_ok=True)
+    (outdir / "index.html").write_text(page, encoding="utf-8")
+    data = (outdir / "index.html").read_bytes()
+    print("%s  %d bytes  sha256 %s" % (outdir / "index.html", len(data), hashlib.sha256(data).hexdigest()))
+    return 0
 
 
 def cmd_check(a):
@@ -383,6 +531,9 @@ def main():
     p.add_argument("--file", required=True); p.add_argument("--jsx", required=True); p.set_defaults(f=cmd_figure)
     p = sp.add_parser("build"); p.add_argument("source"); p.add_argument("--rev", required=True); p.set_defaults(f=cmd_build)
     p = sp.add_parser("check"); p.add_argument("source"); p.set_defaults(f=cmd_check)
+    p = sp.add_parser("jsx2svg"); p.add_argument("jsx"); p.add_argument("out"); p.set_defaults(f=cmd_jsx2svg)
+    p = sp.add_parser("build-cs"); p.add_argument("source"); p.add_argument("--rev", required=True)
+    p.add_argument("--figs", required=True); p.add_argument("--out", required=True); p.set_defaults(f=cmd_build_cs)
     a = ap.parse_args()
     sys.exit(a.f(a) or 0)
 

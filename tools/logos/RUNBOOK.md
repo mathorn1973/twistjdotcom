@@ -24,14 +24,13 @@ lives in the scheduled task, not here.
            python3 tools/logos/pipeline.py plan WORK/source.md WORK/pending.json
    The plan lists the text blocks without English and the state of every figure.
 4  Figures. For each figure the plan lists: take its node id from WORK/export.html, read the node's
-   code, save it to WORK/figN.jsx exactly as returned followed by one newline (the recorded jsx_sha
-   values are taken that way). If the plan says "known" and sha256 of that file equals the
-   recorded jsx_sha, nothing to do. Otherwise write the English SVG to logos/<file>: convert the JSX
-   to a static SVG exactly as the existing logos/fig-*.svg files are built (colours ink #1c1c1c,
-   quiet #6a6a6a, edge #454545, grid #c4c4c4, accent #b4532a; camelCase attributes to SVG names;
-   data-claude-* attributes dropped), translate the text labels only, keep the geometry, and widen
-   the viewBox rather than shrinking text when an English label runs long. Then register it:
+   code, save it to WORK/figN.jsx with one trailing newline. If the plan says "known" and sha256 of that
+   file equals the recorded jsx_sha, nothing to do for the English page. Otherwise
+           python3 tools/logos/pipeline.py jsx2svg WORK/figN.jsx WORK/figN.svg
+   gives the static SVG; copy it to logos/<file>, translate the text labels only, keep the geometry,
+   and widen the viewBox rather than shrinking text when an English label runs long. Then register it:
            python3 tools/logos/pipeline.py figure --caption-sha S --en-caption "..." --file fig-x.svg --jsx WORK/figN.jsx
+   Keep every WORK/figN.jsx: step 10 needs all of them, changed or not.
 5  Translate. Write the English of every pending block, in the order of WORK/pending.json, one block
    per item, blocks separated by one blank line, into WORK/english.md. Rules:
      - numbers stay digits where the source has digits, words where it has words; every number,
@@ -59,6 +58,15 @@ lives in the scheduled task, not here.
    Commit as A. M. Thorn <thorn@twistj.com>, message "logos: sync to source rev N", push to main.
 9  Report in one paragraph: the revision synced, how many blocks were new, which figures changed,
    or "no change".
+10 Czech static copy. The owner keeps a private static copy of the Czech source as a claude.ai artifact;
+   its slug is named in the scheduled task, never here. After the push (or when only the copy is stale):
+           python3 tools/logos/pipeline.py jsx2svg WORK/figN.jsx WORK/figs-cs/<file>   for every figure,
+                                                  <file> as memory.json names it (Czech labels stay)
+           python3 tools/logos/pipeline.py build-cs WORK/source.md --rev <revision> --figs WORK/figs-cs --out WORK/cs
+   then get_artifact for the current version and republish WORK/cs/index.html with publish_files
+   (slug, base_version; shared_live when the artifact's read value is not owner). Nothing of this is
+   committed: the Czech page and figures stay in WORK. The page uses native MathML, because the artifact
+   viewer blocks outside stylesheets.
 ```
 
 Stop without guessing when the export fails, when a rejection cannot be fixed without altering a
