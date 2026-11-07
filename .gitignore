@@ -1,7 +1,3 @@
-*.jam
-!storyteller/model/*.jam
-!jam/mj.jam
-!jam/dj.jam
 *.bak*
 backup_*/
 jam_backup_*/
