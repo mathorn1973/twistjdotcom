@@ -15,6 +15,11 @@
     <script src="../reading.js"></script>
     <link rel="stylesheet" href="../reading.css">
     <link rel="stylesheet" href="../site-nav.css">
+    <style>
+      .contact-figure { margin: 1rem 0; max-width: 24rem; }
+      .contact-figure svg { display: block; width: 100%; height: auto; }
+      .contact-figure figcaption { margin-top: .4rem; color: var(--muted); font-size: .9rem; }
+    </style>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -56,6 +61,36 @@
         <button id="contact-reset" type="button">Reset</button>
       </div>
       <p><output id="contact-value" aria-live="polite">Step 0. Left (2, 0, 0, 0). Right (0, 0, 0, 0). Sum (2, 0, 0, 0).</output></p>
+      <figure class="contact-figure">
+        <svg viewBox="0 0 354 238" role="img" aria-labelledby="contact-geometry-title contact-geometry-description">
+          <title id="contact-geometry-title">Directed contact in the principal complex embedding</title>
+          <desc id="contact-geometry-description">The starting arrow goes from right site 0 to left site 2, through midpoint 1.</desc>
+          <defs>
+            <marker id="contact-arrowhead" viewBox="0 0 6 6" refX="8.5" refY="3" markerWidth="4" markerHeight="4" orient="auto">
+              <path d="M0 0 L6 3 L0 6 Z" fill="var(--ink)"/>
+            </marker>
+            <marker id="contact-before-arrowhead" viewBox="0 0 6 6" refX="6" refY="3" markerWidth="4" markerHeight="4" orient="auto">
+              <path d="M0 0 L6 3 L0 6 Z" fill="var(--muted)"/>
+            </marker>
+          </defs>
+          <path d="M12 119 H340 M76 16 V215 M176 114 v10 M276 114 v10" fill="none" stroke="var(--line)"/>
+          <g fill="var(--muted)" font-size="13">
+            <text x="340" y="138" text-anchor="end">Re</text>
+            <text x="81" y="20">Im</text>
+            <text x="76" y="140" text-anchor="middle">0</text>
+            <text x="176" y="140" text-anchor="middle">1</text>
+            <text x="276" y="140" text-anchor="middle">2</text>
+          </g>
+          <circle id="contact-orbit" cx="176" cy="119" r="100" fill="none" stroke="var(--line)"/>
+          <line id="contact-before" x1="76" y1="119" x2="276" y2="119" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#contact-before-arrowhead)" visibility="hidden"/>
+          <line id="contact-current" x1="76" y1="119" x2="276" y2="119" stroke="var(--ink)" stroke-width="2" marker-end="url(#contact-arrowhead)"/>
+          <path id="contact-turn" fill="none" stroke="var(--ink)" stroke-width="1.2" visibility="hidden"/>
+          <circle id="contact-center" cx="176" cy="119" r="2.8" fill="var(--ink)"/>
+          <circle id="contact-left" cx="276" cy="119" r="4" fill="var(--ink)"/>
+          <circle id="contact-right" cx="76" cy="119" r="4.2" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.6"/>
+        </svg>
+        <figcaption id="contact-geometry-key">Principal complex embedding, drawn numerically. The open dot marks the right site and the filled dot the left.</figcaption>
+      </figure>
       <noscript><p>The first step sends (2, 0) to (1 + <i>j</i>², 1 − <i>j</i>²). The fifth step returns to (2, 0).</p></noscript>
       <p>This exact exercise follows the supplied two-site rule on two starting pairs. The proof covers the whole specified ring and distinguishes this rule from the native update. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L13580-L13643">Contact rule and proof</a> · <a href="../reading/contact/index.html#contact">Worked example</a>.</p>
     </section>
@@ -76,10 +111,81 @@
 (() => {
   const input = document.getElementById('contact-input');
   const value = document.getElementById('contact-value');
+  const beforeArrow = document.getElementById('contact-before');
+  const currentArrow = document.getElementById('contact-current');
+  const turn = document.getElementById('contact-turn');
+  const center = document.getElementById('contact-center');
+  const orbit = document.getElementById('contact-orbit');
+  const leftSite = document.getElementById('contact-left');
+  const rightSite = document.getElementById('contact-right');
+  const geometryDescription = document.getElementById('contact-geometry-description');
+  const geometryKey = document.getElementById('contact-geometry-key');
+  const geometryLegend = geometryKey.textContent;
+  const embedding = Array.from({ length: 4 }, (_, power) => {
+    const angle = power * 2 * Math.PI / 5;
+    return [Math.cos(angle), Math.sin(angle)];
+  });
   let halfDifference;
   let steps;
 
-  function render() {
+  function project(coefficients) {
+    return [0, 1].map(axis =>
+      coefficients.reduce((sum, coefficient, power) => sum + coefficient * embedding[power][axis], 0)
+    );
+  }
+
+  function point([real, imaginary]) {
+    return [76 + 100 * real, 119 - 100 * imaginary];
+  }
+
+  function drawArrow(arrow, from, to) {
+    arrow.setAttribute('x1', from[0]);
+    arrow.setAttribute('y1', from[1]);
+    arrow.setAttribute('x2', to[0]);
+    arrow.setAttribute('y2', to[1]);
+  }
+
+  function place(circle, [x, y]) {
+    circle.setAttribute('cx', x);
+    circle.setAttribute('cy', y);
+  }
+
+  function drawGeometry(left, right, previousHalfDifference, admitted) {
+    const currentLeft = point(project(left));
+    const currentRight = point(project(right));
+    const midpoint = currentLeft.map((coordinate, axis) => (coordinate + currentRight[axis]) / 2);
+    drawArrow(currentArrow, currentRight, currentLeft);
+    place(center, midpoint);
+    place(orbit, midpoint);
+    place(leftSite, currentLeft);
+    place(rightSite, currentRight);
+    orbit.setAttribute('r', Math.hypot(currentLeft[0] - midpoint[0], currentLeft[1] - midpoint[1]));
+
+    const rotated = admitted && steps > 0;
+    beforeArrow.setAttribute('visibility', rotated ? 'visible' : 'hidden');
+    turn.setAttribute('visibility', rotated ? 'visible' : 'hidden');
+    if (rotated) {
+      const [real, imaginary] = project(previousHalfDifference);
+      const previousOffset = [100 * real, -100 * imaginary];
+      const previousLeft = midpoint.map((coordinate, axis) => coordinate + previousOffset[axis]);
+      const previousRight = midpoint.map((coordinate, axis) => coordinate - previousOffset[axis]);
+      drawArrow(beforeArrow, previousRight, previousLeft);
+
+      // In SVG coordinates the counterclockwise mathematical turn has sweep 0.
+      const start = midpoint.map((coordinate, axis) => coordinate + .36 * previousOffset[axis]);
+      const end = midpoint.map((coordinate, axis) => coordinate + .36 * (currentLeft[axis] - coordinate));
+      turn.setAttribute('d', `M ${start.join(' ')} A 36 36 0 0 0 ${end.join(' ')}`);
+    }
+    const summary = steps === 0
+      ? `The starting arrow goes from right site 0 to left site ${admitted ? '2, through midpoint 1' : '1, through midpoint 1/2'}.`
+      : rotated
+        ? 'The solid arrow is 144° counterclockwise from the dashed one. The midpoint stays fixed.'
+        : 'Contact refused. The preceding and current arrows coincide, and their midpoint stays at 1/2.';
+    geometryDescription.textContent = summary;
+    geometryKey.textContent = steps === 0 ? geometryLegend : `${geometryLegend} ${summary}`;
+  }
+
+  function render(previousHalfDifference = halfDifference) {
     const admitted = input.value === 'even';
     const left = admitted ? halfDifference.map((term, index) => (index === 0 ? 1 : 0) + term) : [1, 0, 0, 0];
     const right = admitted ? halfDifference.map((term, index) => (index === 0 ? 1 : 0) - term) : [0, 0, 0, 0];
@@ -87,6 +193,7 @@
     const tuple = terms => `(${terms.join(', ')})`;
     const outcome = steps === 0 ? '' : admitted ? ' Contact applied.' : ' Contact refused.';
     value.textContent = `Step ${steps}. Left ${tuple(left)}. Right ${tuple(right)}. Sum ${tuple(sum)}.${outcome}`;
+    drawGeometry(left, right, previousHalfDifference, admitted);
   }
 
   function reset() {
@@ -96,13 +203,14 @@
   }
 
   document.getElementById('contact-step').addEventListener('click', () => {
+    const previousHalfDifference = halfDifference;
     if (input.value === 'even') {
       // Multiply by j² and reduce j⁴ = −1 − j − j² − j³ and j⁵ = 1.
       const [a, b, c, d] = halfDifference;
       halfDifference = [d - c, -c, a - c, b - c];
     }
     steps++;
-    render();
+    render(previousHalfDifference);
   });
   document.getElementById('contact-reset').addEventListener('click', reset);
   input.addEventListener('change', reset);

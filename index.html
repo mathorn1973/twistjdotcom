@@ -303,7 +303,17 @@
     <p class="equation">
       <math aria-label="Capital J equals one plus lowercase j squared"><mi>J</mi><mo>=</mo><mn>1</mn><mo>+</mo><msup><mi>j</mi><mn>2</mn></msup></math>
     </p>
-    <p>Write a number in the basis (1, <i>j</i>, <i>j</i>², <i>j</i>³). Its four integer coefficients are enough to multiply it by <i>J</i>. Start with 1, written (1, 0, 0, 0). One step gives (1, 0, 1, 0). A second gives (0, −1, 1, −1). Each step uses four additions or subtractions and can be undone exactly. <a href="core/index.html">Kernel, matrix and inverse</a> · <a href="verify/kernel_identities.py">Exact Python verifier</a>.</p>
+    <p>In the basis (1, <i>j</i>, <i>j</i>², <i>j</i>³), four integers give the coefficients of a number. Start with 1 and multiply twice by <i>J</i>.</p>
+    <p class="equation step-sequence">
+      <math aria-label="Starting at (1, 0, 0, 0), multiply by J to get (1, 0, 1, 0). Multiply by J again to get (0, minus 1, 1, minus 1).">
+        <mtext>(1, 0, 0, 0)</mtext>
+        <mover><mo lspace=".10em" rspace=".10em">⟶</mo><mrow><mo>×</mo><mi>J</mi></mrow></mover>
+        <mtext>(1, 0, 1, 0)</mtext>
+        <mover><mo lspace=".10em" rspace=".10em">⟶</mo><mrow><mo>×</mo><mi>J</mi></mrow></mover>
+        <mtext>(0, −1, 1, −1)</mtext>
+      </math>
+    </p>
+    <p>Each step uses four additions or subtractions and can be undone exactly. <a href="papers/twist-numbers/guide/index.html?example=inverse#experiment-title">Try the inverse</a> · <a href="core/index.html">Kernel, matrix and inverse</a> · <a href="verify/kernel_identities.py">Exact Python verifier</a>.</p>
     <p>A physical model needs more. Which sites can interact? What survives the next interaction? What could an observer read twice? TWIST-J gives these questions separate mathematical statements, so each answer can be checked at its own scope.</p>
     <h2 id="reading">Where to start</h2>
     <dl>

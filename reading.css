@@ -49,6 +49,7 @@ p { margin: .6rem 0 .85rem; }
   text-align: center;
 }
 .equation math { font-size: inherit; }
+.step-sequence { font-size: clamp(1rem, 3.6vw, 1.45rem); }
 .references, .kicker, figcaption { color: var(--muted); font-size: .97rem; }
 dl { margin: .85rem 0; }
 dt { margin-top: .85rem; }

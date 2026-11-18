@@ -43,14 +43,23 @@
       <mrow><mi>R</mi><mo>(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>)</mo></mrow><mo>=</mo>
       <mfrac><mrow><mi mathvariant="normal">Tr</mi><mo>[</mo><mo>(</mo><mi>ρ</mi><mo>−</mo><msup><mi>ρ</mi><mn>2</mn></msup><mo>)</mo><mo>(</mo><mi>a</mi><mo>−</mo><mi>b</mi><mo>)</mo><mo>]</mo></mrow><mn>30</mn></mfrac>
     </math></p>
-    <p>The calculation follows three preparations on each of two lattices. In all six histories the archive stays fixed at both stages of every tick from 4 through 13. The reader returns 0 for the named absence preparation, +1 for the positive input and −1 for the negative input. At tick 14 the signed records change.</p>
+    <p>The calculation follows three preparations on each of two lattices. In all six histories the archive stays fixed at both stages of every tick from 4 through 13. For the named absence preparation, the reader returns 0 throughout that interval.</p>
     <table>
-      <caption>Two signed inputs at tick 14</caption>
-      <thead><tr><th scope="col">Input</th><th scope="col">Archive account <i>q</i>(<i>a</i>)</th><th scope="col">Reading <i>R</i>(<i>a</i>, <i>b</i>)</th></tr></thead>
-      <tbody><tr><th scope="row">Positive</th><td>163</td><td>1/6</td></tr>
-      <tr><th scope="row">Negative</th><td>163</td><td>−1/2</td></tr></tbody>
+      <caption>Archive readouts for the two signed inputs</caption>
+      <thead>
+        <tr>
+          <th scope="col">Input</th>
+          <th scope="col">Reading <i>R</i><br>Ticks 4–13</th>
+          <th scope="col">Reading <i>R</i><br>Tick 14</th>
+          <th scope="col">Account <i>q</i><br>Tick 14</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Positive</th><td>+1</td><td>1/6</td><td>163</td></tr>
+        <tr><th scope="row">Negative</th><td>−1</td><td>−1/2</td><td>163</td></tr>
+      </tbody>
     </table>
-    <p>Both archives have the same account, 163. The reference stays fixed and the reader still distinguishes the two inputs. Their signs survive. Their exact values of +1 and −1 lasted only through tick 13.</p>
+    <p>The reference stays fixed. At tick 14 the accounts coincide and the readings change, but their signs still distinguish the two inputs.</p>
     <p class="references">The registered result is a finite computation with specified preparations, geometry, schedule and reader. Implementing that reader inside the model and calibrating a physical instrument remain further questions. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L17332-L17378">Calculation and limits</a> · <a href="https://github.com/mathorn1973/twist-j/tree/canon-v113/reproduce/h3-referenced-record">Reproduction files</a>.</p>
   </main>
   <footer><p><a href="../../index.html">Return to the programme</a> · <a href="../../questions/index.html#record">The record question in the Canon</a> · <a href="#top">Back to top</a></p></footer>

@@ -52,7 +52,7 @@
     <section class="station experiment-station" id="experiment" aria-labelledby="experiment-title">
       <div class="station-body">
         <h2 id="experiment-title">Can you get back exactly?</h2>
-        <p>Start with 1. Apply <i>J</i> = 1 + j², then apply its inverse. Watch the integer slots and the algebraic norm. Switch the picture to the second embedding without changing the number.</p>
+        <p>The seed is 1. Apply <i>J</i> to step forward or <i>J</i>⁻¹ to undo a step. Watch the four integer coefficients and the algebraic norm. Switching the embedding gives a second picture of the same number.</p>
       </div>
       <div class="experiment" id="twist-experiment" hidden>
         <div class="lab-heading">
@@ -118,6 +118,7 @@
         <span class="eyebrow">A worked example — also readable without JavaScript</span>
         <div class="example-flow"><span>(1, 0, 0, 0)</span><b>J →</b><span>(1, 0, 1, 0)</span><b>J⁻¹ →</b><span>(1, 0, 0, 0)</span></div>
         <p>Forward: (1 − 0 + 0, 0 − 0, 1, 0 − 0 + 0). Inverse: (1, 1 + 0 − 1, 1 + 0 − 1 − 0, 0 − 0). Both are exact. The norm is 1 throughout.</p>
+          <noscript><p>From (0, −1, 1, −1), one inverse step gives (1, 0, 1, 0). A second recovers (1, 0, 0, 0).</p></noscript>
       </div>
     </section>
 

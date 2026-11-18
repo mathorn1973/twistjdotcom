@@ -297,7 +297,14 @@
       view = Number(button.dataset.view);
       render('Same exact coefficients, ' + (view === 1 ? 'first' : 'second') + ' complex view. Changing the embedding does not apply a J step.');
     }));
-    render();
+    if (new URLSearchParams(document.location?.search).get('example') === 'inverse') {
+      step = 2;
+      current = state(seed, step);
+      lastRule = tupleText(seed) + ' × J² = ' + tupleText(current) + '.';
+      render('Two J steps from 1. Apply J⁻¹ twice to return to the seed.');
+    } else {
+      render();
+    }
     host.dataset.mounted = 'true';
     host.hidden = false;
   }
