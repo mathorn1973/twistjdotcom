@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Logos pipeline: Czech working document (a Claude Doc) -> English page at https://twistj.com/logos/.
+"""Logos pipeline: public English editorial edition and private Czech translation workflow.
 
 The Czech original is never committed. Only its block hashes, the English blocks and the English
 figures live in this repository. See RUNBOOK.md for the sync procedure.
@@ -16,8 +16,12 @@ Subcommands (run from anywhere; paths are resolved against the repository root):
   figure --caption-sha S --en-caption TEXT --file NAME --jsx JSXFILE
                                     register the English figure NAME (already written to logos/) for
                                     the figure whose Czech caption hashes to S
-  build SOURCE.md --rev REV         write logos/logos.md, logos/index.html, logos/SOURCE.json
-  check SOURCE.md                   verify the English against the Czech source, exit 1 on failure
+  build-edition [--historical-source SOURCE.md]
+                                    render both public editions; logos/logos.md is never written
+  build SOURCE.md --rev REV [--out DIR] [--figs DIR]
+                                    merge a translation into the public edition, or build an isolated draft
+  check SOURCE.md [--markdown FILE] [--figs DIR]
+                                    verify the translation against its Czech source
   jsx2svg JSXFILE OUT.svg           convert a figure's JSX code (as read from the source document) into
                                     a static SVG with the fixed colours; translate its labels afterwards
   build-cs SOURCE.md --rev REV --figs DIR --out DIR
@@ -34,7 +38,10 @@ import hashlib
 import html
 import json
 import re
+import subprocess
 import sys
+import tempfile
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -43,6 +50,10 @@ TOOLS = ROOT / "tools" / "logos"
 OUT = ROOT / "logos"
 MEMORY = TOOLS / "memory.json"
 TEMPLATE = TOOLS / "template.html"
+EDITION_CONFIG = TOOLS / "editions.json"
+ARCHIVE_MARKDOWN = "logos-v109.md"
+TRANSLATION_MARKDOWN = "translation.md"
+TRANSLATION_FIELDS = ("doc_rev", "source_sha256", "blocks", "synced", "memory_blocks", "figures")
 
 CZECH = re.compile(r"[ěščřžýáíéúůňťďĚŠČŘŽÝÁÍÉÚŮŇŤĎ]")
 CANON_ID = re.compile(r"\b[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\b")  # RELATIVE-CONTACT-INTEGRAL-LAW, CMB-S4
@@ -243,9 +254,9 @@ def cmd_apply(a):
 def cmd_figure(a):
     mem = load_memory()
     jsx = Path(a.jsx).read_text(encoding="utf-8")
-    svg_path = OUT / a.file
+    svg_path = Path(a.figs) / a.file
     if not svg_path.exists():
-        print("logos/%s does not exist; write the English SVG first" % a.file); return 1
+        print("%s does not exist; write the English SVG first" % svg_path); return 1
     svg = svg_path.read_text(encoding="utf-8")
     if CZECH.search(svg):
         print("logos/%s still contains Czech diacritics" % a.file); return 1
@@ -301,29 +312,239 @@ def english_blocks(blocks, mem):
     return out
 
 
+TRANSLATION_NOTE = ("Working document of the TWIST-J program, NON-CANONICAL. Translated from the Czech working "
+                    "original, which is not published; the translation is machine-made and synced automatically "
+                    "from the source document. Nothing here is stronger than the registry row it rests on.")
+
+
+def translated_markdown(blocks, mem):
+    en = english_blocks(blocks, mem)
+    title = next((t for k, t, _ in en if k == "title"), "")
+    if not title:
+        raise SystemExit("translation has no title")
+    body = "\n\n".join(t for k, t, _ in en if k != "title") + "\n"
+    return f"{title}\n\n{TRANSLATION_NOTE}\n\n{body}"
+
+
+def manuscript(markdown_text):
+    first, separator, rest = markdown_text.partition("\n")
+    if not separator or not first.startswith("# ") or not first[2:].strip():
+        raise SystemExit("the first line must be a Markdown H1")
+    return first[2:].strip(), rest.lstrip("\n")
+
+
+def referenced_figures(body, directory, fallbacks=None):
+    figures = {}
+    for caption, name in re.findall(r"^!\[([^\]\n]+)\]\((fig-[A-Za-z0-9-]+\.svg)\)$", body, re.M):
+        if name in figures:
+            raise SystemExit(f"figure appears twice: {name}")
+        svg = fallbacks[name] if fallbacks and name in fallbacks else None
+        if svg is None:
+            svg = (directory / name).read_text(encoding="utf-8")
+        figures[name] = {"file": name, "caption": caption, "svg": svg}
+    return list(figures.values())
+
+
+def write_outputs(directory, files):
+    directory.mkdir(parents=True, exist_ok=True)
+    for name, contents in files.items():
+        path = directory / name
+        data = contents.encode("utf-8")
+        if not path.exists() or path.read_bytes() != data:
+            path.write_bytes(data)
+        print("%-14s %7d bytes  sha256 %s" % (name, len(data), sha(contents)))
+
+
 def cmd_build(a):
+    if not a.out:
+        return sync_translation(a)
+    draft = Path(a.out).resolve()
+    if draft == ROOT or ROOT in draft.parents:
+        raise SystemExit("translation draft output must be outside the public repository")
+    source = Path(a.source).read_text(encoding="utf-8")
+    blocks = split_blocks(source)
+    md = translated_markdown(blocks, load_memory())
+    title, body = manuscript(md)
+    body = body.removeprefix(TRANSLATION_NOTE + "\n\n")
+    figures = referenced_figures(body, Path(a.figs))
+    draft_edition = {"kind": "draft", "date": today(), "label": "Local translation draft",
+                     "description": "A translation draft for editorial review."}
+    note = f"English translation of private Czech source revision {a.rev}. Local draft for editorial review."
+    page = render_html(title, note, body, figures, rev=a.rev, edition=draft_edition)
+    write_outputs(draft, {"logos.md": md, "index.html": page,
+                          "SOURCE.json": json.dumps({"kind": "translation-draft", "doc_rev": a.rev,
+                                                     "source_sha256": sha(source), "blocks": len(blocks),
+                                                     "markdown_sha256": sha(md)}, indent=2) + "\n",
+                          **{f["file"]: f["svg"] for f in figures}})
+    return 0
+
+
+def load_config():
+    return json.loads(EDITION_CONFIG.read_text(encoding="utf-8"))
+
+
+def archive_markdown(historical, historical_source=None):
+    if historical_source:
+        source = Path(historical_source).read_text(encoding="utf-8")
+        if sha(source) != historical["source_sha256"]:
+            raise SystemExit("historical source hash does not match normalized Czech revision 124")
+        blocks = split_blocks(source)
+        if len(blocks) != historical["blocks"] or sum(b["sha"] == V109_REFERENCES_SHA for b in blocks) != 1:
+            raise SystemExit("historical source block inventory is inconsistent")
+        archive_md = translated_markdown(blocks, load_memory())
+    else:
+        archive_md = (OUT / ARCHIVE_MARKDOWN).read_text(encoding="utf-8")
+    if sha(archive_md) != historical["markdown_sha256"]:
+        raise SystemExit("historical Markdown does not match the archived v109 reading")
+
+    return archive_md
+
+
+def edition_files(config, current_md, archive_md, translation, candidate_figures=None):
+    current = config["current"]
+    historical = config["historical"]
+    archive_title, archive_body = manuscript(archive_md)
+    archive_body = archive_body.removeprefix(TRANSLATION_NOTE + "\n\n")
+    current_title, current_body = manuscript(current_md)
+    current_figures = referenced_figures(current_body, OUT, candidate_figures)
+    archive_figures = referenced_figures(archive_body, OUT)
+    archive_asset_hashes = {f["file"]: sha(f["svg"]) for f in archive_figures}
+    if archive_asset_hashes != historical["figures"]:
+        raise SystemExit("historical figure inventory or content changed")
+
+    archive_note = "Historical machine translation of the private Czech working document, revision 124."
+    current_version = current["canon"]["tag"].removeprefix("canon-")
+    archive_edition = {**historical, "kind": "historical", "label": "Historical reading",
+                       "url": "https://twistj.com/logos/v109.html",
+                       "description": "Historical Logos reading of Public Canon v109, translated from Czech revision 124.",
+                       "markdown": "logos-v109.md"}
+    current_edition = {**current, "kind": "editorial", "label": "English editorial reading",
+                       "url": "https://twistj.com/logos/",
+                       "description": f"Non-canonical English editorial reading of the TWIST-J programme based on Public Canon {current_version}.",
+                       "markdown": "logos.md"}
+    archived_html = render_html(archive_title, archive_note, archive_body, archive_figures, edition=archive_edition)
+    current_html = render_html(current_title, "", current_body, current_figures, edition=current_edition)
+    provenance = {
+        **translation,
+        "schema": 1,
+        "hash_encoding": "UTF-8 with LF line endings",
+        "current": {
+            "kind": "english-editorial-reading", "derived_from": "historical",
+            "translation_baseline": translation["translation_markdown"],
+            "date": current["date"], "canon": current["canon"],
+            "markdown": "logos.md", "markdown_sha256": sha(current_md),
+            "html": "index.html", "html_sha256": sha(current_html),
+            "figures": {f["file"]: sha(f["svg"]) for f in current_figures},
+        },
+        "historical": {
+            "kind": "translation-snapshot", "doc_rev": historical["doc_rev"],
+            "source_sha256": historical["source_sha256"], "blocks": historical["blocks"],
+            "date": historical["date"], "canon": historical["canon"],
+            "reference_block_sha256": V109_REFERENCES_SHA,
+            "markdown": "logos-v109.md", "markdown_sha256": sha(archive_md),
+            "html": "v109.html", "html_sha256": sha(archived_html),
+            "figures": archive_asset_hashes,
+        },
+    }
+    return {"v109.html": archived_html, ARCHIVE_MARKDOWN: archive_md, "index.html": current_html,
+            "SOURCE.json": json.dumps(provenance, indent=2) + "\n"}
+
+
+def load_translation(historical, archive_md):
+    provenance = OUT / "SOURCE.json"
+    stored = json.loads(provenance.read_text(encoding="utf-8")) if provenance.exists() else {}
+    defaults = {"doc_rev": historical["doc_rev"], "source_sha256": historical["source_sha256"],
+                "blocks": historical["blocks"], "synced": historical["date"],
+                "memory_blocks": len(load_memory()["blocks"]), "figures": len(historical["figures"])}
+    translation = {k: stored.get(k, defaults[k]) for k in TRANSLATION_FIELDS}
+    name = stored.get("translation_markdown", ARCHIVE_MARKDOWN)
+    if name not in {ARCHIVE_MARKDOWN, TRANSLATION_MARKDOWN}:
+        raise SystemExit("unknown recorded translation baseline")
+    baseline = archive_md if name == ARCHIVE_MARKDOWN else (OUT / name).read_text(encoding="utf-8")
+    digest = sha(baseline)
+    if digest != stored.get("translation_sha256", historical["markdown_sha256"]):
+        raise SystemExit("last English translation baseline checksum does not match SOURCE.json")
+    return {**translation, "translation_markdown": name, "translation_sha256": digest,
+            "translation_figures": stored.get("translation_figures", historical["figures"])}, baseline
+
+
+def merge_translation(editorial, baseline, translation):
+    if baseline == translation:
+        return editorial
+    with tempfile.TemporaryDirectory(prefix="logos-translation-") as work:
+        inputs = [Path(work) / name for name in ("editorial.md", "baseline.md", "translation.md")]
+        for path, contents in zip(inputs, (editorial, baseline, translation)):
+            path.write_text(contents, encoding="utf-8", newline="\n")
+        result = subprocess.run(["git", "merge-file", "-p", "-L", "current English editorial reading",
+                                 "-L", "previous English translation", "-L", "new English translation",
+                                 *map(str, inputs)], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                check=False)
+    merged = result.stdout.decode("utf-8")
+    if result.returncode:
+        headings = []
+        section = "opening"
+        for n, line in enumerate(merged.splitlines(), 1):
+            if line.startswith(("## ", "### ")):
+                section = line.lstrip("# ").strip()
+            elif line == "<<<<<<< current English editorial reading":
+                headings.append(f"{section} (merge line {n})")
+        if headings:
+            raise SystemExit("Logos translation conflicts in " + "; ".join(headings) +
+                             ". Resolve overlapping edits before retrying. Public outputs were unchanged.")
+        raise SystemExit("could not merge Logos translation: " + result.stderr.decode("utf-8", errors="replace"))
+    return merged
+
+
+def cmd_build_edition(a):
+    config = load_config()
+    archive_md = archive_markdown(config["historical"], a.historical_source)
+    translation, _ = load_translation(config["historical"], archive_md)
+    current_md = (OUT / "logos.md").read_text(encoding="utf-8")
+    write_outputs(OUT, edition_files(config, current_md, archive_md, translation))
+    return 0
+
+
+def sync_translation(a):
     source = Path(a.source).read_text(encoding="utf-8")
     blocks = split_blocks(source)
     mem = load_memory()
-    en = english_blocks(blocks, mem)
-    title = next(t for k, t, _ in en if k == "title")[2:].strip()
-    body_md = "\n\n".join(t for k, t, _ in en if k != "title") + "\n"
-    note = ("Working document of the TWIST-J program, NON-CANONICAL. Translated from the Czech working "
-            "original, which is not published; the translation is machine-made and synced automatically "
-            "from the source document. Nothing here is stronger than the registry row it rests on.")
-    md = "# %s\n\n%s\n\n%s" % (title, note, body_md)
-    OUT.mkdir(exist_ok=True)
-    (OUT / "logos.md").write_text(md, encoding="utf-8")
-    figs = [{"file": f["file"], "svg": (OUT / f["file"]).read_text(encoding="utf-8"), "caption": f["en_caption"]}
-            for f in mem["figures"].values()]
-    page = render_html(title, note, body_md, figs, "en", a.rev)
-    (OUT / "index.html").write_text(page, encoding="utf-8")
-    src = {"doc_rev": a.rev, "source_sha256": sha(source), "blocks": len(blocks),
-           "synced": today(), "memory_blocks": len(mem["blocks"]), "figures": len(mem["figures"])}
-    (OUT / "SOURCE.json").write_text(json.dumps(src, indent=1) + "\n", encoding="utf-8")
-    for fn in ("logos.md", "index.html", "SOURCE.json"):
-        data = (OUT / fn).read_bytes()
-        print("%-12s %7d bytes  sha256 %s" % (fn, len(data), hashlib.sha256(data).hexdigest()))
+    md = translated_markdown(blocks, mem)
+    config = load_config()
+    historical = config["historical"]
+    archive_md = archive_markdown(historical)
+    translation, baseline = load_translation(historical, archive_md)
+    if a.rev.isdecimal() and translation["doc_rev"].isdecimal() and int(a.rev) < int(translation["doc_rev"]):
+        raise SystemExit(f"source revision {a.rev} is older than the recorded revision {translation['doc_rev']}")
+    same_revision = a.rev == translation["doc_rev"]
+    if same_revision and (sha(source) != translation["source_sha256"] or md != baseline):
+        raise SystemExit("source or English translation changed without a new source revision")
+
+    figure_dir = Path(a.figs)
+    staged = {f.name: f.read_text(encoding="utf-8") for f in figure_dir.glob("fig-*.svg")} if figure_dir != OUT else {}
+    figures = {f["file"]: f["svg"] for f in referenced_figures(md, OUT, staged)}
+    figure_hashes = {name: sha(svg) for name, svg in figures.items()}
+    if same_revision and figure_hashes != translation["translation_figures"]:
+        raise SystemExit("translation figures changed without a new source revision")
+    if translation_problems(blocks, mem, figures.keys()):
+        raise SystemExit("translation check failed before writing public outputs")
+    for name, digest in historical["figures"].items():
+        if name in figures and sha(figures[name]) != digest:
+            raise SystemExit(f"use a new filename for the revised historical figure {name}")
+
+    editorial = (OUT / "logos.md").read_text(encoding="utf-8")
+    merged = merge_translation(editorial, baseline, md)
+    output = {}
+    if not same_revision:
+        translation = {"doc_rev": a.rev, "source_sha256": sha(source), "blocks": len(blocks),
+                       "synced": today(), "memory_blocks": len(mem["blocks"]), "figures": len(figures),
+                       "translation_markdown": TRANSLATION_MARKDOWN, "translation_sha256": sha(md),
+                       "translation_figures": figure_hashes}
+        output[TRANSLATION_MARKDOWN] = md
+    if merged != editorial:
+        output["logos.md"] = merged
+    output.update(figures)
+    output.update(edition_files(config, merged, archive_md, translation, figures))
+    write_outputs(OUT, output)
     return 0
 
 
@@ -370,7 +591,98 @@ STRINGS = {
 }
 
 
-def render_html(title, note, body_md, figs, lang="en", rev=""):
+def heading_navigation(body, required):
+    """Reserve the simple IDs for sections; subsection IDs include their parent."""
+    def title(contents):
+        return html.unescape(re.sub("<[^>]+>", "", contents))
+
+    def slug(text):
+        ascii_text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+        return re.sub(r"[^a-z0-9]+", "-", ascii_text.lower()).strip("-")
+
+    headings = re.compile(r"<h([23])>(.*?)</h\1>")
+    sections = [(slug(title(m[2])), title(m[2])) for m in headings.finditer(body) if m[1] == "2"]
+    used = {anchor for anchor, _ in sections}
+    if not sections or "" in used or len(used) != len(sections) or "top" in used:
+        raise SystemExit("section headings must have distinct nonempty slugs other than top")
+    if missing := set(required) - used:
+        raise SystemExit("missing required section IDs: " + ", ".join(sorted(missing)))
+    parent = "reading"
+
+    def add_id(match):
+        nonlocal parent
+        level, contents = match.groups()
+        anchor = slug(title(contents))
+        if level == "2":
+            parent = anchor
+        else:
+            base = parent + "-" + (anchor or "section")
+            anchor = base
+            suffix = 1
+            while anchor in used:
+                suffix += 1
+                anchor = f"{base}-{suffix}"
+            used.add(anchor)
+        return f'<h{level} id="{anchor}">{contents}</h{level}>'
+
+    links = "\n".join(f'        <li><a href="#{anchor}">{html.escape(text)}</a></li>'
+                      for anchor, text in sections)
+    toc = f'''    <nav class="logos-toc" aria-label="Contents">
+      <ul>
+{links}
+      </ul>
+    </nav>
+
+'''
+    return toc + headings.sub(add_id, body)
+
+
+def edition_metadata(edition, title):
+    """Reader-facing metadata and attribution are intentionally distinct by edition."""
+    description = html.escape(edition["description"], quote=True)
+    if edition["kind"] == "draft":
+        head = f'<title>{html.escape(title)} · Translation draft</title>\n<meta name="robots" content="noindex">'
+        return head, "", "", "Local translation draft", '<a href="logos.md">Markdown draft</a>', ""
+    url = edition["url"]
+    canonical = f'https://github.com/mathorn1973/twist-j/tree/{edition["canon"]["tag"]}'
+    display_tag = edition["canon"]["tag"].removeprefix("canon-")
+    historical = edition["kind"] == "historical"
+    byline = "A. M. Thorn" if historical else "TWIST-J"
+    reader_label = f'{edition["label"]} · Public Canon {display_tag} · Non-canonical · {edition["date"]}'
+    headline = f"Logos · {title} ({display_tag})"
+    escaped_headline = html.escape(headline, quote=True)
+    safe_url = html.escape(url, quote=True)
+    head = f'''    <title>{escaped_headline} · TWIST-J</title>
+    <meta name="description" content="{description}">
+    <meta name="author" content="{byline}">
+    <meta property="og:title" content="{escaped_headline}">
+    <meta property="og:description" content="{description}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{safe_url}">
+    <meta property="og:site_name" content="TWIST-J">
+    <meta property="og:locale" content="en_US">
+    <link rel="canonical" href="{safe_url}">
+    <link rel="alternate" type="text/markdown" href="{edition["markdown"]}" title="Logos source Markdown">'''
+    metadata = {
+        "@context": "https://schema.org", "@type": "Article",
+        "headline": title, "author": {"@type": "Person" if historical else "Organization", "name": byline},
+        "url": url, "inLanguage": "en", "dateModified": edition["date"],
+        "description": edition["description"], "isBasedOn": canonical,
+    }
+    if not historical:
+        metadata["isBasedOn"] = [canonical, "https://twistj.com/logos/v109.html"]
+    jsonld = ('    <script type="application/ld+json">\n' +
+              json.dumps(metadata, ensure_ascii=False, indent=2).replace("<", "\\u003c") +
+              '\n    </script>')
+    foot = (f'<a href="{canonical}">Evidence edition ({display_tag})</a> &middot; '
+            f'<a href="../canon/index.html">Current Public Canon</a> &middot; '
+            f'<a href="{edition["markdown"]}">Plain Markdown</a> &middot; <a href="#top">Back to top</a>')
+    other = ('<a class="edition-links" href="index.html">Current reading</a>' if historical
+             else '<a class="edition-links" href="v109.html">Reading of v109</a>')
+    return head, jsonld, byline, reader_label, foot, other
+
+
+def render_html(title, note, body_md, figs, lang="en", rev="", edition=None):
     """figs: list of {"file", "svg", "caption"}; each ![caption](file) in body_md becomes an inline figure."""
     try:
         import markdown  # noqa
@@ -399,8 +711,19 @@ def render_html(title, note, body_md, figs, lang="en", rev=""):
             svg = svg.replace(hexc, var)
         pat = re.compile(r'<p><img alt="[^"]*" src="%s"\s*/?></p>' % re.escape(fig["file"]))
         assert len(pat.findall(body)) == 1, fig["file"]
-        body = pat.sub(lambda m: '<figure>%s<figcaption>%s</figcaption></figure>' % (
-            svg.replace("\\", "\\\\"), html.escape(fig["caption"])), body)
+        caption = html.escape(fig["caption"])
+        if edition and edition["kind"] != "draft":
+            label = html.escape(fig["caption"], quote=True)
+            asset = html.escape(fig["file"], quote=True)
+            figure = (f'<figure><div class="logos-figure-graphic" role="region" tabindex="0" '
+                      f'aria-label="{label}">{svg}</div><figcaption>{caption} '
+                      f'<a href="{asset}">Open diagram</a></figcaption></figure>')
+            body = pat.sub(lambda _: figure, body)
+        else:
+            body = pat.sub(lambda m: '<figure>%s<figcaption>%s</figcaption></figure>' % (
+                svg.replace("\\", "\\\\"), caption), body)
+    if edition and edition["kind"] != "draft":
+        body = heading_navigation(body, edition.get("required_sections", []))
     tpl = TEMPLATE.read_text(encoding="utf-8")
     jsonld = ""
     if S["jsonld"]:
@@ -429,13 +752,21 @@ def render_html(title, note, body_md, figs, lang="en", rev=""):
         fonts = """    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">"""
-    page = (tpl.replace("{{LANG}}", S["lang"]).replace("{{HEAD}}", S["head"]).replace("{{JSONLD}}", jsonld)
-            .replace("{{EYEBROW}}", S["eyebrow"]).replace("{{BYLINE}}", S["byline"]).replace("{{VERSION}}", S["version"])
-            .replace("{{FOOT}}", S["foot"]).replace("{{KATEX}}", S["katex"])
-            .replace("{{NOTE}}", html.escape(note)).replace("{{BODY}}", body)
+    head, byline, version, foot = S["head"], S["byline"], S["version"], S["foot"]
+    note_class = "note"
+    if edition:
+        head, jsonld, byline, version, foot, other = edition_metadata(edition, title)
+        note_class += " logos-edition-note"
+        if other:
+            nav = nav.replace("    </nav>", "        " + other + "\n    </nav>")
+    page = (tpl.replace("{{LANG}}", S["lang"]).replace("{{HEAD}}", head).replace("{{JSONLD}}", jsonld)
+            .replace("{{EYEBROW}}", S["eyebrow"]).replace("{{BYLINE}}", byline).replace("{{VERSION}}", version)
+            .replace("{{FOOT}}", foot).replace("{{KATEX}}", S["katex"])
+            .replace("{{NOTE}}", (f'        <div class="{note_class}">{html.escape(note)}</div>\n' if note else ""))
+            .replace("{{BODY}}", body)
             .replace("{{FONTS}}", fonts).replace("{{READERASSETS}}", reader_assets)
             .replace("{{NAV}}", nav).replace("{{BODYCLASS}}", body_class).replace("{{HTMLCLASS}}", html_class))
-    page = page.replace("{{TITLE}}", html.escape(title)).replace("{{DATE}}", today()).replace("{{REV}}", html.escape(str(rev)))
+    page = page.replace("{{TITLE}}", html.escape(title)).replace("{{DATE}}", edition["date"] if edition else today()).replace("{{REV}}", html.escape(str(rev)))
     page = page.replace('        <div class="byline"></div>\n', "")
     assert "{{" not in page, re.findall(r"{{[A-Z]+}}", page)
     return page
@@ -525,42 +856,57 @@ def cmd_build_cs(a):
     return 0
 
 
+def translation_problems(blocks, mem, figures):
+    failures = 0
+    for i, block in enumerate(blocks):
+        kind = block["kind"]
+        if kind in ("text", "title"):
+            en = mem["blocks"].get(block["sha"])
+            problems = ["no English"] if not en else block_problems(block["cs"], en["en"])
+        elif kind == "figure":
+            cap = FIGURE.match(block["cs"]).group(1)
+            fig = mem["figures"].get(sha(cap))
+            problems = ["no English figure"] if not fig else (
+                [] if fig["file"] in figures else ["missing figure " + fig["file"]])
+        else:
+            problems = []
+        if problems:
+            failures += 1
+            print("block %d (%s): %s" % (i, kind, "; ".join(problems)))
+    return failures
+
+
 def cmd_check(a):
     source = Path(a.source).read_text(encoding="utf-8")
     blocks = split_blocks(source)
     mem = load_memory()
-    failures = 0
-    for i, b in enumerate(blocks):
-        if b["kind"] in ("text", "title"):
-            en = mem["blocks"].get(b["sha"])
-            probs = ["no English"] if not en else block_problems(b["cs"], en["en"])
-        elif b["kind"] == "figure":
-            cap = FIGURE.match(b["cs"]).group(1)
-            fig = mem["figures"].get(sha(cap))
-            probs = ["no English figure"] if not fig else (
-                [] if (OUT / fig["file"]).exists() else ["missing file logos/%s" % fig["file"]])
+    figure_paths = {f.name for directory in (OUT, Path(a.figs)) for f in directory.glob("fig-*.svg")}
+    failures = translation_problems(blocks, mem, figure_paths)
+    if not failures:
+        expected = translated_markdown(blocks, mem)
+        if a.markdown:
+            actual = Path(a.markdown).read_text(encoding="utf-8")
+            if actual != expected:
+                failures += 1
+                print("supplied English Markdown differs from the source translation")
         else:
-            probs = []
-        if probs:
-            failures += 1
-            print("block %d (%s): %s" % (i, b["kind"], b["cs"][:50].replace("\n", " ")))
-            for p in probs:
-                print("   " + p)
-    md = (OUT / "logos.md")
-    if md.exists():
-        text = md.read_text(encoding="utf-8")
-        for bad in ("[embedded content", "MATHBLOCK", "&#91;"):
-            if bad in text:
-                failures += 1; print("logos.md contains %r" % bad)
-        if text.count("$$") % 2:
-            failures += 1; print("logos.md has unbalanced $$")
-        en_blocks = [x for x in split_blocks(text) if x["kind"] != "byline"]
-        cs_blocks = [x for x in blocks if x["kind"] != "byline"]
-        # logos.md = title + note + body; source (byline dropped) = title + body
-        if len(en_blocks) != len(cs_blocks) + 1:
-            failures += 1
-            print("block count differs: logos.md %d vs source %d + note" % (len(en_blocks), len(cs_blocks)))
-    print("check: %d problem block(s), %d blocks total" % (failures, len(blocks)))
+            config = load_config()
+            archive_md = archive_markdown(config["historical"])
+            translation, baseline = load_translation(config["historical"], archive_md)
+            if translation["source_sha256"] != sha(source) or baseline != expected:
+                failures += 1
+                print("source or translation differs from the recorded public baseline")
+            actual_figures = {f["file"]: sha(f["svg"]) for f in referenced_figures(baseline, OUT)}
+            if actual_figures != translation["translation_figures"]:
+                failures += 1
+                print("translation figure checksums differ from the recorded public baseline")
+            editorial = (OUT / "logos.md").read_text(encoding="utf-8")
+            output = edition_files(config, editorial, archive_md, translation)
+            for name, contents in output.items():
+                if (OUT / name).read_text(encoding="utf-8") != contents:
+                    failures += 1
+                    print(f"{name} differs from the generated public edition")
+    print("check: %d problem block(s) or output(s), %d source blocks" % (failures, len(blocks)))
     return 1 if failures else 0
 
 
@@ -572,9 +918,13 @@ def main():
     p = sp.add_parser("fill"); p.add_argument("pending"); p.add_argument("english"); p.add_argument("--source"); p.set_defaults(f=cmd_fill)
     p = sp.add_parser("apply"); p.add_argument("pending"); p.set_defaults(f=cmd_apply)
     p = sp.add_parser("figure"); p.add_argument("--caption-sha", required=True); p.add_argument("--en-caption", required=True)
-    p.add_argument("--file", required=True); p.add_argument("--jsx", required=True); p.set_defaults(f=cmd_figure)
-    p = sp.add_parser("build"); p.add_argument("source"); p.add_argument("--rev", required=True); p.set_defaults(f=cmd_build)
-    p = sp.add_parser("check"); p.add_argument("source"); p.set_defaults(f=cmd_check)
+    p.add_argument("--file", required=True); p.add_argument("--jsx", required=True)
+    p.add_argument("--figs", default=OUT); p.set_defaults(f=cmd_figure)
+    p = sp.add_parser("build-edition"); p.add_argument("--historical-source"); p.set_defaults(f=cmd_build_edition)
+    p = sp.add_parser("build"); p.add_argument("source"); p.add_argument("--rev", required=True)
+    p.add_argument("--out"); p.add_argument("--figs", default=OUT); p.set_defaults(f=cmd_build)
+    p = sp.add_parser("check"); p.add_argument("source"); p.add_argument("--markdown")
+    p.add_argument("--figs", default=OUT); p.set_defaults(f=cmd_check)
     p = sp.add_parser("jsx2svg"); p.add_argument("jsx"); p.add_argument("out"); p.set_defaults(f=cmd_jsx2svg)
     p = sp.add_parser("build-cs"); p.add_argument("source"); p.add_argument("--rev", required=True)
     p.add_argument("--figs", required=True); p.add_argument("--out", required=True); p.set_defaults(f=cmd_build_cs)

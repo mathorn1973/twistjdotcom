@@ -67,6 +67,32 @@
 .logos-reader figure { border: 0; border-radius: 0; padding: 0; }
 .logos-reader ol, .logos-reader ul { margin-inline-start: 0; }
 .logos-reader table { table-layout: fixed; }
+.logos-reader .edition-links { font-size: .9em; }
+.logos-edition-note {
+  color: var(--muted);
+  font-size: .95rem;
+  margin-block: .75rem 1.2rem;
+}
+.logos-toc {
+  border-block: 1px solid var(--line);
+  margin-block: 1.15rem 1.6rem;
+  padding-block: .65rem;
+  font-size: 1rem;
+}
+.logos-toc ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: .25rem .9rem;
+  margin: .35rem 0 0;
+  padding-inline-start: 1.25rem;
+}
+.logos-toc li { margin: 0; }
+.logos-figure-graphic { overflow-x: auto; }
+.logos-figure-graphic:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+@media screen and (max-width: 42rem) {
+  .logos-figure-graphic > svg { min-inline-size: 42rem; }
+  .logos-reader figcaption { text-align: start; }
+}
 @media (max-width: 32rem) {
   .logos-reader { padding-top: 1rem; }
   .logos-reader h1 { margin-top: 1.5rem; }

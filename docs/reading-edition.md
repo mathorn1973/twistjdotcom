@@ -15,7 +15,7 @@ All four edition DOIs resolved to their respective public Zenodo records on 18 N
 
 Run `python -B verify/paper_mirrors.py` from the repository root to check the mirrors, manuscript fingerprints and edition citations offline. Run `python -B verify/kernel_identities.py` for the exact integer identities. The [sitemap](../sitemap.xml) and [machine index](../llms.txt) describe the same routes as the home page. Modification dates for existing routes follow their page history.
 
-The [Logos reading](../logos/index.html) and its [Markdown edition](../logos/logos.md) were rebuilt from source revision 124. Five historical citations point to the `canon-v109` tag for the status, registry, frontier, two-site contact notes and four-slot minimum probe. The HTML footer links to the current Canon.
+The [current Logos reading](../logos/index.html) and its [Markdown edition](../logos/logos.md) are the main routes. The [earlier reading of Canon v109](../logos/v109.html) and its [Markdown edition](../logos/logos-v109.md) preserve the English reading from source revision 124. Its historical citations point to the `canon-v109` tag for the status, registry, frontier, two-site contact notes and four-slot minimum probe.
 
 The current Evo app can share four settings the older subdomain cannot read: target density, viscosity, solidification strength and its toggle. Share and Lock & Share in this checkout point to `https://twistj.com/evo/`, which reads all four. The fragment format is preserved. Existing links on the subdomain still depend on the application served there.
 
@@ -37,7 +37,7 @@ The public home page gives equal visual weight to eight destinations. Six lead t
 
 Public Canon v113 is the scientific baseline for this review. The home page’s kernel identities still check. Its examples give little indication of the more recent work on what contact can write, what an archive retains and which readings lose information. The finite H3 result entered in v112. In v113 the selected weighted scalar incidence comparison moved from open to dictionary status. The massless-phase question remains open. The Frontier at this review held 23 open obligations and two hypotheses. Release examples should cite the precise edition. General navigation should lead to the current status. [Status at the review](https://github.com/mathorn1973/twist-j/blob/canon-v113/STATUS.md) · [Changes in v112 and v113](https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CHANGELOG.md) · [Live Frontier](https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md)
 
-Logos presents a dated working reading of v109, with 26 live obligations and hypotheses at that edition. Several source links follow the moving main branch. Treat the November reading as a dated work, retain its qualifiers and link its historical claims to the matching edition. Reassess the affected passages before offering a current reading. Its generated HTML and Markdown have a documented upstream workflow. [Published Logos](https://twistj.com/logos/) · [v109 status](https://github.com/mathorn1973/twist-j/blob/canon-v109/STATUS.md) · [Publishing workflow](https://github.com/mathorn1973/twistjdotcom/blob/818e9bcef885769f1baf806662595677c4cfb20f/tools/logos/RUNBOOK.md)
+The archived Logos reading records 26 live obligations and hypotheses in v109. Keep those qualifiers and cite that edition when discussing its claims. The current reading has a separate citation context. Its HTML and Markdown share the documented upstream workflow. [Current Logos](https://twistj.com/logos/) · [v109 status](https://github.com/mathorn1973/twist-j/blob/canon-v109/STATUS.md) · [Publishing workflow](../tools/logos/RUNBOOK.md)
 
 ## Proposed reading order
 
@@ -59,7 +59,8 @@ Keep each question at a stable URL. Use a short argument and a worked example be
 | `/core/` | Kernel reference reached from the first equation | Keep its verifier download and reciprocal route to the Canon overview. |
 | `/canon/`, `/canon/core/` | Public record and short Canon overview | Retain raw Markdown and repository fallbacks, activation authority and live source behavior. |
 | `/manifest/`, `/manifest/cs/` | Method in English | Check the old localized address redirects to the English edition. List the canonical address in the site indexes. |
-| `/logos/`, `/logos/logos.md` | Dated working interpretation | Preserve HTML and Markdown, source attribution and version scope. Make future anchor changes in the generator. |
+| `/logos/`, `/logos/logos.md` | Current working interpretation | Keep HTML and Markdown aligned and cite the corresponding evidence. Make anchor changes in the generator. |
+| `/logos/v109.html`, `/logos/logos-v109.md` | Earlier English reading | Keep existing v109 citations resolvable and the version scope visible. |
 | `/demolab/`, `/pentaplex/` | Index of illustrations and an instrument | Preserve direct entry and a clear return to the lab. |
 | `/fractal/` | Illustration with shareable state | Open saved fragments in Mandelbrot, Julia and split views and compare state. |
 | `/evo/`, `https://evo.twistj.com/` | The current experiment and an older share target | Test Share and Lock & Share through a fresh browser. The application currently writes the subdomain and encodes state in the fragment. Verify historical links before editing that behavior. |

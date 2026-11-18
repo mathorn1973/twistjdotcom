@@ -1,81 +1,103 @@
-# Logos sync runbook
+# Logos editions
 
-`https://twistj.com/logos/` is the English mirror of a Czech working document that is edited elsewhere
-and is not published. The mirror is kept by an automatic sync: a scheduled session runs this runbook.
-Nothing on the page is stronger than the registry row it rests on; the page is NON-CANONICAL.
+The public English reading at `https://twistj.com/logos/` is edited in
+`logos/logos.md`. It is a non-canonical editorial revision of the historical
+reading, with its own evidence basis recorded in `tools/logos/editions.json`.
+Changes to the English edition are editorial changes. They do not imply any
+change to the private Czech working document.
 
-What lives in this repository: `logos/index.html` (the page), `logos/logos.md` (the same text as plain
-markdown, for agents), `logos/fig-*.svg` (the figures), `logos/SOURCE.json` (which source revision the
-page mirrors) and `tools/logos/memory.json` (the translation memory: SHA-256 of each Czech block, the
-English block, nothing else). The Czech text itself is never committed. The link to the source document
-lives in the scheduled task, not here.
+The reading at `https://twistj.com/logos/v109.html` preserves the English
+machine translation of private Czech revision 124. Its Markdown is
+`logos/logos-v109.md`. The English snapshot retains five historical links
+pinned to `canon-v109`. The generator recognizes the historical references
+by the source block's SHA-256. Both forms link separately to the live Canon.
+`logos/SOURCE.json` records the source and evidence provenance, dates, output
+hashes and referenced figures for both editions. It holds no private source URL.
 
-## Procedure
+## English editorial build
 
-```
-0  Preconditions. A clone of mathorn1973/twistjdotcom at main with push rights; python3 with the
-   `markdown` package (pip install --break-system-packages markdown if missing). All work files go
-   to a directory OUTSIDE the repository, call it WORK.
-1  Currency. Read the source document and take its current revision number. Compare with
-   logos/SOURCE.json field doc_rev. Equal: stop, report "no change", touch nothing.
-2  Export. Export the document as markdown to WORK/export.md and as html to WORK/export.html
-   (the html carries the figure node ids: <figure data-embed="node/ID">).
-3  Plan.   python3 tools/logos/pipeline.py normalize WORK/export.md WORK/source.md
-           python3 tools/logos/pipeline.py plan WORK/source.md WORK/pending.json
-   The plan lists the text blocks without English and the state of every figure.
-4  Figures. For each figure the plan lists: take its node id from WORK/export.html, read the node's
-   code, save it to WORK/figN.jsx with one trailing newline. If the plan says "known" and sha256 of that
-   file equals the recorded jsx_sha, nothing to do for the English page. Otherwise
-           python3 tools/logos/pipeline.py jsx2svg WORK/figN.jsx WORK/figN.svg
-   gives the static SVG; copy it to logos/<file>, translate the text labels only, keep the geometry,
-   and widen the viewBox rather than shrinking text when an English label runs long. Then register it:
-           python3 tools/logos/pipeline.py figure --caption-sha S --en-caption "..." --file fig-x.svg --jsx WORK/figN.jsx
-   Keep every WORK/figN.jsx: step 10 needs all of them, changed or not.
-5  Translate. Write the English of every pending block, in the order of WORK/pending.json, one block
-   per item, blocks separated by one blank line, into WORK/english.md. Rules:
-     - numbers stay digits where the source has digits, words where it has words; every number,
-       superscript and subscript must reappear;
-     - every status label ([T], [D], [C], [H], [O], [F], [candidate-T], [candidate-C]) and every
-       registry id (UPPER-CASE-WITH-HYPHENS) is kept exactly; [čtení] becomes [reading],
-       [úsudek] becomes [judgment], [model] stays, [sonda ...] becomes [probe ...],
-       [výklad ...] becomes [interpretation ...];
-     - tables keep their rows, lists their items, headings their level;
-     - if a block is a small edit of a paragraph that already has English (see context_before_en,
-       context_after_en and logos/logos.md), keep the existing wording and change only what changed;
-     - the glossary below is binding.
-           python3 tools/logos/pipeline.py fill WORK/pending.json WORK/english.md
-           python3 tools/logos/pipeline.py apply WORK/pending.json
-   apply rejects a block that drops a number, a label or an id, or still carries Czech letters.
-   Fix the English and apply again. Never fix a rejection by changing a number: if the source
-   itself looks wrong, stop and report.
-6  Build.  python3 tools/logos/pipeline.py build WORK/source.md --rev <revision from step 1>
-           python3 tools/logos/pipeline.py check WORK/source.md
-   check must end with "0 problem block(s)".
-7  Review. git diff logos/logos.md once. The diff must contain only the paragraphs that changed in
-   the source. Anything else means a block was mis-aligned: stop and report.
-8  Commit and push. Audit the staged files first: only logos/, tools/logos/memory.json and, if the
-   date changed, sitemap.xml; no secrets, no private hostnames, no link to the source document.
-   Commit as A. M. Thorn <thorn@twistj.com>, message "logos: sync to source rev N", push to main.
-9  Report in one paragraph: the revision synced, how many blocks were new, which figures changed,
-   or "no change".
-10 Czech static copy. The owner keeps a private static copy of the Czech source as a claude.ai artifact;
-   its slug is named in the scheduled task, never here. After the push (or when only the copy is stale):
-           python3 tools/logos/pipeline.py jsx2svg WORK/figN.jsx WORK/figs-cs/<file>   for every figure,
-                                                  <file> as memory.json names it (Czech labels stay)
-           python3 tools/logos/pipeline.py build-cs WORK/source.md --rev <revision> --figs WORK/figs-cs --out WORK/cs
-   then get_artifact for the current version and republish WORK/cs/index.html with publish_files
-   (slug, base_version; shared_live when the artifact's read value is not owner). Nothing of this is
-   committed: the Czech page and figures stay in WORK. The page uses native MathML, because the artifact
-   viewer blocks outside stylesheets.
-```
+1. Verify the intended evidence edition against authoritative `STATUS.md` in
+   the scientific repository. Record its release tag, content commit and
+   Canon hash in `tools/logos/editions.json`. Set the editorial date explicitly.
+   Check every specific claim against its frozen registry row. Keep the
+   source dates and live links distinguishable from edition-specific citations.
+2. Edit `logos/logos.md`. Begin with one H1 title, use unique H2 section
+   headings and H3 subheadings, and put multiline `$$` formula fences on their
+   own lines. Keep the required section slugs in `editions.json` stable.
+   Diagrams are separate paragraphs such as `![Plain caption](fig-name.svg)`,
+   using a local, uniquely named SVG. Give any revision to a historical
+   diagram a new filename.
+3. Run `python -B tools/logos/check_frontier.py CANON_DIRECTORY` against the
+   pinned scientific directory with `REGISTRY.tsv` and `FRONTIER.md`. The
+   optional `--markdown FILE` checks an alternate working manuscript. Review
+   the link anchors, labels and scientific scope independently of rendering.
+4. With Python and Python-Markdown installed, run
+   `python -B tools/logos/pipeline.py build-edition`. This generates the two
+   HTML pages and provenance from the two English Markdown sources, and
+   verifies the historical Markdown and three figure fingerprints. It never
+   writes `logos/logos.md`. Use `--historical-source WORK/source.md` on first
+   publication of the archive or to reconstruct the historical Markdown from
+   the verified normalized Czech revision 124. The command checks its
+   source hash, block count and reference-block identity before rendering.
+5. Review the diff and test the navigation, narrow layout, diagrams and
+   formulas. Repeating the same build with the same configuration,
+   Python-Markdown 3.11.3 and inputs should produce the same UTF-8/LF hashes.
+   Confirm that no private source, identifiers or exports entered the
+   change. Publish only within the separately authorized website procedure.
 
-Stop without guessing when the export fails, when a rejection cannot be fixed without altering a
-number or a label, when check fails, when the diff touches paragraphs the source did not change, or
-when the push is rejected. A stopped sync leaves the repository untouched.
+## Review a future translation
 
-The English editions pin five citations in the v109 reference list to `canon-v109`. The generator
-recognises the list by its source block hash. If the list changes, check which edition the revised
-citations describe before updating the pins. The HTML footer links to the current Canon.
+The Czech working document and its private static copy belong to the
+owner. Their references live in the scheduled task, outside this repository.
+Keep their export, temporary translations and Czech assets under `WORK`,
+outside the repository. The scheduled workflow still uses the top-level
+source revision and hash in SOURCE.json. For a new revision, the default
+build merges the incoming English translation into the current manuscript
+using the last English translation as its base. The archived v109
+translation is the first base. Later bases live in generated translation.md.
+Overlapping edits stop the build with the affected sections named. The
+merger writes public outputs only after resolving the merge and rendering
+both editions.
+
+1. Export the owner-approved Czech revision as `WORK/export.md` and HTML
+   as `WORK/export.html`. Match each embedded figure to its source node and
+   keep the exact JSX with one trailing newline.
+2. Run `pipeline.py normalize WORK/export.md WORK/source.md` and
+   `pipeline.py plan WORK/source.md WORK/pending.json`. Compare the recorded
+   revision and hash against the last approved translation review.
+3. Translate only pending blocks. Preserve every number, superscript,
+   subscript, scope label, claim ID, heading level and table/list layout.
+   Preserve unchanged wording. Review edition-specific citation targets.
+   Run `pipeline.py fill WORK/pending.json WORK/english.md`, then
+   `pipeline.py apply WORK/pending.json` in the isolated working checkout.
+4. Reuse the known English figures where their node hashes match. Convert
+   each new node with `pipeline.py jsx2svg WORK/figN.jsx WORK/figs/fig-name.svg`,
+   translate labels and register it with `pipeline.py figure` using
+   `--caption-sha`, `--en-caption`, `--file`, `--jsx` and `--figs WORK/figs`.
+   Never overwrite a shared historical diagram. If a diagram changes, use
+   a new asset filename and keep the recorded historical source mapping.
+5. Run `pipeline.py build WORK/source.md --rev REV`. Include `--figs WORK/figs`
+   for staged new diagrams. The current English Markdown receives the
+   incoming translation changes while non-overlapping editorial edits
+   remain. Run `pipeline.py check WORK/source.md`. It checks the actual
+   translation baseline and the generated HTML/provenance against the
+   current public Markdown. A repeated build for an identical source
+   revision leaves the outputs unchanged. An optional `--out WORK/en`
+   builds an isolated draft; check it with `--markdown WORK/en/logos.md`.
+6. Review the generated diff, preserving the editorial context and frozen
+   evidence labels. In the authorized scheduled workflow, commit the
+   merged manuscript, generated files, translation baseline, new figures,
+   translation memory and relevant discovery dates, then push as usual.
+   A merge conflict stops publication before any generated file is changed.
+7. Continue the existing private Czech copy workflow. Render the source
+   with `build-cs`, supplying the Czech SVGs made from all source JSX nodes
+   and an output directory under `WORK`. Use the scheduled task's private
+   artifact slug and version to republish the Czech static copy. Keep its
+   HTML, figures and source export out of the public repository.
+
+Stop if the export or figure identity cannot be verified, if the
+translation check fails, or if the generated diff contains unauthorized
+changes. Keep the public English edition and historical snapshot intact.
 
 ## Glossary (Czech to English, binding)
 
