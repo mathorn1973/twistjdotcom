@@ -8,7 +8,7 @@ let globalTick = 0;
 const TICK_RATE = 1000 / 60; // 60 Hz = 16.66 ms
 const NETWORK_BUFFER_TICKS = 8; // 8 ticks = ~133 ms
 
-// Fronta VŠECH příchozích událostí od VŠECH klientů
+// Queue incoming events from all clients
 let pendingEvents = [];
 
 // Scheduled settings changes (applied at a future tick, like drag events)
@@ -113,7 +113,7 @@ wss.on('connection', (ws) => {
     clientOrder.push(ws);
     console.log(`Client #${ws._clientId} connected. Total: ${clientOrder.length}. Master: #${clientOrder[0]._clientId}`);
 
-    // 1. Synchronizace času při připojení
+    // 1. Synchronize time on connection
     ws.send(JSON.stringify({ type: 'sync', tick: globalTick }));
 
     // 2. Broadcast roles to everyone (new client = slave, existing master stays)
@@ -132,7 +132,7 @@ wss.on('connection', (ws) => {
         console.log(`New client joined — full resync triggered. All clients reset to tick 0.`);
     }
 
-    // 3. Příjem událostí
+    // 3. Receive events
     ws.on('message', (msg) => {
         try {
             let data = JSON.parse(msg);

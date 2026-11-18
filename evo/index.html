@@ -1937,7 +1937,7 @@ if(u_reactOn == 1 && u_dualOn == 0){
 
   // LIVE ONLINE: network events from server
   uniform int   u_numNetEvents;
-  uniform vec3  u_netEvents[8]; // x, y, síla
+  uniform vec3  u_netEvents[8]; // x, y, strength
 
   layout(location=0) out vec4 o_state;
   layout(location=1) out vec4 o_k0;
@@ -3332,7 +3332,7 @@ float accLen = length(acc);
   }
 
 
-  // VÝCHOZÍ: reset sliders to defaults + reset simulation
+  // Restore default sliders and reset the simulation
   const DEFAULTS = {
     tglKernel: true, tglField: true, tglMouse: true, tglChaos: true, tglPump: true, tglReact: false, tglExact: false,
     mouseRepel: false,

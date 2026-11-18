@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -495,8 +495,8 @@
   <header>
     <div>
       <h1>Mandelbrot · Fractal</h1>
-      <p class="subtitle">z ↦ z² + c &nbsp;·&nbsp; čas je počítadlo úniku</p>
-      <p class="scope-note">numerická ilustrace (Float64, konečný počet iterací) · nikoli důkaz Canonu</p>
+      <p class="subtitle">z ↦ z² + c &nbsp;·&nbsp; count the steps until escape</p>
+      <p class="scope-note">Escape times are computed in Float64 up to a finite iteration limit.</p>
     </div>
     <div class="info">
       zoom · <b id="z">×1.0</b><br>
@@ -505,32 +505,32 @@
     </div>
   </header>
   <div class="canvas-wrap" id="wrap">
-    <div class="loading" id="loading">Počítám časy úniku…</div>
+    <div class="loading" id="loading">Computing escape times…</div>
     <canvas id="cv"></canvas>
     <div class="controls">
-      <button id="zin"  title="přiblížit (+)">+</button>
-      <button id="zout" title="oddálit (−)">−</button>
-      <button id="mup"  title="víc detailu (m)">⊕</button>
-      <button id="mdn"  title="míň detailu, rychleji">⊖</button>
-      <button id="rst"  title="výchozí (R)">↺</button>
-      <button id="clr"  title="schéma barev (C)">◐</button>
+      <button id="zin"  title="Zoom in (+)">+</button>
+      <button id="zout" title="Zoom out (−)">−</button>
+      <button id="mup"  title="Increase iteration limit (M)">⊕</button>
+      <button id="mdn"  title="Decrease iteration limit">⊖</button>
+      <button id="rst"  title="Reset view (R)">↺</button>
+      <button id="clr"  title="Color scheme (C)">◐</button>
       <button id="dmo"  title="demo (D)">▶</button>
-      <button id="fsb"  title="celá obrazovka (F)">⛶</button>
-      <button id="shr"  title="sdílet odkaz (S)">⤴</button>
+      <button id="fsb"  title="Full screen (F)">⛶</button>
+      <button id="shr"  title="Copy link to this view (S)">⤴</button>
       <button id="jul"  title="Mandelbrot / Julia / split (J)">✦</button>
-      <button id="hid"  title="skrýt UI (H)">◉</button>
+      <button id="hid"  title="Hide controls (H)">◉</button>
     </div>
     <div class="juliabar" id="juliabar">
       <label>c<sub>Re</sub> <input type="text" id="jRe" inputmode="decimal" value="-0.8" spellcheck="false"></label>
       <input type="range" id="jReS" class="jslider" min="-2" max="1" step="0.0005" value="-0.8">
       <label>c<sub>Im</sub> <input type="text" id="jIm" inputmode="decimal" value="0.156" spellcheck="false"></label>
       <input type="range" id="jImS" class="jslider" min="-1.5" max="1.5" step="0.0005" value="0.156">
-      <span class="jhint" id="jhint">počáteční c &nbsp;·&nbsp; pixel = z₀</span>
+      <span class="jhint" id="jhint">fixed c &nbsp;·&nbsp; pixel = z₀</span>
     </div>
   </div>
   <div class="toast" id="toast"></div>
   <footer>
-    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>H</kbd> · UI &nbsp;·&nbsp; <kbd>S</kbd> · share</span>
+    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>C</kbd> · colors &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>H</kbd> · UI &nbsp;·&nbsp; <kbd>S</kbd> · share</span>
     <span class="count" id="cnt">…</span>
   </footer>
 </div>
@@ -570,45 +570,45 @@
 
 <script>
 (() => {
-  // ===== stav pohledu =====
+  // View state
   const home = { cx: -0.75, cy: 0, scale: 3 };
-  // Julia: pevné c laditelné zvlášť Re/Im. Vypnuto = klasický Mandelbrot.
-  // tři režimy na jednom přepínači: mandel -> julia -> split -> mandel.
-  // julia.on = celé plátno počítá Julia jádro (jen v režimu 'julia');
-  // split má vlastní cestu (vlevo Mandelbrot, vpravo Julia).
+  // The Julia parameter has independent real and imaginary controls.
+  // The mode button cycles through Mandelbrot, Julia and a split view.
+  // Only full-canvas Julia uses the Julia kernel in the worker pool.
+  // Split view draws the two planes separately.
   const julia = { mode: 'mandel', on: false, cx: -0.8, cy: 0.156 };
   const view = { ...home };
-  let boost = 0;                       // ruční doladění detailu nad automatiku
-  const SCALE_MIN = 3e-13;             // hranice přesnosti double
+  let boost = 0;                       // Manual offset to the automatic iteration limit.
+  const SCALE_MIN = 3e-13;             // Double-precision zoom limit.
   const SCALE_MAX = 6;
 
-  // m roste plynule s hloubkou zoomu (logaritmicky)
+  // Increase the iteration limit logarithmically with zoom depth.
   function mFor(scale) {
     return Math.max(60, Math.min(4000,
       Math.round(120 + 55 * Math.log2(3 / scale)) + boost));
   }
 
-  // ===== schémata barev =====
-  // každé dostane t = i/m a stín s = 1 - t^6 (stáhne tělo do černé)
-  const SCHEMES = ['sepie', 'priroda', 'atol', 'strakata', 'psycho', 'pulnoc'];
+  // Color schemes
+  // t is the fraction i/m; s = 1 - t^6 darkens the boundary.
+  const SCHEMES = ['sepia', 'woodland', 'atoll', 'variegated', 'psychedelic', 'midnight'];
   const SCHEME_NAMES = {
-    sepie:   'sépie · chiaroscuro',
-    priroda: 'příroda · les a hlína',
-    atol:    'atol · laguna a korál',
-    strakata:'strakatá · zlato, měděnka, lazur',
-    psycho:  'psychedelická · spektrum',
-    pulnoc:  'půlnoc'
+    sepia:   'sepia · chiaroscuro',
+    woodland: 'woodland · forest and earth',
+    atoll:    'atoll · lagoon and coral',
+    variegated:'variegated · gold, verdigris and azure',
+    psychedelic:  'psychedelic · spectrum',
+    midnight:  'midnight'
   };
-  // Paleta atolu: pevné barevné zastávky, mezi nimi lineární přechod.
-  // Vnitřek (t = 1) není černý, končí v hlubinné mořské modři.
+  // Interpolate between fixed atoll color stops.
+  // The interior uses deep blue.
   const ATOL_STOPS = [
-    [0.00, 243, 235, 213],   // korálový písek
-    [0.16, 138, 217, 201],   // mělčina
-    [0.34,  24, 158, 170],   // tyrkys laguny
-    [0.50, 235, 171, 122],   // korálová lavice
+    [0.00, 243, 235, 213],   // Coral sand
+    [0.16, 138, 217, 201],   // Shallows
+    [0.34,  24, 158, 170],   // Turquoise lagoon
+    [0.50, 235, 171, 122],   // Coral shelf
     [0.66,  18, 121, 148],   // reef
-    [0.84, 233, 130, 105],   // korál
-    [1.00,  13,  54, 102]    // hlubina
+    [0.84, 233, 130, 105],   // Coral
+    [1.00,  13,  54, 102]    // Deep water
   ];
   const ATOL = new Array(768);
   for (let k = 0; k < 256; k++) {
@@ -622,34 +622,34 @@
   }
 
   const SHADERS = {
-    sepie:    (t, s, D, q) => { const v = 230 - 130*t, o = -90*t*t;
+    sepia:    (t, s, D, q) => { const v = 230 - 130*t, o = -90*t*t;
       D[q] = (v+o)*s; D[q+1] = (v-10+o*.3)*s; D[q+2] = (v-30-o)*s; },
-    atol:     (t, s, D, q) => { const k = 3 * Math.min(255, (t * 255) | 0);
+    atoll:     (t, s, D, q) => { const k = 3 * Math.min(255, (t * 255) | 0);
       D[q] = ATOL[k]; D[q+1] = ATOL[k+1]; D[q+2] = ATOL[k+2]; },
-    priroda:  (t, s, D, q) => { const w = 14*t;
+    woodland:  (t, s, D, q) => { const w = 14*t;
       D[q]   = (170-120*t+45*Math.sin(w+4.5))*s;
       D[q+1] = (205-110*t+45*Math.sin(w+0.6))*s;
       D[q+2] = (150-130*t+35*Math.sin(w+2.5))*s; },
-    strakata: (t, s, D, q) => { const w = 22*t;
+    variegated: (t, s, D, q) => { const w = 22*t;
       D[q]   = (150+95*Math.sin(w+1.0))*s;
       D[q+1] = (140+95*Math.sin(w+2.6))*s;
       D[q+2] = (130+105*Math.sin(w+4.2))*s; },
-    psycho:   (t, s, D, q) => { const w = 50*t;
+    psychedelic:   (t, s, D, q) => { const w = 50*t;
       D[q]   = (128+127*Math.sin(w))*s;
       D[q+1] = (128+127*Math.sin(w+2.094))*s;
       D[q+2] = (128+127*Math.sin(w+4.188))*s; },
-    pulnoc:   (t, s, D, q) => { const u = t*t;
+    midnight:   (t, s, D, q) => { const u = t*t;
       D[q] = (16+230*u)*s; D[q+1] = (20+150*u)*s; D[q+2] = (46+40*t)*s; }
   };
-  let currentScheme = 'sepie';
+  let currentScheme = 'sepia';
 
-  // ===== plátno =====
+  // Canvas
   const cv = document.getElementById('cv');
   const wrap = document.getElementById('wrap');
   const g = cv.getContext('2d');
-  const buf = document.createElement('canvas');   // mezikrok pro adaptivní rozlišení
+  const buf = document.createElement('canvas');   // Intermediate frame for adaptive resolution.
   const bg = buf.getContext('2d');
-  const anchors = {};       // schéma -> { canvas, view }: přehledové kotvy okrajů
+  const anchors = {};       // Overview frames cover exposed edges during reprojection.
   function anchorKey(sch) { return (julia.on ? 'J:' : 'M:') + sch; }
   function anchorFor(sch) {
     const key = anchorKey(sch);
@@ -677,18 +677,18 @@
     else requestRender(true);
   }
 
-  // ===== render: z -> z² + c, tři násobení na krok přes (a+b)² =====
+  // Compute z² + c with three multiplications per step using (a+b)².
   let lastDt = 40;
   let lastM = 120;
 
-  // Jádro běží v bazénu web workerů: snímek se dělí na vodorovné pásy
-  // přes všechna jádra, hlavní vlákno nikdy neblokuje. Uvnitř tři triky:
-  // 1) kardioida a period-2 bulva: vnitřek poznáme bez jediné iterace,
-  // 2) Brentova detekce periody: orbita, která se opakuje, je vnitřek
-  //    a smyčka končí hned, ne až na stropu m,
-  // 3) klasická struktura smyčky: b první (ze starého a), žádná dočasná
-  //    proměnná, zdvojení je sčítání a test úniku čte udržované T zadarmo.
-  // SHADERS se serializují, jeden zdroj pravdy pro barvy.
+  // Workers render horizontal strips while the main thread handles input.
+  // The kernel uses three shortcuts.
+  // 1. Skip iteration inside the main cardioid and period-two bulb.
+  // 2. Brent cycle detection recognizes a repeating orbit
+  //    and stops before the iteration limit.
+  // 3. Update b first using the previous a. Double by addition
+  //    and reuse the squared magnitude T for the escape test.
+  // The worker uses the same shader functions as the main thread.
   const workerSrc =
     'const ATOL=[' + ATOL.join(',') + '];' +
     'const SHADERS={' +
@@ -740,8 +740,8 @@
     pool.push(w);
   }
 
-  // chybějící kotvu schématu tiše dopočítá vyhrazený worker,
-  // aby zoom out měl kryté okraje hned po přepnutí barev v hloubce
+  // A dedicated worker prepares a full overview for each missing palette
+  // so that zooming out immediately after a palette change covers the edges.
   const anchorWorker = new Worker(wUrl);
   let anchorJob = null;
   anchorWorker.onmessage = e => {
@@ -771,13 +771,13 @@
   }
 
   let inFlight = null;          // { id, ..., parts, left, t0 }
-  let wanted = 0;               // rs další úlohy po dokončení, 0 = nic
+  let wanted = 0;               // Resolution requested for the next job; zero means none.
   let jobSeq = 0;
 
-  function render(rs) {         // asynchronně rozdej pásy bazénu
-    if (julia.mode === 'split') return;     // split renderuje vlastní cestou
+  function render(rs) {         // Distribute strips among workers.
+    if (julia.mode === 'split') return;     // Split view uses a separate renderer.
     if (inFlight) { wanted = Math.max(wanted, rs); return; }
-    const os = 1.35;            // overscan kryje i celý tik kolečka ven (1.25)
+    const os = 1.35;            // Overscan covers one 1.25× wheel step out.
     const rw = Math.max(64, Math.round(W * rs * os));
     const rh = Math.max(48, Math.round(H * rs * os));
     const { cx, cy, scale } = view;
@@ -803,20 +803,20 @@
     if (!inFlight || inFlight.id !== id) return;
     inFlight.parts.push({ row0, rows, pix });
     if (--inFlight.left > 0) return;
-    // všechny pásy doletěly: slož snímek
+    // Assemble the completed strips.
     const meta = inFlight; inFlight = null;
-    // monotónnost kvality: dolet, který by zobrazený obraz zhrubil,
-    // se zahodí, dokud starý snímek aktuální pohled stále kryje.
-    // To zabíjí pulzování ostrý/hrubý/ostrý při plynulém zoomu.
+    // While the previous frame covers the current view, discard a completion
+    // that would lower its resolution.
+    // This prevents visible jumps between sharp and coarse frames.
     const kv = view.scale * (H / W);
     const covered = bufView &&
       bufView.cx - bufView.scale/2 <= view.cx - view.scale/2 &&
       bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
       bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
       bufView.cy + bufView.k/2     >= view.cy + kv/2;
-    // přísně nezhoršující: nahraď zobrazený snímek jen ostřejším nebo
-    // stejně ostrým, nikdy hrubším (dokud pohled kryje); to dorovnává
-    // poslední drobné probliknutí při plynulém přibližování
+    // Keep the displayed resolution steady or improving while the old frame
+    // still covers the viewport.
+    // This also prevents flicker at small zoom increments.
     const accept = !covered || meta.scheme !== bufScheme ||
       meta.rw / meta.sc >= bufView.rw / bufView.scale;
     if (accept) {
@@ -825,7 +825,7 @@
         bg.putImageData(new ImageData(new Uint8ClampedArray(p.pix), meta.rw, p.rows), 0, p.row0);
       bufView = { cx: meta.cx, cy: meta.cy, scale: meta.sc, k: meta.ky, rw: meta.rw };
       bufScheme = meta.scheme;
-      if (meta.sc > 3.9) {            // přehledový snímek: kotva pro okraje
+      if (meta.sc > 3.9) {            // Keep wide overview frames for the exposed edges.
         const A = anchorFor(meta.scheme);
         A.canvas.width = buf.width; A.canvas.height = buf.height;
         A.canvas.getContext('2d').drawImage(buf, 0, 0);
@@ -840,7 +840,7 @@
       if (l) l.style.display = 'none';
     }
     updateInfo();
-    // adaptace rozlišení podle skutečného času snímku
+    // Adapt resolution to the measured frame time.
     if (demoState) {
       if (lastDt > 75) demoState.rs = Math.max(0.1, demoState.rs * 0.92);
       else if (lastDt < 35) demoState.rs = Math.min(1, demoState.rs * 1.05);
@@ -868,19 +868,19 @@
     document.getElementById('cnt').textContent = Math.round(lastDt) + ' ms';
   }
 
-  // ===== mezibuffer: reprojekce posledního snímku do nového pohledu =====
-  let bufView = null;                 // pohled, ve kterém je buf spočítaný
-  let bufScheme = '';                 // schéma toho snímku
+  // Reproject the previous frame into the new view.
+  let bufView = null;                 // View used to render this buffer.
+  let bufScheme = '';                 // Palette used for this frame.
 
-  function edgeColor() {              // barva exteriéru schématu (t = 0)
+  function edgeColor() {              // Exterior color at t = 0.
     const D = [0, 0, 0, 0];
     SHADERS[currentScheme](0, 1, D, 0);
     return 'rgb(' + (D[0]|0) + ',' + (D[1]|0) + ',' + (D[2]|0) + ')';
   }
 
-  // Efektivní rozlišení reprojekce: kolik z plného rozlišení by blit dal.
-  // 0 znamená, že buf nepokrývá celý aktuální pohled (zoom out, posun),
-  // pak se musí přepočítat vždy, jinak by okraje zůstaly prázdné.
+  // Estimate the effective resolution of the reprojected frame.
+  // Return zero if a pan or zoom out exposes new territory.
+  // That forces a render instead of leaving an empty border.
   function blitQuality() {
     if (!bufView) return 0;
     const kv = view.scale * (H / W);
@@ -893,7 +893,7 @@
     return (bufView.rw / bufView.scale) * (view.scale / W);
   }
 
-  function project(img, v) {        // reprojekce snímku do aktuálního pohledu
+  function project(img, v) {        // Project a rendered frame into the current viewport.
     const kv = view.scale * (H / W);
     const dx = (v.cx - v.scale/2 - (view.cx - view.scale/2)) / view.scale * W;
     const dy = (v.cy - v.k/2     - (view.cy - kv/2))         / kv * H;
@@ -904,14 +904,14 @@
     g.imageSmoothingEnabled = true;
     g.fillStyle = edgeColor();
     g.fillRect(0, 0, W, H);
-    // kotva pod aktuálním snímkem: odkryté okraje ukážou hrubý fraktál,
-    // ne prázdnou barvu; při krytém pohledu je neviditelná
+    // Draw the overview underneath so uncovered edges have a coarse preview.
+    // It stays hidden wherever the current frame covers the view.
     const A = anchors[anchorKey(currentScheme)];
     if (A && A.view) project(A.canvas, A.view);
     project(buf, bufView);
   }
 
-  // ===== plánování: blit každý snímek, výpočty asynchronně ve workeru =====
+  // Paint every display frame; render asynchronously in workers.
   let queued = false, interRS = 0.5, refineT = null;
   function requestRender(interactive) {
     if (julia.mode === 'split') {
@@ -923,7 +923,7 @@
       queued = true;
       requestAnimationFrame(() => { queued = false; blit(); });
     }
-    render(interRS);            // in-flight fronta workeru drží tempo sama
+    render(interRS);            // The worker queue paces itself.
     scheduleRefine();
   }
   function scheduleRefine() {
@@ -932,7 +932,7 @@
     syncHash();
   }
 
-  // ===== interakce =====
+  // Input
   function clampScale(s) { return Math.max(SCALE_MIN, Math.min(SCALE_MAX, s)); }
   function pos(e) {
     const r = cv.getBoundingClientRect();
@@ -964,7 +964,7 @@
     zoomAt(mx, my, 0.5);
   });
 
-  // drag = posun (náhled posouvá hotový snímek, přepočet po puštění); 2 prsty = pinch
+  // Drag reprojects the frame until release. Two fingers pinch to zoom.
   let drag = null;
   const ptrs = new Map();
   let pinchPrev = null;
@@ -1033,7 +1033,7 @@
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms || 1800);
   }
 
-  // ===== immersive (H) a fullscreen (F) =====
+  // Immersive (H) and full-screen (F) modes
   function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
   function enterFS() {
     const el = document.documentElement;
@@ -1049,7 +1049,7 @@
     const was = document.body.classList.contains('immersive');
     document.body.classList.toggle('immersive');
     fitSize();
-    if (!was) showToast('<kbd>H</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+    if (!was) showToast('<kbd>H</kbd> · <kbd>Esc</kbd> &nbsp; to exit', 1600);
   }
   function toggleFullscreen() {
     if (fsEl()) { exitFS(); }
@@ -1058,7 +1058,7 @@
       document.body.classList.add('immersive');
       enterFS();
       fitSize();
-      showToast('<kbd>F</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+      showToast('<kbd>F</kbd> · <kbd>Esc</kbd> &nbsp; to exit', 1600);
     }
   }
   ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev =>
@@ -1070,11 +1070,11 @@
       fitSize();
     }));
 
-  // ===== demo: fullscreen + ambientní dron + auto kamera po zastávkách =====
+  // Guided tour, full screen and ambient audio
   let demoState = null;
 
 
-  // Riff-player state helpers: gating zvuku v demu řídí stav riff přehrávače.
+  // Use the riff player to manage audio during the tour.
   function isRiffPlaying() {
     const b = document.getElementById('audioToggle');
     return !!(b && b.classList.contains('playing'));
@@ -1084,18 +1084,18 @@
     if (b) b.click();
   }
 
-  // Zastávky prohlídky: pojmenovaná místa hranice, hloubka v bezpečí double.
+  // Named boundary locations with zoom depths inside double precision.
   const DEMO_STOPS = [
-    { x: -0.74548,   y: 0.11669,   minS: 4e-4, name: 'údolí mořských koníků' },
-    { x:  0.28443,   y: 0.01273,   minS: 5e-4, name: 'sloní údolí' },
+    { x: -0.74548,   y: 0.11669,   minS: 4e-4, name: 'Seahorse Valley' },
+    { x:  0.28443,   y: 0.01273,   minS: 5e-4, name: 'Elephant Valley' },
     { x: -1.7687773, y: 0.0017384, minS: 3e-4, name: 'mini Mandelbrot' },
-    { x: -0.7436439, y: 0.1318259, minS: 2e-4, name: 'Misiurewiczova spirála' },
-    { x: -0.15920,   y: 1.03275,   minS: 6e-4, name: 'anténa' },
-    { x: -0.7269,    y: 0.1889,    minS: 5e-4, name: 'dvojitá spirála' }
+    { x: -0.7436439, y: 0.1318259, minS: 2e-4, name: 'Misiurewicz spiral' },
+    { x: -0.15920,   y: 1.03275,   minS: 6e-4, name: 'Antenna' },
+    { x: -0.7269,    y: 0.1889,    minS: 5e-4, name: 'Double spiral' }
   ];
-  // Prohlídka jedné zastávky jako úseky: průlet se zastaveními,
-  // na každé pauze se jednou vykreslí detailní snímek v plném rozlišení.
-  // f = podíl hloubky v ln škále (0 přehled, 1 dno zastávky).
+  // Each stop has travel and pause intervals.
+  // Render one full-resolution frame at each pause.
+  // f is the fraction of logarithmic depth from overview (0) to the stop (1).
   const DEMO_LEGS = [
     { type: 'pan',  dur: 3 },
     { type: 'zoom', dur: 9,  from: 0,    to: 0.45 },
@@ -1110,13 +1110,13 @@
   ];
   const DEMO_TOTAL = DEMO_LEGS.reduce((a, l) => a + l.dur, 0);
 
-  // Demo pohání virtuální čas, ale posune ho jen když je zobrazený snímek
-  // dost ostrý: render vždy počítá plné rozlišení a čas čeká, dokud
-  // zvětšení posledního snímku nepřekročí malou mez. Ostrost tím drží
-  // nahoře (nikdy hrubo), pauzy zůstanou ostré a tempo se samo
-  // přizpůsobí rychlosti rendereru: mělce plynule, hluboko o něco pomaleji.
-  const DEMO_TARGET = 1.12;         // do téhle ostrosti jede plnou rychlostí
-  const DEMO_CAP = 1.45;            // u téhle se zoom spojitě zastaví (ne skok)
+  // Tour time advances only while the displayed frame has enough detail.
+  // The worker renders at full resolution. Pause the virtual clock when
+  // the last frame has been magnified beyond the threshold.
+  // This preserves sharpness at stops and lets the camera slow down
+  // during expensive deep zooms.
+  const DEMO_TARGET = 1.12;         // Run at full speed below this magnification.
+  const DEMO_CAP = 1.45;            // Smoothly stop the tour clock at this magnification.
 
   function demoStep(now) {
     if (!demoState) return;
@@ -1124,7 +1124,7 @@
     const dtWall = st.last ? Math.min(0.05, (now - st.last) / 1000) : 0;
     st.last = now;
 
-    // jak ostrý je teď zobrazený snímek vůči aktuálnímu pohledu
+    // Measure the sharpness of the displayed frame at the current zoom.
     let mag = Infinity, covered = false;
     if (bufView) {
       const kv = view.scale * (H / W);
@@ -1133,13 +1133,13 @@
         bufView.cx + bufView.scale/2 >= view.cx + view.scale/2 &&
         bufView.cy - bufView.k/2     <= view.cy - kv/2 &&
         bufView.cy + bufView.k/2     >= view.cy + kv/2;
-      const nativeDensity = bufView.rw / bufView.scale;  // spočtené px na jednotku
-      const screenDensity = W / view.scale;              // px obrazovky na jednotku
-      mag = screenDensity / nativeDensity;               // >1 = zvětšeno (měkčí)
+      const nativeDensity = bufView.rw / bufView.scale;  // Rendered pixels per unit.
+      const screenDensity = W / view.scale;              // Screen pixels per unit.
+      mag = screenDensity / nativeDensity;               // Values over one indicate magnification.
     }
-    // tempo se spojitě škrtí podle ostrosti: dokud je snímek ostrý, plná
-    // rychlost; jak zvětšení roste k mezi, zoom plynule zvolní (nikdy tvrdě
-    // nezamrzne, jen v hloubce jede pomaleji), takže pohyb neškube
+    // Slow the camera smoothly as frame magnification approaches the cap.
+    // Resume full speed as soon as the renderer catches up.
+    // This avoids jumps when deep zooms take longer.
     let sf = 0;
     if (covered) {
       if (mag <= DEMO_TARGET) sf = 1;
@@ -1178,7 +1178,7 @@
     view.scale = Math.exp(ln3 + (Math.log(cur.minS) - ln3) * f);
     view.cx = cxT; view.cy = cyT;
 
-    render(1);                       // vždy plné rozlišení, samo se škrtí
+    render(1);                       // Render at full resolution; the tour clock adjusts its speed.
     blit();
     st.raf = requestAnimationFrame(demoStep);
   }
@@ -1190,9 +1190,9 @@
     document.body.classList.add('showcase');
     fitSize();
 
-    // Zvuk v demu je defaultně zapnutý: hraje hlavní riff engine
-    // (preset zvolený v přehrávači, default drift). Když už hrál,
-    // necháme ho; když ne, zapneme a po konci dema zase vypneme.
+    // The tour uses the selected riff, with drift as the default.
+    // Leave audio playing if it was already on.
+    // Stop it afterwards only if the tour started it.
     const audioStarted = !isRiffPlaying();
     if (audioStarted) toggleRiff();
 
@@ -1223,30 +1223,30 @@
   }
   function toggleDemo() { if (demoState) stopDemo(); else startDemo(); }
 
-  // ===== schéma barev =====
+  // Color scheme selection
   function cycleScheme() {
     currentScheme = SCHEMES[(SCHEMES.indexOf(currentScheme) + 1) % SCHEMES.length];
-    showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2200);
+    showToast('Colors · ' + SCHEME_NAMES[currentScheme], 2200);
     ensureAnchor();
     if (julia.mode === 'split') { renderSplitMandel(); renderSplitJulia(); syncHash(); }
     else if (!demoState) { render(1); syncHash(); }
   }
 
-  // ===== sdílení stavu v adrese (vzor /evo) =====
-  // hash nese přesnou polohu, zoom, detail, schéma a nastavení playeru
+  // Shareable view state
+  // The fragment stores position, zoom, detail, palette and audio.
   let wantAudio = false;
   function encodeState() {
     const p = new URLSearchParams();
-    p.set('x', String(view.cx));            // String() = nejkratší přesný zápis
+    p.set('x', String(view.cx));            // Shortest round-trip representation.
     p.set('y', String(view.cy));
     p.set('s', String(Number(view.scale.toPrecision(6))));
     if (boost) p.set('b', String(boost));
-    if (julia.mode !== 'mandel') {           // počáteční c, jen v Julia/split
+    if (julia.mode !== 'mandel') {           // Store the fixed parameter for Julia and split views.
       p.set('j', julia.mode === 'split' ? '2' : '1');
       p.set('jr', String(julia.cx));
       p.set('ji', String(julia.cy));
     }
-    if (currentScheme !== 'sepie') p.set('c', currentScheme);
+    if (currentScheme !== 'sepia') p.set('c', currentScheme);
     if (isRiffPlaying()) p.set('a', '1');
     const r = document.getElementById('audioRiff');
     if (r && r.value !== 'drift') p.set('r', r.value);
@@ -1267,15 +1267,18 @@
     if (isFinite(fs)) { view.scale = clampScale(fs); any = true; }
     const fb = parseInt(p.get('b'), 10);
     if (isFinite(fb)) boost = fb;
-    // počáteční c: zpětně kompatibilní, bez klíče j zůstává Mandelbrot
+    // Links without a mode key use Mandelbrot.
     const jr = parseFloat(p.get('jr')), ji = parseFloat(p.get('ji'));
     if (isFinite(jr)) julia.cx = jr;
     if (isFinite(ji)) julia.cy = ji;
     const jm = p.get('j');
     julia.mode = jm === '2' ? 'split' : jm === '1' ? 'julia' : 'mandel';
     julia.on = (julia.mode === 'julia');
-    const c = p.get('c');
-    if (c && SHADERS[c]) currentScheme = c;
+    // Older shared views used the original palette identifiers.
+    const legacyPalettes = { sepie: 'sepia', priroda: 'woodland', atol: 'atoll', strakata: 'variegated', psycho: 'psychedelic', pulnoc: 'midnight' };
+    const palette = p.get('c');
+    const scheme = Object.hasOwn(legacyPalettes, palette) ? legacyPalettes[palette] : palette;
+    if (SCHEMES.includes(scheme)) currentScheme = scheme;
     const r = p.get('r'), rs = document.getElementById('audioRiff');
     if (r && rs && [...rs.options].some(o => o.value === r)) {
       rs.value = r;
@@ -1292,7 +1295,7 @@
     return any;
   }
   let hashT = null;
-  function syncHash() {                     // tiché zrcadlení stavu do adresy
+  function syncHash() {                     // Mirror state in the address without adding a history entry.
     if (hashT) clearTimeout(hashT);
     hashT = setTimeout(() => {
       if (demoState) return;
@@ -1302,7 +1305,7 @@
   function shareURL() {
     const url = location.origin + location.pathname + '#' + encodeState();
     try { history.replaceState(null, '', '#' + encodeState()); } catch (e) {}
-    const ok = () => showToast('odkaz zkopírován', 1800);
+    const ok = () => showToast('Link copied', 1800);
     const fallback = () => {
       const ta = document.createElement('textarea');
       ta.value = url;
@@ -1312,13 +1315,13 @@
       let done = false;
       try { done = document.execCommand('copy'); } catch (e) {}
       document.body.removeChild(ta);
-      if (done) ok(); else prompt('Zkopíruj odkaz:', url);
+      if (done) ok(); else prompt('Copy this link', url);
     };
     if (navigator.clipboard && navigator.clipboard.writeText)
       navigator.clipboard.writeText(url).then(ok).catch(fallback);
     else fallback();
   }
-  // zvuk ze sdíleného odkazu: prohlížeč chce gesto, spustí ho první dotyk
+  // Browsers require a user gesture to start audio from a shared link.
   function armAudioStart() {
     const go = () => {
       if (wantAudio && !isRiffPlaying()) toggleRiff();
@@ -1342,10 +1345,10 @@
   const at = document.getElementById('audioToggle');
   if (at) at.addEventListener('click', syncHash);
 
-  // ===== Julia a split: pevné c, pixel je z0 =====
-  const JULIA_HOME = { cx: 0, cy: 0, scale: 3 };   // Julia množina sedí kolem 0
+  // Julia and split views: fixed c, with each pixel supplying z₀.
+  const JULIA_HOME = { cx: 0, cy: 0, scale: 3 };   // The Julia set is centered near zero.
   function homeView() { return julia.on ? JULIA_HOME : home; }
-  function fmtNum(v) {                              // krátký, ale přesný zápis
+  function fmtNum(v) {                              // Compact numeric display.
     const t = String(v);
     return t.length > 12 ? Number(v.toPrecision(8)).toString() : t;
   }
@@ -1357,7 +1360,7 @@
     jImS.value = Math.max(+jImS.min, Math.min(+jImS.max, julia.cy));
   }
 
-  // jediné místo pro změnu c: srovná widgety a spustí správnou cestu renderu
+  // Keep both controls and the matching renderer in sync.
   function setC(re, im) {
     if (isFinite(re)) julia.cx = re;
     if (isFinite(im)) julia.cy = im;
@@ -1367,20 +1370,22 @@
     syncHash();
   }
 
-  // přepínač cykluje tři režimy: mandel -> julia -> split
+  // The mode button cycles through all three views.
   const MODES = ['mandel', 'julia', 'split'];
   const MODE_TOAST = {
     mandel: () => 'Mandelbrot',
     julia: () => 'Julia · c = ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i',
-    split: () => 'split · vlevo Mandelbrot, vpravo Julia'
+    split: () => 'Split view · Mandelbrot on the left, Julia on the right'
   };
   function applyModeUI() {
     julia.on = (julia.mode === 'julia');
+    document.getElementById('mup').disabled = julia.mode === 'split';
+    document.getElementById('mdn').disabled = julia.mode === 'split';
     document.getElementById('jul').classList.toggle('on', julia.mode !== 'mandel');
     document.getElementById('juliabar').classList.toggle('show', julia.mode !== 'mandel');
     const hint = document.getElementById('jhint');
     if (hint) hint.innerHTML = julia.mode === 'split'
-      ? 'klikni vlevo · vyber c' : 'počáteční c &nbsp;·&nbsp; pixel = z₀';
+      ? 'click the left pane to choose c' : 'fixed c &nbsp;·&nbsp; pixel = z₀';
     cv.style.cursor = julia.mode === 'split' ? 'crosshair' : '';
   }
   function setMode(mode, keepView) {
@@ -1404,7 +1409,7 @@
     Object.assign(view, homeView()); boost = 0; requestRender(true);
   }
 
-  // pole i slidery jdou přes setC
+  // Text and slider input both use setC.
   function commitFields() {
     setC(parseFloat(jReEl.value.replace(',', '.')), parseFloat(jImEl.value.replace(',', '.')));
   }
@@ -1416,15 +1421,15 @@
   jImS.addEventListener('input', () => setC(julia.cx, parseFloat(jImS.value)));
   document.getElementById('jul').addEventListener('click', cycleMode);
 
-  // ===== split: vlevo Mandelbrot (s bodem c), vpravo Julia pro toto c =====
-  const splitMC = document.createElement('canvas');   // levý pás (cache, c ho nemění)
-  const splitJC = document.createElement('canvas');   // pravý pás (přepočet při změně c)
+  // Split view: Mandelbrot with the selected c on the left, its Julia set on the right.
+  const splitMC = document.createElement('canvas');   // Cached independently of c.
+  const splitJC = document.createElement('canvas');   // Recompute when c changes.
   let splitMView = null, splitJView = null;
   let splitMReady = false, splitJReady = false;
   const splitWorker = new Worker(wUrl);
   let splitInFlight = null, splitWantJ = false, splitDragging = false;
 
-  function fitView(cx, cy, halfW, halfH, pw, ph) {     // vejde box do panelu
+  function fitView(cx, cy, halfW, halfH, pw, ph) {     // Fit the requested box into the panel.
     const aspect = pw / ph;
     const scaleW = Math.max(2 * halfW, 2 * halfH * aspect) * 1.06;
     return { cx, cy, scale: scaleW, k: scaleW * ph / pw };
@@ -1475,7 +1480,7 @@
     if (splitJReady) g.drawImage(splitJC, d.pw, 0, d.rpw, d.ph);
     g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(d.pw - 1, 0, 2, H);
     g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(d.pw, 0, 1, H);
-    if (splitMView) {                                  // bod c na levém panelu
+    if (splitMView) {                                  // Mark the selected parameter in the left pane.
       const sh = splitMView.k;
       const mx = (julia.cx - (splitMView.cx - splitMView.scale / 2)) / splitMView.scale * d.pw;
       const my = (julia.cy - (splitMView.cy - sh / 2)) / sh * d.ph;
@@ -1501,7 +1506,7 @@
     document.getElementById('cc').innerHTML =
       'c ' + fmtNum(julia.cx) + (julia.cy < 0 ? ' − ' : ' + ') + Math.abs(julia.cy) + 'i';
   }
-  function splitPick(mx, my) {                          // klik vlevo -> vyber c
+  function splitPick(mx, my) {                          // A click on the left selects c.
     const d = paneDims();
     if (!splitMView || mx >= d.pw) return;
     const sh = splitMView.k;
@@ -1510,7 +1515,7 @@
     setC(cx, cy);
   }
 
-  // ===== tlačítka =====
+  // Buttons
   document.getElementById('zin').addEventListener('click',  () => zoomAt(W/2, H/2, 0.6));
   document.getElementById('zout').addEventListener('click', () => zoomAt(W/2, H/2, 1/0.6));
   document.getElementById('mup').addEventListener('click',  () => { boost += 100; showToast('detail · m = ' + mFor(view.scale), 1400); requestRender(true); });
@@ -1522,12 +1527,12 @@
   document.getElementById('hid').addEventListener('click',  toggleImmersive);
   document.getElementById('shr').addEventListener('click',  shareURL);
 
-  // ===== klávesnice =====
+  // Keyboard
   document.addEventListener('keydown', e => {
     const tag = (e.target && e.target.tagName) || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
       if (e.key === 'Escape') e.target.blur();
-      return;                               // psaní do polí neřídí explorer
+      return;                               // Let the user edit the field without triggering shortcuts.
     }
     if (e.key === 'Escape') {
       if (demoState) { e.preventDefault(); stopDemo(); return; }
@@ -1540,10 +1545,11 @@
     }
     const k = e.key.toLowerCase();
     if (k === 'd') { e.preventDefault(); toggleDemo(); return; }
-    // jakákoli další klávesa za běhu dema demo ukončí
+    // Any other key stops an active tour.
     if (demoState) { e.preventDefault(); stopDemo(); return; }
     if (k === '+' || k === '=') zoomAt(W/2, H/2, 0.6);
     else if (k === '-') zoomAt(W/2, H/2, 1/0.6);
+    else if (k === 'm') document.getElementById('mup').click();
     else if (k === 'c') cycleScheme();
     else if (k === 'f') toggleFullscreen();
     else if (k === 'h') toggleImmersive();
@@ -1561,13 +1567,13 @@
   applyHash();
   refreshJuliaInputs();
   applyModeUI();
-  fitSize();                 // ve split spustí oba panely, jinak normální render
+  fitSize();                 // Initialize both panes in split view, or render the single view.
   ensureAnchor();
   if (wantAudio) {
     armAudioStart();
-    setTimeout(() => showToast('zvuk ze sdíleného odkazu se spustí prvním dotykem', 3200), 700);
+    setTimeout(() => showToast('Tap to start audio for the shared view', 3200), 700);
   } else {
-    setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>S</kbd> · share', 2800), 700);
+    setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>C</kbd> · colors &nbsp;·&nbsp; <kbd>F</kbd> · fullscreen &nbsp;·&nbsp; <kbd>S</kbd> · share', 2800), 700);
   }
 })();
 </script>

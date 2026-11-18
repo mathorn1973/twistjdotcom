@@ -123,6 +123,22 @@ h1 {
 .algebra tr.gap td { height: 14px; }
 .algebra .d { color: var(--muted); }
 
+/* Interactive reading examples */
+.oq-jump { margin-top: 1rem; }
+.oq-jump a { color: var(--text-bright); }
+.lessons { margin: 0 0 32px; }
+.lessons h2 { color: var(--text-bright); font-size: 1.5rem; margin-bottom: .65rem; }
+.lesson { border-top: 1px solid var(--rule); padding: .8rem 0; scroll-margin-top: 1rem; }
+.lesson h3 { color: var(--text-bright); font-size: 1.18rem; }
+.lesson p { margin: .35rem 0; }
+.lesson-controls { margin: .6rem 0; gap: .45rem .65rem; }
+.lesson-run { cursor: pointer; }
+.lesson-run:disabled { opacity: .55; cursor: default; }
+.lesson-source, .lesson-instructions { color: var(--muted); font-size: .9rem; }
+.lesson-source a { color: var(--text-bright); text-underline-offset: .15em; }
+.lesson-expect { color: var(--text-bright); }
+.lessons :focus-visible, #out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* ── console ── */
 .console { margin-top: 6px; }
 .row {
@@ -130,6 +146,7 @@ h1 {
     font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--muted);
 }
 .row.top { margin-bottom: 8px; }
+.circuit-link-tools input { width: min(100%, 28rem); }
 .row.bottom { margin-top: 10px; }
 .lbl { letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; color: var(--dim); }
 .spacer { flex: 1; }
@@ -177,11 +194,16 @@ button.alt:hover { color: var(--accent); border-color: var(--accent); }
 button.stop { color: var(--err); opacity: 1; }
 button.stop:hover { border-color: var(--err); color: var(--err); }
 button.stop:disabled { opacity: 1; }
-.presets a {
-    color: var(--muted); text-decoration: none; cursor: pointer;
-    border-bottom: 1px dotted var(--rule); transition: all 0.2s;
+.presets button {
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    padding: .15rem .05rem;
+    text-decoration: underline dotted;
+    text-underline-offset: .16em;
 }
-.presets a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.presets button:hover { color: var(--accent); }
 
 /* live read-out of what is in the editor, before anything is run */
 .chip { color: var(--muted); }
@@ -237,8 +259,8 @@ button.stop:disabled { opacity: 1; }
 <header>
     <div class="mark">(OQ)</div>
     <h1>Ordinary Quantum</h1>
-    <p class="thesis">Exact, <b>zero-noise</b> discrete algebra for quantum circuits — leaving
-    physical noise where it actually belongs: in condensed-matter spectroscopy, not in computation.</p>
+    <p class="thesis">Run quantum circuits in the browser with exact cyclotomic arithmetic. Compare exact probabilities with simulated measurement samples.</p>
+    <p class="oq-jump"><a href="#measurement">Measurement</a> · <a href="#grover-search">Search</a> · <a href="#console">QASM console</a></p>
 </header>
 
 <div class="algebra">
@@ -257,12 +279,60 @@ button.stop:disabled { opacity: 1; }
 </table>
 </div>
 
-<div class="console">
+<section class="lessons" aria-labelledby="lessonTitle">
+    <h2 id="lessonTitle">Try a circuit</h2>
+    <section class="lesson" id="measurement" aria-labelledby="measurementTitle">
+        <h3 id="measurementTitle">When does phase change a measurement?</h3>
+        <p>An H gate prepares equal amplitudes. Change the phase of the |1⟩ amplitude, then compare a direct measurement with a second H before measurement.</p>
+        <div class="row lesson-controls">
+            <label for="phaseTurn">Relative phase</label>
+            <select id="phaseTurn">
+                <option value="0">None</option>
+                <option value="1">Eighth-turn (T)</option>
+                <option value="2">Quarter-turn (S)</option>
+                <option value="4">Sign flip (Z)</option>
+            </select>
+            <button type="button" id="phaseDirect" class="lesson-run">Measure directly</button>
+            <button type="button" id="phaseReadout" class="lesson-run">Apply H and measure</button>
+        </div>
+        <p class="lesson-expect" id="phaseExpected" aria-live="polite">Exact probability of 0: 1/2 directly, 1 after the second H.</p>
+        <p class="lesson-source"><a href="https://matematyka.cz/en/kvantum#s2">Matematyka · State and measurement</a> · <a href="https://matematyka.cz/en/kvantum#s3">Interference</a> · <a href="https://matematyka.cz/en/kvantum#s5">Eighth-turn phase</a></p>
+    </section>
+
+    <section class="lesson" id="grover-search" aria-labelledby="groverTitle">
+        <h3 id="groverTitle">How much can one search step do?</h3>
+        <p>Start with equally likely boxes. One Grover step applies the target oracle once, then redistributes amplitudes by interference. Compare it with zero queries.</p>
+        <div class="row lesson-controls">
+            <label for="searchQubits">Search space</label>
+            <select id="searchQubits">
+                <option value="2">4 boxes</option>
+                <option value="3">8 boxes</option>
+            </select>
+            <label for="searchTarget">Target box</label>
+            <select id="searchTarget">
+                <option value="0">00</option><option value="1">01</option>
+                <option value="2" selected>10</option><option value="3">11</option>
+            </select>
+            <button type="button" id="searchBaseline" class="lesson-run">Run baseline</button>
+            <button type="button" id="searchStep" class="lesson-run">Run one step</button>
+        </div>
+        <p class="lesson-expect" id="searchExpected" aria-live="polite">Exact probability of target |10⟩: 1/4 before the oracle, 1 after one step.</p>
+        <p class="lesson-source"><a href="https://matematyka.cz/en/kvantum#s9">Matematyka · Quantum leap</a></p>
+    </section>
+    <p class="lesson-instructions">Each button loads the circuit into the editable QASM console and runs it. Compare the exact state probabilities with the sampled counts.</p>
+</section>
+
+<div class="console" id="console">
     <div class="row top">
         <span class="lbl">qasm</span>
         <span class="presets" id="presets"></span>
         <span class="spacer"></span>
         <span class="chip" id="chip"></span>
+    </div>
+    <div class="row circuit-link-tools">
+        <button class="alt" type="button" id="shareCircuit">Copy circuit link</button>
+        <input id="circuitLink" type="text" aria-label="Circuit link" readonly hidden>
+        <span id="circuitLinkStatus" role="status"></span>
     </div>
 
     <div class="row mode-row">
@@ -284,7 +354,7 @@ button.stop:disabled { opacity: 1; }
         Observables are evaluated before terminal measurements.
         Runtime grows with 2<sup>r</sup>; active rank r is limited to 16 here.</p>
     </div>
-    <textarea id="src" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+    <textarea id="src" aria-label="OpenQASM source" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
 
     <div class="row bottom">
         <button class="run" id="runBtn">Run</button>
@@ -302,12 +372,13 @@ button.stop:disabled { opacity: 1; }
     <div class="prog" id="prog"><i id="progBar"></i></div>
     <div class="progtext" id="progText"></div>
 
-    <div class="out" id="out"></div>
+    <div class="out" id="out" role="region" tabindex="-1" aria-label="Circuit results"></div>
 </div>
 
 <div class="foot">
     <span id="modeFoot">Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state</span>
     <span class="spacer"></span>
+    <a href="README.md">Console guide</a>
     <a href="https://github.com/mathorn1973/twistjdotcom/blob/main/oq/QASM3.md" target="_blank" rel="noopener">QASM 3 support</a>
     <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
     <a href="../index.html">twistj.com</a>
@@ -322,6 +393,8 @@ button.stop:disabled { opacity: 1; }
 <script src="oqopt.js?v=rank-1"></script>
 <script src="oqrank.js?v=rank-1"></script>
 <script src="qasm.js?v=qasm3-2"></script>
+<script src="lessons.js"></script>
+<script src="circuit-link.js"></script>
 <script>
 (function () {
 'use strict';
@@ -343,6 +416,8 @@ var el = function (id) { return document.getElementById(id); };
     if (typeof OQRANK === 'undefined') missing.push('oqrank.js');
     /* oqsynth.js is optional: without it the approximate box just stays off */
     if (typeof QASM === 'undefined') missing.push('qasm.js');
+    if (typeof OQLessons === 'undefined') missing.push('lessons.js');
+    if (typeof OQCircuitLink === 'undefined') missing.push('circuit-link.js');
     if (!missing.length) return;
 
     /* Two different causes, and they deserve two different sentences: a
@@ -354,7 +429,7 @@ var el = function (id) { return document.getElementById(id); };
     var out = el('out');
     if (out) out.innerHTML =
         '<span class="err">the engine did not load: ' + missing.join(', ') + '</span>\n\n' +
-        '<span class="d">oq is this page plus six JavaScript files beside it, loaded by\n' +
+        '<span class="d">oq is this page plus its JavaScript modules, loaded by\n' +
         'relative path. ' +
         (noBase
           ? 'This copy is running from a ' + location.protocol + ' URL, which has no base\n' +
@@ -362,7 +437,7 @@ var el = function (id) { return document.getElementById(id); };
             'Open the directory itself — serve it over http and go to /oq/, or use\n' +
             'https://twistj.com/oq/.'
           : 'They are not beside this copy of the page, so the requests for\nthem failed.\n\n' +
-            'Keep index.html, oq.js, oq16.js, oqsparse.js, oqopt.js, oqrank.js and qasm.js in one directory,\n' +
+            'Keep index.html and its script files together in one directory,\n' +
             'or use https://twistj.com/oq/.') +
         '\n\nNothing is wrong with the circuit you pasted — none of the arithmetic is here\n' +
         'to run it with.</span>';
@@ -857,10 +932,30 @@ PRESETS['if / else'] = [
     'result = measure pair;'
 ].join('\n');
 
+/* Parameters from Matematyka's Quantum Safecracker OQ example. */
+PRESETS['vqe ansatz'] = [
+    'OPENQASM 3;',
+    'include "stdgates.inc";',
+    '',
+    '// A fixed two-qubit ansatz with continuous rotations.',
+    '// To synthesize nearby Clifford+T gates, enable Approximate before Run.',
+    'qubit[2] q;',
+    'bit[2] c;',
+    '',
+    'h q[0];',
+    'rx(0.354 * pi) q[0];',
+    'ry(0.218 * pi) q[1];',
+    'cx q[0], q[1];',
+    'rz(0.412 * pi) q[1];',
+    '',
+    'measure q -> c;'
+].join('\n');
+
 var pbox = el('presets');
 Object.keys(PRESETS).forEach(function (name, i) {
     if (i) pbox.appendChild(document.createTextNode(' · '));
-    var a = document.createElement('a');
+    var a = document.createElement('button');
+    a.type = 'button';
     a.textContent = name;
     a.addEventListener('click', function () {
         if (busy) return;
@@ -871,8 +966,12 @@ Object.keys(PRESETS).forEach(function (name, i) {
             el('rankQubits').value = '0-3, 98-99';
             el('rankPaulis').value = 'X0 X4; Z0 Z4';
             syncMode();
-        } else if (name === 'if / else') {
+        } else if (name === 'if / else' || name === 'vqe ansatz') {
             el('runMode').value = 'statevector';
+            if (name === 'vqe ansatz') {
+                el('synth').checked = false;
+                el('out').textContent = 'This circuit has three continuous rotations. Enable Approximate to synthesize Clifford+T replacements. The reported tolerance is per replacement gate.';
+            }
             syncMode();
         } else if (compressedMode()) {
             el('rankQubits').value = '';
@@ -946,6 +1045,8 @@ function setBusy(on) {
     el('rankQubits').disabled = on;
     el('rankPaulis').disabled = on;
     el('stopBtn').disabled = false;
+    lessonRunButtons.forEach(function (button) { button.disabled = on; });
+    presetButtons.forEach(function (button) { button.disabled = on; });
 }
 
 function compressedMode() { return el('runMode').value === 'compressed'; }
@@ -1087,8 +1188,8 @@ async function simulate(prog, out) {
         var draws = s.sample(shots, seed);
         tShots = performance.now() - t1;
         counts = {};
-        for (i = 0; i < shots; i++) {
-            var b = draws[i], word = 0, mi;
+        for (var drawIndex = 0; drawIndex < shots; drawIndex++) {
+            var b = draws[drawIndex], word = 0, mi;
             for (mi = 0; mi < prog.measures.length; mi++) {
                 if (b & (1 << prog.measures[mi].q)) word |= (1 << prog.measures[mi].c);
             }
@@ -2952,6 +3053,66 @@ function fmtTime(sec) {
     return Math.round(sec / 60) + ' min';
 }
 
+/* ── lesson comparisons ───────────────────────────────────────────────── */
+var lessonRunButtons = Array.from(document.querySelectorAll('.lesson-run'));
+var presetButtons = Array.from(pbox.querySelectorAll('button'));
+
+async function runLesson(source) {
+    if (busy) return;
+    el('src').value = source;
+    el('runMode').value = 'statevector';
+    el('synth').checked = false;
+    syncMode();
+    refreshChip();
+    await execute();
+    el('out').focus();
+}
+
+function syncPhase() {
+    var result = { 0: '1', 1: '(2 + √2)/4', 2: '1/2', 4: '0' };
+    el('phaseExpected').textContent = 'Exact probability of 0: 1/2 directly, ' +
+        result[el('phaseTurn').value] + ' after the second H.';
+}
+
+function syncSearchSpace() {
+    var qubits = +el('searchQubits').value;
+    var target = el('searchTarget');
+    var oldValue = +target.value;
+    var count = 1 << qubits;
+    target.replaceChildren();
+    for (var box = 0; box < count; box++) {
+        target.add(new Option(box.toString(2).padStart(qubits, '0'), box));
+    }
+    target.value = oldValue < count ? oldValue : 2;
+    syncSearchExpectation();
+}
+
+function syncSearchExpectation() {
+    var qubits = +el('searchQubits').value;
+    var target = (+el('searchTarget').value).toString(2).padStart(qubits, '0');
+    el('searchExpected').textContent = 'Exact probability of target |' + target +
+        '⟩: 1/' + (1 << qubits) + ' before the oracle, ' + (qubits === 2 ? '1' : '25/32') +
+        ' after one step.';
+}
+
+el('phaseTurn').addEventListener('change', syncPhase);
+el('phaseDirect').addEventListener('click', function () {
+    runLesson(OQLessons.phase(+el('phaseTurn').value, false));
+});
+el('phaseReadout').addEventListener('click', function () {
+    runLesson(OQLessons.phase(+el('phaseTurn').value, true));
+});
+el('searchQubits').addEventListener('change', syncSearchSpace);
+el('searchTarget').addEventListener('change', syncSearchExpectation);
+el('searchBaseline').addEventListener('click', function () {
+    runLesson(OQLessons.grover(+el('searchQubits').value, +el('searchTarget').value, false));
+});
+el('searchStep').addEventListener('click', function () {
+    runLesson(OQLessons.grover(+el('searchQubits').value, +el('searchTarget').value, true));
+});
+syncSearchSpace();
+syncPhase();
+
 /* ── wiring ───────────────────────────────────────────────────────────── */
 el('runBtn').addEventListener('click', execute);
 el('testBtn').addEventListener('click', runSelfTest);
@@ -2976,9 +3137,55 @@ el('src').addEventListener('input', function () {
     chipTimer = setTimeout(refreshChip, 180);
 });
 
+/* Matematyka uses a percent-encoded OpenQASM source in #qasm=. A
+ * circuit opened from a link stays in the editor session until the user edits it. */
+function loadCircuitLink() {
+    if (!location.hash.startsWith('#qasm=')) return false;
+    var status = el('circuitLinkStatus');
+    var source = OQCircuitLink.read(location.hash);
+    if (source === null) {
+        status.textContent = 'The circuit link could not be read. The editor was kept as it was.';
+    } else if (busy) {
+        status.textContent = 'A circuit is running. Open the link again after it finishes.';
+    } else {
+        el('src').value = source;
+        el('synth').checked = false;
+        el('out').textContent = 'Linked circuit loaded. Press Run to simulate it.';
+        status.textContent = 'Circuit loaded from a link. Your saved draft is unchanged.';
+    }
+    return true;
+}
+
+el('shareCircuit').addEventListener('click', async function () {
+    var status = el('circuitLinkStatus');
+    var field = el('circuitLink');
+    var base = location.protocol === 'file:' ? 'https://twistj.com/oq/' : location.href;
+    var link = OQCircuitLink.build(base, el('src').value);
+    field.hidden = true;
+    if (link === null) {
+        status.textContent = 'The editor is empty or this circuit could not be encoded as a link.';
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(link);
+        status.textContent = 'Circuit link copied. Anyone with it can read this QASM.';
+    } catch (error) {
+        field.value = link;
+        field.hidden = false;
+        field.focus();
+        field.select();
+        status.textContent = 'Copy the selected link to share this QASM.';
+    }
+});
+
+window.addEventListener('hashchange', function () {
+    if (loadCircuitLink() && !busy) refreshChip();
+});
+
 var saved = null;
 try { saved = localStorage.getItem('oq-src'); } catch (e) {}
 el('src').value = saved || PRESETS['shor 15'];
+var openedCircuitLink = loadCircuitLink();
 try {
     if (localStorage.getItem('oq-mode') === 'compressed') el('runMode').value = 'compressed';
 } catch (e) {}
@@ -2990,6 +3197,7 @@ refreshChip();
  * anything — the estimate is right there in the chip, and Run is one click. */
 (function () {
     try {
+        if (openedCircuitLink) return;
         if (compressedMode()) {
             el('out').textContent = 'Compressed circuit loaded — press Run to compute observables.';
             return;

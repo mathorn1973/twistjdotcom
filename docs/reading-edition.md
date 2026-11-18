@@ -23,6 +23,10 @@ In a fresh local browser, Evo restored both a legacy dot-separated fragment and 
 
 The [research question index](../questions/index.html) pairs six results with their open obligations. Each entry has a stable fragment and cites the relevant passage or registry row in Public Canon v113. Its link to the live Frontier follows later editions. The opening links on every HTML page lead directly to the home page and the question index, including the papers, guides, applications and archived preview.
 
+Three questions also have hands-on examples. [Pentaplex](../pentaplex/index.html?scheme=polar#wrap) colours a finite patch using a second embedding. The [two-site contact](../demolab/index.html#contact-cycle) lets the reader step through an admitted pair and a refused pair. [Ordinary Quantum](../oq/index.html#measurement) compares two measurement bases for the same state. The index links the mathematical claims to their Canon passages. The [console guide](../oq/README.md) also covers Grover search, continuous rotations and sharing circuits with Matematyka.
+
+The reading edition and its applications use English throughout. The former Czech Manifest address redirects to the English edition so that existing bookmarks still work.
+
 ## Original review and migration plan
 
 The 18 November review below documents the site before consolidation and the [three-page prototype](../reading-preview/index.html). Its [paper shelf](../reading-preview/papers/index.html) illustrates the June edition of *Twist Numbers*. The four November editions are available from the library above.
@@ -45,7 +49,7 @@ Logos presents a dated working reading of v109, with 26 live obligations and hyp
 | What can I read and cite? | Local Papers shelf | Exact version DOI, full paper, source, author profile |
 | What can I try? | Existing Demo Lab and Ordinary Quantum | Each instrument's own scope, controls and documentation |
 
-Keep each question at a stable URL. Use a short argument and a worked example before offering an interactive instrument. Where the reader needs a diagram, provide it at that point. This prototype uses one column, a system serif, underlined links and native MathML. It needs no image, font download, script or account to read. The site's existing localized pages and interactive applications keep their own appropriate forms.
+Keep each question at a stable URL. Use a short argument and a worked example before offering an interactive instrument. Where the reader needs a diagram, provide it at that point. This prototype uses one column, a system serif, underlined links and native MathML. It needs no image, font download, script or account to read.
 
 ## Route and migration inventory
 
@@ -54,7 +58,7 @@ Keep each question at a stable URL. Use a short argument and a worked example be
 | `/` | Reading entry at the same address | Preserve external entry points, the `twistj-agent-card` JSON and canonical metadata. Update the human and machine summaries together. |
 | `/core/` | Kernel reference reached from the first equation | Keep its verifier download and reciprocal route to the Canon overview. |
 | `/canon/`, `/canon/core/` | Public record and short Canon overview | Retain raw Markdown and repository fallbacks, activation authority and live source behavior. |
-| `/manifest/`, `/manifest/cs/` | Method in English and Czech | Keep both addresses and reciprocal language links. Make the Czech address explicit in `llms.txt`. |
+| `/manifest/`, `/manifest/cs/` | Method in English | Check the old localized address redirects to the English edition. List the canonical address in the site indexes. |
 | `/logos/`, `/logos/logos.md` | Dated working interpretation | Preserve HTML and Markdown, source attribution and version scope. Make future anchor changes in the generator. |
 | `/demolab/`, `/pentaplex/` | Index of illustrations and an instrument | Preserve direct entry and a clear return to the lab. |
 | `/fractal/` | Illustration with shareable state | Open saved fragments in Mandelbrot, Julia and split views and compare state. |
@@ -82,5 +86,5 @@ For a revised edition, generate HTML and PDF from the same manuscript. Check equ
 
 1. **Review the three-page reading path.** Read it on a phone and on paper. A reader should be able to reproduce the first two integer steps, explain when the stored value changes and find the paper without following an identifier to another service.
 2. **Finish one paper edition.** Use Twist Numbers to prove the path from source to HTML, PDF, guide, citation and verified mirror. Supply a persistent per-paper URL before adding the next titles.
-3. **Move the reading path to the existing front door.** Bring over the live metadata, verifier and machine-readable card. Reconcile the open [metadata draft](https://github.com/mathorn1973/twistjdotcom/pull/18). Check both language routes, deep links, shared application states and source fallbacks. Preserve the previous deployed revision as the rollback point.
+3. **Move the reading path to the existing front door.** Bring over the live metadata, verifier and machine-readable card. Reconcile the open [metadata draft](https://github.com/mathorn1973/twistjdotcom/pull/18). Check the Manifest redirect, deep links, shared application states and source fallbacks. Preserve the previous deployed revision as the rollback point.
 4. **Refresh the rest in small groups.** Review Logos against its cited edition, extend the question index and attach only relevant illustrations. Treat the Canon displays, generated Logos and applications as separate changes with their own validation. A production switch and any new deposit are separate release decisions.

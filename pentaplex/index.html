@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -473,8 +473,8 @@
   <header>
     <div>
       <h1>Penrose · Pentaplex</h1>
-      <p class="subtitle">ζ ↦ ζ² &nbsp;·&nbsp; polární kódování Galoisovy projekce</p>
-      <p class="scope-note">numerická ilustrace (floating-point, konečná výseč) · nikoli důkaz Canonu</p>
+      <p class="subtitle">ζ ↦ ζ² &nbsp;·&nbsp; polar coordinates of the Galois projection</p>
+      <p class="scope-note">A finite Penrose patch drawn with floating-point coordinates.</p>
     </div>
     <div class="info">
       zoom · <b id="z">28.0</b><br>
@@ -483,24 +483,24 @@
     </div>
   </header>
   <div class="canvas-wrap" id="wrap">
-    <div class="loading" id="loading">Generuji pentaplexovou hvězdu…</div>
+    <div class="loading" id="loading">Generating the Penrose patch…</div>
     <canvas id="cv"></canvas>
     <div class="controls">
-      <button id="zin"  title="přiblížit">+</button>
-      <button id="zout" title="oddálit">−</button>
-      <button id="zdet" title="rychlý detail">⊕</button>
-      <button id="rst"  title="výchozí">↺</button>
-      <button id="ssm"  title="menší hvězda">★−</button>
-      <button id="slg"  title="větší hvězda">★+</button>
-      <button id="clr"  title="schéma barev (C)">◐</button>
+      <button id="zin"  title="Zoom in">+</button>
+      <button id="zout" title="Zoom out">−</button>
+      <button id="zdet" title="Zoom to detail">⊕</button>
+      <button id="rst"  title="Reset view">↺</button>
+      <button id="ssm"  title="Smaller star">★−</button>
+      <button id="slg"  title="Larger star">★+</button>
+      <button id="clr"  title="Color scheme (C)">◐</button>
       <button id="dmo"  title="demo (D)">▶</button>
-      <button id="hid"  title="skrýt UI (H)">⛶</button>
+      <button id="hid"  title="Hide controls (H)">⛶</button>
       <button id="shw"  title="showcase (S)">◉</button>
     </div>
   </div>
   <div class="toast" id="toast"></div>
   <footer>
-    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>,</kbd> <kbd>.</kbd> · hvězda &nbsp;·&nbsp; <kbd>C</kbd> · barvy &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>S</kbd> · showcase &nbsp;·&nbsp; <kbd>H</kbd> · UI</span>
+    <span>drag · pan &nbsp;·&nbsp; scroll · zoom &nbsp;·&nbsp; <kbd>,</kbd> <kbd>.</kbd> · star size &nbsp;·&nbsp; <kbd>C</kbd> · colors &nbsp;·&nbsp; <kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>S</kbd> · showcase &nbsp;·&nbsp; <kbd>H</kbd> · UI</span>
     <span class="count" id="cnt">…</span>
   </footer>
 </div>
@@ -601,14 +601,15 @@
   const SCHEME_NAMES = {
     polar:    'polar (Galois)',
     orbit:    'orbit (σ₁/σ₂)',
-    pair:     'pair (10 tříd)',
+    pair:     'pair (10 classes)',
     spectral: 'spectral (radius)',
     angle:    'angle (rainbow)',
     shells:   'shells (SS-PI Fibonacci)',
     classic:  'classic (Penrose)',
-    grey:     'grey (orientace)'
+    grey:     'grey (orientation)'
   };
-  let currentScheme = 'polar';
+  const requestedScheme = new URLSearchParams(location.search).get('scheme');
+  let currentScheme = SCHEMES.includes(requestedScheme) ? requestedScheme : 'polar';
 
   // SS-PI Fibonacci shells: Q ∈ {1, 2, 3, 5, 8, 13, 21, ...}.
   // Map Q-value → Fibonacci index for color cycling.
@@ -750,7 +751,7 @@
     const i = SCHEMES.indexOf(currentScheme);
     const ni = (i + (dir || 1) + SCHEMES.length) % SCHEMES.length;
     currentScheme = SCHEMES[ni];
-    showToast('schéma · ' + SCHEME_NAMES[currentScheme], 1400);
+    showToast('Colors · ' + SCHEME_NAMES[currentScheme], 1400);
     applyScheme();
   }
 
@@ -1017,8 +1018,8 @@
       }
     }
     document.getElementById('cnt').textContent =
-      drawn.toLocaleString() + ' v okně · ' + (starTiles ? starTiles.length.toLocaleString() : '0') +
-      ' v hvězdě · r=' + MAX_PATCH_HALF;
+      drawn.toLocaleString('en') + ' tiles in view · ' + (starTiles ? starTiles.length.toLocaleString('en') : '0') +
+      ' in the star · r=' + MAX_PATCH_HALF;
     document.getElementById('z').textContent  = z.toFixed(z < 1 ? 2 : 1);
     document.getElementById('cx').textContent = camera.x.toFixed(2);
     document.getElementById('cy').textContent = camera.y.toFixed(2);
@@ -1216,12 +1217,12 @@
 
   function shrinkStar() {
     MAX_PATCH_HALF = Math.max(40, MAX_PATCH_HALF - 20);
-    showToast('hvězda · ' + MAX_PATCH_HALF, 1200);
+    showToast('Star radius · ' + MAX_PATCH_HALF, 1200);
     regenerateStar(); requestRender();
   }
   function growStar() {
     MAX_PATCH_HALF = Math.min(280, MAX_PATCH_HALF + 20);
-    showToast('hvězda · ' + MAX_PATCH_HALF, 1200);
+    showToast('Star radius · ' + MAX_PATCH_HALF, 1200);
     regenerateStar(); requestRender();
   }
   document.getElementById('ssm').addEventListener('click', shrinkStar);
@@ -1263,7 +1264,7 @@
     document.body.classList.toggle('immersive');
     fitSize();
     if (!wasImmersive) {
-      showToast('<kbd>H</kbd> · <kbd>F</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+      showToast('<kbd>H</kbd> · <kbd>F</kbd> · <kbd>Esc</kbd> &nbsp; to exit', 1600);
     }
   }
   function toggleShowcase() {
@@ -1272,7 +1273,7 @@
     document.body.classList.toggle('showcase');
     fitSize();
     if (!wasShowcase) {
-      showToast('showcase &nbsp;·&nbsp; <kbd>S</kbd> · <kbd>Esc</kbd> &nbsp; ven', 1600);
+      showToast('showcase &nbsp;·&nbsp; <kbd>S</kbd> · <kbd>Esc</kbd> &nbsp; to exit', 1600);
     } else {
       stopInertia();
     }
@@ -1476,7 +1477,7 @@
       if (now - lastSchemeChange >= DEMO_SCHEME_DURATION) {
         schemeIdx = (schemeIdx + 1) % SCHEMES.length;
         currentScheme = SCHEMES[schemeIdx];
-        showToast('schéma · ' + SCHEME_NAMES[currentScheme], 2500);
+        showToast('Colors · ' + SCHEME_NAMES[currentScheme], 2500);
         applyScheme();
         lastSchemeChange = now;
       }
@@ -1491,7 +1492,7 @@
       identityHideTimer: null
     };
     showToast(
-      'demo · <kbd>Esc</kbd> ven' + (audioWanted ? '' : ' &nbsp;·&nbsp; bez zvuku'),
+      'demo · <kbd>Esc</kbd> to exit' + (audioWanted ? '' : ' &nbsp;·&nbsp; sound off'),
       2500
     );
 
@@ -1600,7 +1601,7 @@
       cycleScheme(1);
     }
   });
-  setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>S</kbd> · showcase &nbsp;·&nbsp; <kbd>C</kbd> · barvy', 2800), 700);
+  setTimeout(() => showToast('<kbd>D</kbd> · demo &nbsp;·&nbsp; <kbd>S</kbd> · showcase &nbsp;·&nbsp; <kbd>C</kbd> · colors', 2800), 700);
 
   function boot() {
     readThemeColors();

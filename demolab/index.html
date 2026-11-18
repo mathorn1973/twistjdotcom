@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TWIST-J Demo Lab</title>
-    <meta name="description" content="Interactive TWIST-J demonstrations: exact finite checkpoint logic inside a floating-point live visualization, a finite-patch Pentaplex explorer, and a finite-cutoff Mandelbrot explorer. Illustrations, not Canon evidence.">
+    <meta name="description" content="Try an exact two-site contact, explore Pentaplex and Evo, or compare readouts in Ordinary Quantum.">
     <meta name="author" content="A. M. Thorn">
     <meta property="og:title" content="TWIST-J Demo Lab">
     <meta property="og:description" content="Interactive TWIST-J visualizations. Illustrations, not Canon evidence.">
@@ -42,14 +42,73 @@
     <p class="lead">Explore selected ideas from TWIST-J through interactive demonstrations.</p>
     <p>These pages are illustrations. The Public Canon records the program’s claims and evidence, with mathematical checks in the <a href="https://github.com/mathorn1973/twist-j">scientific repository</a>.</p>
 
+    <section aria-labelledby="contact-cycle">
+      <h2 id="contact-cycle">Five contacts bring the pair back</h2>
+      <p>Start with (2, 0) and apply contact five times. The sum stays 2 as the difference is multiplied by <i>j</i>² at each step. Then try (1, 0). Its difference is odd, so the rule leaves the pair fixed.</p>
+      <p>Values below are coefficient tuples in the ordered basis (1, <i>j</i>, <i>j</i>², <i>j</i>³).</p>
+      <div id="contact-controls" hidden>
+        <label for="contact-input">Starting pair</label>
+        <select id="contact-input">
+          <option value="even">(2, 0)</option>
+          <option value="odd">(1, 0)</option>
+        </select>
+        <button id="contact-step" type="button">Apply contact</button>
+        <button id="contact-reset" type="button">Reset</button>
+      </div>
+      <p><output id="contact-value" aria-live="polite">Step 0. Left (2, 0, 0, 0). Right (0, 0, 0, 0). Sum (2, 0, 0, 0).</output></p>
+      <noscript><p>The first step sends (2, 0) to (1 + <i>j</i>², 1 − <i>j</i>²). The fifth step returns to (2, 0).</p></noscript>
+      <p>This exact exercise follows the supplied two-site rule on two starting pairs. The proof covers the whole specified ring and distinguishes this rule from the native update. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L13580-L13643">Contact rule and proof</a> · <a href="../reading/contact/index.html#contact">Worked example</a>.</p>
+    </section>
+
+    <h2><a href="../oq/index.html#measurement">Ordinary Quantum</a></h2>
+    <p>Compare direct readout of a one-qubit state with readout after a Hadamard change of basis. This example uses ordinary quantum circuit rules.</p>
+
     <h2><a href="../evo/index.html">Evo</a></h2>
     <p>Explore an exact finite checkpoint rule with floating-point projections, particle dynamics and rendering.</p>
 
-    <h2><a href="../pentaplex/index.html">Pentaplex</a></h2>
+    <h2><a href="../pentaplex/index.html?scheme=polar#wrap">Pentaplex</a></h2>
     <p>Explore a finite Penrose patch and the Galois projection from ζ to ζ².</p>
 
     <h2><a href="../fractal/index.html">Fractal</a></h2>
     <p>Explore escape-time counting in the Mandelbrot and Julia sets, with a finite iteration cutoff and Float64 arithmetic.</p>
 </main>
+<script>
+(() => {
+  const input = document.getElementById('contact-input');
+  const value = document.getElementById('contact-value');
+  let halfDifference;
+  let steps;
+
+  function render() {
+    const admitted = input.value === 'even';
+    const left = admitted ? halfDifference.map((term, index) => (index === 0 ? 1 : 0) + term) : [1, 0, 0, 0];
+    const right = admitted ? halfDifference.map((term, index) => (index === 0 ? 1 : 0) - term) : [0, 0, 0, 0];
+    const sum = left.map((term, index) => term + right[index]);
+    const tuple = terms => `(${terms.join(', ')})`;
+    const outcome = steps === 0 ? '' : admitted ? ' Contact applied.' : ' Contact refused.';
+    value.textContent = `Step ${steps}. Left ${tuple(left)}. Right ${tuple(right)}. Sum ${tuple(sum)}.${outcome}`;
+  }
+
+  function reset() {
+    halfDifference = [1, 0, 0, 0];
+    steps = 0;
+    render();
+  }
+
+  document.getElementById('contact-step').addEventListener('click', () => {
+    if (input.value === 'even') {
+      // Multiply by j² and reduce j⁴ = −1 − j − j² − j³ and j⁵ = 1.
+      const [a, b, c, d] = halfDifference;
+      halfDifference = [d - c, -c, a - c, b - c];
+    }
+    steps++;
+    render();
+  });
+  document.getElementById('contact-reset').addEventListener('click', reset);
+  input.addEventListener('change', reset);
+  reset();
+  document.getElementById('contact-controls').hidden = false;
+})();
+</script>
 </body>
 </html>

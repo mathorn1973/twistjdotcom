@@ -71,17 +71,17 @@ Earlier and related works:
 - [Research questions](https://twistj.com/questions/) pairs results and open obligations for the integer step, contact, records, measurement, light and dark energy. Each question cites the relevant rows or passages in Public Canon v113.
 - [When does a contact leave a record?](https://twistj.com/reading/contact/): a theorem about two sites followed by a separate finite H3 archive calculation, its holding interval and its first changed reading
 - [The kernel](https://twistj.com/core/): starting identities, the matrix, the step rule
-- [Manifest](https://twistj.com/manifest/) and [Czech Manifest](https://twistj.com/manifest/cs/): the twelve rules of the method
+- [Manifest](https://twistj.com/manifest/) sets out the twelve rules of the method
 - [Logos](https://twistj.com/logos/): a dated, non-canonical reading of Public Canon v109. Status labels belong to that edition. [Plain Markdown](https://twistj.com/logos/logos.md).
 - [Public Canon](https://twistj.com/canon/): the active public ledger
 - [Code](https://github.com/mathorn1973/twist-j): verify it yourself
-- [Ordinary Quantum](https://twistj.com/oq/): exact circuit computation with its own technical documentation
+- [Ordinary Quantum](https://twistj.com/oq/) runs editable OpenQASM circuits. Its [measurement lesson](https://twistj.com/oq/#measurement) compares two bases, and its [Grover lesson](https://twistj.com/oq/#grover-search) compares baseline and amplified target probabilities. The [console guide](https://twistj.com/oq/README.md) covers both lessons, circuit sharing and optional rotation synthesis.
 
 ## Optional
 
 Interactive demonstrations. Illustrations of the arithmetic; they carry no status label and are not evidence.
 
-- [Demo Lab](https://twistj.com/demolab/): index of the demonstrations below
+- [Demo Lab](https://twistj.com/demolab/) includes a [five-step contact](https://twistj.com/demolab/#contact-cycle) with one admitted and one refused pair. The [proof in the Canon](https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L13580-L13643) covers the specified ring.
 - [Live demo](https://twistj.com/evo/): exact finite checkpoint logic inside an illustrative floating-point particle, field, and rendering layer
 - [Pentaplex](https://twistj.com/pentaplex/): Penrose tilings, Galois projection ζ to ζ²
 - [Fractal](https://twistj.com/fractal/): Mandelbrot set as escape-time counting, z to z² + c
