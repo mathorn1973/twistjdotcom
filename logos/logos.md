@@ -557,11 +557,11 @@ Since 2 November PR #1855 is merged into main as a NON-CANONICAL note. V108 took
 
 ## Sources
 
-- [STATUS.md](https://github.com/mathorn1973/twist-j/blob/main/STATUS.md): Public Canon v109, tag canon-v109, the Canon fingerprints.
-- [Registry v109](https://github.com/mathorn1973/twist-j/blob/main/canon/REGISTRY.tsv): the statuses of all cited rows.
-- [Frontier v109](https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md): the 26 live H and O rows.
-- [Contact C-J-INTEGRAL-RELATIVE-CONTACT-N](https://github.com/mathorn1973/twist-j/tree/main/notes/C-J-INTEGRAL-RELATIVE-CONTACT-N): the definition of contact and the proof, including the accounts of the triple (4, 0, 0).
-- [Probe P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1](https://github.com/mathorn1973/twist-j/tree/main/probes/P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1): the account formula q, the minima 12 and 27, the bank capacity.
+- [STATUS.md](https://github.com/mathorn1973/twist-j/blob/canon-v109/STATUS.md): Public Canon v109, tag canon-v109, the Canon fingerprints.
+- [Registry v109](https://github.com/mathorn1973/twist-j/blob/canon-v109/canon/REGISTRY.tsv): the statuses of all cited rows.
+- [Frontier v109](https://github.com/mathorn1973/twist-j/blob/canon-v109/canon/FRONTIER.md): the 26 live H and O rows.
+- [Contact C-J-INTEGRAL-RELATIVE-CONTACT-N](https://github.com/mathorn1973/twist-j/tree/canon-v109/notes/C-J-INTEGRAL-RELATIVE-CONTACT-N): the definition of contact and the proof, including the accounts of the triple (4, 0, 0).
+- [Probe P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1](https://github.com/mathorn1973/twist-j/tree/canon-v109/probes/P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1): the account formula q, the minima 12 and 27, the bank capacity.
 - [Probe P-DIGON-TRIANGLE-J-MODE-1, PR #1733](https://github.com/mathorn1973/twist-j/pull/1733): the digon and triangle cell.
 - [PR #1855, C-RELATIVE-CONTACT-RHYTHM-CLASSIFICATION-N](https://github.com/mathorn1973/twist-j/pull/1855): the classification of periods, sharp account bounds, the hidden phase and the limits of reading. Merged into main on 2 November as a NON-CANONICAL note, with the acceptance of the review in REVIEW-ACCEPTANCE.md. V108 took four general theorems from it.
 - [Issue #1854](https://github.com/mathorn1973/twist-j/issues/1854): the reservation of the same candidate.

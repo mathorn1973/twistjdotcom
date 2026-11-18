@@ -73,6 +73,10 @@ Stop without guessing when the export fails, when a rejection cannot be fixed wi
 number or a label, when check fails, when the diff touches paragraphs the source did not change, or
 when the push is rejected. A stopped sync leaves the repository untouched.
 
+The English editions pin five citations in the v109 reference list to `canon-v109`. The generator
+recognises the list by its source block hash. If the list changes, check which edition the revised
+citations describe before updating the pins. The HTML footer links to the current Canon.
+
 ## Glossary (Czech to English, binding)
 
 ```

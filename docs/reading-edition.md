@@ -15,10 +15,9 @@ All four edition DOIs resolved to their respective public Zenodo records on 18 N
 
 Run `python -B verify/paper_mirrors.py` from the repository root to check the mirrors, manuscript fingerprints and edition citations offline. Run `python -B verify/kernel_identities.py` for the exact integer identities. The [sitemap](../sitemap.xml) and [machine index](../llms.txt) describe the same routes as the home page. Modification dates for existing routes follow their page history.
 
-Two findings affect the remaining migration work.
+The [Logos reading](../logos/index.html) and its [Markdown edition](../logos/logos.md) were rebuilt from source revision 124. Five historical citations point to the `canon-v109` tag for the status, registry, frontier, two-site contact notes and four-slot minimum probe. The HTML footer links to the current Canon.
 
-- The current Evo app can share four settings the older subdomain cannot read: target density, viscosity, solidification strength and its toggle. Share and Lock & Share in this checkout point to `https://twistj.com/evo/`, which reads all four. The fragment format is preserved. Existing links on the subdomain still depend on the application served there.
-- Logos is identified in the navigation as a reading of v109. Five citations in its source list refer to that edition through `main`: STATUS, the Registry, the Frontier, the two-site contact notes and the four-slot minimum probe. All five paths exist at `canon-v109`. Pin them in the next source revision and rebuild HTML and Markdown together with the [Logos workflow](../tools/logos/RUNBOOK.md). The final link to the current Canon should continue to follow the live edition.
+The current Evo app can share four settings the older subdomain cannot read: target density, viscosity, solidification strength and its toggle. Share and Lock & Share in this checkout point to `https://twistj.com/evo/`, which reads all four. The fragment format is preserved. Existing links on the subdomain still depend on the application served there.
 
 In a fresh local browser, Evo restored both a legacy dot-separated fragment and the four settings above. Lock & Share restored the locked state. Fractal restored the centre, scale and audio level in Mandelbrot, Julia and split views, including the Julia parameter where applicable. The tests captured the URL passed to the clipboard and reopened its fragment in a fresh page. The four paper guides were exercised at widths of 390 and 1280 pixels. The home and contact pages were also checked at 320 pixels and in print mode.
 

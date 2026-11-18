@@ -256,6 +256,26 @@ def cmd_figure(a):
     return 0
 
 
+# The translation of this exact reference block is a snapshot of Canon v109.
+# Keep the links in memory unchanged so source and translation checks still see
+# the same block and number tokens.
+V109_REFERENCES_SHA = "92bc88cb96180d9968a1eb122553223addf9f99c2df18bae6762f71c2f7bcff6"
+V109_REFERENCES = (
+    ("blob", "STATUS.md"),
+    ("blob", "canon/REGISTRY.tsv"),
+    ("blob", "canon/FRONTIER.md"),
+    ("tree", "notes/C-J-INTEGRAL-RELATIVE-CONTACT-N"),
+    ("tree", "probes/P-RELATIVE-CONTACT-FOUR-SLOT-MINIMUM-1"),
+)
+
+
+def pin_v109_references(text):
+    for kind, path in V109_REFERENCES:
+        base = f"https://github.com/mathorn1973/twist-j/{kind}"
+        text = text.replace(f"]({base}/main/{path})", f"]({base}/canon-v109/{path})")
+    return text
+
+
 def english_blocks(blocks, mem):
     """The English document as a list of (kind, text, meta). Raises on a missing translation."""
     out = []
@@ -274,7 +294,10 @@ def english_blocks(blocks, mem):
             en = mem["blocks"].get(b["sha"])
             if not en:
                 raise SystemExit("block %s without English: %s" % (b["sha"][:12], b["cs"][:60]))
-            out.append((b["kind"], en["en"], None))
+            text = en["en"]
+            if b["sha"] == V109_REFERENCES_SHA:
+                text = pin_v109_references(text)
+            out.append((b["kind"], text, None))
     return out
 
 
