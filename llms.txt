@@ -75,7 +75,7 @@ Earlier and related works:
 - [Logos](https://twistj.com/logos/): a dated, non-canonical reading of Public Canon v109. Status labels belong to that edition. [Plain Markdown](https://twistj.com/logos/logos.md).
 - [Public Canon](https://twistj.com/canon/): the active public ledger
 - [Code](https://github.com/mathorn1973/twist-j): verify it yourself
-- [Ordinary Quantum](https://twistj.com/oq/) runs editable OpenQASM circuits. Its [measurement lesson](https://twistj.com/oq/#measurement) compares two bases, and its [Grover lesson](https://twistj.com/oq/#grover-search) compares baseline and amplified target probabilities. The [console guide](https://twistj.com/oq/README.md) covers both lessons, circuit sharing and optional rotation synthesis.
+- [Ordinary Quantum](https://twistj.com/oq/) runs editable OpenQASM. [Compare two circuits](https://twistj.com/oq/#compare-exactly) on a fixed input or check their entire unitary operation. The [Bell pair](https://twistj.com/oq/#bell-pair), [measurement](https://twistj.com/oq/#measurement) and [Grover search](https://twistj.com/oq/#grover-search) experiments use exact readouts. The [console guide](https://twistj.com/oq/README.md) covers scalar queries, comparison bounds, sharing and optional rotation synthesis.
 
 ## Optional
 

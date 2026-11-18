@@ -26,12 +26,14 @@ QasmError.prototype = Object.create(Error.prototype);
  * A tiny recursive-descent evaluator over + - * / ( ) pi. No eval, and the
  * result is immediately quantized: k = angle / (pi/4) must be an integer. */
 
-function evalAngle(src, line) {
-    var i = 0;
+function evalAngle(src, line, exact) {
+    var i = 0, terms = 0;
+    if (exact && src.length > 12000) throw new QasmError(line, 'exact expression exceeds 12000 characters');
 
     function skip() { while (i < src.length && /\s/.test(src[i])) i++; }
 
     function primary() {
+        if (exact && ++terms > 256) throw new QasmError(line, 'exact expression exceeds 256 terms');
         skip();
         if (src[i] === '(') {
             i++;
@@ -41,22 +43,29 @@ function evalAngle(src, line) {
             i++;
             return v;
         }
-        if (src[i] === '-') { i++; return -primary(); }
+        if (src[i] === '-') { i++; var x = primary(); return exact ? [-x[0], x[1], x[2]] : -x; }
         if (src[i] === '+') { i++; return primary(); }
         var m = /^(pi|π)/.exec(src.slice(i));
-        if (m) { i += m[0].length; return Math.PI; }
+        if (m) { i += m[0].length; return exact ? [1n, 1n, 1] : Math.PI; }
         m = /^\d+(\.\d+)?([eE][+-]?\d+)?/.exec(src.slice(i));
-        if (m) { i += m[0].length; return parseFloat(m[0]); }
+        if (m) { i += m[0].length; return exact ? exactDecimal(m[0], line) : parseFloat(m[0]); }
         throw new QasmError(line, 'cannot read angle "' + src + '"',
             'angles may use numbers, pi, + - * / and parentheses');
     }
 
-    /* right-associative power, checked before '*' so 3**2 does not read as a
-     * multiplication by nothing */
+    function calculate(a, b, op) {
+        if (exact) return exactArithmetic(a, b, op, line);
+        if (op === '**') return Math.pow(a, b);
+        if (op === '*') return a * b;
+        if (op === '/') return a / b;
+        return op === '+' ? a + b : a - b;
+    }
+
+    /* Right-associative power. */
     function power() {
         var v = primary();
         skip();
-        if (src[i] === '*' && src[i + 1] === '*') { i += 2; return Math.pow(v, power()); }
+        if (src[i] === '*' && src[i + 1] === '*') { i += 2; return calculate(v, power(), '**'); }
         return v;
     }
 
@@ -64,10 +73,11 @@ function evalAngle(src, line) {
         var v = power();
         for (;;) {
             skip();
-            if (src[i] === '*' && src[i + 1] === '*') { i += 2; v = Math.pow(v, power()); }
-            else if (src[i] === '*') { i++; v *= power(); }
-            else if (src[i] === '/') { i++; v /= power(); }
-            else return v;
+            if (src[i] === '*' && src[i + 1] === '*') { i += 2; v = calculate(v, power(), '**'); }
+            else if (src[i] === '*' || src[i] === '/') {
+                var op = src[i++];
+                v = calculate(v, power(), op);
+            } else return v;
         }
     }
 
@@ -75,9 +85,9 @@ function evalAngle(src, line) {
         var v = term();
         for (;;) {
             skip();
-            if (src[i] === '+') { i++; v += term(); }
-            else if (src[i] === '-') { i++; v -= term(); }
-            else return v;
+            if (src[i] !== '+' && src[i] !== '-') return v;
+            var op = src[i++];
+            v = calculate(v, term(), op);
         }
     }
 
@@ -85,6 +95,85 @@ function evalAngle(src, line) {
     skip();
     if (i < src.length) throw new QasmError(line, 'trailing text in angle "' + src + '"');
     return val;
+}
+
+/* Exact-query expressions use a reduced rational times a single integer
+ * power of pi. Reject mixed nonzero powers instead of guessing cancellation. */
+function exactReduced(n, d, power, line) {
+    if (!d) throw new QasmError(line, 'division by zero in exact expression');
+    if (!n) return [0n, 1n, 0];
+    if (d < 0n) { n = -n; d = -d; }
+    var a = n < 0n ? -n : n, b = d;
+    if (Math.abs(power) > 64 || a.toString(2).length > 8192 || d.toString(2).length > 8192)
+        throw new QasmError(line, 'exact expression exceeds its arithmetic size limit');
+    while (b) { var r = a % b; a = b; b = r; }
+    return [n / a, d / a, power];
+}
+
+function exactDecimal(text, line) {
+    var parts = text.toLowerCase().split('e'), exponent = Number(parts[1] || 0);
+    var digits = parts[0].split('.');
+    var fraction = digits[1] || '';
+    var places = fraction.length - exponent;
+    if (!Number.isSafeInteger(exponent) || Math.abs(places) > 256 || text.length > 256)
+        throw new QasmError(line, 'exact decimal exceeds its size limit');
+    var n = BigInt(digits[0] + fraction);
+    return places >= 0 ? exactReduced(n, 10n ** BigInt(places), 0, line)
+                       : [n * 10n ** BigInt(-places), 1n, 0];
+}
+
+function exactArithmetic(a, b, op, line) {
+    if (op === '**') {
+        if (b[2] || b[1] !== 1n || b[0] < -64n || b[0] > 64n)
+            throw new QasmError(line, 'exact numeric powers require an integer exponent from -64 to 64');
+        var e = b[0] < 0n ? -b[0] : b[0];
+        var n = b[0] < 0n ? a[1] : a[0], d = b[0] < 0n ? a[0] : a[1];
+        if (e * BigInt(Math.max(n.toString(2).length, d.toString(2).length)) > 8192n)
+            throw new QasmError(line, 'exact expression exceeds its arithmetic size limit');
+        return exactReduced(n ** e, d ** e, a[2] * Number(b[0]), line);
+    }
+    if (op === '*') return exactReduced(a[0] * b[0], a[1] * b[1], a[2] + b[2], line);
+    if (op === '/') return exactReduced(a[0] * b[1], a[1] * b[0], a[2] - b[2], line);
+    if (!b[0]) return a;
+    if (!a[0]) return op === '+' ? b : [-b[0], b[1], b[2]];
+    if (a[2] !== b[2])
+        throw new QasmError(line, 'exact expressions cannot add unlike powers of pi',
+            'Write an angle as a rational multiple of pi, such as pi/8.');
+    return exactReduced(a[0] * b[1] + (op === '+' ? 1n : -1n) * b[0] * a[1],
+                        a[1] * b[1], a[2], line);
+}
+
+function exactNumber(value, line) {
+    var n = value[0], d = value[1];
+    /* These dyadic numbers can be carried through the existing compile-time
+     * environment without rounding or changing an integer/branch decision. */
+    if (value[2] || n < -9007199254740991n || n > 9007199254740991n ||
+        d > 4096n || (d & (d - 1n)) !== 0n)
+        throw new QasmError(line, 'exact compile-time numbers must be safe integers or bounded dyadic fractions');
+    return Number(n) / Number(d);
+}
+
+function exactDyadicNumber(value, line) {
+    return exactReduced(BigInt(value * 4096), 4096n, 0, line);
+}
+
+function numberSource(value, line) {
+    if (!EXACT_QUERY) return String(value);
+    var pair = exactDyadicNumber(value, line);
+    return pair[1] === 1n ? String(pair[0]) : pair[0] + '/' + pair[1];
+}
+
+function gateAngle(src, line, exact) {
+    if (!exact) return evalAngle(src, line);
+    var v = evalAngle(src, line, true);
+    if (!v[0]) return 0;
+    var eighths = v[0] * 8n;
+    if (v[2] !== 1 || eighths % v[1] !== 0n)
+        throw new QasmError(line, 'exact gate angle must be a multiple of pi/8',
+            'Write an exact multiple such as pi/8 instead of a decimal approximation.');
+    /* 4*pi is a full period even for the half-angle global phases. The
+     * existing emitter receives only a small, already-proved lattice angle. */
+    return Number(eighths / v[1] % 32n) * (Math.PI / 8);
 }
 
 /* angle -> k in SIXTEENTHS, so the phase is zeta_16^k = e^(i k pi/8). A k that
@@ -242,24 +331,30 @@ function modText(mods) {
  * modifier order. inv and pow fold into one exponent, because all three
  * commute the way they have to: ctrl(U^k) = ctrl(U)^k, ctrl(U†) = ctrl(U)†,
  * and (U^a)^b = U^ab. So the whole chain is (controls, exponent). */
-function foldMods(mods, line, num) {
+function foldMods(mods, line, num, controlLimit) {
     var ctrls = [], e = 1, i, kind, arg, n, c;
+    var exactExponent = controlLimit ? [1n, 1n, 0] : null;
     for (i = 0; i < mods.length; i++) {
         kind = mods[i].kind; arg = mods[i].arg;
         if (kind === 'inv') {
             if (arg !== undefined && arg.trim()) throw new QasmError(line, 'inv takes no argument');
             e = -e;
+            if (exactExponent) exactExponent[0] = -exactExponent[0];
         } else if (kind === 'pow') {
             if (arg === undefined || !arg.trim()) throw new QasmError(line,
                 'pow needs an exponent, as in pow(2) @');
-            e *= num(arg);
+            if (exactExponent) exactExponent = exactArithmetic(exactExponent, exactDyadicNumber(num(arg), line), '*', line);
+            else e *= num(arg);
         } else {
             n = arg === undefined || !arg.trim() ? 1 : num(arg);
             if (n < 0 || Math.abs(n - Math.round(n)) > 1e-9) throw new QasmError(line,
                 kind + ' needs a whole, non-negative number of control qubits');
+            if (controlLimit && n > controlLimit - ctrls.length)
+                throw new QasmError(line, 'exact-query control count exceeds ' + controlLimit);
             for (c = 0; c < Math.round(n); c++) ctrls.push(kind === 'negctrl');
         }
     }
+    if (exactExponent) e = exactNumber(exactExponent, line);
     return { ctrls: ctrls, e: e };
 }
 
@@ -340,7 +435,7 @@ function controlGates(list, cq, line) {
 /* U^k for a whole word. A word made only of phases folds into one phase per
  * gate instead of k copies of it, which is what keeps pow(512) @ cp(θ) a
  * single gate rather than 512 of them. */
-function repeatGates(list, e) {
+function repeatGates(list, e, limit, line) {
     var out = [], i, allPhase = list.length > 0;
     for (i = 0; i < list.length; i++)
         if (list[i][0] !== 'zpow' && list[i][0] !== 'mcpow' && list[i][0] !== 'gphase')
@@ -353,7 +448,11 @@ function repeatGates(list, e) {
         }
         return out;
     }
-    for (i = 0; i < e; i++) out = out.concat(list);
+    if (limit && e * list.length > limit)
+        throw new QasmError(line, 'exact-query compilation exceeds ' + limit + ' gates');
+    for (i = 0; i < e; i++) {
+        for (var j = 0; j < list.length; j++) out.push(list[j]);
+    }
     return out;
 }
 
@@ -381,7 +480,7 @@ var FRAC_SCALE = { p: 1, u1: 1, phase: 1, cp: 1, cphase: 1, cu1: 1, mcp: 1,
                    gphase: 1, rz: 1, rx: 1, ry: 1 };
 
 function fracPowStatements(name, params, ops, e, line) {
-    var E = '(' + e + ')';
+    var E = '(' + numberSource(e, line) + ')';
     if (Object.prototype.hasOwnProperty.call(FRAC_SCALE, name)) {
         if (params === undefined || !params.trim()) throw new QasmError(line,
             name + ' takes an angle, e.g. ' + name + '(pi/4)');
@@ -416,6 +515,7 @@ function fracPowStatements(name, params, ops, e, line) {
  * every off-lattice angle is refused exactly as before. The module is passed
  * in rather than required, so nothing here depends on it being loaded. */
 var SYNTH = null;
+var EXACT_QUERY = false;
 
 /* Try to replace an unrepresentable single-qubit rotation with a nearby
  * exact word. Returns true if it did, and records what it substituted so the
@@ -924,7 +1024,7 @@ function q3Num(expr, env, line, what) {
         throw new QasmError(line, 'cannot evaluate "' + expr.trim() + '" at translation time',
             '"' + m + '" is not a compile-time constant here. ' + (what || ''));
     });
-    return evalAngle(t, line);
+    return EXACT_QUERY ? exactNumber(evalAngle(t, line, true), line) : evalAngle(t, line);
 }
 
 /* Compile-time Boolean expressions only. Runtime bit conditions remain a
@@ -976,7 +1076,7 @@ function q3Bool(expr, env, line) {
 
 function q3Int(expr, env, line, what) {
     var v = q3Num(expr, env, line, what);
-    if (Math.abs(v - Math.round(v)) > 1e-9)
+    if (EXACT_QUERY ? !Number.isSafeInteger(v) : Math.abs(v - Math.round(v)) > 1e-9)
         throw new QasmError(line, '"' + expr.trim() + '" is not an integer (' + v + ')');
     return Math.round(v);
 }
@@ -1107,13 +1207,39 @@ var Q3_NO = {
  * parameters theta, lambda and phi in the alphabet those letters came from. */
 var Q3_IDENT = /[\p{L}_][\p{L}\p{N}_]*/gu;
 
-function q3Translate(src) {
+/* Exact verdicts use this fixed gate library. No external includes are
+ * loaded or silently assumed to have the same definitions. */
+function checkExactInclude(text, library, line) {
+    var match = /^include\s+"([^"]+)"$/i.exec(text);
+    if (!match || match[1] !== library)
+        throw new QasmError(line, 'exact queries support only the ' + library + ' include for this dialect');
+}
+
+function q3Translate(src, opts) {
+    var maxStatements = opts && opts.mode === 'exact-query' ? 10000 : 0;
+    var work = 0, expandedChars = 0;
     var out = [], map = [], gdefs = {}, ddefs = {}, qregs = {}, cregs = {}, env = {}, fenv = {};
     var qalias = {};
     var problems = [];
     var order = [], measured = {}, warnings = [], anyGate = false, runtimeDepth = 0, branchDepth = 0;
 
-    function push(text, line) { out.push(text); map.push(line); }
+    function visit(line) {
+        if (maxStatements && ++work > 50000)
+            throw new QasmError(line, 'exact-query expansion exceeds 50000 compile-time steps');
+    }
+
+    function chargeText(size, line) {
+        if (maxStatements && (expandedChars += size) > 2 * 1024 * 1024)
+            throw new QasmError(line, 'exact-query expansion exceeds 2 MiB of generated text');
+    }
+
+    function push(text, line) {
+        if (maxStatements && out.length >= maxStatements) throw new QasmError(line,
+            'exact-query expansion exceeds 10000 QASM3 statements',
+            'reduce the loop or circuit size; the Worker is not an unbounded compiler');
+        chargeText(text.length, line);
+        out.push(text); map.push(line);
+    }
 
     /* A circuit can be out of reach for more than one reason, and reporting
      * only the one the translator happened to reach first is how you send
@@ -1137,12 +1263,12 @@ function q3Translate(src) {
         if (SYNTH) SYNTH.dry = true;
         try {
             if (np < 0) {
-                raw = params === undefined || !params.trim() ? [] : splitTop(substConst(params));
+                raw = params === undefined || !params.trim() ? [] : splitTop(substConst(params, line));
                 if (raw.length !== -np) return true;
-                te[2](dry, [0, 0, 0], raw.map(function (a) { return evalAngle(a, line); }), line);
+                te[2](dry, [0, 0, 0], raw.map(function (a) { return gateAngle(a, line, maxStatements); }), line);
             } else if (np) {
                 if (params === undefined) return true;
-                te[2](dry, [0, 0, 0], quantize(evalAngle(substConst(params), line), line, name), line);
+                te[2](dry, [0, 0, 0], quantize(gateAngle(substConst(params, line), line, maxStatements), line, name), line);
             }
         } catch (e) {
             if (e.name !== 'QasmError') throw e;
@@ -1153,11 +1279,17 @@ function q3Translate(src) {
     }
 
     /* Angle constants back into an angle expression, verbatim. */
-    function substConst(t) {
-        return t.replace(Q3_IDENT, function (w) {
-            return Object.prototype.hasOwnProperty.call(fenv, w) ? fenv[w] : w;
+    function replaceWords(text, bindings, line) {
+        chargeText(text.length, line);
+        return text.replace(Q3_IDENT, function (word) {
+            if (!Object.prototype.hasOwnProperty.call(bindings, word)) return word;
+            var value = bindings[word];
+            chargeText(Math.max(0, value.length - word.length), line);
+            return value;
         });
     }
+
+    function substConst(text, line) { return replaceWords(text, fenv, line); }
 
     function distinctOperands(operands, name, line) {
         var seen = new Set();
@@ -1202,9 +1334,7 @@ function q3Translate(src) {
     /* Textual substitution on a gate body, on whole identifiers only. */
     function substitute(st, sub) {
         function one(t) {
-            return t.replace(Q3_IDENT, function (m) {
-                return Object.prototype.hasOwnProperty.call(sub, m) ? sub[m] : m;
-            });
+            return replaceWords(t, sub, st.line);
         }
         return { text: one(st.text), body: st.body === undefined ? undefined : one(st.body),
                  elseBody: st.elseBody === undefined ? undefined : one(st.elseBody),
@@ -1251,7 +1381,7 @@ function q3Translate(src) {
                 'commute, so it can be pushed inside a one-gate body and no further. ' +
                 'Write the root you mean as its own gate.');
             for (i = 0; i < body.length; i++)
-                walk({ text: prependCtrls(body[i].text, ctrlSel, pre + 'pow(' + e + ') @ ', line),
+                walk({ text: prependCtrls(body[i].text, ctrlSel, pre + 'pow(' + numberSource(e, line) + ') @ ', line),
                        line: body[i].line }, line, depth + 1);
             return;
         }
@@ -1288,7 +1418,7 @@ function q3Translate(src) {
         if (depth > 32) throw new QasmError(line, 'gate modifiers nested more than 32 deep');
         var call = splitCall(md.rest);
         if (!call) throw new QasmError(line, 'cannot read statement "' + md.rest + '"');
-        var f = foldMods(md.mods, line, function (a) { return q3Num(a, env, line); });
+        var f = foldMods(md.mods, line, function (a) { return q3Num(a, env, line); }, maxStatements && 4096);
         var C = f.ctrls.length, i, w, pre = '';
         var items = call.operands.trim()
             ? splitTop(call.operands).map(function (s) { return s.trim(); }) : [];
@@ -1334,9 +1464,9 @@ function q3Translate(src) {
         }
 
         /* a built-in: the gate layer knows how to control the word it emits */
-        if (f.e !== 1) pre += 'pow(' + f.e + ') @ ';
+        if (f.e !== 1) pre += 'pow(' + numberSource(f.e, line) + ') @ ';
         else if (!checkGate(call.name, call.params, line)) return;
-        var ptxt = call.params === undefined ? '' : '(' + substConst(call.params) + ')';
+        var ptxt = call.params === undefined ? '' : '(' + substConst(call.params, line) + ')';
         var te = TABLE[call.name], flatq, sel;
         if (te && te[0] === -1) {                     /* variadic: one control set */
             flatq = ctrlSel.slice();
@@ -1359,10 +1489,16 @@ function q3Translate(src) {
 
     function walk(st, callerLine, depth) {
         var text = st.text, line = st.line || callerLine, m, i;
+        visit(line);
         if (!text) return;
 
         if (/^OPENQASM\b/i.test(text)) return;
-        if (/^include\b/i.test(text)) return;                 /* stdgates is the table below */
+        if (/^include\b/i.test(text)) {
+            if (maxStatements) checkExactInclude(text, 'stdgates.inc', line);
+            return;
+        }
+        if (/^(?:#\s*pragma|pragma)\b/i.test(text) && maxStatements)
+            throw new QasmError(line, 'exact queries do not assign semantics to pragmas');
         if (/^(?:#\s*pragma|pragma|barrier|delay)\b/i.test(text)) return;
         if (/^box\b/i.test(text) && st.body !== undefined) {
             var bst = q3Split(st.body, st.bodyLine || line);
@@ -1416,7 +1552,7 @@ function q3Translate(src) {
         m = /^(?:(?:const|input|output)\s+)?(u?int|float|angle)\s*(?:\[\s*[^\]]*\s*\])?\s+([\p{L}_][\p{L}\p{N}_]*)(?:\s*=\s*(.+))?$/iu.exec(text);
         if (m) {
             if (/^u?int$/i.test(m[1])) env[m[2]] = m[3] !== undefined ? q3Int(m[3], env, line) : 0;
-            else if (m[3] !== undefined) fenv[m[2]] = '(' + substConst(m[3]) + ')';
+            else if (m[3] !== undefined) fenv[m[2]] = '(' + substConst(m[3], line) + ')';
             return;
         }
         /* An angle register with no value exists to be WRITTEN while the
@@ -1454,6 +1590,8 @@ function q3Translate(src) {
 
         /* reset: free at the top, because the state starts there anyway */
         if (/^reset\b/i.test(text)) {
+            // An exact query may start from a nonzero computational basis input.
+            if (maxStatements) throw new QasmError(line, 'exact scalar queries do not support reset');
             /* Before any gate this is free: the state starts in |0..0>.
              * After one it is measure-and-correct, which the gate layer
              * now knows how to do, so hand it down instead of refusing.
@@ -1565,7 +1703,10 @@ function q3Translate(src) {
                 var stp = pr.length === 3 ? q3Int(pr[1], env, line) : 1;
                 var b = q3Int(pr[pr.length - 1], env, line);
                 if (stp === 0) throw new QasmError(line, 'a for-loop step of 0 never ends');
+                if (maxStatements && ![a, b, stp].every(Number.isSafeInteger))
+                    throw new QasmError(line, 'exact-query loop bounds and step must be safe integers');
                 for (var v = a; stp > 0 ? v <= b : v >= b; v += stp) {
+                    visit(line);
                     env[m[1]] = v;
                     for (i = 0; i < inner.length; i++) walk(inner[i], line, depth);
                 }
@@ -1574,6 +1715,7 @@ function q3Translate(src) {
                 for (var j = 0; j < items.length; j++) {
                     var it = items[j].trim();
                     if (!it) continue;
+                    visit(line);
                     env[m[1]] = q3Int(it, env, line);
                     for (i = 0; i < inner.length; i++) walk(inner[i], line, depth);
                 }
@@ -1609,7 +1751,7 @@ function q3Translate(src) {
             }
             try { taken = q3Bool(cond, env, line); }
             catch (e) {
-                if (e.name !== 'QasmError') throw e;
+                if (maxStatements || e.name !== 'QasmError') throw e;
                 push('if (' + cond.trim() + ') {', line);
                 runtimeDepth++;
                 try {
@@ -1657,7 +1799,7 @@ function q3Translate(src) {
         }) : [];
         anyGate = true;
         if (!checkGate(call.name, call.params, line)) return;   /* reported where written */
-        var ptxt = call.params !== undefined ? '(' + substConst(call.params) + ')' : '';
+        var ptxt = call.params !== undefined ? '(' + substConst(call.params, line) + ')' : '';
 
         /* mcz, mcx and mcp are variadic: the whole operand list is ONE control
          * set, so it must not be broadcast apart. */
@@ -1746,6 +1888,7 @@ function parse2(src, opts) {
     var qregs = {}, cregs = {}, nq = 0, nc = 0;
     var gates = [], measures = [], warnings = [], si, st;
     var dynamic = false, scratchBits = 0;
+    var exactGateLimit = opts && opts.mode === 'exact-query' ? 10000 : 0;
 
     /* One statement, emitted into a gate list. Pulled out of the loop so an
      * if-block can run it too: classical control applies the same statement
@@ -1753,7 +1896,11 @@ function parse2(src, opts) {
     function doStatement(text, line, gates, block) {
         var m, i;
 
-            if (/^OPENQASM\b/i.test(text) || /^include\b/i.test(text)) return;
+            if (/^OPENQASM\b/i.test(text)) return;
+            if (/^include\b/i.test(text)) {
+                if (exactGateLimit) checkExactInclude(text, 'qelib1.inc', line);
+                return;
+            }
 
             var m = /^(qreg|creg)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\[\s*(\d+)\s*\]$/.exec(text);
             if (m) {
@@ -1773,12 +1920,16 @@ function parse2(src, opts) {
                         'stays sparse, but the index has to stop somewhere. ' +
                         'The native engine has no such cap.');
                 } else {
+                    if (exactGateLimit && size > SPARSE_MAX_QUBITS - nc)
+                        throw new QasmError(line, 'exact-query classical registers exceed 4096 bits');
                     cregs[m[2]] = { base: nc, size: size };
                     nc += size;
                 }
                 return;
             }
 
+            if (/^(?:#\s*pragma|pragma)\b/i.test(text) && exactGateLimit)
+                throw new QasmError(line, 'exact queries do not assign semantics to pragmas');
             if (/^(?:#\s*pragma|pragma|barrier|delay)\b/i.test(text)) return;
 
             if (/^(gate|opaque)\b/i.test(text)) throw new QasmError(line,
@@ -1792,6 +1943,7 @@ function parse2(src, opts) {
              * produces belongs to one trajectory rather than to the circuit. */
             var iff = splitIf(text);
             if (iff && (iff.rest || (block && block.body !== undefined))) {
+                if (exactGateLimit) throw new QasmError(line, 'exact scalar queries do not support classical feedback');
                 var cnd = parseCond(iff.cond, cregs, line), sub = [], otherwise = [];
                 function branch(body, baseLine, target) {
                     var parts = q3Split(body, baseLine || line);
@@ -1818,6 +1970,7 @@ function parse2(src, opts) {
              * measures into is scratch and the program never reads it. */
             m = /^reset\s+(.+)$/i.exec(text);
             if (m) {
+                if (exactGateLimit) throw new QasmError(line, 'exact scalar queries do not support reset');
                 var rq = resolve(m[1], qregs, line), ri, scratch;
                 for (ri = 0; ri < rq.length; ri++) {
                     scratch = SCRATCH_BASE + scratchBits++;
@@ -1882,10 +2035,10 @@ function parse2(src, opts) {
                 var raw = params === undefined || !params.trim() ? [] : splitTop(params);
                 if (raw.length !== -nP) throw new QasmError(line,
                     name + ' takes ' + (-nP) + ' angle(s), got ' + raw.length);
-                k = raw.map(function (a) { return evalAngle(a, line); });
+                k = raw.map(function (a) { return gateAngle(a, line, exactGateLimit); });
             } else if (nP) {
                 if (params === undefined) throw new QasmError(line, name + ' takes an angle, e.g. ' + name + '(pi/4)');
-                k = quantize(evalAngle(params, line), line, name);
+                k = quantize(gateAngle(params, line, exactGateLimit), line, name);
             } else if (params !== undefined && params.trim()) {
                 throw new QasmError(line, name + ' takes no parameters');
             }
@@ -1942,7 +2095,7 @@ function parse2(src, opts) {
      * its own angle checks and its own refusals. negctrl is X-conjugation
      * around the whole thing, which is the definition, not a trick. */
     function emitModified(md, line, gates) {
-        var f = foldMods(md.mods, line, function (a) { return evalAngle(a, line); });
+        var f = foldMods(md.mods, line, function (a) { return exactGateLimit ? exactNumber(evalAngle(a, line, true), line) : evalAngle(a, line); }, exactGateLimit && 4096);
         var call = splitCall(md.rest);
         if (!call) throw new QasmError(line, 'cannot read statement "' + md.rest + '"');
         var items = call.operands.trim() ? splitTop(call.operands) : [];
@@ -1979,14 +2132,15 @@ function parse2(src, opts) {
                 for (fi = 0; fi < frac.length; fi++) doStatement(frac[fi], line, sub);
             } else {
                 e = Math.round(e);
-                if (e !== 0) {
+                if (e !== 0 || exactGateLimit) {
                     doStatement(call.name + ptxt + (rest ? ' ' + rest : ''), line, one);
+                    if (e === 0) return;
                     if (e < 0) { one = invertGates(one, line); e = -e; }
                     if (e > MAX_POW) throw new QasmError(line,
                         'pow(' + e + ') @ ' + call.name + ' would emit more than ' + MAX_POW + ' gates',
                         'a power of a phase gate folds into the angle and costs nothing; ' +
                         'this one does not, so it really is that many gates.');
-                    sub = repeatGates(one, e);
+                    sub = repeatGates(one, e, exactGateLimit, line);
                 }
             }
         } catch (err) {
@@ -2002,7 +2156,11 @@ function parse2(src, opts) {
             throw err;
         } finally { SYNTH = prevSynth; }
         if (!sub.length) return;
-        if (C) sub = controlGates(sub, cq, line);
+        if (C) {
+            if (exactGateLimit && sub.length * C > 1000000)
+                throw new QasmError(line, 'exact-query control expansion exceeds 1000000 wire references');
+            sub = controlGates(sub, cq, line);
+        }
         for (i = 0; i < C; i++) if (f.ctrls[i]) gates.push(['x', cq[i]]);
         for (i = 0; i < sub.length; i++) gates.push(sub[i]);
         for (i = C - 1; i >= 0; i--) if (f.ctrls[i]) gates.push(['x', cq[i]]);
@@ -2011,6 +2169,9 @@ function parse2(src, opts) {
     for (si = 0; si < stmts.length; si++) {
         st = stmts[si];
         doStatement(st.text, st.line, gates, st);
+        if (exactGateLimit && gates.length > exactGateLimit) throw new QasmError(st.line,
+            'exact-query compilation exceeds 10000 gates',
+            'reduce circuit repetition; no full statevector or sampling is attempted');
     }
 
     if (nq === 0) throw new QasmError(1, 'no qreg declared',
@@ -2027,6 +2188,12 @@ function parse2(src, opts) {
     }
 
     var compressed = opts && opts.mode === 'compressed';
+    /* Scalar exact queries never allocate a physical statevector. Preserve the
+     * original gates and global phase, but reject nonunitary trajectories. */
+    var exactQuery = opts && opts.mode === 'exact-query';
+    if (exactQuery && dynamic) throw new QasmError(1,
+        'exact scalar queries do not support intermediate measurement or reset',
+        'select a static unitary circuit with terminal measurements only');
     if (compressed) {
         if (dynamic) throw new QasmError(1,
             'compressed observables require a circuit without intermediate measurement, feedback or reset',
@@ -2132,7 +2299,7 @@ function parse2(src, opts) {
      * does not. */
     /* The bigger ring doubles the state, so the qubit ceiling comes down with
      * it — 2^24 amplitudes at 32 bytes each is over half a gigabyte. */
-    if (ring === 16 && nq > 22) throw new QasmError(1,
+    if (!exactQuery && ring === 16 && nq > 22) throw new QasmError(1,
         nq + ' qubits in Z[ζ₁₆] — the bigger ring caps at 22',
         'Z[ζ₁₆] carries eight integers per amplitude, so 2^' + nq + ' of them is ' +
         Math.round(Math.pow(2, nq) * 32 / 1048576) + ' MB. Keep the phases on the π/4 ' +
@@ -2151,6 +2318,16 @@ function parse2(src, opts) {
         }
     }
     if (ring === 8) halvePhases(gates);
+
+    /* This path returns the SAME unitary gate list and exact ring as ordinary
+     * parsing. Only the storage-dependent dense/sparse caps are omitted. The
+     * worker enforces gate and counting resource budgets before computing. */
+    if (exactQuery) return {
+        n: nq, nc: nc, qregs: qregs, cregs: cregs, ring: ring,
+        gates: gates.filter(function (g) { return g[0] !== 'measure'; }),
+        measures: measures, warnings: warnings, backend: 'exact-query',
+        supportBound: null, dynamic: false, optimization: optimization
+    };
 
     /* Which container? Dense stores 2^n amplitudes whatever the circuit does
      * with them; sparse stores only the non-zero ones and pays BigInt prices
@@ -2207,15 +2384,16 @@ function parse(src, opts) {
     /* Synthesis is off unless the caller hands over the module AND says so.
      * Off is not a limitation to apologise for: it is the difference between
      * running the circuit that was written and running one near it. */
-    var prev = SYNTH;
-    SYNTH = (opts && opts.synth) ? { mod: opts.synth, log: [],
+    var prev = SYNTH, prevExact = EXACT_QUERY;
+    EXACT_QUERY = Boolean(opts && opts.mode === 'exact-query');
+    SYNTH = (!EXACT_QUERY && opts && opts.synth) ? { mod: opts.synth, log: [],
                                      eps: opts.eps === undefined ? 1e-3 : opts.eps } : null;
     var mine = SYNTH;
     try {
         var r;
         if (!q3Detect(src)) r = parse2(src, opts);
         else {
-            var tr = q3Translate(src);
+            var tr = q3Translate(src, opts);
             try { r = parse2(tr.text, opts); }
             catch (e) {
                 if (e.name === 'QasmError' && tr.map[e.line - 1] !== undefined)
@@ -2246,7 +2424,7 @@ function parse(src, opts) {
             r.synthWorst = worst;
         }
         return r;
-    } finally { SYNTH = prev; }
+    } finally { SYNTH = prev; EXACT_QUERY = prevExact; }
 }
 
 return { parse: parse, parse2: parse2, QasmError: QasmError, TABLE: TABLE,

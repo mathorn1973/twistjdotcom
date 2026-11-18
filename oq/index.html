@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>oq — Ordinary Quantum</title>
-<meta name="description" content="oq — exact, zero-noise discrete algebra for quantum circuits. Run OpenQASM in the browser over the cyclotomic ring Z[ζ₈]: integer amplitudes, exact Born probabilities, byte-identical statevector on every machine.">
+<meta name="description" content="Compare OpenQASM circuits in your browser. Compute exact amplitudes, joint probabilities and Pauli expectations, or check whether two unitary circuits agree.">
 <meta name="author" content="A. M. Thorn">
 <meta property="og:title" content="oq — Ordinary Quantum">
-<meta property="og:description" content="Exact, zero-noise discrete algebra for quantum circuits. Paste QASM, get exact amplitudes in Z[ζ₈].">
+<meta property="og:description" content="Compare two quantum circuits and test what their relative phases change. Explore exact amplitudes, probabilities and unitary equivalence.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://twistj.com/oq/">
 
@@ -23,6 +23,7 @@
 
 
 <link rel="stylesheet" href="../site-nav.css">
+<link rel="stylesheet" href="compare.css">
 <style>
 :root {
     --bg: #f4f1eb;
@@ -132,6 +133,9 @@ h1 {
 .lesson h3 { color: var(--text-bright); font-size: 1.18rem; }
 .lesson p { margin: .35rem 0; }
 .lesson-controls { margin: .6rem 0; gap: .45rem .65rem; }
+.lesson-controls[hidden] { display: none; }
+#bell-pair .compare-table { max-width: 28rem; }
+#bell-pair .compare-table th:first-child { width: 45%; }
 .lesson-run { cursor: pointer; }
 .lesson-run:disabled { opacity: .55; cursor: default; }
 .lesson-source, .lesson-instructions { color: var(--muted); font-size: .9rem; }
@@ -178,6 +182,12 @@ select, input[type="text"] { max-width: 100%; }
 .rank-controls { margin: 10px 0; }
 .rank-controls[hidden] { display: none; }
 .rank-controls input { width: 250px; }
+.query-controls { margin: 10px 0 14px; padding: 12px 13px; border: 1px solid var(--rule); border-radius: 3px; }
+.query-controls[hidden], .query-fields[hidden] { display: none; }
+.query-controls .row { margin: 2px 0 9px; gap: 7px 10px; }
+.query-controls input { width: 106px; }
+.query-controls #queryQubits, .query-controls #queryPauli { width: min(250px, 100%); }
+.query-controls .mode-note { margin-bottom: 0; }
 .mode-note { font: 11.5px/1.65 ui-monospace, Consolas, monospace; color: var(--muted); margin: 8px 0; }
 input[type="number"]:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
 button.run {
@@ -256,31 +266,88 @@ button.stop:disabled { opacity: 1; }
 
 <div class="wrap">
 
-<header>
-    <div class="mark">(OQ)</div>
+<header class="oq-header">
     <h1>Ordinary Quantum</h1>
-    <p class="thesis">Run quantum circuits in the browser with exact cyclotomic arithmetic. Compare exact probabilities with simulated measurement samples.</p>
-    <p class="oq-jump"><a href="#measurement">Measurement</a> · <a href="#grover-search">Search</a> · <a href="#console">QASM console</a></p>
+    <p class="thesis">Run OpenQASM with exact arithmetic. Compare amplitudes, probabilities and simulated samples.</p>
+    <p class="oq-jump"><a href="#compare-exactly">Compare</a> · <a href="#measurement">Measurement</a> · <a href="#bell-pair">Bell pair</a> · <a href="#grover-search">Search</a> · <a href="#console">QASM console</a></p>
 </header>
 
-<div class="algebra">
-<table>
-<tr><td class="sym">ζ</td><td>= e<sup>iπ/4</sup></td><td>ζ⁴ = −1</td><td>√2 = ζ − ζ³</td></tr>
-<tr class="gap"><td></td></tr>
-<tr><td class="sym">amp(b)</td><td>= (c₀ + c₁ζ + c₂ζ² + c₃ζ³) / 2<sup>d</sup></td><td class="d">c<sub>i</sub> ∈ ℤ</td></tr>
-<tr class="gap"><td></td></tr>
-<tr><td class="sym">H</td><td>(a, b) → M(a+b), M(a−b)</td><td class="d">d ← d + 1</td></tr>
-<tr><td class="sym">M</td><td>(c₀,c₁,c₂,c₃) → (c₁−c₃, c₀+c₂, c₁+c₃, c₂−c₀)</td><td></td></tr>
-<tr><td class="sym">ζ<sup>k</sup></td><td>c<sub>i</sub> → ±c<sub>(i+k) mod 4</sub></td><td class="d">d unchanged</td></tr>
-<tr class="gap"><td></td></tr>
-<tr><td class="sym">|amp|²</td><td>= (S + X√2) / 2<sup>2d</sup></td><td></td></tr>
-<tr><td class="sym">S</td><td>= c₀² + c₁² + c₂² + c₃²</td><td class="d">Σ S = 2<sup>2d</sup></td></tr>
-<tr><td class="sym">X</td><td>= c₀c₁ + c₁c₂ + c₂c₃ − c₀c₃</td><td class="d">Σ X = 0</td></tr>
-</table>
-</div>
+
 
 <section class="lessons" aria-labelledby="lessonTitle">
     <h2 id="lessonTitle">Try a circuit</h2>
+    <section class="lesson compare-lesson" id="compare-exactly" aria-labelledby="compare-exactly-title">
+        <h3 id="compare-exactly-title">Can the same probabilities hide a difference?</h3>
+        <p>Start from |0⟩. Circuit A applies H. Circuit B applies H, then Z, changing the sign of the |1⟩ amplitude. Predict whether the two circuits give the same readout.</p>
+        <div class="compare-actions" id="compare-example-actions" hidden>
+            <button type="button" id="compare-example-h">Apply H to both</button>
+            <button type="button" id="compare-example-reset" disabled>Reset example</button>
+        </div>
+        <table class="compare-table">
+            <caption>Direct measurement</caption>
+            <thead><tr><th scope="col">Outcome</th><th scope="col">A</th><th scope="col">B</th></tr></thead>
+            <tbody>
+                <tr><th scope="row">|0⟩</th><td>1/2</td><td>1/2</td></tr>
+                <tr><th scope="row">|1⟩</th><td>1/2</td><td>1/2</td></tr>
+            </tbody>
+        </table>
+        <p id="compare-example-summary" role="status">The probabilities match in this basis.</p>
+        <div id="compare-example-result"></div>
+        <noscript><p>After applying H to both, A gives |0⟩ with probability 1 and B gives |1⟩ with probability 1. Matching probabilities in one basis can hide a relative phase.</p></noscript>
+
+        <details class="compare-workbench" id="compare-workbench">
+            <summary>Compare your own circuits</summary>
+            <p>Keep circuit A as a reference. Change B and compare exact probabilities from the all-zero input. This panel leaves the console and its saved draft alone.</p>
+            <fieldset class="compare-fields" id="compare-fields" disabled>
+                <div>
+                    <label for="compare-left">A · Reference QASM</label>
+                    <textarea id="compare-left" spellcheck="false" rows="5" readonly>OPENQASM 3;
+    include "stdgates.inc";
+    qubit q;
+    h q;</textarea>
+                    <button type="button" id="compare-edit-left" aria-controls="compare-left">Edit reference</button>
+                    <button type="button" id="compare-copy-left">Copy console to A</button>
+                </div>
+                <div>
+                    <label for="compare-right">B · Candidate QASM</label>
+                    <textarea id="compare-right" spellcheck="false" rows="5">OPENQASM 3;
+    include "stdgates.inc";
+    qubit q;
+    h q;
+    z q;</textarea>
+                    <button type="button" id="compare-copy-right">Copy console to B</button>
+                </div>
+                <p class="compare-outcome">
+                    <label for="compare-bitstring">Outcome bitstring (optional)</label>
+                    <input id="compare-bitstring" type="text" inputmode="numeric" pattern="[01]+" autocomplete="off" aria-describedby="compare-bitstring-note">
+                    <span id="compare-bitstring-note">Blank shows all outcomes for up to four qubits. Enter one bit per qubit to query a single outcome, highest-index qubit first.</span>
+                </p>
+                <details class="compare-sampling">
+                    <summary>Simulated samples</summary>
+                    <label><input type="checkbox" id="compare-samples"> Include 256 shots per circuit</label>
+                    <p>Both circuits use seed 20260605. Samples are available when comparing all outcomes for up to four qubits.</p>
+                </details>
+                <button type="button" id="compare-run-state">Compare probabilities</button>
+                <details class="compare-expert">
+                    <summary>Compare the whole operation</summary>
+                    <p>Test the action on all inputs. Choose two equal-width unitary circuits without measurements. Strict equality includes global phase under Ordinary Quantum’s gate definitions. Each circuit can have up to 16 qubits and 500 lowered gates. If the calculation reaches its limit, the result is undecided.</p>
+                    <label for="compare-operation-example">Example pair</label>
+                    <div class="compare-actions">
+                        <select id="compare-operation-example">
+                            <option value="strict">S and T then T</option>
+                            <option value="projective">X and minus X</option>
+                            <option value="different">Identity and Z</option>
+                        </select>
+                        <button type="button" id="compare-load-example">Load example pair</button>
+                    </div>
+                    <button type="button" id="compare-run-unitary">Compare operations</button>
+                </details>
+            </fieldset>
+            <p class="compare-status" id="compare-status" role="status">The comparison worker requires JavaScript.</p>
+            <button type="button" id="compare-cancel" hidden>Cancel comparison</button>
+            <div id="compare-result"></div>
+        </details>
+    </section>
     <section class="lesson" id="measurement" aria-labelledby="measurementTitle">
         <h3 id="measurementTitle">When does phase change a measurement?</h3>
         <p>An H gate prepares equal amplitudes. Change the phase of the |1⟩ amplitude, then compare a direct measurement with a second H before measurement.</p>
@@ -296,9 +363,34 @@ button.stop:disabled { opacity: 1; }
             <button type="button" id="phaseReadout" class="lesson-run">Apply H and measure</button>
         </div>
         <p class="lesson-expect" id="phaseExpected" aria-live="polite">Exact probability of 0: 1/2 directly, 1 after the second H.</p>
+        <output id="phaseObserved" aria-live="polite"></output>
         <p class="lesson-source"><a href="https://matematyka.cz/en/kvantum#s2">Matematyka · State and measurement</a> · <a href="https://matematyka.cz/en/kvantum#s3">Interference</a> · <a href="https://matematyka.cz/en/kvantum#s5">Eighth-turn phase</a></p>
     </section>
 
+    <section class="lesson" id="bell-pair" aria-labelledby="bellTitle">
+        <h3 id="bellTitle">What does a Bell pair share?</h3>
+        <p>Prepare (|00⟩ + |11⟩)/√2 with H and CNOT. Either bit alone has an even chance of being zero. How often are both zero? Try changing the plus sign to a minus with one Z gate.</p>
+        <div class="row lesson-controls" id="bell-actions" hidden>
+            <button type="button" id="bell-flip" aria-pressed="false">Flip one phase</button>
+        </div>
+        <table class="compare-table">
+            <caption>Exact readouts before measurement</caption>
+            <thead><tr><th scope="col">Readout</th><th scope="col">Bell +</th><th scope="col" class="bell-minus" hidden>Bell −</th></tr></thead>
+            <tbody id="bell-rows">
+                <tr><th scope="row">P(q₀ = 0)</th><td>1/2</td><td class="bell-minus" hidden></td></tr>
+                <tr><th scope="row">P(q₁ = 0)</th><td>1/2</td><td class="bell-minus" hidden></td></tr>
+                <tr><th scope="row">P(00)</th><td>1/2</td><td class="bell-minus" hidden></td></tr>
+                <tr><th scope="row">P(01)</th><td>0</td><td class="bell-minus" hidden></td></tr>
+                <tr><th scope="row">⟨X₀X₁⟩</th><td>1</td><td class="bell-minus" hidden></td></tr>
+            </tbody>
+        </table>
+        <p id="bell-summary" role="status">The bits agree in the Z basis. The last row measures their correlation in the X basis.</p>
+        <div class="row lesson-controls" id="bell-inspect" hidden>
+            <button type="button" class="lesson-run" id="bell-joint">Inspect P(00) in the console</button>
+            <button type="button" class="lesson-run" id="bell-xx">Inspect ⟨X₀X₁⟩</button>
+        </div>
+        <noscript><p>Changing the sign leaves every Z-basis probability unchanged and takes the X correlation from +1 to −1.</p></noscript>
+    </section>
     <section class="lesson" id="grover-search" aria-labelledby="groverTitle">
         <h3 id="groverTitle">How much can one search step do?</h3>
         <p>Start with equally likely boxes. One Grover step applies the target oracle once, then redistributes amplitudes by interference. Compare it with zero queries.</p>
@@ -317,10 +409,30 @@ button.stop:disabled { opacity: 1; }
             <button type="button" id="searchStep" class="lesson-run">Run one step</button>
         </div>
         <p class="lesson-expect" id="searchExpected" aria-live="polite">Exact probability of target |10⟩: 1/4 before the oracle, 1 after one step.</p>
+        <output id="searchObserved" aria-live="polite"></output>
         <p class="lesson-source"><a href="https://matematyka.cz/en/kvantum#s9">Matematyka · Quantum leap</a></p>
     </section>
-    <p class="lesson-instructions">Each button loads the circuit into the editable QASM console and runs it. Compare the exact state probabilities with the sampled counts.</p>
+    <p class="lesson-instructions">The <a href="#console">QASM console</a> shows the editable circuits, exact amplitudes and simulated sample counts for the measurement and search exercises.</p>
 </section>
+
+<details class="oq-algebra-details">
+    <summary>Exact arithmetic and notation</summary>
+<div class="algebra">
+<table>
+<tr><td class="sym">ζ</td><td>= e<sup>iπ/4</sup></td><td>ζ⁴ = −1</td><td>√2 = ζ − ζ³</td></tr>
+<tr class="gap"><td></td></tr>
+<tr><td class="sym">amp(b)</td><td>= (c₀ + c₁ζ + c₂ζ² + c₃ζ³) / 2<sup>d</sup></td><td class="d">c<sub>i</sub> ∈ ℤ</td></tr>
+<tr class="gap"><td></td></tr>
+<tr><td class="sym">H</td><td>(a, b) → M(a+b), M(a−b)</td><td class="d">d ← d + 1</td></tr>
+<tr><td class="sym">M</td><td>(c₀,c₁,c₂,c₃) → (c₁−c₃, c₀+c₂, c₁+c₃, c₂−c₀)</td><td></td></tr>
+<tr><td class="sym">ζ<sup>k</sup></td><td>c<sub>i</sub> → ±c<sub>(i+k) mod 4</sub></td><td class="d">d unchanged</td></tr>
+<tr class="gap"><td></td></tr>
+<tr><td class="sym">|amp|²</td><td>= (S + X√2) / 2<sup>2d</sup></td><td></td></tr>
+<tr><td class="sym">S</td><td>= c₀² + c₁² + c₂² + c₃²</td><td class="d">Σ S = 2<sup>2d</sup></td></tr>
+<tr><td class="sym">X</td><td>= c₀c₁ + c₁c₂ + c₂c₃ − c₀c₃</td><td class="d">Σ X = 0</td></tr>
+</table>
+</div>
+</details>
 
 <div class="console" id="console">
     <div class="row top">
@@ -340,6 +452,7 @@ button.stop:disabled { opacity: 1; }
         <select id="runMode">
             <option value="statevector">Statevector — amplitudes &amp; sampling</option>
             <option value="compressed">Compressed — Pauli observables</option>
+            <option value="exact-query">Exact query — one result (experimental)</option>
         </select>
     </div>
     <div id="rankControls" class="rank-controls" hidden>
@@ -353,6 +466,42 @@ button.stop:disabled { opacity: 1; }
         Up to 64 qubits per readout and 16 Pauli products. No joint samples, physical-basis amplitudes or state fingerprint.
         Observables are evaluated before terminal measurements.
         Runtime grows with 2<sup>r</sup>; active rank r is limited to 16 here.</p>
+    </div>
+    <div id="queryControls" class="query-controls" hidden>
+        <div class="row">
+            <label class="lbl" for="queryKind">readout</label>
+            <select id="queryKind">
+                <option value="probability">Born probability (joint bit event)</option>
+                <option value="amplitude">One computational-basis amplitude</option>
+                <option value="pauli">Physical Pauli expectation</option>
+            </select>
+            <label class="lbl" for="queryMethod">method</label>
+            <select id="queryMethod">
+                <option value="auto">Auto (structural estimate)</option>
+                <option value="count">Path counts (#3SAT, bounded)</option>
+                <option value="affine">Affine phase sum (bounded)</option>
+                <option value="active">Active Clifford space (ring8)</option>
+            </select>
+            <label class="lbl" for="queryInput">input |x⟩</label>
+            <input id="queryInput" type="text" value="0" aria-label="Input computational basis number, decimal or 0b binary">
+        </div>
+        <div class="row query-fields" data-query-kind="probability">
+            <label class="lbl" for="queryQubits">measured qubits</label>
+            <input id="queryQubits" type="text" value="0" aria-label="Measured qubits in listed order, for example 0,2">
+            <label class="lbl" for="queryOutcome">outcome bits</label>
+            <input id="queryOutcome" type="text" value="0" aria-label="Binary outcomes corresponding to measured qubit order">
+        </div>
+        <div class="row query-fields" data-query-kind="amplitude" hidden>
+            <label class="lbl" for="queryOutput">output |y⟩</label>
+            <input id="queryOutput" type="text" value="0" aria-label="Output computational basis number, decimal or 0b binary">
+        </div>
+        <div class="row query-fields" data-query-kind="pauli" hidden>
+            <label class="lbl" for="queryPauli">Pauli product</label>
+            <input id="queryPauli" type="text" value="Z0" aria-label="One Hermitian Pauli product such as Z0 or X0 Z1">
+        </div>
+        <p class="mode-note">One exact scalar result only. Qubit 0 is the least significant bit; outcome bits follow the listed measured-qubit order.
+        Parsing and counting run in a Worker with a 30-second limit. Stop ends the query.
+        Queries return no samples or full-state fingerprint. The active method supports Z[ζ₈] only. <a href="QUERY_UI.md">Exact query guide</a>.</p>
     </div>
     <textarea id="src" aria-label="OpenQASM source" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
 
@@ -392,9 +541,11 @@ button.stop:disabled { opacity: 1; }
 <script src="oqsynth.js"></script>
 <script src="oqopt.js?v=rank-1"></script>
 <script src="oqrank.js?v=rank-1"></script>
-<script src="qasm.js?v=qasm3-2"></script>
-<script src="lessons.js"></script>
+<script src="qasm.js?v=qasm3-exact-1"></script>
+<script src="oqqueryui.js?v=1"></script>
+<script src="lessons.js?v=bell-1"></script>
 <script src="circuit-link.js"></script>
+<script src="compare-ui.js" defer></script>
 <script>
 (function () {
 'use strict';
@@ -1047,20 +1198,26 @@ function setBusy(on) {
     el('stopBtn').disabled = false;
     lessonRunButtons.forEach(function (button) { button.disabled = on; });
     presetButtons.forEach(function (button) { button.disabled = on; });
+    exactUI.sync();
 }
 
 function compressedMode() { return el('runMode').value === 'compressed'; }
+function exactMode() { return el('runMode').value === 'exact-query'; }
 
 function syncMode() {
-    var compressed = compressedMode();
+    var compressed = compressedMode(), exact = exactMode();
     el('rankControls').hidden = !compressed;
-    el('shots').disabled = compressed;
-    el('seed').disabled = compressed;
-    el('synth').disabled = compressed;
-    el('synthEps').disabled = compressed;
-    el('modeFoot').textContent = compressed
-        ? 'Z[ζ₈] Clifford frame + 2^r active coefficients · exact Pauli expectations'
-        : 'Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state';
+    el('queryControls').hidden = !exact;
+    el('shots').disabled = compressed || exact;
+    el('seed').disabled = compressed || exact;
+    el('synth').disabled = compressed || exact;
+    el('synthEps').disabled = compressed || exact;
+    exactUI.sync();
+    el('modeFoot').textContent = exact
+        ? 'Experimental exact scalar queries · 30-second Worker limit'
+        : compressed
+            ? 'Z[ζ₈] Clifford frame + 2^r active coefficients · exact Pauli expectations'
+            : 'Z[ζ₈] statevector · exact Born sampling · fingerprint = FNV-1a over the canonical state';
     try { localStorage.setItem('oq-mode', el('runMode').value); } catch (e) {}
 }
 
@@ -1083,6 +1240,7 @@ function progress(done, total, dAmp, dMs, elapsed, s) {
 
 async function execute() {
     if (busy) return;
+    if (exactMode()) return exactUI.run();
     var src = el('src').value;
     var out = el('out');
 
@@ -1106,8 +1264,9 @@ async function execute() {
     el('prog').classList.add('on');
     out.innerHTML = '';
 
+    var result;
     try {
-        await simulate(prog, out);
+        result = await simulate(prog, out);
     } catch (e) {
         /* the honest failure mode at 2^n: the tab runs out of memory */
         out.innerHTML = '<span class="err">' + esc(e && e.message ? e.message : String(e)) + '</span>' +
@@ -1118,6 +1277,7 @@ async function execute() {
     el('prog').classList.remove('on');
     el('progText').textContent = '';
     setBusy(false);
+    return result;
 }
 
 /* Two containers for the same algebra. Dense keeps 2^n amplitudes because a
@@ -1199,6 +1359,7 @@ async function simulate(prog, out) {
     }
 
     render(prog, s, tRun, ampOps, counts, shots, tShots, i);
+    if (i === total && !stopRequested) return {state: s, counts: counts, shots: shots};
 }
 
 /* A synthesized run is an exact run of a DIFFERENT circuit. That has to be the
@@ -3001,6 +3162,11 @@ async function runWorkloads() {
  * runs: 2^n is the number that decides whether this is instant or hopeless. */
 function refreshChip() {
     var c = el('chip');
+    if (exactMode()) {
+        c.className = 'chip';
+        c.textContent = exactUI.chip();
+        return;
+    }
     try {
         var prog = QASM.parse(el('src').value, { mode: el('runMode').value });
         if (prog.backend === 'compressed') {
@@ -3057,18 +3223,48 @@ function fmtTime(sec) {
 var lessonRunButtons = Array.from(document.querySelectorAll('.lesson-run'));
 var presetButtons = Array.from(pbox.querySelectorAll('button'));
 
-async function runLesson(source) {
+function lessonNumber(real, radical, exponent) {
+    while (exponent > 0 && real % 2n === 0n && radical % 2n === 0n) {
+        real /= 2n;
+        radical /= 2n;
+        exponent--;
+    }
+    // In the ring basis, √2 = ζ − ζ³. Show small dyadic denominators as fractions.
+    return OQRANK.toString({numerator: [real, radical, 0n, -radical], denominatorExp: exponent})
+        .replace(/\/2\^(\d+)$/, (_, power) => '/' + (1n << BigInt(power)))
+        .replace(/-/g, '−');
+}
+
+function lessonProbability(state, outcomes) {
+    var real = 0n, radical = 0n;
+    for (const outcome of outcomes) {
+        const pair = state.bornPair(outcome);
+        real += pair.S;
+        radical += pair.X;
+    }
+    return lessonNumber(real, radical, 2 * state.denom);
+}
+
+async function runLesson(source, outcome, output, label) {
     if (busy) return;
     el('src').value = source;
     el('runMode').value = 'statevector';
     el('synth').checked = false;
     syncMode();
     refreshChip();
-    await execute();
-    el('out').focus();
+    const run = await execute();
+    if (!run || !run.counts) {
+        output.textContent = 'The console has details of this run.';
+        return;
+    }
+    const word = outcome.toString(2).padStart(run.state.n, '0');
+    const exact = lessonProbability(run.state, [outcome]);
+    output.textContent = label + ' · P(' + word + ') = ' + exact + '. Sample: ' +
+        (run.counts[word] || 0) + ' of ' + run.shots + '.';
 }
 
 function syncPhase() {
+    el('phaseObserved').textContent = '';
     var result = { 0: '1', 1: '(2 + √2)/4', 2: '1/2', 4: '0' };
     el('phaseExpected').textContent = 'Exact probability of 0: 1/2 directly, ' +
         result[el('phaseTurn').value] + ' after the second H.';
@@ -3088,6 +3284,7 @@ function syncSearchSpace() {
 }
 
 function syncSearchExpectation() {
+    el('searchObserved').textContent = '';
     var qubits = +el('searchQubits').value;
     var target = (+el('searchTarget').value).toString(2).padStart(qubits, '0');
     el('searchExpected').textContent = 'Exact probability of target |' + target +
@@ -3097,23 +3294,67 @@ function syncSearchExpectation() {
 
 el('phaseTurn').addEventListener('change', syncPhase);
 el('phaseDirect').addEventListener('click', function () {
-    runLesson(OQLessons.phase(+el('phaseTurn').value, false));
+    runLesson(OQLessons.phase(+el('phaseTurn').value, false), 0, el('phaseObserved'), 'Direct readout');
 });
 el('phaseReadout').addEventListener('click', function () {
-    runLesson(OQLessons.phase(+el('phaseTurn').value, true));
+    runLesson(OQLessons.phase(+el('phaseTurn').value, true), 0, el('phaseObserved'), 'After H');
 });
 el('searchQubits').addEventListener('change', syncSearchSpace);
 el('searchTarget').addEventListener('change', syncSearchExpectation);
 el('searchBaseline').addEventListener('click', function () {
-    runLesson(OQLessons.grover(+el('searchQubits').value, +el('searchTarget').value, false));
+    const target = +el('searchTarget').value;
+    runLesson(OQLessons.grover(+el('searchQubits').value, target, false), target, el('searchObserved'), 'Baseline');
 });
 el('searchStep').addEventListener('click', function () {
-    runLesson(OQLessons.grover(+el('searchQubits').value, +el('searchTarget').value, true));
+    const target = +el('searchTarget').value;
+    runLesson(OQLessons.grover(+el('searchQubits').value, target, true), target, el('searchObserved'), 'One Grover step');
 });
 syncSearchSpace();
 syncPhase();
 
+function showBell(flipped) {
+    const program = QASM.parse(OQLessons.bell(flipped));
+    const state = OQ.run(program.gates, program.n);
+    const rank = OQRANK.run(program.gates, program.n);
+    const xx = rank.expectation(OQRANK.parseObservable('X0 X1', program.n));
+    const values = [[0, 2], [0, 1], [0], [1]].map(words => lessonProbability(state, words));
+    values.push(OQRANK.toString(xx).replace(/-/g, '−'));
+    Array.from(el('bell-rows').rows).forEach((row, i) => { row.cells[flipped ? 2 : 1].textContent = values[i]; });
+    document.querySelectorAll('#bell-pair .bell-minus').forEach(cell => { cell.hidden = !flipped; });
+    el('bell-flip').setAttribute('aria-pressed', String(flipped));
+    el('bell-summary').textContent = flipped
+        ? 'All Z-basis probabilities stay the same. In the X basis the outcomes now always disagree.'
+        : 'The bits agree in the Z basis. The last row measures their correlation in the X basis.';
+}
+
+function inspectBell(kind) {
+    if (busy) return;
+    const flipped = el('bell-flip').getAttribute('aria-pressed') === 'true';
+    el('src').value = OQLessons.bell(flipped);
+    el('runMode').value = 'exact-query';
+    el('queryKind').value = kind;
+    el('queryMethod').value = 'auto';
+    el('queryInput').value = '0';
+    el('queryQubits').value = '0,1';
+    el('queryOutcome').value = '00';
+    el('queryPauli').value = 'X0 X1';
+    syncMode();
+    refreshChip();
+    el('out').textContent = 'Bell ' + (flipped ? '−' : '+') + ' circuit loaded. Press Run to compute the exact query.';
+    el('runBtn').focus();
+}
+el('bell-flip').addEventListener('click', () => showBell(el('bell-flip').getAttribute('aria-pressed') === 'false'));
+el('bell-joint').addEventListener('click', () => inspectBell('probability'));
+el('bell-xx').addEventListener('click', () => inspectBell('pauli'));
+showBell(false);
+el('bell-actions').hidden = false;
+el('bell-inspect').hidden = false;
+
 /* ── wiring ───────────────────────────────────────────────────────────── */
+var exactUI = typeof OQQUERYUI !== 'undefined'
+    ? OQQUERYUI.create({el:el,setBusy:setBusy,isBusy:function(){return busy;}})
+    : {run:function(){el('out').textContent='Exact-query controls are not available: oqqueryui.js did not load.';},
+       sync:function(){},stop:function(){return false;},chip:function(){return 'Exact-query UI module missing';}};
 el('runBtn').addEventListener('click', execute);
 el('testBtn').addEventListener('click', runSelfTest);
 el('benchBtn').addEventListener('click', runBenchmark);
@@ -3124,6 +3365,7 @@ el('runMode').addEventListener('change', function () {
     refreshChip();
 });
 el('stopBtn').addEventListener('click', function () {
+    if (exactUI.stop()) return;
     stopRequested = true;
     el('progText').textContent = 'stopping…';
 });
@@ -3148,8 +3390,11 @@ function loadCircuitLink() {
     } else if (busy) {
         status.textContent = 'A circuit is running. Open the link again after it finishes.';
     } else {
+        clearTimeout(chipTimer);
         el('src').value = source;
         el('synth').checked = false;
+        el('chip').className = 'chip';
+        el('chip').textContent = 'Linked circuit';
         el('out').textContent = 'Linked circuit loaded. Press Run to simulate it.';
         status.textContent = 'Circuit loaded from a link. Your saved draft is unchanged.';
     }
@@ -3178,37 +3423,19 @@ el('shareCircuit').addEventListener('click', async function () {
     }
 });
 
-window.addEventListener('hashchange', function () {
-    if (loadCircuitLink() && !busy) refreshChip();
-});
+window.addEventListener('hashchange', loadCircuitLink);
 
 var saved = null;
 try { saved = localStorage.getItem('oq-src'); } catch (e) {}
-el('src').value = saved || PRESETS['shor 15'];
-var openedCircuitLink = loadCircuitLink();
+el('src').value = saved === null ? OQLessons.phase(0, false) : saved;
 try {
-    if (localStorage.getItem('oq-mode') === 'compressed') el('runMode').value = 'compressed';
+    var savedMode = localStorage.getItem('oq-mode');
+    if (savedMode === 'compressed' || savedMode === 'exact-query') el('runMode').value = savedMode;
 } catch (e) {}
 syncMode();
-refreshChip();
-
-/* Run on load only when it is cheap. Coming back to a tab that still holds a
- * 20-qubit circuit should not cost twenty seconds before you have touched
- * anything — the estimate is right there in the chip, and Run is one click. */
-(function () {
-    try {
-        if (openedCircuitLink) return;
-        if (compressedMode()) {
-            el('out').textContent = 'Compressed circuit loaded — press Run to compute observables.';
-            return;
-        }
-        var prog = QASM.parse(el('src').value);
-        var est = Math.pow(2, prog.n) * prog.gates.length / rateI32;
-        if (est < 1.5) execute();
-        else el('out').innerHTML = '<span class="d">circuit loaded — ' +
-            'estimated ' + fmtTime(est) + ', so it is waiting for you to press Run</span>';
-    } catch (e) { /* the chip already shows the parse error */ }
-})();
+el('chip').textContent = saved === null ? 'One-qubit example' : 'Saved draft';
+el('out').textContent = 'Press Run to compute the selected readout.';
+loadCircuitLink();
 })();
 </script>
 

@@ -1,0 +1,88 @@
+.compare-lesson { color: var(--site-ink); }
+.compare-lesson h3 { color: inherit; }
+.compare-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: .55rem 0;
+    font: .95rem/1.4 Georgia, "Times New Roman", serif;
+}
+.compare-table caption {
+    text-align: left;
+    font-weight: bold;
+    margin-block-end: .25rem;
+}
+.compare-table th, .compare-table td {
+    padding: .3rem .4rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--site-rule);
+    overflow-wrap: anywhere;
+}
+.compare-table th:first-child { width: 24%; }
+.compare-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.compare-actions[hidden] { display: none; }
+
+.compare-lesson button {
+    min-height: 2.35rem;
+    margin: .15rem .2rem .15rem 0;
+    border-color: var(--site-rule);
+    background: var(--site-surface);
+    color: var(--site-ink);
+}
+.compare-lesson button:disabled, .compare-lesson button[aria-disabled="true"] {
+    color: var(--site-muted);
+    opacity: .65;
+}
+.compare-lesson :focus-visible { outline: 2px solid var(--site-link); outline-offset: 2px; }
+
+.compare-workbench, .oq-algebra-details {
+    border-top: 1px solid var(--site-rule);
+    margin-top: .8rem;
+    padding-top: .55rem;
+}
+.compare-workbench summary, .oq-algebra-details summary { cursor: pointer; font-weight: bold; }
+.compare-fields {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem .9rem;
+    border: 0;
+    margin: .5rem 0;
+    padding: 0;
+}
+.compare-fields label { display: block; font-weight: bold; }
+.compare-fields textarea, .compare-fields input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    color: var(--site-ink);
+    background: var(--site-surface);
+    border: 1px solid var(--site-rule);
+    font: .85rem/1.45 ui-monospace, Consolas, monospace;
+}
+.compare-fields textarea {
+    min-height: 7.5em;
+    padding: .35rem .45rem;
+    resize: vertical;
+}
+.compare-fields > .compare-outcome, .compare-fields > .compare-expert, .compare-fields > .compare-sampling { grid-column: 1 / -1; }
+.compare-outcome input { display: block; width: min(17rem, 100%); margin: .18rem 0; padding: .35rem; }
+#compare-bitstring-note { color: var(--site-muted); font-size: .86rem; }
+#compare-run-state { justify-self: start; }
+.compare-expert select { width: min(100%, 14rem); }
+.compare-expert, .compare-sampling { border-top: 1px solid var(--site-rule); padding-top: .45rem; }
+.compare-status { font-weight: bold; }
+#compare-result { overflow-wrap: anywhere; }
+#compare-result dt { font-weight: bold; }
+#compare-result dd { margin: 0 0 .35rem; }
+.oq-algebra-details { margin-block: 0 1.6rem; }
+.oq-algebra-details .algebra { overflow-x: auto; margin-bottom: 0; }
+
+@media (max-width: 37rem) {
+    .oq-header { margin-bottom: 1.15rem; }
+    .oq-header .thesis { margin-top: .5rem; }
+    .oq-header .oq-jump { margin-top: .5rem; }
+    .compare-fields { grid-template-columns: minmax(0, 1fr); }
+    .oq-jump a { display: inline-block; }
+}

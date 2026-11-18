@@ -40,5 +40,11 @@
         return lines.join('\n') + '\n';
     }
 
-    return { phase: phase, grover: grover };
+    function bell(negative) {
+        var lines = ['OPENQASM 3;', 'include "stdgates.inc";', 'qubit[2] q;', 'h q[0];', 'cx q[0], q[1];'];
+        if (negative) lines.push('z q[0];');
+        return lines.join('\n') + '\n';
+    }
+
+    return { phase: phase, grover: grover, bell: bell };
 });

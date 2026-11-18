@@ -5,6 +5,24 @@ additions below support feed-forward experiments and reusable register
 layouts without changing the arithmetic. The browser preset **if / else**
 demonstrates measurement initialization, branch execution and concatenation.
 
+## Exact query and circuit comparison
+
+These modes use a stricter subset of the same gate definitions. Rotation
+parameters must be provable multiples of π/8, with stricter lattice
+requirements for some gates. Enter `pi/8` or `0.125*pi` instead of a nearby
+decimal angle. Expressions use bounded rational arithmetic and a single
+integer power of π at each operation. Arithmetic for compile-time branch
+decisions, indices and modifiers must yield a safe integer or a bounded
+dyadic fraction. The parser rejects expressions outside that subset.
+
+OpenQASM 3 accepts `stdgates.inc` as its include. Other includes and pragmas
+are rejected. Barrier and timing directives carry no effect on the ideal
+circuit being computed. Reset and feedback are refused. Terminal
+measurements are metadata for the scalar query and state comparison, and
+whole-unitary comparison requires a circuit without measurements. A
+strict comparison uses OQ's lowered gate definitions and their global
+phase conventions. See [Exact scalar queries](QUERY_UI.md).
+
 ## Measurement and classical branches
 
 ```qasm
@@ -89,12 +107,9 @@ The standard gate set is expanded to cover common OpenQASM 3 benchmarks and hard
 - Uninitialized classical integers: `int[32] x;` and `uint y;` (initialized to 0 by default)
 - Compiler & timing annotations: `delay[100ns] q;`, `pragma ...`, `#pragma ...`, and `box { ... }` blocks are accepted without rejecting the circuit (treated as no-ops in gate simulation).
 
-## Automatic Solovay-Kitaev approximation
+## Optional Solovay–Kitaev approximation
 
-When a circuit uses continuous rotations off the Clifford+T lattice (such as continuous VQE/QAOA parameter ansatzes `rx(theta)`, `ry(theta)`, `u3(...)`, `p(...)`):
-- OQ automatically enables **approximate synthesis** (`approximate` checkbox) as the default for that code.
-- The circuit immediately parses and runs using Solovay-Kitaev synthesis, outputting the substituted Clifford+T sequence length, T-count, and operator error.
-- Pure Clifford+T or lattice-compatible circuits automatically keep exact zero-noise mode by default.
+In Statevector mode, enable **Approximate** to synthesize continuous rotations outside the supported exact lattice. The report gives the substituted Clifford+T sequence length, T-count and per-rotation distance. Exact amplitudes in that report describe the substituted circuit. Compressed observables, exact queries and whole-operation comparisons require their supported exact gates.
 
 ## Modes and limits
 
