@@ -25,6 +25,8 @@ Global decoder uniqueness is therefore not a program requirement. Scoped uniquen
 
 - COSMOLOGY-REGISTER [D] commits w = -14/15 as a target and consistency witness. DE-CONFORMAL-WEIGHT [O] owns the still-open typed selection of its density character.
 - PHOTON-KAPPA-LEMMA [F] and PHOTON-WINDOW-PROOF [F] falsify the necessary universal occupancy conjunct and the frozen compound route. Roughening was not reached; no Coulomb, continuum, propagator, or physical-photon conclusion follows.
+- In the six specified H3 histories, the referenced record holds through ticks 4–13. At tick 14 the two signed preparations have the same archive account (163) and readings of 1/6 and −1/2. H3-FINITE-REFERENCED-RECORD [C] is a finite computation with a specified reader. [Worked example](https://twistj.com/reading/contact/) · [Evidence in v113](https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L17332-L17378)
+- PHOTON-CONE-CONVERGENCE [D] compares two characteristic sets for the specified weighted scalar action and projection. PHOTON-MASSLESS-PHASE [O] asks whether a massless phase follows from its five-component vector with the required action and theorem chain. [Entries in v113](https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/REGISTRY.tsv#L401-L402)
 
 ## Canon
 
@@ -43,13 +45,20 @@ Public Canon is ACTIVE. Authority and activation are determined exclusively by S
 - [SHA256SUMS](https://github.com/mathorn1973/twist-j/blob/main/canon/SHA256SUMS), checksums of the normative files
 - [Kernel identity verifier](https://twistj.com/verify/kernel_identities.py): exact integer check of every identity printed on the homepage, Python standard library only, no floats
 
-The current Canon is the head of main in the canonical repository. Version number, tag, content commit, Canon SHA-256 and byte count are stated in STATUS.md there. This site carries no pins of its own.
+The authoritative activation, version number, tag, content commit, Canon SHA-256 and byte count are stated in STATUS.md in the canonical repository. Reading notes cite the edition used for their examples.
 
 ## Papers
 
-Full registry of works: https://orcid.org/0009-0008-5463-278X
+The [paper library](https://twistj.com/papers/) gives the full HTML, PDF, LaTeX source, reader's guide and citation for each of the following editions of 18 November 2026. Each edition page distinguishes the DOI of its deposited files from the DOI for the series. The [file manifest](https://twistj.com/papers/manifest.json) supplies sizes, MD5 and SHA-256 for the mirrors. [A. M. Thorn's ORCID](https://orcid.org/0009-0008-5463-278X) identifies the author.
 
-- [Twist Numbers and Four-Dimensional Integer J Algebra](https://doi.org/10.5281/zenodo.19056597): the foundation
+- [Twist Numbers](https://twistj.com/papers/twist-numbers/), exact integer arithmetic and the J step. [Edition DOI](https://doi.org/10.5281/zenodo.24326776)
+- [Magic Numbers](https://twistj.com/papers/magic-numbers/), the silver unit in the eighth cyclotomic ring. [Edition DOI](https://doi.org/10.5281/zenodo.24326767)
+- [The Hyperbolic J Map](https://twistj.com/papers/hyperbolic-j/), lattice and torus dynamics. [Edition DOI](https://doi.org/10.5281/zenodo.24326803)
+- [Twist Algebra](https://twistj.com/papers/twist-algebra/), integral coordinates for projective states. [Edition DOI](https://doi.org/10.5281/zenodo.24326818)
+
+Earlier and related works:
+
+- [Twist Numbers and Four-Dimensional Integer J Algebra](https://doi.org/10.5281/zenodo.19056597)
 - [Twisted Units, Celestial Symmetries and Entropic Motion](https://doi.org/10.5281/zenodo.18311965): adelic computations, dilogarithmic identities, hyperbolic dynamics in Q(ζ5)
 - [The Hyperbolic Automorphism J: A Golden Ratio Unit in Z[ζ5]](https://doi.org/10.5281/zenodo.18523754)
 - [Time from a single algebraic datum: the Page-Wootters mechanism over Z[j]](https://doi.org/10.5281/zenodo.19313537)
@@ -58,12 +67,14 @@ Full registry of works: https://orcid.org/0009-0008-5463-278X
 
 ## Site
 
-- [Home](https://twistj.com/): the algebraic axiom, declared architecture, typed partial decoder, and selected ledger claims
+- [Home](https://twistj.com/): the axiom, two integer steps, and reading paths into the research programme
+- [When does a contact leave a record?](https://twistj.com/reading/contact/): a theorem about two sites followed by a separate finite H3 archive calculation, its holding interval and its first changed reading
 - [The kernel](https://twistj.com/core/): starting identities, the matrix, the step rule
-- [Manifest](https://twistj.com/manifest/): the public commitment of the method, twelve rules, English (Czech at /manifest/cs/)
-- [Logos](https://twistj.com/logos/): a working reading of the Canon, what one number and one step give for space, time, energy, matter and light and what is still missing; NON-CANONICAL, every sentence labelled, plain markdown at /logos/logos.md
+- [Manifest](https://twistj.com/manifest/) and [Czech Manifest](https://twistj.com/manifest/cs/): the twelve rules of the method
+- [Logos](https://twistj.com/logos/): a dated, non-canonical reading of Public Canon v109. Status labels belong to that edition. [Plain Markdown](https://twistj.com/logos/logos.md).
 - [Public Canon](https://twistj.com/canon/): the active public ledger
 - [Code](https://github.com/mathorn1973/twist-j): verify it yourself
+- [Ordinary Quantum](https://twistj.com/oq/): exact circuit computation with its own technical documentation
 
 ## Optional
 

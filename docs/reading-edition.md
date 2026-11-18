@@ -1,6 +1,30 @@
-# Preparing the TWIST-J reading edition
+# TWIST-J reading edition
 
-Website review, 18 November 2026. The [home page](../reading-preview/index.html), [worked example](../reading-preview/record.html) and [paper shelf](../reading-preview/papers/index.html) form a local prototype. Open the home page directly in a browser. Its stylesheet, equations, companion pages and two paper files work offline. The source citations and links to the existing site use the network.
+## Local edition after the November deposits
+
+Start at the [home page](../index.html). Follow the two integer steps to the [kernel](../core/index.html), the [contact and record example](../reading/contact/index.html) or [Papers](../papers/index.html). The home page and library use relative paths, so this reading sequence also works when opened directly from disk. For the applications and live Canon readers, serve the checkout as a static site. The production website revision at the start of this change was `818e9bcef885769f1baf806662595677c4cfb20f`.
+
+| Paper | Edition DOI | Files in deposit |
+| --- | --- | ---: |
+| [Twist Numbers](../papers/twist-numbers/index.html) | [10.5281/zenodo.24326776](https://doi.org/10.5281/zenodo.24326776) | 3 |
+| [Magic Numbers](../papers/magic-numbers/index.html) | [10.5281/zenodo.24326767](https://doi.org/10.5281/zenodo.24326767) | 5 |
+| [The Hyperbolic J Map](../papers/hyperbolic-j/index.html) | [10.5281/zenodo.24326803](https://doi.org/10.5281/zenodo.24326803) | 4 |
+| [Twist Algebra](../papers/twist-algebra/index.html) | [10.5281/zenodo.24326818](https://doi.org/10.5281/zenodo.24326818) | 4 |
+
+All four edition DOIs resolved to their respective public Zenodo records on 18 November 2026. The [file manifest](../papers/manifest.json) lists every deposited file with its size, Zenodo MD5 and SHA-256. The complete HTML articles and interactive guides are reading copies provided by the website. Their head metadata identifies the exact TeX manuscript used. Each paper's landing page carries the edition citation, the DOI for all versions and the author's ORCID.
+
+Run `python -B verify/paper_mirrors.py` from the repository root to check the mirrors, manuscript fingerprints and edition citations offline. Run `python -B verify/kernel_identities.py` for the exact integer identities. The [sitemap](../sitemap.xml) and [machine index](../llms.txt) describe the same routes as the home page. Modification dates for existing routes follow their page history.
+
+Two findings affect the remaining migration work.
+
+- The current Evo app can share four settings the older subdomain cannot read: target density, viscosity, solidification strength and its toggle. Share and Lock & Share in this checkout point to `https://twistj.com/evo/`, which reads all four. The fragment format is preserved. Existing links on the subdomain still depend on the application served there.
+- Logos is identified in the navigation as a reading of v109. Five citations in its source list refer to that edition through `main`: STATUS, the Registry, the Frontier, the two-site contact notes and the four-slot minimum probe. All five paths exist at `canon-v109`. Pin them in the next source revision and rebuild HTML and Markdown together with the [Logos workflow](../tools/logos/RUNBOOK.md). The final link to the current Canon should continue to follow the live edition.
+
+In a fresh local browser, Evo restored both a legacy dot-separated fragment and the four settings above. Lock & Share restored the locked state. Fractal restored the centre, scale and audio level in Mandelbrot, Julia and split views, including the Julia parameter where applicable. The tests captured the URL passed to the clipboard and reopened its fragment in a fresh page. The four paper guides were exercised at widths of 390 and 1280 pixels. The home and contact pages were also checked at 320 pixels and in print mode.
+
+## Original review and migration plan
+
+The 18 November review below documents the site before consolidation and the [three-page prototype](../reading-preview/index.html). Its [paper shelf](../reading-preview/papers/index.html) illustrates the June edition of *Twist Numbers*. The four November editions are available from the library above.
 
 ## What a reader encounters today
 

@@ -1,0 +1,234 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=27mm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\ph}{\varphi}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\Nm}{\operatorname{N}}
+\title{Twist Numbers:\\Exact Integer Arithmetic and the J Step}
+\author{A. M. Thorn\\\small\href{https://orcid.org/0009-0008-5463-278X}{ORCID 0009-0008-5463-278X}}
+\date{18 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+Twist numbers are the elements of the classical cyclotomic ring
+$\Z[j]$, where $j=e^{2\pi i/5}$. We give its unique four-integer
+coordinates, product rule and real subring $\Z[\ph]$.
+Multiplication by $J=1+j^2$ and its inverse each admit a schedule of
+four integer additions or subtractions. The identities $\ph J=j$
+and $(J-1)^3=j$ connect the golden unit, the root of unity and the
+step operator. Two complex embeddings show contraction and expansion
+with determinant one. These explicit coordinates provide an algebraic
+foundation for TWIST-J; they do not by themselves specify a physical
+update law or a spacetime interpretation.
+\end{abstract}
+
+\section{The ring and its coordinates}\label{sec:coordinates}
+Fix the embedding $j=e^{2\pi i/5}$ and put
+\[
+ \Phi_5(x)=1+x+x^2+x^3+x^4,\qquad
+ R=\Z[j]\simeq\Z[x]/(\Phi_5(x)),\qquad K=\Q(j).
+\]
+The polynomial $\Phi_5(x+1)=x^4+5x^3+10x^2+10x+5$ is Eisenstein
+at $5$, so $\Phi_5$ is irreducible over $\Q$. Division by this monic
+polynomial gives the unique coordinates
+\begin{equation}\label{eq:coordinates}
+ \alpha=a+bj+cj^2+dj^3,\qquad (a,b,c,d)\in\Z^4.
+\end{equation}
+Thus four-dimensional means rank four over $\Z$, or degree four over
+$\Q$ after passing to $K$. It specifies neither a spacetime dimension
+nor a bound on the size of the four integers.
+
+Addition is coordinatewise. For multiplication, form the ordinary
+polynomial product $\sum_{k=0}^6u_kj^k$ and use
+$j^4=-1-j-j^2-j^3$, $j^5=1$, $j^6=j$. The result is
+\begin{equation}\label{eq:product}
+ (u_0-u_4+u_5)+(u_1-u_4+u_6)j+(u_2-u_4)j^2+(u_3-u_4)j^3.
+\end{equation}
+This supplies exact, commutative and associative arithmetic with integer
+coefficients. The name twist numbers denotes this coordinate presentation
+of the familiar cyclotomic ring, not a new number field \cite{washington}.
+
+\section{The golden real subring}\label{sec:real}
+Define the algebraic element
+\begin{equation}\label{eq:golden}
+ \ph=-j^2-j^3.
+\end{equation}
+In the fixed embedding it is $(1+\sqrt5)/2$. Its sign and numerical
+interpretation refer to that embedding; a Galois conjugate need not be
+positive.
+
+\begin{proposition}\label{prop:real}
+One has $\ph^2=\ph+1$, $\ph^{-1}=\ph-1=j+j^4$, and
+$R\cap\mathbb R=\Z[\ph]$ in the fixed embedding. Moreover
+\[
+ R=\Z[\ph]\oplus j\Z[\ph].
+\]
+\end{proposition}
+\begin{proof}
+Expanding $(-j^2-j^3)^2$ and reducing powers gives $\ph^2=\ph+1$;
+the other scalar identity follows from the cyclotomic relation.
+Complex conjugation sends the coordinates in \eqref{eq:coordinates} to
+$(a-b,-b,d-b,c-b)$. Equality with $(a,b,c,d)$ is equivalent to
+$b=0$ and $c=d$. The fixed elements are therefore exactly $a-c\ph$.
+Finally,
+\[
+ j^2=(\ph-1)j-1,\qquad j^3=(1-\ph)(1+j).
+\]
+These identities give the displayed decomposition. It is unique because
+$r+js=0$, with real $r,s$, forces $s=0$ and then $r=0$.
+\end{proof}
+
+The field tower is $\Q\subset\Q(\sqrt5)\subset K$, with both degrees
+equal to two. For $r=a+b\ph$, the quadratic norm is
+\[
+ \Nm_{\Q(\sqrt5)/\Q}(r)=a^2+ab-b^2.
+\]
+It must be distinguished from the quartic norm:
+$\Nm_{K/\Q}(r)=(a^2+ab-b^2)^2$. In particular $\ph$ has
+quadratic norm $-1$ and quartic norm $1$.
+
+\section{The distinguished unit}\label{sec:unit}
+Set $J=1+j^2$. Multiplication by the closure relation gives
+\begin{equation}\label{eq:unit}
+ \ph J=j,\qquad J^{-1}=\ph j^{-1}=-j-j^2,\qquad (J-1)^3=j.
+\end{equation}
+Consequently $J$ is a unit of $R$ and $\Z[J]=R$: $J$ determines
+the original generator as well as belonging to its ring. Also
+\begin{equation}\label{eq:polar}
+ J=\ph^{-1}e^{2\pi i/5},\qquad J^5=\ph^{-5}.
+\end{equation}
+The polar statement uses the fixed embedding; the fifth-power identity
+is an identity in the ring.
+
+For $r\in\{1,2,3,4\}$ let $\sigma_r(j)=j^r$. The field norm is
+$\Nm_{K/\Q}(\alpha)=\prod_{r=1}^4\sigma_r(\alpha)$.
+The evaluation matrix $(j^{rk})_{1\leq r\leq4,\,0\leq k\leq3}$
+is a Vandermonde matrix at four distinct roots, hence invertible;
+it diagonalizes multiplication by $\alpha$ with entries $\sigma_r(\alpha)$.
+Thus for $\alpha\in R$ the norm equals the integer determinant of
+multiplication by $\alpha$ in the integral basis. It is positive for
+nonzero $\alpha$, since the factors occur in complex-conjugate pairs.
+An element of $R$
+is a unit precisely when this determinant is $1$: necessity follows
+from multiplicativity, and sufficiency from the integral inverse
+matrix applied to the coordinate vector of $1$.
+
+\section{Matrices and the exact step}\label{sec:step}
+Use column vectors in the ordered basis $(1,j,j^2,j^3)$. Multiplication
+by $j$ and by $J$ has the matrices
+\begin{equation}\label{eq:matrices}
+ M_j=\begin{pmatrix}
+ 0&0&0&-1\\1&0&0&-1\\0&1&0&-1\\0&0&1&-1
+ \end{pmatrix},\qquad
+ M_J=I+M_j^2=\begin{pmatrix}
+ 1&0&-1&1\\0&1&-1&0\\1&0&0&0\\0&1&-1&1
+ \end{pmatrix}.
+\end{equation}
+Each column follows by multiplying one basis element and applying
+\eqref{eq:product}. In particular $M_j^5=I$.
+
+\begin{proposition}\label{prop:step}
+The forward and inverse coordinate rules are
+\begin{align}
+ (a,b,c,d)&\longmapsto(a-c+d,\ b-c,\ a,\ b-c+d),\label{eq:forward}\\
+ (A,B,C,D)&\longmapsto(C,\ C+D-A,\ C+D-A-B,\ D-B).\label{eq:inverse}
+\end{align}
+Each rule uses four additions or subtractions and no multiplications,
+when repeated intermediate values are reused. Furthermore,
+\begin{equation}\label{eq:charpoly}
+ \det M_J=1,\quad\Tr M_J=3,\quad
+ \det(xI-M_J)=x^4-3x^3+4x^2-2x+1.
+\end{equation}
+\end{proposition}
+\begin{proof}
+Equation \eqref{eq:forward} is \eqref{eq:matrices} applied to a column
+vector. Compute $t=a-c$ and $u=b-c$, then output $(t+d,u,a,u+d)$.
+For the inverse, compute $t=D-A$, $b=C+t$, $c=b-B$, $d=D-B$ and
+output $(C,b,c,d)$. Substitution verifies both compositions.
+The trace is read from the matrix. Since squaring permutes the
+nontrivial fifth roots, the eigenvalues are the four numbers
+$1+j^r$, and
+\[
+ \det(xI-M_J)=\prod_{r=1}^4(x-1-j^r)=\Phi_5(x-1).
+\]
+Expansion gives \eqref{eq:charpoly}, including the determinant.
+\end{proof}
+
+For example, the unit element makes the exact round trip
+\begin{equation}\label{eq:example}
+ (1,0,0,0)\xrightarrow{J}(1,0,1,0)
+ \xrightarrow{J^{-1}}(1,0,0,0).
+\end{equation}
+
+The operation count concerns integer arithmetic operations; it is not
+a constant bit-cost claim. Coefficients can grow under iteration.
+Likewise $M_j^2$ has order five, but is not orthogonal for the ordinary
+Euclidean dot product on coefficient vectors. Its rotation interpretation
+belongs to the embedding described next.
+
+\section{Two complex embeddings}\label{sec:embeddings}
+The map
+\[
+ \alpha\longmapsto\bigl(\sigma_1(\alpha),\sigma_2(\alpha)\bigr)
+ \quad\hbox{into }\mathbb C^2\simeq\mathbb R^4
+\]
+is the Minkowski representation, choosing one embedding from each
+conjugate pair. The Vandermonde argument above, together with complex
+conjugation, makes its real-linear extension from $K\otimes_{\Q}\mathbb R$
+an isomorphism. In these coordinates multiplication by $J$ acts
+separately on the two complex planes:
+\begin{equation}\label{eq:embeddings}
+ \sigma_1(J)=\ph^{-1}e^{2\pi i/5},\qquad
+ \sigma_2(J)=\ph e^{-\pi i/5}.
+\end{equation}
+The second formula follows from
+$1+e^{-2\pi i/5}=2\cos(\pi/5)e^{-\pi i/5}$ and
+$2\cos(\pi/5)=\ph$. The first is \eqref{eq:polar}.
+
+One real two-plane contracts by $\ph^{-1}$ while the other expands
+by $\ph$. The real determinant is therefore
+$\ph^{-2}\ph^2=1$. The product of the two complex moduli is $1$;
+the quartic field norm is the square of that product. Since no
+eigenvalue has modulus one, $M_J$ is hyperbolic. Since
+$|\sigma_1(J)|<1$, $J$ has infinite order. None of these statements
+asserts an increase of every coefficient norm at each step.
+
+\section{Scope and relation to TWIST-J}\label{sec:scope}
+These classical algebraic facts provide explicit coordinates for the
+J identities used in TWIST-J \cite{canon}. Toral dynamics is a separate
+application \cite{hyperbolic}. Public Canon v97 adopts $J=1+\zeta_5^2$
+as a primitive axiom of the physical program; its state architecture,
+full update law and decoder are additional declarations. The identities
+here do not select those declarations or supply a physical clock,
+metric, force or occurrence law. In particular $M_J=I+M_j^2$ is a
+linear identity, not a decomposition of the full native update into
+physical rest and motion.
+
+\paragraph{Verification.}
+The accompanying \texttt{verify\_algebra.py} checks the finite algebraic
+identities using integer polynomial reduction and independent determinant
+expansion. Checks on basis vectors establish the displayed linear maps;
+checks on basis pairs establish the product rule by bilinearity. This is
+an editorial check of the written proofs, not a new formal Canon probe
+or a verification of a physical interpretation.
+
+\paragraph{Edition.}
+This manuscript revises the source edition at \href{https://doi.org/10.5281/zenodo.20559777}{Zenodo 20559777}.
+
+\begin{thebibliography}{9}
+\bibitem{washington} L. C. Washington, \emph{Introduction to Cyclotomic
+Fields}, second edition, Springer, 1997.
+\bibitem{hyperbolic} A. M. Thorn, \emph{The Hyperbolic Automorphism J:
+A Golden Ratio Unit in $\Z[\zeta_5]$}, 2026.
+\href{https://doi.org/10.5281/zenodo.18523754}{doi:10.5281/zenodo.18523754}.
+\bibitem{canon} A. M. Thorn, \emph{TWIST-J Public Canon v97},
+\href{https://github.com/mathorn1973/twist-j/tree/canon-v97}{tag canon-v97}.
+Authority is declared in
+\href{https://github.com/mathorn1973/twist-j/blob/canon-v97/STATUS.md}{STATUS.md}.
+\end{thebibliography}
+\end{document}

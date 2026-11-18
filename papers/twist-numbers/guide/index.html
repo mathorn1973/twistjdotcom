@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A hands-on guide to Twist Numbers: four exact integer coordinates, an invertible J step, and two complex embeddings.">
+  <title>Twist Numbers — a hands-on guide</title>
+  <link rel="stylesheet" href="guide.css">
+<link rel="stylesheet" href="../../guide-reading.css">
+<link rel="canonical" href="https://twistj.com/papers/twist-numbers/guide/">
+  <script defer src="guide.js"></script>
+<meta name="paper-source-sha256" content="e6c64af327f57dd3ea5f5a3abb832431b6f6143e5197c23ae0ff55c8254157dc">
+<link rel="icon" href="../../../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the guide</a>
+  <header class="site-header"><a class="wordmark" href="../../index.html">TWIST-J Papers</a><a href="../index.html">Edition details</a></header>
+  <main id="main">
+    <div class="hero">
+      <p class="eyebrow">Twist Numbers · Paper guide</p>
+      <h1>The exact J step</h1>
+      <p class="lede">Build a number from four integer coefficients. Multiply it by <i>J</i>, undo the step, and see why a shrinking picture can hide an expanding one.</p>
+      <nav class="stations" aria-label="On this page">
+        <a href="#coordinates">Coordinates</a>
+        <a href="#experiment">Try the step</a>
+        <a href="#unit">Why it works</a>
+        <a href="#embeddings">Two views</a>
+        <a href="#scope">The boundary</a>
+      </nav>
+    </div>
+
+    <section class="station intro-station" id="coordinates" aria-labelledby="coordinates-title">
+      <div class="station-body">
+        <h2 id="coordinates-title">A number with four integer slots.</h2>
+        <p>Choose <i>j</i> = exp(2π<i>i</i>/5), a fifth root of unity. A twist number is <span class="math">α = a + bj + cj² + dj³</span>, with <i>a</i>, <i>b</i>, <i>c</i>, <i>d</i> integers.</p>
+        <div class="basis-strip" aria-label="Four coefficients in the ordered basis one, j, j squared, j cubed">
+          <div><strong>a</strong><span>× 1</span></div><div><strong>b</strong><span>× j</span></div><div><strong>c</strong><span>× j²</span></div><div><strong>d</strong><span>× j³</span></div>
+        </div>
+        <p>The relation <span class="math">j⁴ = −1 − j − j² − j³</span> folds higher powers back into those slots. The paper proves that the four coefficients are unique. “Four” describes the algebraic rank; it does not identify four spacetime axes.</p>
+        <a class="evidence" href="../article.html#sec:coordinates">Read the definition and uniqueness argument <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="station experiment-station" id="experiment" aria-labelledby="experiment-title">
+      <div class="station-body">
+        <h2 id="experiment-title">Can you get back exactly?</h2>
+        <p>Start with 1. Apply <i>J</i> = 1 + j², then apply its inverse. Watch the integer slots and the algebraic norm. Switch the picture to the second embedding without changing the number.</p>
+      </div>
+      <div class="experiment" id="twist-experiment" hidden>
+        <div class="lab-heading">
+          <div><span class="eyebrow">One number · two pictures</span><h3>Exact step laboratory</h3></div>
+          <div class="view-choice" role="group" aria-label="Complex embedding">
+            <button type="button" data-view="1" aria-pressed="true">First view · σ₁</button>
+            <button type="button" data-view="2" aria-pressed="false">Second view · σ₂</button>
+          </div>
+        </div>
+        <div class="lab-layout">
+          <figure class="visual">
+            <svg id="orbit-plot" viewBox="0 0 460 400" role="img" aria-labelledby="plot-title plot-description">
+              <title id="plot-title">Approximate first complex embedding</title>
+              <desc id="plot-description">The plot loads with the interaction.</desc>
+              <g id="plot-content"></g>
+            </svg>
+            <div class="plot-legend"><span><i class="legend-dot current"></i> Current</span><span><i class="legend-dot seed"></i> Seed</span><span><i class="legend-dot next"></i> Next J step</span></div>
+            <figcaption id="plot-caption">Approximate complex picture. The integer calculation is exact.</figcaption>
+          </figure>
+          <div class="control-panel">
+            <div class="step-heading"><span class="eyebrow">Exact current coefficients</span><span id="step-count">n = 0</span></div>
+            <div class="coefficients" aria-label="Current integer coefficients">
+              <div><span>a</span><output id="coefficient-a">1</output></div><div><span>b</span><output id="coefficient-b">0</output></div><div><span>c</span><output id="coefficient-c">0</output></div><div><span>d</span><output id="coefficient-d">0</output></div>
+            </div>
+            <p id="element-readout" class="element-readout">α = 1</p>
+            <div class="step-buttons"><button type="button" id="forward" class="primary">Apply J <span aria-hidden="true">→</span></button><button type="button" id="inverse">Apply J⁻¹ <span aria-hidden="true">←</span></button></div>
+            <div class="reset-buttons"><button type="button" id="return-seed">Return to seed</button><button type="button" id="reset">Reset example</button></div>
+            <p class="limit-note">Explore −24 ≤ n ≤ 24. A J step adds 1 to n; its inverse subtracts 1.</p>
+            <div class="norm-box"><div><span class="eyebrow">Exact algebraic norm</span><output id="norm-value">1</output></div><p id="norm-explanation">Unchanged from the seed: 1.</p></div>
+            <p id="step-message" class="step-message" role="status" aria-live="polite" aria-atomic="true">Seed loaded. Apply J, then J⁻¹ to recover these four integers.</p>
+          </div>
+        </div>
+        <div class="embedding-readouts" aria-label="Approximate numerical embeddings">
+          <div><span>σ₁(α) · approximate</span><output id="embedding-one"></output><small id="radius-one"></small></div>
+          <div><span>σ₂(α) · approximate</span><output id="embedding-two"></output><small id="radius-two"></small></div>
+        </div>
+        <details class="custom-inputs">
+          <summary>Try your own four integers</summary>
+          <form id="seed-form" novalidate>
+            <p id="input-help">Enter four whole numbers from −999 to 999. Loading them starts a new orbit at n = 0. The limits keep the diagram readable; they are not limits of the ring.</p>
+            <div class="input-grid">
+              <label>a<input id="seed-a" name="a" type="text" inputmode="text" value="1" maxlength="5" autocomplete="off" spellcheck="false" aria-describedby="input-help input-error"></label>
+              <label>b<input id="seed-b" name="b" type="text" inputmode="text" value="0" maxlength="5" autocomplete="off" spellcheck="false" aria-describedby="input-help input-error"></label>
+              <label>c<input id="seed-c" name="c" type="text" inputmode="text" value="0" maxlength="5" autocomplete="off" spellcheck="false" aria-describedby="input-help input-error"></label>
+              <label>d<input id="seed-d" name="d" type="text" inputmode="text" value="0" maxlength="5" autocomplete="off" spellcheck="false" aria-describedby="input-help input-error"></label>
+            </div>
+            <div class="form-actions"><button type="submit" class="primary">Use these integers</button><button type="button" id="load-golden">Load φ</button><button type="button" id="load-zero">Load zero</button></div>
+            <p id="input-error" class="input-error" role="alert"></p>
+          </form>
+        </details>
+        <details class="calculation-detail">
+          <summary>Read the exact calculation</summary>
+          <p id="rule-readout">The current state is the seed.</p>
+          <p><strong>Forward:</strong> compute <span class="math">t = a − c</span> and <span class="math">u = b − c</span>; output <span class="math">(t + d, u, a, u + d)</span>.</p>
+          <p><strong>Inverse:</strong> for input <span class="math">(A, B, C, D)</span>, compute <span class="math">t = D − A, b = C + t, c = b − B, d = D − B</span>; output <span class="math">(C, b, c, d)</span>.</p>
+          <p>Each schedule uses four integer additions or subtractions. This counts arithmetic operations, not bit cost: larger integers take more work.</p>
+          <p>Coefficients and norm use exact integer arithmetic. The norm is the determinant of multiplication by α. Numerical pictures use the bounded seed and the polar formula for Jⁿ, avoiding cancellation from large iterated coefficients. Values are rounded to six significant figures; they are illustrations, not error-certified measurements.</p>
+          <a class="evidence" href="../article.html#eq:forward">Forward rule</a> · <a class="evidence" href="../article.html#eq:inverse">Inverse rule</a>
+        </details>
+      </div>
+      <p id="interaction-failure" class="input-error" hidden>The interaction could not load. The worked example below remains available.</p>
+      <div class="worked-example">
+        <span class="eyebrow">A worked example — also readable without JavaScript</span>
+        <div class="example-flow"><span>(1, 0, 0, 0)</span><b>J →</b><span>(1, 0, 1, 0)</span><b>J⁻¹ →</b><span>(1, 0, 0, 0)</span></div>
+        <p>Forward: (1 − 0 + 0, 0 − 0, 1, 0 − 0 + 0). Inverse: (1, 1 + 0 − 1, 1 + 0 − 1 − 0, 0 − 0). Both are exact. The norm is 1 throughout.</p>
+      </div>
+    </section>
+
+    <section class="station" id="unit" aria-labelledby="unit-title">
+      <div class="station-body">
+        <h2 id="unit-title">The inverse already belongs to the ring.</h2>
+        <p>The real golden unit is <span class="math">φ = −j² − j³</span>, with <span class="math">φ² = φ + 1</span>. In the first embedding it is the positive number (1 + √5)/2. It connects <i>J</i> to a root of unity:</p>
+        <div class="formula-block"><span>φJ = j</span><span>J⁻¹ = −j − j²</span></div>
+        <p>So applying J⁻¹ requires no rounding and no fractions in the four coefficient slots. It undoes J for <em>every</em> twist number, including zero. A sample can illustrate that statement; the proof establishes it.</p>
+        <a class="evidence" href="../article.html#sec:real">The real subring</a><span class="link-divider"> · </span><a class="evidence" href="../article.html#sec:unit">The unit and its inverse <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="station" id="embeddings" aria-labelledby="embeddings-title">
+      <div class="station-body">
+        <h2 id="embeddings-title">Shrinking is only half the picture.</h2>
+        <p>The two views evaluate the same four integers with different images of <i>j</i>. The first uses <span class="math">j ↦ exp(2πi/5)</span>; the second uses <span class="math">j ↦ exp(4πi/5)</span>.</p>
+        <div class="view-explanations"><div><span class="eyebrow">Each forward J step · σ₁</span><strong>× 0.618…</strong><p>Radius × φ⁻¹<br>Rotation +72°</p></div><div><span class="eyebrow">Each forward J step · σ₂</span><strong>× 1.618…</strong><p>Radius × φ<br>Rotation −36°</p></div></div>
+        <p>The quartic algebraic norm is <span class="math">N(α) = |σ₁(α)|² |σ₂(α)|²</span>. Since <span class="math">N(J) = 1</span>, the exact norm remains the seed’s norm even as the two radii change. An arbitrary seed need not have norm 1.</p>
+        <p>On the full four-dimensional real representation, the two area factors multiply to <span class="math">φ⁻² φ² = 1</span>. This explains determinant one. It does not say that the ordinary length of the coefficient tuple stays fixed.</p>
+        <a class="evidence" href="#experiment">Compare the two views in the laboratory ↑</a><br><a class="evidence" href="../article.html#sec:embeddings">Read the embedding argument <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="station" id="scope" aria-labelledby="scope-title">
+      <div class="station-body">
+        <h2 id="scope-title">An algebraic foundation.</h2>
+        <p>The paper provides exact coordinates, arithmetic and an invertible linear step in the classical fifth cyclotomic ring. That is the algebraic contribution to TWIST-J.</p>
+        <p>A physical update law, clock, metric or measurement rule needs additional definitions and evidence. The four slots and the two pictures do not supply those choices.</p>
+        <details class="checkpoint"><summary>Check your understanding: after five J steps, must you return to the seed?</summary><p>No, unless the seed is zero. The first picture makes a full turn, but its radius is multiplied by φ⁻⁵. The ring identity is J⁵ = φ⁻⁵, not J⁵ = 1. For a nonzero seed, applying five inverse steps does recover the seed exactly.</p></details>
+        <a class="evidence" href="../article.html#sec:scope">Read the precise scope <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+    <nav class="next-links" aria-label="Continue reading"><a href="../article.html"><span class="eyebrow">Complete argument</span><strong>Read Twist Numbers <span aria-hidden="true">↗</span></strong></a></nav>
+  </main>
+  <footer><p>This interactive guide accompanies the article and runs locally in your browser.</p><p><a href="../article.html">Full article</a> · <a href="../paper.pdf">PDF</a> · <a href="https://doi.org/10.5281/zenodo.24326776">Zenodo edition</a></p></footer>
+</body>
+</html>

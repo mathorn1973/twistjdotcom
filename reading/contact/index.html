@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="An exact two-site contact and a finite holding interval for a written record.">
+  <title>When does a contact leave a record? · TWIST-J</title>
+  <meta name="author" content="A. M. Thorn">
+  <meta property="og:title" content="When does a contact leave a record? · TWIST-J">
+  <meta property="og:description" content="An exact two-site contact and a finite holding interval for a written record.">
+  <meta property="og:url" content="https://twistj.com/reading/contact/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="TWIST-J">
+  <meta property="og:image" content="https://twistj.com/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://twistj.com/reading/contact/">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <script src="../../reading.js"></script>
+  <link rel="stylesheet" href="../../reading.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to text</a>
+  <header class="masthead"><a href="../../index.html">TWIST-J</a><span>Research note</span></header>
+  <main id="main" tabindex="-1">
+    <h1>When does a contact leave a record?</h1>
+    <p class="lead">An interaction can be exact and leave very little behind. To call something a record, specify where it is stored, how to read it, and how long the reading lasts.</p>
+    <h2 id="contact">A contact you can work out on paper</h2>
+    <p>Take two sites holding <i>x</i> and <i>y</i> in the ring ℤ[<i>j</i>], with <i>j</i> = exp(2π<i>i</i>/5). In this two-site model the sites touch if <i>x</i> − <i>y</i> is divisible by 2 in the ring. At contact, keep their sum and rotate their difference by <i>j</i>².</p>
+    <p class="equation"><math aria-label="x prime plus y prime equals x plus y"><msup><mi>x</mi><mo>′</mo></msup><mo>+</mo><msup><mi>y</mi><mo>′</mo></msup><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi></math><br>
+      <math aria-label="x prime minus y prime equals j squared times x minus y in parentheses"><msup><mi>x</mi><mo>′</mo></msup><mo>−</mo><msup><mi>y</mi><mo>′</mo></msup><mo>=</mo><msup><mi>j</mi><mn>2</mn></msup><mo>(</mo><mi>x</mi><mo>−</mo><mi>y</mi><mo>)</mo></math></p>
+    <p>Start with (2, 0). Its sum is 2 and its difference becomes 2<i>j</i>², so the new pair is (1 + <i>j</i>², 1 − <i>j</i>²). Five successive contacts restore (2, 0). Starting with (1, 0) gives a different outcome. Its odd difference leaves both sites as they were.</p>
+    <p class="references">This is a theorem for the specified two-site rule. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L13598-L13643">Contact rule and its domain</a>.</p>
+
+    <h2 id="archive">What survives from tick 4 through tick 13?</h2>
+    <p>A separate model called H3 places four ring variables at each site of a finite lattice. It lets us ask about storage. Prepare one of three inputs, then follow an archive site <i>a</i> and a reference site <i>b</i>. The reader takes the algebraic trace of their weighted difference. Here ρ = <i>j</i>².</p>
+    <p class="equation"><math aria-label="R of a and b equals the trace of rho minus rho squared times a minus b, divided by thirty">
+      <mrow><mi>R</mi><mo>(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>)</mo></mrow><mo>=</mo>
+      <mfrac><mrow><mi mathvariant="normal">Tr</mi><mo>[</mo><mo>(</mo><mi>ρ</mi><mo>−</mo><msup><mi>ρ</mi><mn>2</mn></msup><mo>)</mo><mo>(</mo><mi>a</mi><mo>−</mo><mi>b</mi><mo>)</mo><mo>]</mo></mrow><mn>30</mn></mfrac>
+    </math></p>
+    <p>The calculation follows three preparations on each of two lattices. In all six histories the archive stays fixed at both stages of every tick from 4 through 13. The reader returns 0 for the named absence preparation, +1 for the positive input and −1 for the negative input. At tick 14 the signed records change.</p>
+    <table>
+      <caption>Two signed inputs at tick 14</caption>
+      <thead><tr><th scope="col">Input</th><th scope="col">Archive account <i>q</i>(<i>a</i>)</th><th scope="col">Reading <i>R</i>(<i>a</i>, <i>b</i>)</th></tr></thead>
+      <tbody><tr><th scope="row">Positive</th><td>163</td><td>1/6</td></tr>
+      <tr><th scope="row">Negative</th><td>163</td><td>−1/2</td></tr></tbody>
+    </table>
+    <p>Both archives have the same account, 163. The reference stays fixed and the reader still distinguishes the two inputs. Their signs survive. Their exact values of +1 and −1 lasted only through tick 13.</p>
+    <p class="references">The registered result is a finite computation with specified preparations, geometry, schedule and reader. Implementing that reader inside the model and calibrating a physical instrument remain further questions. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v113/canon/CANON.md#L17332-L17378">Calculation and limits</a> · <a href="https://github.com/mathorn1973/twist-j/tree/canon-v113/reproduce/h3-referenced-record">Reproduction files</a>.</p>
+  </main>
+  <footer><p><a href="../../index.html">Return to the programme</a> · <a href="../../papers/index.html">Papers</a></p></footer>
+</body>
+</html>

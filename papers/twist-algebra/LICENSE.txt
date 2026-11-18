@@ -1,0 +1,10 @@
+Twist Algebra: Integral Coordinates for Projective States
+A. M. Thorn, 18 November 2026
+
+Copyright 2026 A. M. Thorn.
+
+This article, its LaTeX source, and the accompanying verification files
+are licensed under the Creative Commons Attribution 4.0 International
+license (CC BY 4.0).
+
+License text: https://creativecommons.org/licenses/by/4.0/legalcode

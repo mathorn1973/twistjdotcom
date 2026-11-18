@@ -1,2 +1,9 @@
 # Unified-diff blank context lines are a single space; preserve the frozen patch.
 oq/counting/matematyka-qasm.patch whitespace=-blank-at-eol
+
+# Preserve the exact deposited bytes, including text files on Windows.
+papers/**/*.tex -text
+papers/**/*.py -text
+papers/**/LICENSE.txt -text whitespace=trailing-space,space-before-tab,cr-at-eol
+papers/**/*.pdf binary
+papers/**/*.zip binary

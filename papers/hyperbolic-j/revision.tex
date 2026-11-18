@@ -1,0 +1,212 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=27mm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\ph}{\varphi}
+\newcommand{\Nm}{\operatorname{N}}
+\newcommand{\Fix}{\operatorname{Fix}}
+\title{The Hyperbolic J Map:\\Lattice and Torus Dynamics}
+\author{A. M. Thorn\\\small\href{https://orcid.org/0009-0008-5463-278X}{ORCID 0009-0008-5463-278X}}
+\date{18 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+Multiplication by the cyclotomic unit $J=1+j^2$, with
+$j=e^{2\pi i/5}$, gives one integer matrix and several different
+dynamical systems. On the integer lattice its only periodic point is
+zero. On the four-dimensional torus it is hyperbolic, has topological
+entropy $2\log\ph$, and has exactly $|\Nm(J^n-1)|$ points fixed by
+its $n$th iterate. We give the quotient proof, distinguish fixed points
+from exact periods, and specify the different kernels of lattice,
+real-linear and complex-linear evaluation. The contribution is an
+explicit, self-contained application of classical toral dynamics;
+it establishes no physical interpretation of the full TWIST-J update.
+\end{abstract}
+
+\section{One matrix, three carriers}\label{sec:carriers}
+Let $j=e^{2\pi i/5}$, $K=\Q(j)$, $R=\Z[j]$ and
+$\ph=(1+\sqrt5)/2$. The closure relation
+$1+j+j^2+j^3+j^4=0$ gives the integral basis $(1,j,j^2,j^3)$.
+Here $\Phi_5(x)=1+x+x^2+x^3+x^4$ is irreducible over $\Q$,
+since $\Phi_5(x+1)$ is Eisenstein at $5$. The unit
+$J=1+j^2$ has inverse $-j-j^2$, by direct multiplication.
+Its coordinate matrix is
+\begin{equation}\label{eq:matrix}
+ M=\begin{pmatrix}
+ 1&0&-1&1\\0&1&-1&0\\1&0&0&0\\0&1&-1&1
+ \end{pmatrix},\qquad \det M=1.
+\end{equation}
+The coordinates are developed in \emph{Twist Numbers} \cite{twist}.
+We distinguish the lattice map
+$v\mapsto Mv$ on $\Z^4$, its real-linear extension on $\R^4$, and
+\begin{equation}\label{eq:torus}
+ T:\R^4/\Z^4\longrightarrow\R^4/\Z^4,\qquad [x]\longmapsto[Mx].
+\end{equation}
+Integrality of $M$ and $M^{-1}$ makes $T$ a toral automorphism.
+Equality on the torus means equality modulo $\Z^4$.
+
+For completeness the forward rule is
+$(a,b,c,d)\mapsto(a-c+d,b-c,a,b-c+d)$: compute $t=a-c$, $u=b-c$
+and return $(t+d,u,a,u+d)$. The inverse takes $(A,B,C,D)$, computes
+$t=D-A$, $b=C+t$, $c=b-B$, $d=D-B$, and returns $(C,b,c,d)$.
+Each schedule uses four additions or subtractions; no optimality or
+constant bit-cost claim is made.
+
+\section{Hyperbolicity and lattice nonperiodicity}\label{sec:spectrum}
+For $r=1,2,3,4$, write $\sigma_r(j)=j^r$.
+Evaluation at these four distinct roots is an invertible Vandermonde
+change of coordinates. It diagonalizes multiplication by $J$, giving
+\begin{equation}\label{eq:spectrum}
+ \det(xI-M)=\Phi_5(x-1)=x^4-3x^3+4x^2-2x+1,
+ \qquad \lambda_r=1+j^{2r}.
+\end{equation}
+The set of exponents $2r$ modulo five is $\{1,2,3,4\}$. In particular
+\begin{equation}\label{eq:embeddings}
+ \sigma_1(J)=\ph^{-1}e^{2\pi i/5},\qquad
+ \sigma_2(J)=\ph e^{-\pi i/5}.
+\end{equation}
+The other eigenvalues are their conjugates. Use
+$1+e^{i\theta}=2\cos(\theta/2)e^{i\theta/2}$ to obtain these formulas.
+
+\begin{proposition}\label{prop:hyperbolic}
+The real space splits as $\R^4=E^s\oplus E^u$, with two real
+dimensions in each summand. In embedding coordinates, $M$ contracts
+$E^s$ by $\ph^{-1}$ and expands $E^u$ by $\ph$, with rotations.
+Its Lyapunov exponents are $-\log\ph$ and $\log\ph$, each twice.
+The only periodic vector in $\R^4$, hence in $\Z^4$, is zero.
+\end{proposition}
+\begin{proof}
+Pair each eigenline with its conjugate to obtain a real two-plane.
+Equation \eqref{eq:embeddings} gives the scaling factors, so no
+eigenvalue has modulus one. The logarithmic rates are the stated
+exponents; an equivalent norm on a finite-dimensional space has the
+same asymptotic rates. If $M^n v=v$ for $n\geq1$, then
+$(M^n-I)v=0$. Every eigenvalue of $M^n$ has modulus $\ph^n$ or
+$\ph^{-n}$, neither one. Thus $M^n-I$ is invertible and $v=0$.
+The needed condition is absence of root-of-unity eigenvalues, not
+merely absence of the eigenvalue one for $M$ itself.
+\end{proof}
+
+\section{What evaluation retains}\label{sec:evaluation}
+The lattice evaluation $\varepsilon_{\Z}:\Z^4\to\C$ is
+\begin{equation}\label{eq:evaluation}
+ \varepsilon_{\Z}(a,b,c,d)=a+bj+cj^2+dj^3.
+\end{equation}
+Let $\varepsilon_{\R}:\R^4\to\C$ be the same formula with real
+coefficients, and $\varepsilon_{\C}:\C^4\to\C$ the same formula
+with complex coefficients. These are different maps. Each satisfies
+$\varepsilon(Mv)=J\varepsilon(v)$ on its stated domain.
+
+\begin{proposition}\label{prop:evaluation}
+The lattice map $\varepsilon_{\Z}$ is injective.
+The real-linear map $\varepsilon_{\R}$ is onto and has kernel $E^u$,
+of real dimension two. The complex-linear map $\varepsilon_{\C}$
+has kernel equal to the sum of the three eigenlines whose eigenvalues
+are different from $J$, of complex dimension three.
+\end{proposition}
+\begin{proof}
+An integer polynomial of degree at most three cannot vanish at $j$
+unless it is zero, proving injectivity. Define the real-linear map
+$\Psi:\R^4\to\C^2$ by evaluation at $j$ and $j^2$.
+If both values vanish, their conjugates also vanish; the invertible
+four-root evaluation matrix then forces all coefficients to vanish.
+Equal real dimensions make $\Psi$ an isomorphism. In these coordinates
+$M$ acts by the two multipliers in \eqref{eq:embeddings}.
+The first coordinate map is onto and kills exactly the expanding
+second plane. Finally, on a complex eigenvector with eigenvalue
+$\lambda$, semiconjugacy gives
+$(\lambda-J)\varepsilon_{\C}(v)=0$.
+The four eigenvalues are distinct and their eigenvectors span
+$\C^4$; since $\varepsilon_{\C}(1,0,0,0)=1$, precisely the
+$J$ eigenline survives.
+\end{proof}
+
+Projection hides expansion but is injective on the lattice.
+Embedding scale factors need not scale the coefficient norm each step.
+
+\section{Periodic points on the torus}\label{sec:periodic}
+Put $F_n=\#\Fix(T^n)$ for integers $n\geq1$.
+
+\begin{proposition}\label{prop:count}
+Every $F_n$ is finite, and
+\begin{equation}\label{eq:count}
+ F_n=|\det(M^n-I)|=|\Nm_{K/\Q}(J^n-1)|.
+\end{equation}
+If $P_n$ counts points of exact period $n$, then
+\begin{equation}\label{eq:exact-period}
+ F_n=\sum_{d\mid n}P_d,\qquad
+ P_n=F_n-\sum_{d\mid n,\ d<n}P_d.
+\end{equation}
+There are $P_n/n$ distinct orbits of exact period $n$.
+\end{proposition}
+\begin{proof}
+Set $A=M^n-I$, invertible by Proposition \ref{prop:hyperbolic}.
+A torus class is fixed precisely when $Ax\in\Z^4$. Hence
+$\Fix(T^n)=A^{-1}\Z^4/\Z^4$.
+The map $[x]\mapsto[Ax]$ is a bijection of this group with
+$\Z^4/A\Z^4$. The index of the full-rank integer lattice
+$A\Z^4$ is $|\det A|$, as follows from its fundamental
+parallelepiped volume. Also $A$ represents multiplication by
+$J^n-1$ on $R$, so its determinant is the product of the four
+conjugates, the field norm. Finally a point fixed by $T^n$ has least
+period dividing $n$. Partitioning by that period proves
+\eqref{eq:exact-period}; each exact-period orbit contains $n$ points.
+\end{proof}
+
+For example $F_1=1$, $F_2=11$ and $F_3=31$, giving
+$P_1=1$, $P_2=10$ and $P_3=30$: one fixed point, five two-cycles
+and ten three-cycles. Nonzero toral periodic points are represented
+by rational vectors, since $A^{-1}$ has rational entries. They do
+not contradict lattice nonperiodicity: their lifts return only up
+to an integer vector.
+
+\section{Entropy and scope}\label{sec:scope}
+The classical entropy formula for a toral automorphism induced by
+an integer matrix \cite{lindward} gives
+\begin{equation}\label{eq:entropy}
+ h_{\mathrm{top}}(T)=\sum_{|\lambda|>1}\log|\lambda|
+ =2\log\ph.
+\end{equation}
+Eigenvalues are counted with multiplicity; logarithms are natural.
+This applies the established theorem to \eqref{eq:embeddings}.
+The uniform splitting of the constant derivative $M$ also makes
+$T$ an Anosov automorphism.
+
+These results support TWIST-J's toral-dynamics layer \cite{canon}.
+The four-torus supplies neither physical spacetime nor an entropy
+calculation for the native update $U$. Physical interpretation
+requires additional definitions and evidence. No convergence of
+unspecified coordinate ratios is asserted.
+
+\paragraph{Verification.}
+The accompanying \texttt{verify\_algebra.py} checks the schedules
+and compares determinants with independent cyclotomic products for
+$1\leq n\leq32$. This supports the proof of \eqref{eq:count};
+the finite check does not replace it.
+
+\paragraph{Edition.}
+This article revises the earlier edition
+(\href{https://doi.org/10.5281/zenodo.18523754}{Zenodo 18523754})
+and incorporates the fixed-point norm argument from \cite{units}.
+
+\begin{thebibliography}{9}
+\bibitem{twist} A. M. Thorn, \emph{Twist Numbers and Four-Dimensional
+Integer J Algebra}, 2026.
+\href{https://doi.org/10.5281/zenodo.20559777}{Zenodo 20559777}.
+\bibitem{lindward} D. A. Lind and T. Ward, \emph{Automorphisms of
+solenoids and p-adic entropy}, Ergodic Theory and Dynamical Systems
+8 (1988), 411--419, equation (1),
+\href{https://doi.org/10.1017/S0143385700004545}{publisher DOI}.
+\bibitem{units} A. M. Thorn, \emph{Twisted Units, Celestial Symmetries
+and Entropic Motion}, 2026.
+\href{https://doi.org/10.5281/zenodo.18311965}{Zenodo 18311965}.
+\bibitem{canon} A. M. Thorn, \emph{TWIST-J Public Canon v97},
+\href{https://github.com/mathorn1973/twist-j/tree/canon-v97}{tag canon-v97}.
+\end{thebibliography}
+\end{document}

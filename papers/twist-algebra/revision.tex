@@ -1,0 +1,223 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=27mm]{geometry}
+\usepackage[hidelinks,pdftitle={Twist Algebra: Integral Coordinates for Projective States},pdfauthor={A. M. Thorn},pdflang={en}]{hyperref}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\C}{\mathbb C}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\OO}{\mathcal O}
+\newcommand{\ph}{\varphi}
+\newcommand{\Nm}{\operatorname{N}}
+\newcommand{\tr}{\operatorname{tr}}
+\title{Twist Algebra:\\Integral Coordinates for Projective States}
+\author{A. M. Thorn\\\small\href{https://orcid.org/0009-0008-5463-278X}{ORCID 0009-0008-5463-278X}}
+\date{18 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We describe projective states over the fifth cyclotomic field by an
+integral matrix--scalar pair. Equality and overlap require only exact
+field arithmetic, without a normalizing square root. For primitive
+coordinates, the norm of the Hermitian size is a positive integral ray
+height. We prove the sharp bound that this height is at least the square
+of the number of nonzero coordinates, and classify its equality case.
+In two coordinates this gives exactly twelve rays of height at most
+four. The same bound explains the rigidity of integral invertible
+similitudes. The construction specializes classical projective geometry
+and Schmidt height; it does not derive physical measurement frequencies.
+\end{abstract}
+
+\section{Coordinates and primitive rays}\label{sec:coordinates}
+Fix $j=e^{2\pi i/5}$, $K=\Q(j)$, $\OO=\Z[j]$ and
+$F=\Q(\ph)$, where $\ph=(1+\sqrt5)/2=-j^2-j^3$.
+Conjugation sends $j$ to $j^4$; $\dagger$ denotes conjugate transpose.
+The ring of integers $\OO$ has discriminant $125$, real subring
+$\Z[\ph]$ and roots of unity
+$\mu_{10}=\{\pm j^r:0\leq r<5\}$ \cite{washington}.
+Each coordinate has four integer coefficients in the basis
+$(1,j,j^2,j^3)$, with $j^4=-1-j-j^2-j^3$.
+
+States are rays $[v]\in\PP^{d-1}(K)$, $d\geq1$, in a fixed basis.
+A vector in $\OO^d$ is \emph{primitive} if its coordinates generate
+the unit ideal. Every ray has a primitive representative, unique up
+to a unit. Indeed, Minkowski's ideal-class bound is
+$(4/\pi)^2(4!/4^4)\sqrt{125}<2$; every class therefore contains
+an integral ideal of norm one, so $\OO$ is a principal ideal domain.
+Clear denominators, then divide by a generator of the coordinate ideal.
+If $w=av$ and both are primitive, $\OO=a\OO$ forces
+$a\in\OO^\times$.
+
+\section{An integral pair for a ray}\label{sec:pairs}
+For nonzero $v,w\in\OO^d$, set $h(v,w)=v^\dagger w$ and
+$H(v)=h(v,v)$. The two embeddings $\sigma_1(j)=j$ and
+$\sigma_2(j)=j^2$ represent the conjugate pairs of embeddings of $K$.
+Their restrictions to $F$ are denoted $\tau_1,\tau_2$.
+Then $H(v)\in\Z[\ph]$ and
+$\tau_r(H(v))=\sum_i|\sigma_r(v_i)|^2>0$ for $r=1,2$.
+Store the homogeneous pair
+\begin{equation}\label{eq:pair}
+ (R_v,s_v)=(vv^\dagger,H(v)),\qquad
+ \rho_v=R_v/s_v\in M_d(K).
+\end{equation}
+This is the familiar rank-one projector representation of projective
+geometry \cite{brody}, with numerator and denominator kept integral.
+
+\begin{proposition}\label{prop:projector}
+The matrix $\rho_v$ is Hermitian, idempotent and of trace one.
+It determines the ray, and
+\begin{equation}\label{eq:equality}
+ [v]=[w]\quad\Longleftrightarrow\quad s_wR_v=s_vR_w.
+\end{equation}
+The projective overlap is
+\begin{equation}\label{eq:overlap}
+ P([v],[w])=\frac{h(v,w)\overline{h(v,w)}}{H(v)H(w)}
+ =\tr(\rho_v\rho_w)\in F.
+\end{equation}
+It is unchanged by nonzero scalars in $K$, and
+$0\leq\tau_r(P)\leq1$ for both embeddings.
+Moreover $P=0$ precisely when $h(v,w)=0$, and $P=1$ precisely
+when the rays coincide.
+\end{proposition}
+\begin{proof}
+Use $R_v^2=H(v)R_v$ and $\tr R_v=H(v)$.
+The image of $\rho_v$ is $Kv$. Scaling by $a\in K^\times$ multiplies
+both entries by $a\bar a$; cross multiplication gives
+\eqref{eq:equality}. Multiplying the two rank-one matrices gives
+\eqref{eq:overlap}. Its numerator is fixed by conjugation.
+Cauchy--Schwarz gives both bounds. Zero overlap means zero inner
+product; equality at one in an embedding
+means proportional complex vectors; choosing a nonzero coordinate
+makes the proportionality factor an element of $K$.
+\end{proof}
+
+For example, $v=(1,1)$ and $w=(1,j)$ give
+\begin{equation}\label{eq:example}
+ P([v],[w])=\frac{1+\ph}{4},\qquad
+ \tau_1(P)=\frac{3+\sqrt5}{8},\qquad
+ \tau_2(P)=\frac{3-\sqrt5}{8}.
+\end{equation}
+One exact element has two real readings.
+
+\section{A sharp height bound}\label{sec:height}
+For a primitive representative write $H(v)=a+b\ph$ and define
+\begin{equation}\label{eq:height}
+ \Delta([v])=\Nm_{F/\Q}(H(v))=a^2+ab-b^2.
+\end{equation}
+This positive integer is unchanged by units: replacing $v$ by $uv$
+multiplies it by $\Nm_{K/\Q}(u)=1$, a positive integer unit.
+Primitivity matters: for example $(2,0)$ represents $[1:0]$ but
+its unreduced norm is $16$, whereas the ray height is $1$.
+
+This is the relative Schmidt height of the line $Kv$, not a new
+height construction. In the product over all four embeddings, the
+two Euclidean lengths of each conjugate pair multiply to
+$\tau_r(H(v))$; the coordinate-ideal norm is one for primitive
+$v$. Thus the definition in \cite{poels}, equation (2.1), gives
+exactly $\Delta$. Its absolute Euclidean normalization is
+$H_2([v])=\Delta([v])^{1/4}$.
+
+\begin{proposition}\label{prop:height}
+If a primitive $v$ has $k$ nonzero coordinates, then
+\begin{equation}\label{eq:bound}
+ \Delta([v])\geq k^2.
+\end{equation}
+Equality holds precisely when all its nonzero coordinates are
+$u\varepsilon_i$, for one unit $u\in\OO^\times$ and
+$\varepsilon_i\in\mu_{10}$.
+\end{proposition}
+\begin{proof}
+For nonzero coordinates put $x_i=|\sigma_1(v_i)|$ and
+$y_i=|\sigma_2(v_i)|$. The norm of every nonzero algebraic integer
+in $K$ is a positive integer. Hence
+\begin{equation}\label{eq:bound-proof}
+ \Delta=(\sum_i x_i^2)(\sum_i y_i^2)
+ \geq(\sum_i x_i y_i)^2
+ =\left(\sum_i\sqrt{\Nm_{K/\Q}(v_i)}\right)^2\geq k^2.
+\end{equation}
+Equality forces each coordinate norm to be one, so each coordinate
+is a unit, and Cauchy--Schwarz forces all $x_i/y_i$ to agree.
+Since $x_i y_i=1$, the $x_i$ agree and the $y_i$ agree.
+The ratio of any two nonzero coordinates is then an algebraic
+integer with all conjugates of modulus one, hence a root of unity.
+For completeness, this last assertion is Kronecker's lemma: the
+monic polynomials of all positive powers have bounded integer
+coefficients and bounded degree, so there are finitely many such
+polynomials and roots. Two powers coincide, giving a root of unity.
+Conversely, for coordinates $u\varepsilon_i$ one has
+$H(v)=k u\bar u$ and $\Delta=k^2$.
+\end{proof}
+
+In two coordinates the complete lowest layer is therefore
+\begin{equation}\label{eq:twelve}
+ \{[v]\in\PP^1(K):\Delta([v])\leq4\}
+ =\{[1:0],[0:1]\}\ \cup\ \{[1:\varepsilon]:\varepsilon\in\mu_{10}\}.
+\end{equation}
+Primitivity gives height one on the two axes; the equality case
+gives the ten distinct ratios at height four. Heights two and three
+do not occur.
+
+\section{Which integral transformations can mix rays?}\label{sec:transformations}
+For $A\in GL_d(K)$, clearing a common denominator gives an integral
+representative of its projective action. The pair updates by
+$R\mapsto ARA^\dagger$, $s\mapsto\tr(ARA^\dagger)$.
+Before computing the new ray height, make the vector primitive.
+
+\begin{proposition}\label{prop:rigidity}
+If $A\in GL_d(\OO)$ and $A^\dagger A=cI$, then $A=uD\Pi$,
+where $u\in\OO^\times$, $D$ is diagonal with entries in
+$\mu_{10}$, and $\Pi$ is a permutation matrix.
+For $c=1$, all nonzero entries lie in $\mu_{10}$.
+\end{proposition}
+\begin{proof}
+Each column has Hermitian size $c$, so $c\in\Z[\ph]$ is totally
+positive. Taking determinants and then norms gives
+$\Nm_{F/\Q}(c)^d=\Nm_{K/\Q}(\det A)=1$.
+Every column is primitive, since the corresponding row of $A^{-1}$
+gives a linear combination of its entries equal to one.
+Its height is therefore one; Proposition \ref{prop:height} leaves
+exactly one nonzero entry, a unit. Invertibility places these entries
+in different rows. They have the same Hermitian size $c$, so their
+ratios have all conjugates of modulus one and lie in $\mu_{10}$.
+If $c=1$, the entries themselves satisfy Kronecker's lemma.
+\end{proof}
+
+Thus an invertible integral standard similitude cannot mix coordinates.
+An integral matrix invertible only over $K$ can:
+\begin{equation}\label{eq:hadamard}
+ A=\begin{pmatrix}1&1\\1&-1\end{pmatrix},\qquad
+ A^\dagger A=A^2=2I,\qquad \det A=-2.
+\end{equation}
+It maps $[1:0]$ to $[1:1]$ and has inverse $A/2$ over $K$.
+Projectively it is an involution; no division by $\sqrt2$ is needed.
+The return sends $(1,1)$ to $(2,0)$, illustrating the required
+primitive reduction before evaluating height.
+
+\section{Scope}\label{sec:scope}
+The scalar $J=1+j^2=j\ph^{-1}$ obeys $J\bar J=\ph^{-2}$,
+yet $[Jv]=[v]$. Its action on integer coefficients differs from its
+trivial action on $K$-rays. Height and support use the fixed standard
+basis. The construction covers $K$-rays, not every complex ray;
+its weights do not derive measurement frequencies, independent trials
+or physical dynamics.
+
+\paragraph{Computational checks.}
+The accompanying verification scripts check pairs, norms, heights
+and overlaps on exact finite examples.
+
+\begin{thebibliography}{9}
+\bibitem{washington} L. C. Washington, \emph{Introduction to
+Cyclotomic Fields}, 2nd edition, Springer, 1997.
+\href{https://doi.org/10.1007/978-1-4612-1934-7}{Publisher DOI}.
+\bibitem{brody} D. C. Brody and L. P. Hughston, \emph{Geometric
+Quantum Mechanics}, Journal of Geometry and Physics 38 (2001),
+19--53. \href{https://arxiv.org/abs/quant-ph/9906086}{arXiv:quant-ph/9906086}.
+\bibitem{poels} A. Poels, \emph{The complex case of Schmidt's
+going-down Theorem}, Monatshefte für Mathematik 184 (2017),
+649--666, equation (2.1).
+\href{https://www.apoels-math-u.net/pdf/note_going_down.pdf}{Author manuscript};
+\href{https://doi.org/10.1007/s00605-017-1084-4}{publisher DOI}.
+\end{thebibliography}
+\end{document}

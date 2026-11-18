@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "papers": [
+    {
+      "url": "/papers/twist-numbers/",
+      "title": "Twist Numbers: Exact Integer Arithmetic and the J Step",
+      "author": {
+        "name": "A. M. Thorn",
+        "orcid": "https://orcid.org/0009-0008-5463-278X"
+      },
+      "edition_doi": "10.5281/zenodo.24326776",
+      "series_doi": "10.5281/zenodo.19056596",
+      "record_url": "https://zenodo.org/records/24326776",
+      "publication_date": "2026-11-18",
+      "license": {
+        "id": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "files": [
+        {
+          "url": "/papers/twist-numbers/paper.pdf",
+          "bytes": 66546,
+          "md5": "516669ff9fe22f60eaaa43520a3b6578",
+          "sha256": "1891a0873a18128e54dfd98d96ede02910087d3956e920d02a0b9875cb13daf9"
+        },
+        {
+          "url": "/papers/twist-numbers/revision.tex",
+          "bytes": 10036,
+          "md5": "e9b3c81f6c4147c8ba12b0b43e894d56",
+          "sha256": "e6c64af327f57dd3ea5f5a3abb832431b6f6143e5197c23ae0ff55c8254157dc"
+        },
+        {
+          "url": "/papers/twist-numbers/verify_algebra.py",
+          "bytes": 4937,
+          "md5": "bdbee28e4d2396baa33890904d3bfe90",
+          "sha256": "6c5b503734aae9f1f3504cc8e10d55eb9751f9003f8c920fcee5ef18882947a8"
+        }
+      ]
+    },
+    {
+      "url": "/papers/magic-numbers/",
+      "title": "Magic Numbers: The Silver Unit in the Eighth Cyclotomic Ring",
+      "author": {
+        "name": "A. M. Thorn",
+        "orcid": "https://orcid.org/0009-0008-5463-278X"
+      },
+      "edition_doi": "10.5281/zenodo.24326767",
+      "series_doi": "10.5281/zenodo.20560039",
+      "record_url": "https://zenodo.org/records/24326767",
+      "publication_date": "2026-11-18",
+      "license": {
+        "id": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "files": [
+        {
+          "url": "/papers/magic-numbers/paper.pdf",
+          "bytes": 59329,
+          "md5": "14ffae25d1c229552d51ffa54becab9c",
+          "sha256": "b05a0076abd454ae0736eaeca7f75f364c1343972d7037b42aa59cde9fc104aa"
+        },
+        {
+          "url": "/papers/magic-numbers/revision.tex",
+          "bytes": 8329,
+          "md5": "bcb441169751a5665c6ae246aa97e9c0",
+          "sha256": "1b3a3c61555215e75c633ad553f60165097034f0cdfd68cff314ef447f891954"
+        },
+        {
+          "url": "/papers/magic-numbers/verify_algebra.py",
+          "bytes": 3782,
+          "md5": "56e250b6b2f68d1ecdbdc3f268087315",
+          "sha256": "2484a9fff5643eb03888e21f23de23aaa2290d824c1da522e41801d6fa170dec"
+        },
+        {
+          "url": "/papers/magic-numbers/verify_independent.py",
+          "bytes": 3108,
+          "md5": "65ed9b32c79b256bcbd8ebcd4fc08da2",
+          "sha256": "f6ec760980a06e69533b4ff21c0b0eb16440a7dabeae52bc4a9c4ac305099f56"
+        },
+        {
+          "url": "/papers/magic-numbers/LICENSE.txt",
+          "bytes": 315,
+          "md5": "1db2523626f92535cef251369b958516",
+          "sha256": "d73d70712c931c813b146a5b2dcfc32df764ac76272b9a78adf46360d3494567"
+        }
+      ]
+    },
+    {
+      "url": "/papers/hyperbolic-j/",
+      "title": "The Hyperbolic J Map: Lattice and Torus Dynamics",
+      "author": {
+        "name": "A. M. Thorn",
+        "orcid": "https://orcid.org/0009-0008-5463-278X"
+      },
+      "edition_doi": "10.5281/zenodo.24326803",
+      "series_doi": "10.5281/zenodo.18144942",
+      "record_url": "https://zenodo.org/records/24326803",
+      "publication_date": "2026-11-18",
+      "license": {
+        "id": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "files": [
+        {
+          "url": "/papers/hyperbolic-j/paper.pdf",
+          "bytes": 64629,
+          "md5": "95033ed5d499d6f1e48ce79ff8fc1b78",
+          "sha256": "1821eac4b473d2553b5094e2460f0c5327f1a083dbf474f752dafe8b16df2113"
+        },
+        {
+          "url": "/papers/hyperbolic-j/revision.tex",
+          "bytes": 9534,
+          "md5": "887956fa5e827c9d2e8afb40acdcb27e",
+          "sha256": "191e73bef6725dccb80213bc811fbfeb98fb814a39e185a2288d93ee97dcfff5"
+        },
+        {
+          "url": "/papers/hyperbolic-j/verify_algebra.py",
+          "bytes": 3464,
+          "md5": "61985429049ab12488858860c53752c1",
+          "sha256": "63a1ddc9acfff7edb58325c956aa689f6064ef6ebce6edb96d68f2f55029afe3"
+        },
+        {
+          "url": "/papers/hyperbolic-j/verify_independent.py",
+          "bytes": 3986,
+          "md5": "485854f71748cac4f5278666be4aac79",
+          "sha256": "0e817d0325c50389bcaf38173bdb64571f46b3bfb1136a5120a563f1bfb25286"
+        }
+      ]
+    },
+    {
+      "url": "/papers/twist-algebra/",
+      "title": "Twist Algebra: Integral Coordinates for Projective States",
+      "author": {
+        "name": "A. M. Thorn",
+        "orcid": "https://orcid.org/0009-0008-5463-278X"
+      },
+      "edition_doi": "10.5281/zenodo.24326818",
+      "series_doi": "10.5281/zenodo.24326817",
+      "record_url": "https://zenodo.org/records/24326818",
+      "publication_date": "2026-11-18",
+      "license": {
+        "id": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "files": [
+        {
+          "url": "/papers/twist-algebra/paper.pdf",
+          "bytes": 60955,
+          "md5": "1fdef66cb707c819e90735133f87df51",
+          "sha256": "e0a7ab48e29a6e7497136bf81c0dd161c72d00328115dfdf23e5142e77cef99a"
+        },
+        {
+          "url": "/papers/twist-algebra/revision.tex",
+          "bytes": 10056,
+          "md5": "becc8a6e2c80beda7b49d43800934fc9",
+          "sha256": "8052dd6cdb5e47a436f1f3b819c14105db36f7416297d8587008ec5c6e71dd20"
+        },
+        {
+          "url": "/papers/twist-algebra/twist-algebra-verification.zip",
+          "bytes": 9037,
+          "md5": "b68c535bb72317d972791ce106c6aa58",
+          "sha256": "71aab2bfe7f35998df99ad13c05f04cd468dc72ce2c4da8055f911b609079dff"
+        },
+        {
+          "url": "/papers/twist-algebra/LICENSE.txt",
+          "bytes": 351,
+          "md5": "f3c8e208638fe2ec9e27c01c5fb54802",
+          "sha256": "173480f2acb14bbb4ecaec6c1197683ea3ed7d6226037fa946df972e74e74754"
+        }
+      ]
+    }
+  ]
+}

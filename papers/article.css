@@ -1,0 +1,76 @@
+/* Local, dependency-free reading and print styles for the scholarly paper. */
+:root{color-scheme:light;--paper:#f8f6f0;--ink:#232925;--muted:#616962;--line:#d9ded4;--accent:#285d51;--soft:#eef2e9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font:18px/1.65 Georgia,"Times New Roman",serif}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible,[tabindex]:focus-visible{outline:3px solid #96722f;outline-offset:4px;border-radius:2px}
+.skip-link{position:absolute;top:-100px;left:20px;z-index:10;background:var(--paper);padding:12px}
+.skip-link:focus{top:10px}
+.site-header{max-width:1200px;margin:auto;padding:26px 36px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px;font:13px/1.4 Arial,sans-serif}
+.site-header a{text-decoration:none}
+.wordmark{font-weight:700;letter-spacing:.09em}
+.wordmark span{margin-left:14px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.paper-shell{max-width:850px;margin:auto;padding:55px 44px 65px}
+.paper-header{text-align:left;margin-bottom:30px}
+.eyebrow{font:11px/1.5 Arial,sans-serif;text-transform:uppercase;letter-spacing:.13em;color:var(--accent);margin:0 0 18px}
+h1{font-size:clamp(31px,4.5vw,47px);font-weight:400;line-height:1.16;letter-spacing:-.028em;margin:0 0 23px}
+.authors{font-size:17px;line-height:1.65;margin-bottom:4px}
+.authors a{font:12px/1.4 Arial,sans-serif}
+.edition-date{font:12px/1.5 Arial,sans-serif;color:var(--muted);margin:8px 0 23px}
+.formats{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font:13px/1.4 Arial,sans-serif}
+.formats a{min-height:44px;display:inline-flex;align-items:center}
+.formats .primary-link{background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:4px}
+.pending-format{color:var(--muted)}
+.contents{margin:30px 0 35px;padding:18px 22px;border:1px solid var(--line);border-radius:5px;background:#ffffff60;font:13px/1.55 Arial,sans-serif}
+.contents p{font-size:10px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 12px;color:var(--muted)}
+.contents ol{margin:0;padding-left:19px;display:grid;grid-template-columns:1fr 1fr;column-gap:34px;row-gap:6px}
+.contents a{display:inline-block;padding:3px 0}
+article p{margin:.8em 0;text-wrap:pretty}
+article h2{font-size:25px;line-height:1.25;font-weight:400;letter-spacing:-.016em;margin:42px 0 16px}
+article h3{font-size:18px;line-height:1.4;margin:26px 0 6px}
+.section-number{color:var(--muted)}
+.abstract{border-left:3px solid #adbdb0;padding-left:21px;margin-bottom:38px;font-size:17px;line-height:1.65}
+.abstract .block-heading{font:11px/1.5 Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;margin:0 0 9px;color:var(--accent)}
+.abstract p{margin:.4em 0}
+.proposition{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:24px 0 16px}
+.proposition .block-heading{font-weight:bold;font-size:17px;margin:0 0 9px}
+.proposition>p:not(.block-heading){font-style:italic}
+.proof{position:relative;margin:14px 0 24px}
+.proof .block-heading{font-style:italic;display:inline;margin:0}
+.proof .block-heading+p{display:inline}
+.qed{display:block;text-align:right;line-height:1;margin-top:9px}
+.equation{display:flex;align-items:center;gap:14px;max-width:100%;margin:19px 0;scroll-margin-top:24px}
+.math-scroll{min-width:0;flex:1;overflow-x:auto;overflow-y:hidden;padding:9px 3px 12px;scrollbar-width:thin}
+.equation-number{flex:0 0 auto;color:var(--muted);font:14px/1.3 Georgia,serif;text-decoration:none}
+math{font-family:"Cambria Math","STIX Two Math","Latin Modern Math",math;font-size:1.04em}
+math[display="inline"]{display:inline math;white-space:nowrap}
+math[display="block"]{margin:0 auto;min-width:max-content;max-width:none}
+.citation,.crossref{white-space:nowrap}
+code{font:13px/1.5 Consolas,monospace;overflow-wrap:anywhere}
+.references{font-size:15px;line-height:1.6}
+.references h2{font-size:23px}
+.references ol{padding-left:24px}
+.references li{padding-left:4px;margin:12px 0;overflow-wrap:anywhere}
+.paper-footer{margin-top:42px;border-top:1px solid var(--line);padding-top:17px;color:var(--muted);font:12px/1.6 Arial,sans-serif}
+.paper-footer p:last-child{display:flex;flex-wrap:wrap;gap:12px 28px}
+:target{scroll-margin-top:24px}
+.equation:target,.proposition:target{background:#e9edde80;outline:5px solid #e9edde80}
+@media(max-width:600px){body{font-size:17px;line-height:1.65}.site-header{padding:19px 19px;font-size:12px}.wordmark span{display:none}.paper-shell{padding:34px 20px 45px}h1{font-size:32px}.contents{padding:16px 18px}.contents ol{grid-template-columns:1fr;row-gap:0}.contents a{padding:7px 0}.formats{gap:7px 17px}.abstract{padding-left:16px;font-size:16px}article h2{font-size:24px;margin-top:36px}.equation{gap:8px;margin:16px 0}.equation-number{font-size:12px}.math-scroll{padding-left:0;padding-right:0}math{font-size:1em}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A4;margin:27mm}
+@media print{
+ :root{--paper:#fff;--ink:#000;--muted:#333;--line:#ccc}
+ html{scroll-behavior:auto}body{background:white;color:black;font:11pt/1.32 Georgia,"Times New Roman",serif}
+ .site-header,.skip-link,.formats,.contents,.paper-footer,.eyebrow{display:none!important}
+ .paper-shell{max-width:none;margin:0;padding:0}.paper-header{text-align:center;margin:0 0 7mm}
+ h1{font-size:20pt;line-height:1.12;margin:0 0 4mm}.authors{font-size:11pt;line-height:1.45;margin:0}.authors a{font-size:9pt}.edition-date{font-size:9pt;margin:3mm 0 0}
+ a{color:inherit;text-decoration:none}article p{margin:2.5mm 0;orphans:3;widows:3}
+ .abstract{font-size:10pt;line-height:1.28;border:0;padding:0 6mm;margin:0 0 6mm}.abstract .block-heading{font:bold 10pt/1.3 Georgia,serif;text-transform:none;letter-spacing:0;color:black;text-align:center}.abstract p{margin:2mm 0}
+ article h2{font-size:13pt;font-weight:bold;margin:5mm 0 2.5mm;break-after:avoid}article h3{font-size:11pt;margin:4mm 0 1mm;break-after:avoid}
+ .proposition{border:0;padding:0;margin:3.5mm 0 2mm}.proposition .block-heading{font-size:11pt;break-after:avoid}.proof{margin:2mm 0 3.5mm}.proof .block-heading{break-after:avoid}.qed{margin:1mm 0;font-size:11pt}
+ .equation{margin:2mm 0;gap:3mm;break-inside:avoid}.math-scroll{overflow:visible;padding:1mm 0 1.5mm}.equation-number{font-size:10pt}math{font-size:1em}.references{font-size:9pt;line-height:1.3}.references h2{font-size:12pt}.references li{margin:2mm 0}code{font-size:9pt}
+ :target,.equation:target,.proposition:target{background:none;outline:none}
+}
+.proof .block-heading{margin-inline-end:.35em}

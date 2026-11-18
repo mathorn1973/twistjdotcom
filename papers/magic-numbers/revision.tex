@@ -1,0 +1,187 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=27mm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\Nm}{\operatorname{N}}
+\title{Magic Numbers:\\The Silver Unit in the Eighth Cyclotomic Ring}
+\author{A. M. Thorn\\\small\href{https://orcid.org/0009-0008-5463-278X}{ORCID 0009-0008-5463-278X}}
+\date{18 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+In the classical cyclotomic ring $R=\Z[m]$, with $m=e^{\pi i/4}$,
+the element $M=1-m+m^2$ is a unit with an explicit integral inverse.
+We give its multiplication matrix and exact forward and inverse
+coordinate rules. The identity $M=m/(1+\sqrt2)$ separates an
+eighth-root rotation from a silver-ratio scale. Two complex embeddings
+contract and expand by reciprocal factors while preserving the quartic
+norm. Starting from $1$, eight rotations return to the seed, whereas eight
+$M$ steps do not. These elementary formulas provide a silver counterpart
+to the golden step used in TWIST-J. They describe reversible algebra;
+they do not identify $M$ with a unitary gate or derive physical dynamics.
+\end{abstract}
+
+\section{The ring and its real subring}\label{sec:ring}
+Fix $m=e^{\pi i/4}$, and write
+\begin{equation}\label{eq:ring}
+ R=\Z[m]\simeq\Z[x]/(x^4+1),\qquad K=\Q(m),\qquad m^2=i.
+\end{equation}
+The polynomial $(x+1)^4+1=x^4+4x^3+6x^2+4x+2$ is
+Eisenstein at $2$, so $x^4+1$ is irreducible over $\Q$.
+Every element therefore has unique coordinates
+\begin{equation}\label{eq:coordinates}
+ \alpha=a+bm+cm^2+dm^3,\qquad (a,b,c,d)\in\Z^4.
+\end{equation}
+Multiplication is polynomial convolution followed by $m^4=-1$:
+if the ordinary product is $\sum_{k=0}^6u_km^k$, its coordinates are
+$(u_0-u_4,u_1-u_5,u_2-u_6,u_3)$. The name magic numbers refers
+to this presentation of a familiar cyclotomic ring \cite{washington}.
+Rank four counts integer coordinates, not physical dimensions.
+
+Put $s=m-m^3=\sqrt2$ in the fixed embedding. Then $s^2=2$,
+and complex conjugation sends $(a,b,c,d)$ to $(a,-d,-c,-b)$.
+Its fixed elements have $c=0$, $d=-b$, so
+\begin{equation}\label{eq:real}
+ R\cap\mathbb R=\Z[s],\qquad
+ \delta=1+s,\qquad \delta^{-1}=s-1,\qquad \delta^2=2\delta+1.
+\end{equation}
+The quadratic norm of $a+bs$ is $a^2-2b^2$; its norm in the
+quartic field $K$ is $(a^2-2b^2)^2$. Thus $\delta$ has quadratic
+norm $-1$ and quartic norm $1$.
+
+The automorphisms $\sigma_r(m)=m^r$, for $r=1,3,5,7$, form the
+Klein four-group: each of its three nonidentity elements has order
+two, and any two distinct nonidentity elements generate the group.
+There are two independent generators, not three.
+
+\section{The integral silver step}\label{sec:step}
+Define the distinguished unit
+\begin{equation}\label{eq:unit}
+ M=1-m+m^2=m\delta^{-1},\qquad M^{-1}=1-m^2-m^3.
+\end{equation}
+Indeed, $m(s-1)=m^2-m^4-m=1-m+m^2$, and
+$\delta m^{-1}=(1+m-m^3)(-m^3)=1-m^2-m^3$.
+These identities prove the inverse inside $R$.
+
+In the ordered basis $(1,m,m^2,m^3)$, use column vectors and let
+$A$ denote multiplication by $m$. Then
+\begin{equation}\label{eq:matrix}
+ A=\begin{pmatrix}0&0&0&-1\\1&0&0&0\\0&1&0&0\\0&0&1&0\end{pmatrix},
+ \qquad B=I-A+A^2=
+ \begin{pmatrix}1&0&-1&1\\-1&1&0&-1\\1&-1&1&0\\0&1&-1&1\end{pmatrix}.
+\end{equation}
+The signed shift $A$ satisfies $A^4=-I$ and $A^8=I$.
+The matrix $B$ represents multiplication by $M$.
+
+\begin{proposition}\label{prop:step}
+Multiplication by $M$ and by $M^{-1}$ gives the mutually inverse rules
+\begin{align}
+ (a,b,c,d)&\longmapsto(a-c+d,\ b-a-d,\ c-b+a,\ d-c+b),\label{eq:forward}\\
+ (A,B,C,D)&\longmapsto(A+B+C,\ B+C+D,\ -A+C+D,\ -A-B+D).\label{eq:inverse}
+\end{align}
+Both preserve integer coordinates and the quartic field norm.
+Moreover,
+\begin{equation}\label{eq:charpoly}
+ \det B=1,\qquad \det(xI-B)=x^4-4x^3+8x^2-4x+1.
+\end{equation}
+\end{proposition}
+\begin{proof}
+Reduce the four products of $M$ with the basis elements to obtain
+\eqref{eq:matrix} and \eqref{eq:forward}. Multiplying instead by
+$1-m^2-m^3$ gives \eqref{eq:inverse}; substitution verifies both
+compositions. The characteristic polynomial and norm preservation
+follow from the embeddings below. The coordinate operations use
+only additions and subtractions. This does not imply bounded
+coefficient sizes or constant bit cost under iteration.
+\end{proof}
+
+\section{Two embeddings and one norm}\label{sec:embeddings}
+Choose $\sigma_1$ and $\sigma_3$, one from each complex-conjugate
+pair. Under $\sigma_3$ the element $s$ becomes $-\sqrt2$ and
+$\delta$ becomes $1-\sqrt2=-\delta^{-1}$, where the positive real
+number $\delta=1+\sqrt2$ denotes its value in the fixed embedding.
+Consequently,
+\begin{equation}\label{eq:embeddings}
+ \sigma_1(M)=\delta^{-1}e^{\pi i/4},\qquad
+ \sigma_3(M)=\delta e^{-\pi i/4}.
+\end{equation}
+For the second equality, $m^3/(1-\sqrt2)=-\delta m^3$
+has argument $-\pi/4$. Thus the same exact step contracts one
+complex plane by $\delta^{-1}$ and expands the other by $\delta$.
+
+For any $\alpha\in K$, define
+\begin{equation}\label{eq:norm}
+ \Nm_{K/\Q}(\alpha)=\prod_{r=1,3,5,7}\sigma_r(\alpha)
+ =|\sigma_1(\alpha)|^2|\sigma_3(\alpha)|^2.
+\end{equation}
+The evaluation matrix $(m^{rk})$, with $r=1,3,5,7$ and
+$k=0,1,2,3$, is Vandermonde at four distinct roots. It is invertible
+and diagonalizes multiplication by $\alpha$ with eigenvalues
+$\sigma_r(\alpha)$. Hence the field norm is the determinant of
+the multiplication matrix, an integer when $\alpha\in R$.
+The real-linear extension of $(\sigma_1,\sigma_3)$ identifies
+$K\otimes_{\Q}\mathbb R$ with $\mathbb C^2$.
+The determinant of multiplication by $M$ is
+$\delta^{-2}\delta^2=1$, and multiplicativity proves norm preservation.
+
+The two conjugate pairs in \eqref{eq:embeddings} give
+\[
+ \det(xI-B)=
+ (x^2-(2-\sqrt2)x+3-2\sqrt2)
+ (x^2-(2+\sqrt2)x+3+2\sqrt2).
+\]
+Expansion proves \eqref{eq:charpoly}. No eigenvalue has modulus
+one, so $B$ is hyperbolic. In particular $M$ has infinite order:
+$|\sigma_1(M^n)|=\delta^{-n}$ equals $1$ only when $n=0$.
+An integral unit therefore need not preserve length in either complex
+plane or in the ordinary coefficient metric.
+
+\section{Eight steps and the boundary of the result}\label{sec:scope}
+The rotation and the silver step have the same standard phase per
+step, but different scales. From \eqref{eq:unit},
+\begin{equation}\label{eq:eight}
+ m^8=1,\qquad M^8=\delta^{-8}=577-408s=577-408m+408m^3.
+\end{equation}
+For example, $\delta^{-2}=3-2s$, $\delta^{-4}=17-12s$, and
+squaring again gives \eqref{eq:eight}. Starting at $1$, eight pure
+rotations return to $(1,0,0,0)$; eight silver steps give
+$(577,-408,0,408)$. Phase closure is not orbit closure.
+
+The superficially similar element $1+m^2=1+i=sm$ is not a unit.
+Its norm is $4$: in the two selected embeddings its squared moduli
+are both $2$. This contrasts with $M$, whose norm is $1$.
+The contrast concerns invertibility over the integral ring, not
+physical irreversibility or measurement.
+
+The algebra gives a silver counterpart of the golden relation
+$\varphi J=j$ used in TWIST-J, where $j=e^{2\pi i/5}$,
+$J=1+j^2$ and $\varphi=(1+\sqrt5)/2$: here $\delta M=m$.
+It does not assign forces, select a native update law or identify
+integer rank with spacetime dimension. Nor is $M$ a unitary quantum
+gate: its complex modulus in the fixed embedding is $\delta^{-1}$,
+not $1$. The phase matrix $\operatorname{diag}(1,m)$ is unitary;
+it is a different mathematical object. A coefficient ring and a
+level of the Clifford hierarchy are likewise different kinds of object.
+No quantum synthesis or universality theorem is claimed here.
+
+\paragraph{Verification.}
+The accompanying \texttt{verify\_algebra.py} checks the identities
+by integer polynomial reduction, basis tests and determinant expansion.
+These finite calculations check the displayed algebra; the proofs
+establish the stated general results.
+
+\paragraph{Edition.}
+An earlier edition appeared as \emph{Magic Numbers and
+Four-Dimensional Integer M Algebra}
+(\href{https://doi.org/10.5281/zenodo.20560040}{Zenodo 20560040}).
+
+\begin{thebibliography}{9}
+\bibitem{washington} L. C. Washington, \emph{Introduction to Cyclotomic
+Fields}, second edition, Springer, 1997.
+\href{https://doi.org/10.1007/978-1-4612-1934-7}{Publisher DOI}.
+\end{thebibliography}
+\end{document}
