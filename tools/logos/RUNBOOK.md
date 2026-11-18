@@ -11,6 +11,46 @@ revision, the verified English translation digest, and the current reading's
 evidence, output hashes and figures. The normalized Czech source is private.
 Revision 124 remains the initial translation reference for source sync.
 
+## Following a public Canon activation
+
+The scheduled editor checks the public scientific repository every 30 minutes.
+Start from the current website `origin/main` and run
+`python -B tools/logos/canon_update.py`. Its JSON compares the website pin to
+the active declaration on scientific `main` and its published tag. Unrelated
+commits and candidate branches do not change the edition. When the pins
+agree and the live `logos/SOURCE.json` matches the deployed website commit,
+the check is complete.
+
+1. For a new activation run the detector with `--stage-dir DIR`, where
+   `DIR` is a new directory outside the site. It verifies the release and
+   exports the evidence used by the publication checks. Read the release
+   changelog and compare the two tagged Canon texts, the Frontier and each
+   changed registry row. Review the intervening releases if several appeared.
+   A change of scope or falsifier can alter the reading even when a status
+   letter stays the same.
+2. Update the affected passages of `logos/logos.md`, its open questions,
+   totals, dated comparisons and current evidence links. Check the actual
+   rows and passages behind each new line reference. Keep earlier scientific
+   citations where they describe an earlier result. Update the edition pin
+   with all fields of the detector's `current` object, set the edition date,
+   and update Logos references in the discovery files where needed.
+3. Run the English build below and
+   `python -B tools/logos/check_frontier.py DIR --check-site`. This checks
+   named claim labels, counts, the full Frontier table, output fingerprints
+   and the single public reading. Build again and check that the bytes agree.
+   Review the scientific prose against the release, then the rendered links,
+   formulas and diagrams.
+4. Fetch the website branch and recheck the authoritative activation before
+   a fast-forward push. If either changed, reconcile against its new state
+   and repeat the checks. Publish to `main`, wait for GitHub Pages and verify
+   the live HTML, Markdown and provenance against the committed bytes. A failed
+   deployment can be retried with the same commit. Readers use `/logos/` and
+   `/logos/logos.md` across releases.
+
+For a read-only replay, `--from-tag canon-v112` compares that real release
+with the active release. `--canon-repo DIR --main-ref COMMIT` selects a local
+scientific checkout and a historical activation for an isolated test.
+
 ## English editorial build
 
 1. Verify the intended evidence edition against authoritative `STATUS.md` in
@@ -53,7 +93,10 @@ checkout lacks that blob, fetch the relevant history or supply
 `--previous-source WORK/previous.md` with the exact normalized Czech
 revision 124. The pipeline verifies its source hash and checks that the
 reconstructed English translation matches the pinned digest. Later merges
-use the tracked `logos/translation.md` baseline and verify its digest.
+use a digest-verified translation in the editor's private user cache.
+Set `LOGOS_TRANSLATION_CACHE` to a persistent absolute directory outside
+Git checkouts to share the cache between runs. An exact normalized prior
+source supplied with `--previous-source` can reconstruct a missing baseline.
 Overlapping edits stop the build before public outputs change and name
 the affected sections.
 
@@ -84,7 +127,7 @@ the affected sections.
    builds an isolated draft; check it with `--markdown WORK/en/logos.md`.
 6. Review the generated diff, preserving the editorial context and frozen
    evidence labels. In the authorized scheduled workflow, commit the
-   merged manuscript, generated files, translation baseline, new figures,
+   merged manuscript, generated files, new figures,
    translation memory and relevant discovery dates, then push as usual.
    A merge conflict stops publication before any generated file is changed.
 7. Continue the existing private Czech copy workflow. Render the source

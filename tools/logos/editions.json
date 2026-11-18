@@ -3,7 +3,10 @@
     "date": "2026-11-18",
     "canon": {
       "tag": "canon-v113",
+      "activation_commit": "c089e7ec7ecc82f4838c27663d94c040f5cc4ea3",
+      "tag_object": "3a91e2bee83a3045b17f3aa2895f69deef62d89c",
       "content_commit": "50d0e94d81e4954b7351bff755ed1889290bb7b8",
+      "canon_bytes": 1555510,
       "canon_sha256": "47114cb616069242cff36bb499e5fe9b11266a92c744ba3f15a9085c11956b34"
     },
     "required_sections": [

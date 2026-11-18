@@ -37,6 +37,7 @@ import datetime as dt
 import hashlib
 import html
 import json
+import os
 import re
 import subprocess
 import sys
@@ -51,7 +52,6 @@ OUT = ROOT / "logos"
 MEMORY = TOOLS / "memory.json"
 TEMPLATE = TOOLS / "template.html"
 EDITION_CONFIG = TOOLS / "editions.json"
-TRANSLATION_MARKDOWN = "translation.md"
 TRANSLATION_FIELDS = ("doc_rev", "source_sha256", "blocks", "synced", "memory_blocks", "figures")
 
 CZECH = re.compile(r"[ěščřžýáíéúůňťďĚŠČŘŽÝÁÍÉÚŮŇŤĎ]")
@@ -344,13 +344,24 @@ def referenced_figures(body, directory, fallbacks=None):
     return list(figures.values())
 
 
+def write_atomic(path, data):
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix="." + path.name + ".",
+                                     delete=False) as temporary:
+        staging = Path(temporary.name)
+    try:
+        staging.write_bytes(data)
+        staging.replace(path)
+    finally:
+        staging.unlink(missing_ok=True)
+
+
 def write_outputs(directory, files):
     directory.mkdir(parents=True, exist_ok=True)
     for name, contents in files.items():
         path = directory / name
         data = contents.encode("utf-8")
         if not path.exists() or path.read_bytes() != data:
-            path.write_bytes(data)
+            write_atomic(path, data)
         print("%-14s %7d bytes  sha256 %s" % (name, len(data), sha(contents)))
 
 
@@ -438,12 +449,55 @@ def load_translation(base):
             "translation_figures": base["figures"] if initial else stored["translation_figures"]}
 
 
-def translation_baseline(base, translation, previous_source):
-    if translation["doc_rev"] == base["doc_rev"]:
-        markdown = revision_124_markdown(base, previous_source)
+def translation_cache_file(digest):
+    override = os.environ.get("LOGOS_TRANSLATION_CACHE")
+    if override:
+        cache = Path(override).expanduser()
     else:
-        markdown = (OUT / TRANSLATION_MARKDOWN).read_text(encoding="utf-8")
-    if sha(markdown) != translation["translation_sha256"]:
+        user_cache = os.environ.get("LOCALAPPDATA") if os.name == "nt" else os.environ.get("XDG_CACHE_HOME")
+        cache = (Path(user_cache) if user_cache else Path.home() / ".cache") / "twistj" / "logos"
+    cache = cache.resolve()
+    if cache == ROOT or ROOT in cache.parents or any(
+        (directory / ".git").exists() for directory in (cache, *cache.parents)
+    ):
+        raise SystemExit("the Logos translation cache must be outside Git checkouts")
+    if not re.fullmatch("[0-9a-f]{64}", digest):
+        raise SystemExit("invalid Logos translation baseline SHA-256")
+    return cache / (digest + ".md")
+
+
+def store_translation(markdown):
+    path = translation_cache_file(sha(markdown))
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if path.exists():
+        if sha(path.read_text(encoding="utf-8")) != sha(markdown):
+            raise SystemExit("private translation cache has a mismatched baseline checksum")
+    else:
+        write_atomic(path, markdown.encode("utf-8"))
+
+
+def translation_baseline(base, translation, previous_source):
+    revision = translation["doc_rev"]
+    digest = translation["translation_sha256"]
+    if revision == base["doc_rev"]:
+        markdown = revision_124_markdown(base, previous_source)
+    elif previous_source:
+        source = Path(previous_source).read_text(encoding="utf-8")
+        if sha(source) != translation["source_sha256"]:
+            raise SystemExit(f"previous source hash does not match normalized Czech revision {revision}")
+        blocks = split_blocks(source)
+        if len(blocks) != translation["blocks"]:
+            raise SystemExit("previous source block inventory is inconsistent")
+        markdown = translated_markdown(blocks, load_memory())
+    else:
+        cache_file = translation_cache_file(digest)
+        try:
+            markdown = cache_file.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            raise SystemExit(f"private translation baseline unavailable for revision {revision}. "
+                             "Restore the cached baseline or pass --previous-source with the "
+                             "verified normalized Czech source of that revision.") from None
+    if sha(markdown) != digest:
         raise SystemExit("last English translation baseline checksum does not match SOURCE.json")
     return markdown
 
@@ -518,11 +572,12 @@ def sync_translation(a):
                        "synced": today(), "memory_blocks": len(mem["blocks"]), "figures": len(figures),
                        "translation_sha256": sha(md),
                        "translation_figures": figure_hashes}
-        output[TRANSLATION_MARKDOWN] = md
     if merged != editorial:
         output["logos.md"] = merged
     output.update(figures)
     output.update(edition_files(config, merged, translation, figures))
+    if not same_revision:
+        store_translation(md)
     write_outputs(OUT, output)
     return 0
 
@@ -867,11 +922,10 @@ def cmd_check(a):
             config = load_config()
             base = config["initial_translation"]
             translation = load_translation(base)
-            baseline = expected if translation["doc_rev"] == base["doc_rev"] else (OUT / TRANSLATION_MARKDOWN).read_text(encoding="utf-8")
-            if translation["source_sha256"] != sha(source) or baseline != expected or sha(baseline) != translation["translation_sha256"]:
+            if translation["source_sha256"] != sha(source) or sha(expected) != translation["translation_sha256"]:
                 failures += 1
                 print("source or translation differs from the recorded public baseline")
-            actual_figures = {f["file"]: sha(f["svg"]) for f in referenced_figures(baseline, OUT)}
+            actual_figures = {f["file"]: sha(f["svg"]) for f in referenced_figures(expected, OUT)}
             if actual_figures != translation["translation_figures"]:
                 failures += 1
                 print("translation figure checksums differ from the recorded public baseline")
@@ -898,7 +952,8 @@ def main():
     p = sp.add_parser("build-edition"); p.set_defaults(f=cmd_build_edition)
     p = sp.add_parser("build"); p.add_argument("source"); p.add_argument("--rev", required=True)
     p.add_argument("--out"); p.add_argument("--figs", default=OUT)
-    p.add_argument("--previous-source"); p.set_defaults(f=cmd_build)
+    p.add_argument("--previous-source", help="verified normalized Czech source for the last translated revision")
+    p.set_defaults(f=cmd_build)
     p = sp.add_parser("check"); p.add_argument("source"); p.add_argument("--markdown")
     p.add_argument("--figs", default=OUT); p.set_defaults(f=cmd_check)
     p = sp.add_parser("jsx2svg"); p.add_argument("jsx"); p.add_argument("out"); p.set_defaults(f=cmd_jsx2svg)
