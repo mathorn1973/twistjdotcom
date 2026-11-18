@@ -21,10 +21,8 @@
     if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); })();
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
+<link rel="stylesheet" href="../site-nav.css">
 <style>
 :root {
     --bg: #f4f1eb;
@@ -76,22 +74,14 @@
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: Georgia, "Times New Roman", serif;
     -webkit-font-smoothing: antialiased;
 }
 
 .wrap { max-width: 880px; margin: 0 auto; padding: 56px 22px 34px; }
 
-.back-link {
-    position: fixed; top: 14px; left: 14px; z-index: 50;
-    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
-    letter-spacing: 0.08em; color: var(--dim); text-decoration: none;
-    background: rgba(var(--bg-rgb), 0.88); backdrop-filter: blur(3px);
-    padding: 6px 10px; border-radius: 13px; transition: color 0.2s;
-}
-.back-link:hover { color: var(--accent); }
 .theme-toggle {
-    position: fixed; top: 12px; right: 16px; z-index: 50;
+    position: absolute; top: 12px; right: 16px; z-index: 50;
     width: 30px; height: 30px; border: 1px solid var(--rule); border-radius: 50%;
     background: rgba(var(--bg-rgb), 0.88); backdrop-filter: blur(3px);
     color: var(--dim); cursor: pointer; opacity: 0.7;
@@ -106,7 +96,7 @@ header { text-align: center; margin-bottom: 34px; }
     /* The wordmark. Brackets want the letters closer than the old 0.55em
        tracking, or they float away from what they are holding; text-indent
        cancels the trailing letter-space so the whole thing stays centred. */
-    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    font-family: ui-monospace, Consolas, monospace; font-size: 14px;
     letter-spacing: 0.18em; text-indent: 0.18em;
     color: var(--accent); margin-bottom: 12px;
 }
@@ -122,7 +112,7 @@ h1 {
 
 /* ── the algebra ── */
 .algebra {
-    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 2;
+    font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; line-height: 2;
     margin: 34px 0 40px; padding: 24px 4px; overflow-x: auto;
     border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
     color: var(--text-bright);
@@ -137,7 +127,7 @@ h1 {
 .console { margin-top: 6px; }
 .row {
     display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
-    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted);
+    font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--muted);
 }
 .row.top { margin-bottom: 8px; }
 .row.bottom { margin-top: 10px; }
@@ -147,7 +137,7 @@ h1 {
 textarea, .out {
     width: 100%; background: var(--field);
     border: 1px solid var(--rule); border-radius: 3px;
-    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.72;
+    font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; line-height: 1.72;
     color: var(--text); padding: 14px 16px;
 }
 textarea { min-height: 216px; resize: vertical; tab-size: 2; }
@@ -161,7 +151,7 @@ textarea:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
 .out .q { color: var(--accent); font-weight: 500; }
 
 button, select, input[type="number"], input[type="text"] {
-    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    font-family: ui-monospace, Consolas, monospace; font-size: 11.5px;
     background: var(--field); color: var(--text);
     border: 1px solid var(--rule); border-radius: 2px; padding: 7px 10px;
 }
@@ -171,7 +161,7 @@ select, input[type="text"] { max-width: 100%; }
 .rank-controls { margin: 10px 0; }
 .rank-controls[hidden] { display: none; }
 .rank-controls input { width: 250px; }
-.mode-note { font: 11.5px/1.65 'JetBrains Mono', monospace; color: var(--muted); margin: 8px 0; }
+.mode-note { font: 11.5px/1.65 ui-monospace, Consolas, monospace; color: var(--muted); margin: 8px 0; }
 input[type="number"]:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.55); }
 button.run {
     color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase;
@@ -204,14 +194,14 @@ button.stop:disabled { opacity: 1; }
 .prog.on { display: block; }
 .prog i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); transition: width 0.1s linear; }
 .progtext {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
+    font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted);
     margin-top: 6px; min-height: 15px;
 }
 
 .foot {
     margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--rule);
     display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim);
+    font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--dim);
 }
 .foot a { color: var(--muted); text-decoration: none; }
 .foot a:hover { color: var(--accent); }
@@ -221,17 +211,26 @@ button.stop:disabled { opacity: 1; }
     .algebra { font-size: 10.5px; }
     .out, textarea { font-size: 11.5px; }
 }
+.app-tools { position: relative; min-height: 40px; }
+.wrap { padding-top: 16px; }
+  .site-nav { padding-inline: clamp(.75rem, 3vw, 1.5rem); }
 </style>
 </head>
 <body>
 
-<a href="/" class="back-link">&#8592; twistj.com</a>
+<nav class="site-nav" aria-label="Site navigation">
+    <a href="../index.html">TWIST-J</a>
+    <a href="../questions/index.html">Questions</a>
+    <a href="../canon/index.html">Public Canon</a>
+</nav>
+<div class="app-tools">
 <button class="theme-toggle" id="themeToggle" title="Theme: auto / light / dark">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="5"/>
         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/>
     </svg>
 </button>
+</div>
 
 <div class="wrap">
 
@@ -311,7 +310,7 @@ button.stop:disabled { opacity: 1; }
     <span class="spacer"></span>
     <a href="https://github.com/mathorn1973/twistjdotcom/blob/main/oq/QASM3.md" target="_blank" rel="noopener">QASM 3 support</a>
     <a href="https://orcid.org/0009-0008-5463-278X" target="_blank" rel="noopener">A. M. Thorn</a>
-    <a href="/">twistj.com</a>
+    <a href="../index.html">twistj.com</a>
 </div>
 
 </div>

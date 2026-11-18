@@ -1,25 +1,20 @@
 /* Reading typography shared by the interactive paper guides. */
 @media screen {
   :root {
-    --paper: #fbfaf6;
-    --surface: #fffefa;
-    --ink: #23221f;
-    --muted: #56544e;
-    --rule: #d3d0c4;
-    --accent: #203f76;
-    --soft: #f1efe6;
-    --blue: #203f76;
+    --paper-width: 54rem;
+    --paper: var(--site-paper);
+    --surface: var(--site-surface);
+    --ink: var(--site-ink);
+    --muted: var(--site-muted);
+    --rule: var(--site-rule);
+    --accent: var(--site-link);
+    --soft: var(--site-soft);
+    --blue: var(--site-link);
+    --green: var(--site-visited);
   }
 
   body { font: 1.0625rem/1.54 var(--serif); }
-  .site-header, main, footer { max-width: 54rem; padding-inline: clamp(1rem, 4vw, 2.5rem); }
-  .site-header {
-    padding-block: 1.5rem .55rem;
-    font: .875rem/1.45 var(--serif);
-    flex-wrap: wrap;
-    gap: .25rem 1rem;
-  }
-  .site-header .wordmark { font: inherit; letter-spacing: normal; }
+  main, footer { max-width: var(--paper-width); padding-inline: clamp(1rem, 4vw, 2.5rem); }
   .hero { padding: 1.75rem 0 0; }
   .hero > .eyebrow { margin: 0 0 .35rem; font: .875rem/1.45 var(--serif); text-transform: none; letter-spacing: normal; color: var(--muted); }
   .hero h1 {
@@ -55,6 +50,10 @@
   .next-links { gap: .25rem 1.25rem; margin: 1.1rem 0; }
   .next-links strong { font: inherit; text-decoration: underline; }
   .state-button.selected-a.selected-b { background: var(--soft); }
-  .site-header a, footer a { text-decoration: underline; }
+  .norm-box, .state-button.selected-a, .slot-controls button:first-child[aria-pressed=true] {
+    background: var(--soft);
+    border-color: var(--rule);
+  }
+  footer a { text-decoration: underline; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 }

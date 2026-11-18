@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html class="reader-page" lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,81 +15,14 @@
     <link rel="alternate" hreflang="en" href="https://twistj.com/manifest/">
     <link rel="alternate" hreflang="cs" href="https://twistj.com/manifest/cs/">
     <link rel="alternate" hreflang="x-default" href="https://twistj.com/manifest/">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #f4f1eb; --text: #2a2520; --text-bright: #1a1714;
-            --accent: #8b4513; --muted: #7a7570; --dim: #999;
-            --rule: #d4cfc7; --link: #6b6560; --link-hover: #8b4513;
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #1c1915; --text: #b8b3a8; --text-bright: #d4cfc6;
-                --accent: #b08050; --muted: #7a7268; --dim: #605850;
-                --rule: #38332c; --link: #9a9488; --link-hover: #b08050;
-            }
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: var(--bg); color: var(--text);
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.22rem; font-weight: 400; line-height: 1.62;
-        }
-        .page { max-width: 40em; margin: 0 auto; padding: 4rem 1.4rem 3rem; }
-        .eyebrow {
-            font-size: .82rem; letter-spacing: .34em; text-transform: uppercase;
-            color: var(--accent); text-align: center;
-        }
-        h1 {
-            font-weight: 500; font-size: 2.7rem; text-align: center;
-            color: var(--text-bright); margin: .4rem 0 .6rem;
-        }
-        .byline { text-align: center; color: var(--muted); font-size: 1.02rem; font-style: italic; }
-        .version { text-align: center; color: var(--dim); font-size: .92rem; margin-top: .2rem; }
-        .changelog { max-width: 34em; margin: .9rem auto 0; color: var(--dim); font-size: .84rem; line-height: 1.6; text-align: center; }
-        .lang { text-align: center; font-size: .95rem; margin-top: .5rem; }
-        .motto {
-            text-align: center; font-size: 1.42rem; font-weight: 500;
-            color: var(--text-bright); margin: 2.4rem 0 .8rem;
-        }
-        .lede { text-align: center; font-style: italic; color: var(--muted); margin-bottom: 1.8rem; }
-        blockquote.creed {
-            margin: 1.6rem 0; padding: .1rem 1.2rem;
-            border-left: 2px solid var(--accent);
-            font-size: 1.28rem; font-style: italic; color: var(--text-bright);
-        }
-        .jline {
-            text-align: center; font-size: 1.5rem; color: var(--text-bright);
-            margin: 1.4rem 0;
-        }
-        h2 {
-            font-weight: 500; font-size: .92rem; letter-spacing: .22em;
-            text-transform: uppercase; color: var(--accent);
-            margin: 2.2rem 0 .6rem; padding-top: 1.4rem;
-            border-top: 1px solid var(--rule);
-        }
-        p { margin-bottom: 1rem; }
-        ul, ol { margin: 0 0 1rem 1.5rem; }
-        li { margin-bottom: .25rem; }
-        .aphorisms {
-            margin-top: 2.6rem; padding-top: 1.6rem; border-top: 1px solid var(--rule);
-            text-align: center; font-size: 1.32rem; font-weight: 500;
-            color: var(--text-bright); line-height: 1.9;
-        }
-        .lastrule { text-align: center; font-style: italic; margin-top: 1.4rem; font-size: 1.18rem; }
-        .foot {
-            margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
-            text-align: center; color: var(--muted); font-size: 1rem;
-        }
-        a { color: var(--link); text-decoration: none; border-bottom: 1px solid var(--rule); }
-        a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
-    </style>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
+    <script src="../../reading.js"></script>
+    <link rel="stylesheet" href="../../reading.css">
+    <link rel="stylesheet" href="../../site-nav.css">
+    <link rel="stylesheet" href="../../core/reader.css">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -109,8 +42,12 @@
     </script>
 </head>
 <body>
-    <div class="page">
-        <div class="eyebrow">TWIST-J</div>
+<nav id="top" class="site-nav" aria-label="Hlavní navigace">
+    <a href="../../index.html">TWIST-J</a>
+    <a href="../../questions/index.html" hreflang="en">Otázky</a>
+    <a href="../index.html" lang="en">English</a>
+</nav>
+<main class="page">
         <h1>Manifest</h1>
         <div class="byline">Veřejný manifest programu diskrétní celočíselné fyziky</div>
         <div class="byline">A. M. Thorn / Marek &Scaron;pan&#283;l</div>
@@ -120,7 +57,6 @@
         Úplný fyzikální popis může být klasifikovaná rodina přesně typovaných čtení,
         pokud jsou všechny alternativy a překryvy ovlivňující výsledek výslovné a žádné
         čtení se nevybírá až podle známého cílového výsledku.</div>
-        <div class="lang"><a href="/manifest/">English</a></div>
 
         <div class="motto">Co nejde spočítat v celých číslech, není základní fyzika.<br>
         Je to aproximace, limit nebo nástroj pro inženýry.</div>
@@ -275,8 +211,8 @@
 
         <div class="foot">
             Canon je účetní kniha. Tento manifest je veřejný závazek metody.<br>
-            <a href="/canon/">Public Canon</a> &middot; <a href="/">twistj.com</a> &middot; <a href="/manifest/">English</a>
+            <a href="../../canon/index.html">Public Canon</a> &middot; <a href="../../index.html">twistj.com</a> &middot; <a href="../../manifest/index.html">English</a> &middot; <a href="#top">Zpět nahoru</a>
         </div>
-    </div>
+    </main>
 </body>
 </html>

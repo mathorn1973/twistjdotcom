@@ -343,7 +343,7 @@ STRINGS = {
         "byline": "A. M. Thorn",
         "version": "Working document &middot; NON-CANONICAL &middot; synced {{DATE}}",
         "foot": """The Canon is the ledger. This page is a working reading of it and carries no authority.<br>
-            <a href="/canon/">Public Canon</a> &middot; <a href="/logos/logos.md">plain markdown</a> &middot; <a href="/">twistj.com</a>""",
+            <a href="../canon/index.html">Public Canon</a> &middot; <a href="logos.md">plain markdown</a> &middot; <a href="#top">Back to top</a>""",
         "labels": r"T|D|C|H|O|F|candidate-T|candidate-C|reading|model|judgment|probe|interpretation|boost",
         "jsonld": True,
         "katex": """    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -410,10 +410,31 @@ def render_html(title, note, body_md, figs, lang="en", rev=""):
      "inLanguage": "en", "dateModified": "{{DATE}}",
      "description": "A working document of the TWIST-J program, NON-CANONICAL: what one number and one step give for space, time, energy, matter and light, and what is still missing."}
     </script>""")
+    reader_assets = nav = body_class = fonts = html_class = ""
+    if lang == "en":
+        reader_assets = """
+    <script src="../reading.js"></script>
+    <link rel="stylesheet" href="../reading.css">
+    <link rel="stylesheet" href="../site-nav.css">
+    <link rel="stylesheet" href="../core/reader.css">"""
+        nav = """
+    <nav id="top" class="site-nav" aria-label="Main navigation">
+        <a href="../index.html">TWIST-J</a>
+        <a href="../questions/index.html">Questions</a>
+        <a href="../canon/index.html">Public Canon</a>
+    </nav>"""
+        body_class = ' class="logos-reader"'
+        html_class = ' class="reader-page"'
+    else:
+        fonts = """    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">"""
     page = (tpl.replace("{{LANG}}", S["lang"]).replace("{{HEAD}}", S["head"]).replace("{{JSONLD}}", jsonld)
             .replace("{{EYEBROW}}", S["eyebrow"]).replace("{{BYLINE}}", S["byline"]).replace("{{VERSION}}", S["version"])
             .replace("{{FOOT}}", S["foot"]).replace("{{KATEX}}", S["katex"])
-            .replace("{{NOTE}}", html.escape(note)).replace("{{BODY}}", body))
+            .replace("{{NOTE}}", html.escape(note)).replace("{{BODY}}", body)
+            .replace("{{FONTS}}", fonts).replace("{{READERASSETS}}", reader_assets)
+            .replace("{{NAV}}", nav).replace("{{BODYCLASS}}", body_class).replace("{{HTMLCLASS}}", html_class))
     page = page.replace("{{TITLE}}", html.escape(title)).replace("{{DATE}}", today()).replace("{{REV}}", html.escape(str(rev)))
     page = page.replace('        <div class="byline"></div>\n', "")
     assert "{{" not in page, re.findall(r"{{[A-Z]+}}", page)

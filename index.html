@@ -190,6 +190,7 @@
     "canon_source": "https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md",
     "canon_release": "https://github.com/mathorn1973/twist-j/releases",
     "agent_index": "https://twistj.com/llms.txt",
+    "questions": "https://twistj.com/questions/",
     "manifest": "https://twistj.com/manifest/",
     "orcid": "https://orcid.org/0009-0008-5463-278X",
     "code": "https://github.com/mathorn1973/twist-j",
@@ -284,13 +285,17 @@
   "claims_note": "every id resolves in canon/REGISTRY.tsv on the repository head; no claim here is stronger than its row"
 }
   </script>
+  <link rel="stylesheet" href="site-nav.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to text</a>
-  <header class="masthead">
-    <a href="https://orcid.org/0009-0008-5463-278X">A. M. Thorn</a>
+  <nav class="site-nav" id="top" aria-label="Site">
+    <a href="index.html" aria-current="page">TWIST-J</a>
+    <a href="questions/index.html">Questions</a>
+    <a href="papers/index.html">Papers</a>
+    <a href="canon/index.html">Canon</a>
     <button class="theme-toggle" id="themeToggle" type="button" hidden>Theme: <span id="themeIcon">System</span></button>
-  </header>
+  </nav>
   <main id="main" tabindex="-1">
     <h1>TWIST-J</h1>
     <p class="lead">How much of physics can be read from an exact rule on integers?</p>
@@ -302,6 +307,8 @@
     <p>A physical model needs more. Which sites can interact? What survives the next interaction? What could an observer read twice? TWIST-J gives these questions separate mathematical statements, so each answer can be checked at its own scope.</p>
     <h2 id="reading">Where to start</h2>
     <dl>
+      <dt><a href="questions/index.html">Research questions</a></dt>
+      <dd>Follow a question from its strongest result to the next open step. Each answer links to its evidence in the Canon.</dd>
       <dt><a href="reading/contact/index.html">When does a contact leave a record?</a></dt>
       <dd>Try a two-site contact by hand, then follow a finite archive to the first tick where its two signed readings change.</dd>
       <dt><a href="papers/index.html">Papers</a></dt>
@@ -320,6 +327,7 @@
     <nav aria-label="Elsewhere in TWIST-J">
       <a href="manifest/index.html">Manifest</a> · <a href="manifest/cs/index.html" lang="cs">Česky</a> · <a href="logos/index.html">Logos (reading of v109)</a> · <a href="demolab/index.html">Demo Lab</a> · <a href="oq/index.html">Ordinary Quantum</a> · <a href="https://github.com/mathorn1973/twist-j">Research code</a>
     </nav>
+    <p><a href="https://orcid.org/0009-0008-5463-278X">A. M. Thorn</a> · <a href="#top">Back to top</a></p>
   </footer>
 </body>
 </html>

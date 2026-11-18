@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="reader-page">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +16,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
@@ -71,6 +69,10 @@
         .foot { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); text-align: center; color: var(--muted); font-size: 1rem; }
         @media (max-width: 600px) { body { font-size: 1.1rem; } h1 { font-size: 1.8rem; } .page { padding: 2.4rem 1rem 2.5rem; } }
     </style>
+    <script src="../reading.js"></script>
+    <link rel="stylesheet" href="../reading.css">
+    <link rel="stylesheet" href="../site-nav.css">
+    <link rel="stylesheet" href="../core/reader.css">
     <script type="application/ld+json">
     {"@context": "https://schema.org", "@type": "Article", "headline": "The picture of physics according to TWIST-J, and what is still missing",
      "author": [ { "@type": "Person", "name": "A. M. Thorn" } ], "url": "https://twistj.com/logos/",
@@ -78,7 +80,12 @@
      "description": "A working document of the TWIST-J program, NON-CANONICAL: what one number and one step give for space, time, energy, matter and light, and what is still missing."}
     </script>
 </head>
-<body>
+<body class="logos-reader">
+    <nav id="top" class="site-nav" aria-label="Main navigation">
+        <a href="../index.html">TWIST-J</a>
+        <a href="../questions/index.html">Questions</a>
+        <a href="../canon/index.html">Public Canon</a>
+    </nav>
     <div class="page">
         <div class="eyebrow">TWIST-J &middot; Logos</div>
         <h1>The picture of physics according to TWIST-J, and what is still missing</h1>
@@ -646,7 +653,7 @@ $$</div>
 
         <div class="foot">
             The Canon is the ledger. This page is a working reading of it and carries no authority.<br>
-            <a href="/canon/">Public Canon</a> &middot; <a href="/logos/logos.md">plain markdown</a> &middot; <a href="/">twistj.com</a>
+            <a href="../canon/index.html">Public Canon</a> &middot; <a href="logos.md">plain markdown</a> &middot; <a href="#top">Back to top</a>
         </div>
     </div>
 </body>

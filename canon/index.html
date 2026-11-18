@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="reader-page" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,77 +12,11 @@
     <meta property="og:url" content="https://twistj.com/canon/">
     <link rel="canonical" href="https://twistj.com/canon/">
     <link rel="alternate" type="text/markdown" href="https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md" title="Current Canon, Markdown source">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <style>
-        :root {
-            color-scheme: light dark;
-            --bg: #f4f1eb;
-            --panel: #f3f0ea;
-            --text: #2a2520;
-            --muted: #7a7570;
-            --gold: #8b4513;
-            --rule: #d4cfc7;
-            --strong-rule: #d4cfc7;
-            --panel-bg: rgba(244, 241, 235, 0.95);
-            --panel-border: #d4cfc7;
-        }
-        [data-theme="light"] { color-scheme: light; }
-        [data-theme="dark"] {
-            color-scheme: dark;
-            --bg: #1c1915;
-            --panel: #252118;
-            --text: #b8b3a8;
-            --muted: #7a7268;
-            --gold: #b08050;
-            --rule: #38332c;
-            --strong-rule: #38332c;
-            --panel-bg: rgba(28, 25, 21, 0.95);
-            --panel-border: #38332c;
-        }
-        * { box-sizing: border-box; }
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            max-width: 48em;
-            margin: 4em auto;
-            padding: 0 1.5em 4em;
-            line-height: 1.7;
-            font-size: 1.12em;
-        }
-        a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--strong-rule); }
-        a:hover, a:focus { border-bottom-color: var(--gold); }
-        h1, h2 { font-weight: 400; letter-spacing: 0.06em; }
-        h1 { margin-bottom: 0.2em; }
-        h2 { margin-top: 2em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
-        code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.76em; color: var(--muted); word-break: break-all; }
-        .state { color: var(--gold); letter-spacing: 0.16em; font-variant: small-caps; }
-        .dim { color: var(--muted); }
-        .notice, .links {
-            background: var(--panel);
-            border: 1px solid var(--rule);
-            padding: 1em 1.3em;
-            margin: 1.4em 0;
-        }
-        .notice { border-left: 3px solid var(--gold); }
-        .links ul { margin: 0.3em 0; padding-left: 1.3em; }
-        .links li { margin: 0.35em 0; }
-        @media (max-width: 36em) {
-            body { margin-top: 2em; }
-        }
-    
-        body { transition: background .4s ease, color .4s ease; }
-        .theme-toggle {
-            position: fixed; top: 1.15rem; right: 1.15rem;
-            width: 2.1rem; height: 2.1rem;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; background: var(--panel-bg);
-            border: 1px solid var(--panel-border); border-radius: 50%;
-            color: var(--muted); z-index: 10;
-        }
-        .theme-toggle:hover { color: var(--gold); }
-        .theme-toggle svg { width: .95rem; height: .95rem; }
-    </style>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="../reading.js"></script>
+    <link rel="stylesheet" href="../reading.css">
+    <link rel="stylesheet" href="../site-nav.css">
+    <link rel="stylesheet" href="../core/reader.css">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -99,9 +33,14 @@
     </script>
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" title="Toggle theme: light / dark">
-<svg id="themeIcon" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="none" r="5" stroke="currentColor" stroke-width="1.5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"></path></svg>
-</button>
+<nav class="site-nav" aria-label="Main navigation">
+    <a href="../index.html">TWIST-J</a>
+    <a href="../questions/index.html">Questions</a>
+    <a href="core/index.html">Canon Core</a>
+    <button class="theme-toggle" id="themeToggle" type="button" hidden>Theme: <span id="themeIcon">System</span></button>
+</nav>
+<main>
+
     <h1>TWIST-J Public Canon</h1>
     <p class="state">active</p>
 
@@ -121,7 +60,7 @@
     <div class="links">
         <ul>
             <li><a href="https://github.com/mathorn1973/twist-j/blob/main/canon/CANON.md">Full Canon</a>, and the <a href="https://raw.githubusercontent.com/mathorn1973/twist-j/main/canon/CANON.md">raw Markdown source</a></li>
-            <li><a href="/canon/core/">Core overview</a>, a concise stable introduction; <a href="https://github.com/mathorn1973/twist-j/blob/main/canon/CORE.md">authoritative source</a></li>
+            <li><a href="../canon/core/index.html">Core overview</a>, a concise stable introduction; <a href="https://github.com/mathorn1973/twist-j/blob/main/canon/CORE.md">authoritative source</a></li>
             <li><a href="https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md">Frontier</a>, the live obligations, and <a href="https://github.com/mathorn1973/twist-j/blob/main/canon/REGISTRY.tsv">Registry</a>, every claim with its status</li>
             <li><a href="https://github.com/mathorn1973/twist-j/blob/main/canon/LEDGER.md">Ledger</a>, evidence and history</li>
             <li><a href="https://github.com/mathorn1973/twist-j/blob/main/canon/SHA256SUMS">SHA256SUMS</a>, checksums of the normative files</li>
@@ -142,19 +81,7 @@
 
     <p class="dim">Axiom: J = 1 + j². Time is a counter. Space is a commutator.
        Exact arithmetic first. Plenum, not vacuum.</p>
-    <p><a href="/">back to twistj.com</a></p>
-<script>
-    (function(){
-      var r=document.documentElement, k='twistj-theme';
-      var t=null; try{t=localStorage.getItem(k)}catch(e){}
-      if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light';
-      r.setAttribute('data-theme',t);
-      document.addEventListener('click',function(e){
-        var b=e.target.closest('.theme-toggle'); if(!b) return;
-        var n = r.getAttribute('data-theme')==='dark'?'light':'dark';
-        r.setAttribute('data-theme',n); try{localStorage.setItem(k,n)}catch(e){}
-      });
-    })();
-    </script>
+
+</main>
 </body>
 </html>

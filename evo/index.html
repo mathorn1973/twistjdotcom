@@ -5,26 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>TWIST-J | A Finite Rule with Unbounded Evolution</title>
 <meta name="description" content="TWIST-J Demo Lab visualization: exact finite F5^6 checkpoint logic inside an illustrative floating-point particle, field, and rendering layer. Not Canon evidence." />
+<link rel="stylesheet" href="../site-nav.css">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body{
     background:#06060a; color:#8a8a8a;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-    height:100vh; overflow:hidden;
+    height:100vh; height:100dvh; overflow:hidden;
+    display:flex; flex-direction:column;
     overscroll-behavior:none; touch-action:none;
   }
   .top{
     height:44px; display:flex; align-items:baseline; gap:18px;
     padding:10px 16px; border-bottom:1px solid #141418; background:#06060a;
   }
-  .top .t{ color:#00d2ff; letter-spacing:3px; font-size:12px; }
+  .top .t{ color:#a7b5c5; font: 1rem Georgia, "Times New Roman", serif; }
   .top .scope{ margin-left:auto; color:#5a5a64; letter-spacing:1.4px; font-size:9px; white-space:nowrap; }
-  .wrap{ position:relative; width:100%; height:calc(100vh - 44px); }
+  .wrap{ position:relative; flex:1; width:100%; min-height:0; }
+  .top, .site-nav { flex:none; }
   @media(max-width:700px){
     .top{ height:54px; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px; padding:7px 12px; }
     .top .t{ letter-spacing:2px; font-size:10px; }
     .top .scope{ margin-left:0; font-size:8px; letter-spacing:1px; }
-    .wrap{ height:calc(100vh - 54px); }
   }
   canvas{ width:100%; height:100%; display:block; cursor:crosshair; touch-action:none; }
   .hud{
@@ -179,7 +181,6 @@
   .demo-mode .twistj-link{ display:none !important; }
   .demo-mode #gameLockedHud{ display:none !important; }
   .demo-mode #gameOverlay{ display:none !important; }
-  .demo-mode .wrap{ height:100vh; }
   .demo-mode .audio-btn{
     display:block !important;
     position:fixed; bottom:12px; z-index:200;
@@ -199,7 +200,6 @@
   .game-locked #gameLockedHud .gl-time{ color:#00d2ff; }
   .game-locked #gameLockedHud .gl-fill{ color:#555; }
   .game-locked #gameLockedHud .gl-status{ color:#0a0; }
-  .ui-hidden .wrap{ height:100vh; }
 
   /* UI hidden overrides game-locked mode */
   .ui-hidden.game-locked .top{ display:none !important; }
@@ -207,22 +207,33 @@
   .ui-hidden.game-locked .invert-btn{ display:none !important; }
   .ui-hidden.game-locked .credit{ display:none !important; }
   .ui-hidden.game-locked .twistj-link{ display:none !important; }
-  .ui-hidden.game-locked .wrap{ height:100vh; }
 
   .row.stack{ flex-direction:column; align-items:stretch; }
   .row.stack label{ width:auto; }
   .row.stack input[type=range]{ width:100%; }
 
+  .site-nav {
+    --site-paper: #101116;
+    --site-ink: #e5e6e9;
+    --site-link: #c0d4f3;
+    --site-rule: #393d47;
+    padding-inline: clamp(.75rem, 3vw, 1.5rem);
+  }
 </style>
 </head>
 <body>
+<nav class="site-nav" aria-label="Site navigation">
+    <a href="../index.html">TWIST-J</a>
+    <a href="../questions/index.html">Questions</a>
+    <a href="../demolab/index.html">Demo Lab</a>
+</nav>
   <div class="top">
     <div class="t">TWIST-J DEMO LAB</div>
     <div class="scope">ILLUSTRATION ONLY · NOT CANON EVIDENCE</div>
   </div>
 
   <div class="wrap">
-    <canvas id="c"></canvas>
+    <canvas id="c" tabindex="-1"></canvas>
 
     <div class="hud">
       <div>PARTICLES <span class="v" id="pc">0</span></div>
@@ -232,8 +243,8 @@
       <div id="histDiv" style="display:none">z <span class="v" id="histZ">-</span> i <span class="v" id="histI">-</span></div>
     </div>
 
-    <div id="liveBanner" style="display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:999;padding:4px 18px;font:bold 13px monospace;letter-spacing:2px;border-radius:0 0 8px 8px;pointer-events:none;text-align:center"></div>
-    <div id="diagOverlay" style="display:none;position:fixed;top:28px;right:8px;z-index:998;padding:8px 12px;font:11px/1.6 monospace;background:rgba(0,0,0,0.85);color:#0f0;border:1px solid #0f04;border-radius:6px;pointer-events:none;white-space:pre;min-width:260px"></div>
+    <div id="liveBanner" style="display:none;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:999;padding:4px 18px;font:bold 13px monospace;letter-spacing:2px;border-radius:0 0 8px 8px;pointer-events:none;text-align:center"></div>
+    <div id="diagOverlay" style="display:none;position:absolute;top:28px;right:8px;z-index:998;padding:8px 12px;font:11px/1.6 monospace;background:rgba(0,0,0,0.85);color:#0f0;border:1px solid #0f04;border-radius:6px;pointer-events:none;white-space:pre;min-width:260px"></div>
 
     <div class="panel">
       <div class="row" id="rowModules">
@@ -579,7 +590,7 @@
       <div class="krow"><span class="kk">H</span><span>show / hide this help</span></div>
       <div class="krow"><span class="kk">U</span><span>hide all UI (clean canvas for screenshots)</span></div>
       <div class="krow"><span class="kk">M</span><span>toggle audio (Schumann riff engine)</span></div>
-      <div class="krow"><span class="kk">TAB</span><span>hide / show controls</span></div>
+      <div class="krow"><span class="kk">TAB</span><span>hide / show controls while the canvas has focus</span></div>
       <h3>SHARE</h3>
       <div style="color:#777;margin-bottom:8px;line-height:1.5">
         Press <span style="color:#00d2ff">C</span> or the SHARE button to copy a URL encoding all current settings. Anyone opening the link starts with the same configuration. Explore, then share what you find.
@@ -592,7 +603,7 @@
       </div>
     </div>
 
-    <div id="gameOverlay" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;text-align:center;pointer-events:auto;z-index:50;background:rgba(0,0,0,0.55)">
+    <div id="gameOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;pointer-events:auto;z-index:50;background:rgba(0,0,0,0.55)">
       <div style="background:rgba(6,6,10,0.92);border:1px solid #1e1e28;border-radius:8px;padding:28px 40px;min-width:220px">
         <!-- Start screen -->
         <div id="gameStartScreen" style="display:none">
@@ -621,7 +632,7 @@
       <span class="gl-fill" id="glFill">0%</span>
     </div>
 
-    <a class="credit twistj-link" href="https://twistj.com" target="_blank" style="right:120px">twistj.com</a>
+    <a class="credit twistj-link" href="../index.html" style="right:120px">twistj.com</a>
     <a class="credit" href="https://orcid.org/0009-0008-5463-278X" target="_blank">A. M. Thorn</a>
     <div class="audio-btn" id="audioBtn" title="Toggle audio">🔇</div>
     <div class="audio-btn" id="fullscreenBtn" title="Fullscreen" style="left:52px">⛶</div>
@@ -3049,14 +3060,12 @@ float accLen = length(acc);
   });
   let _canvasRect = canvas.getBoundingClientRect();  // cached; updated on layout/resize only
   function layout(){
-    const topH = document.body.classList.contains('ui-hidden') ? 0 : 44;
-    canvas.style.height = (window.innerHeight - topH) + "px";
-    canvas.style.width = "100%";
     resize();
     _canvasRect = canvas.getBoundingClientRect();  // refresh cache after resize
     needLayout = false;
   }
   window.addEventListener('resize', () => { needLayout = true; _canvasRect = canvas.getBoundingClientRect(); });
+  new ResizeObserver(() => { needLayout = true; }).observe(canvas.parentElement);
   layout();
 
   // =========================
@@ -4079,6 +4088,7 @@ function gameOver(){
         needLayout = true;
         break;
       case 'Tab':
+        if (e.target !== canvas || e.shiftKey) break;
         e.preventDefault();
         togglePanel();
         break;

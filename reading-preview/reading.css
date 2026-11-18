@@ -1,22 +1,12 @@
 /* Shared type for the reading edition. Equations and links use the reader's fonts. */
 :root {
   color-scheme: light dark;
-  --paper: #fbfaf6;
-  --ink: #23221f;
-  --muted: #56544e;
-  --line: #9b988c;
-  --link: #203f76;
-  --visited: #5c3e66;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #1a1b1a;
-    --ink: #eeeae1;
-    --muted: #c2beb2;
-    --line: #78786d;
-    --link: #aac9ff;
-    --visited: #d4b9df;
-  }
+  --paper: var(--site-paper);
+  --ink: var(--site-ink);
+  --muted: var(--site-muted);
+  --line: var(--site-rule);
+  --link: var(--site-link);
+  --visited: var(--site-visited);
 }
 * { box-sizing: border-box; }
 html { background: var(--paper); color: var(--ink); }

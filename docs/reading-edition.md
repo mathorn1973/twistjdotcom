@@ -21,6 +21,8 @@ The current Evo app can share four settings the older subdomain cannot read: tar
 
 In a fresh local browser, Evo restored both a legacy dot-separated fragment and the four settings above. Lock & Share restored the locked state. Fractal restored the centre, scale and audio level in Mandelbrot, Julia and split views, including the Julia parameter where applicable. The tests captured the URL passed to the clipboard and reopened its fragment in a fresh page. The four paper guides were exercised at widths of 390 and 1280 pixels. The home and contact pages were also checked at 320 pixels and in print mode.
 
+The [research question index](../questions/index.html) pairs six results with their open obligations. Each entry has a stable fragment and cites the relevant passage or registry row in Public Canon v113. Its link to the live Frontier follows later editions. The opening links on every HTML page lead directly to the home page and the question index, including the papers, guides, applications and archived preview.
+
 ## Original review and migration plan
 
 The 18 November review below documents the site before consolidation and the [three-page prototype](../reading-preview/index.html). Its [paper shelf](../reading-preview/papers/index.html) illustrates the June edition of *Twist Numbers*. The four November editions are available from the library above.
