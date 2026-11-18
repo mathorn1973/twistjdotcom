@@ -67,7 +67,6 @@
 .logos-reader figure { border: 0; border-radius: 0; padding: 0; }
 .logos-reader ol, .logos-reader ul { margin-inline-start: 0; }
 .logos-reader table { table-layout: fixed; }
-.logos-reader .edition-links { font-size: .9em; }
 .logos-edition-note {
   color: var(--muted);
   font-size: .95rem;

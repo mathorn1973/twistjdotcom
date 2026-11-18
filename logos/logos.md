@@ -1,6 +1,6 @@
 # The picture of physics according to TWIST-J, and what is still missing
 
-A NON-CANONICAL reading of TWIST-J. This English edition revises the machine translation of the unpublished Czech source at revision 124 in light of Public Canon v113. The earlier translation is preserved as the [historical reading](v109.html) and [historical Markdown](logos-v109.md).
+A NON-CANONICAL reading of TWIST-J. This English edition revises the machine translation of the unpublished Czech source at revision 124 in light of Public Canon v113.
 
 Twist-J builds physics out of one number J = 1 + j² and one step. It reads space as the place where order matters. It reads time as the number of steps. Energy as an account that is conserved at contact. Matter as the part of the step that does not come back. Interaction as a contact of two slots whose rhythm is governed by divisibility by two. The mathematics under these readings is largely proved. That it is the physics of our world is not yet proved.
 

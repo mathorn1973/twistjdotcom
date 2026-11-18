@@ -5,7 +5,6 @@
   "synced": "2026-11-18",
   "memory_blocks": 211,
   "figures": 3,
-  "translation_markdown": "logos-v109.md",
   "translation_sha256": "ff38be43e2d8809e59d019bb7f300b141095ecf8b031f509b10022f0dbf67706",
   "translation_figures": {
     "fig-constructing-J.svg": "0e21b5bac24f6c7f77434f53725bffd460c309da8333ca6ae93f939a55407261",
@@ -16,8 +15,7 @@
   "hash_encoding": "UTF-8 with LF line endings",
   "current": {
     "kind": "english-editorial-reading",
-    "derived_from": "historical",
-    "translation_baseline": "logos-v109.md",
+    "initial_translation_revision": "124",
     "date": "2026-11-18",
     "canon": {
       "tag": "canon-v113",
@@ -25,31 +23,9 @@
       "canon_sha256": "47114cb616069242cff36bb499e5fe9b11266a92c744ba3f15a9085c11956b34"
     },
     "markdown": "logos.md",
-    "markdown_sha256": "ba65bbdfe212c8c2f37f4fce959dda6399986822b8ae35419426b476ee18752b",
+    "markdown_sha256": "f3d3d4f86d527335ecd63a90430c3e5deec5f7cab3cfaa64bfac197868890236",
     "html": "index.html",
-    "html_sha256": "41968a35a91c7030cdb6ab7ab7717f94fc2375d32badb99650001035c55a5230",
-    "figures": {
-      "fig-constructing-J.svg": "0e21b5bac24f6c7f77434f53725bffd460c309da8333ca6ae93f939a55407261",
-      "fig-two-projections.svg": "6bcb78cf25429d84d752448428e20d474ddba90b763ba18ad90c3208dbda3dde",
-      "fig-contact.svg": "481a78cfdcdb72fa064787a55140a6a15219429cb6ce864bd6bea235df2183e2"
-    }
-  },
-  "historical": {
-    "kind": "translation-snapshot",
-    "doc_rev": "124",
-    "source_sha256": "63aa39ea0c506a502dc78de4937275fdee9efdaa14d10377568105e6e123101c",
-    "blocks": 226,
-    "date": "2026-11-18",
-    "canon": {
-      "tag": "canon-v109",
-      "content_commit": "2b0f94ec1e0874bff9141259e0b7da80e6681ea6",
-      "canon_sha256": "035408ec79219cc72a7d3613cf1568154cca185137d2a2daa43b896aae0c6383"
-    },
-    "reference_block_sha256": "92bc88cb96180d9968a1eb122553223addf9f99c2df18bae6762f71c2f7bcff6",
-    "markdown": "logos-v109.md",
-    "markdown_sha256": "ff38be43e2d8809e59d019bb7f300b141095ecf8b031f509b10022f0dbf67706",
-    "html": "v109.html",
-    "html_sha256": "c509e2ac2403280a67a2fe8e0562785b19991fdb0a3fdb29975fa136c6bbf45a",
+    "html_sha256": "8df7f5632a7a63ddffed24a2d9f7d2a4011a804beba84136417052a62338ece1",
     "figures": {
       "fig-constructing-J.svg": "0e21b5bac24f6c7f77434f53725bffd460c309da8333ca6ae93f939a55407261",
       "fig-two-projections.svg": "6bcb78cf25429d84d752448428e20d474ddba90b763ba18ad90c3208dbda3dde",

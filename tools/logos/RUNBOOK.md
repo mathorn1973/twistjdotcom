@@ -6,13 +6,10 @@ reading, with its own evidence basis recorded in `tools/logos/editions.json`.
 Changes to the English edition are editorial changes. They do not imply any
 change to the private Czech working document.
 
-The reading at `https://twistj.com/logos/v109.html` preserves the English
-machine translation of private Czech revision 124. Its Markdown is
-`logos/logos-v109.md`. The English snapshot retains five historical links
-pinned to `canon-v109`. The generator recognizes the historical references
-by the source block's SHA-256. Both forms link separately to the live Canon.
-`logos/SOURCE.json` records the source and evidence provenance, dates, output
-hashes and referenced figures for both editions. It holds no private source URL.
+The public provenance file, `logos/SOURCE.json`, records the Czech source
+revision, the verified English translation digest, and the current reading's
+evidence, output hashes and figures. The normalized Czech source is private.
+Revision 124 remains the initial translation reference for source sync.
 
 ## English editorial build
 
@@ -32,13 +29,10 @@ hashes and referenced figures for both editions. It holds no private source URL.
    optional `--markdown FILE` checks an alternate working manuscript. Review
    the link anchors, labels and scientific scope independently of rendering.
 4. With Python and Python-Markdown installed, run
-   `python -B tools/logos/pipeline.py build-edition`. This generates the two
-   HTML pages and provenance from the two English Markdown sources, and
-   verifies the historical Markdown and three figure fingerprints. It never
-   writes `logos/logos.md`. Use `--historical-source WORK/source.md` on first
-   publication of the archive or to reconstruct the historical Markdown from
-   the verified normalized Czech revision 124. The command checks its
-   source hash, block count and reference-block identity before rendering.
+   `python -B tools/logos/pipeline.py build-edition`. This generates
+   `logos/index.html` and `logos/SOURCE.json` from the current Markdown.
+   It works in a shallow checkout without the Czech source or old Git objects
+   and leaves the Markdown untouched.
 5. Review the diff and test the navigation, narrow layout, diagrams and
    formulas. Repeating the same build with the same configuration,
    Python-Markdown 3.11.3 and inputs should produce the same UTF-8/LF hashes.
@@ -53,11 +47,15 @@ Keep their export, temporary translations and Czech assets under `WORK`,
 outside the repository. The scheduled workflow still uses the top-level
 source revision and hash in SOURCE.json. For a new revision, the default
 build merges the incoming English translation into the current manuscript
-using the last English translation as its base. The archived v109
-translation is the first base. Later bases live in generated translation.md.
-Overlapping edits stop the build with the affected sections named. The
-merger writes public outputs only after resolving the merge and rendering
-both editions.
+using the last English translation as its base. The first merge from
+revision 124 reads its pinned Git blob and checks its SHA-256. If a shallow
+checkout lacks that blob, fetch the relevant history or supply
+`--previous-source WORK/previous.md` with the exact normalized Czech
+revision 124. The pipeline verifies its source hash and checks that the
+reconstructed English translation matches the pinned digest. Later merges
+use the tracked `logos/translation.md` baseline and verify its digest.
+Overlapping edits stop the build before public outputs change and name
+the affected sections.
 
 1. Export the owner-approved Czech revision as `WORK/export.md` and HTML
    as `WORK/export.html`. Match each embedded figure to its source node and
@@ -97,7 +95,7 @@ both editions.
 
 Stop if the export or figure identity cannot be verified, if the
 translation check fails, or if the generated diff contains unauthorized
-changes. Keep the public English edition and historical snapshot intact.
+changes. Preserve pinned citations to historical Canon releases where they are needed.
 
 ## Glossary (Czech to English, binding)
 

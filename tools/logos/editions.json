@@ -13,13 +13,8 @@
       "sources"
     ]
   },
-  "historical": {
+  "initial_translation": {
     "date": "2026-11-18",
-    "canon": {
-      "tag": "canon-v109",
-      "content_commit": "2b0f94ec1e0874bff9141259e0b7da80e6681ea6",
-      "canon_sha256": "035408ec79219cc72a7d3613cf1568154cca185137d2a2daa43b896aae0c6383"
-    },
     "doc_rev": "124",
     "source_sha256": "63aa39ea0c506a502dc78de4937275fdee9efdaa14d10377568105e6e123101c",
     "blocks": 226,
@@ -28,6 +23,7 @@
       "fig-constructing-J.svg": "0e21b5bac24f6c7f77434f53725bffd460c309da8333ca6ae93f939a55407261",
       "fig-contact.svg": "481a78cfdcdb72fa064787a55140a6a15219429cb6ce864bd6bea235df2183e2",
       "fig-two-projections.svg": "6bcb78cf25429d84d752448428e20d474ddba90b763ba18ad90c3208dbda3dde"
-    }
+    },
+    "git_blob": "34891ebc25addc3c605d3eb3e60316751c17e09a"
   }
 }
