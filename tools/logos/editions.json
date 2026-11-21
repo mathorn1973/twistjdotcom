@@ -2,12 +2,12 @@
   "current": {
     "date": "2026-11-21",
     "canon": {
-      "tag": "canon-v114",
-      "activation_commit": "1cbf2305a300e927ff3af7b6ee41d587d4c7f078",
-      "tag_object": "04a74c6e43dbd2fe10eefea31f89b52675a59ce5",
-      "content_commit": "6334ffe44f7c30218823abb19b1899622e60854d",
-      "canon_sha256": "d920b1dfbda526f24336d97bfd9dfe33aa77923a4c33f0dca19c0dc38516d21e",
-      "canon_bytes": 1560551
+      "tag": "canon-v115",
+      "activation_commit": "5b09d042dacd8a48d812264f117afe796645a95e",
+      "tag_object": "8dd9c236b7fb48dbe784fbdadfb5030149d122a8",
+      "content_commit": "6cd898bc6d35f339b471ea684486af8c0ac54f84",
+      "canon_sha256": "38afba3f5c815aa1c623f8cec9992f0e5f89659e493e85dc61054e8fdfa253cf",
+      "canon_bytes": 1565061
     },
     "required_sections": [
       "event-and-measurement",
