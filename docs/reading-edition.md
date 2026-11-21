@@ -15,7 +15,7 @@ All four edition DOIs resolved to their respective public Zenodo records on 18 N
 
 Run `python -B verify/paper_mirrors.py` from the repository root to check the mirrors, manuscript fingerprints and edition citations offline. Run `python -B verify/kernel_identities.py` for the exact integer identities. The [sitemap](../sitemap.xml) and [machine index](../llms.txt) describe the same routes as the home page. Modification dates for existing routes follow their page history.
 
-The [Logos reading](../logos/index.html) and its [Markdown edition](../logos/logos.md) give the English interpretation of Public Canon v113. The reading is non-canonical and cites the evidence for its claims.
+The [Logos reading](../logos/index.html) and its [Markdown edition](../logos/logos.md) give the English interpretation of Public Canon v114. The reading is non-canonical and cites the evidence for its claims.
 
 The current Evo app can share four settings the older subdomain cannot read: target density, viscosity, solidification strength and its toggle. Share and Lock & Share in this checkout point to `https://twistj.com/evo/`, which reads all four. The fragment format is preserved. Existing links on the subdomain still depend on the application served there.
 
