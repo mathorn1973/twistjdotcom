@@ -1,15 +1,15 @@
 {
-  "doc_rev": "124",
+  "doc_rev": "169",
   "source_sha256": "63aa39ea0c506a502dc78de4937275fdee9efdaa14d10377568105e6e123101c",
   "blocks": 226,
-  "synced": "2026-11-18",
+  "synced": "2026-11-21",
   "memory_blocks": 211,
   "figures": 3,
   "translation_sha256": "ff38be43e2d8809e59d019bb7f300b141095ecf8b031f509b10022f0dbf67706",
   "translation_figures": {
     "fig-constructing-J.svg": "0e21b5bac24f6c7f77434f53725bffd460c309da8333ca6ae93f939a55407261",
-    "fig-contact.svg": "481a78cfdcdb72fa064787a55140a6a15219429cb6ce864bd6bea235df2183e2",
-    "fig-two-projections.svg": "6bcb78cf25429d84d752448428e20d474ddba90b763ba18ad90c3208dbda3dde"
+    "fig-two-projections.svg": "6bcb78cf25429d84d752448428e20d474ddba90b763ba18ad90c3208dbda3dde",
+    "fig-contact.svg": "481a78cfdcdb72fa064787a55140a6a15219429cb6ce864bd6bea235df2183e2"
   },
   "schema": 1,
   "hash_encoding": "UTF-8 with LF line endings",
