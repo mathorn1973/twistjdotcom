@@ -68,7 +68,8 @@ Earlier and related works:
 ## Site
 
 - [Home](https://twistj.com/): the axiom, two integer steps, and reading paths into the research programme
-- [Research questions](https://twistj.com/questions/) pairs results and open obligations for the integer step, contact, records, measurement, light and dark energy. Each question cites the relevant rows or passages in Public Canon v113.
+- [Research questions](https://twistj.com/questions/) pairs results and open obligations for the integer step, contact, records, measurement, light and dark energy in Public Canon v113, with a number-theory question from v116.
+- [RH at augmentation](https://twistj.com/reading/rh/#augmentace) derives the scalar Möbius coefficients from the prime factors and states the uniform signed estimate required of a TWIST-J derivation.
 - [When does a contact leave a record?](https://twistj.com/reading/contact/): a theorem about two sites followed by a separate finite H3 archive calculation, its holding interval and its first changed reading
 - [The kernel](https://twistj.com/core/): starting identities, the matrix, the step rule
 - [Manifest](https://twistj.com/manifest/) sets out the twelve rules of the method
