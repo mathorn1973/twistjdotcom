@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="How the TWIST-J rapidity lift recovers the Möbius function, and what remains to prove about signed cancellation at augmentation.">
+  <title>The Riemann Hypothesis at augmentation · TWIST-J</title>
+  <meta property="og:title" content="The Riemann Hypothesis at augmentation · TWIST-J">
+  <meta property="og:description" content="An exact arithmetic identity and the open signed-cancellation problem it leaves for TWIST-J.">
+  <meta property="og:url" content="https://twistj.com/reading/rh/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="TWIST-J">
+  <meta property="og:image" content="https://twistj.com/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://twistj.com/reading/rh/">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <script src="../../reading.js"></script>
+  <link rel="stylesheet" href="../../reading.css">
+  <link rel="stylesheet" href="../../site-nav.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to text</a>
+  <nav class="site-nav" id="top" aria-label="Site">
+    <a href="../../index.html">TWIST-J</a>
+    <a href="../../questions/index.html">Questions</a>
+    <a href="../../papers/index.html">Papers</a>
+    <a href="../../canon/index.html">Canon</a>
+  </nav>
+  <main id="main" tabindex="-1">
+    <h1>The Riemann Hypothesis at augmentation</h1>
+    <p class="lead">The TWIST-J rapidity lift recovers the Möbius function exactly when every prime direction is set to one. The programme’s open question is whether those directions give a direct proof of cancellation in the summatory Möbius function.</p>
+    <p>For an integer with a repeated prime factor, μ is zero. For a product of distinct primes, it is +1 or −1 according to whether the number of primes is even or odd. The sum through <i>N</i> counts the excess of one sign over the other.</p>
+    <p class="kicker">Reading note based on <a href="https://github.com/mathorn1973/twist-j/blob/canon-v116/STATUS.md">Public Canon v116</a>.</p>
+
+    <h2 id="augmentace">Augmentation, X<sub>p</sub> → 1</h2>
+    <p>In the real quadratic field ℚ(√5), a split rational prime <i>p</i> has two conjugate prime ideals above it. The integral rapidity lift <b>μ</b>(<i>n</i>) keeps their directions as formal Laurent monomials X<sub>p</sub> and X<sub>p</sub><sup>−1</sup>. Choosing the other orientation interchanges the two monomials. The local series records prime powers, with <i>T</i><sup><i>k</i></sup> marking the coefficient at <i>p</i><sup><i>k</i></sup>.</p>
+    <p class="equation">
+      <math display="block" aria-label="At a split prime, U sub p of T equals the product of one minus X sub p times T and one minus the inverse of X sub p times T, divided by one minus T.">
+        <mrow><msub><mi>U</mi><mi>p</mi></msub><mo>(</mo><mi>T</mi><mo>)</mo></mrow><mo>=</mo>
+        <mfrac>
+          <mrow><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>X</mi><mi>p</mi></msub><mi>T</mi><mo>)</mo><mo>(</mo><mn>1</mn><mo>−</mo><msubsup><mi>X</mi><mi>p</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mi>T</mi><mo>)</mo></mrow>
+          <mrow><mn>1</mn><mo>−</mo><mi>T</mi></mrow>
+        </mfrac>
+      </math>
+    </p>
+    <p>The factor is 1 − <i>T</i> at inert primes and at the ramified prime 5. The augmentation map <strong>aug</strong> sets every X<sub>p</sub> to 1, so the displayed split factor also becomes (1 − <i>T</i>)<sup>2</sup>/(1 − <i>T</i>) = 1 − <i>T</i>. Multiplying the prime factors gives <strong>aug</strong>(<b>μ</b>(<i>n</i>)) = μ(<i>n</i>) for every positive integer <i>n</i>. This is the coefficientwise identity registered as <code>J-IDEAL-RAPIDITY-CHARACTER-LIFT</code> [T]. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v116/canon/REGISTRY.tsv#L61-L64">Registered arithmetic results</a>.</p>
+    <p><strong>Example at 11.</strong> The prime 11 splits. The coefficient of <i>T</i><sup>2</sup> is 2 − X<sub>11</sub> − X<sub>11</sub><sup>−1</sup>. Its three terms are distinct before evaluation. At augmentation they sum to 2 − 1 − 1 = 0, as μ(121) requires. Extracting only the coefficient of the identity monomial would give 2. A calculation on the full lift keeps these prime-power terms through the transfer step. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v116/canon/REGISTRY.tsv#L61-L64">Lift, neutral coefficient and triangle-bound obstruction</a>.</p>
+    <p>The <a href="./Augmentation.lean">Lean exercise</a> verifies the elementary finite algebra. It proves that summing signed coefficients respects convolution and recovers the scalar Möbius factors for any supplied list of prime powers. It also combines two-sided bounds for an integer reconstruction and its error at one scale. The uniform arithmetic estimates below remain separate proof obligations.</p>
+
+    <h2 id="signed-cancellation">The signed estimate</h2>
+    <p>Write <i>P</i><sub><i>N</i></sub> = ∑<sub><i>n</i> ≤ <i>N</i></sub> <b>μ</b>(<i>n</i>). Its augmentation is the Mertens sum <i>M</i>(<i>N</i>) = ∑<sub><i>n</i> ≤ <i>N</i></sub> μ(<i>n</i>). For Re(<i>s</i>) &gt; 1 the augmented Dirichlet series is 1/ζ(<i>s</i>). If |<i>M</i>(<i>N</i>)| ≤ <i>C</i><sub>ε</sub><i>N</i><sup>1/2+ε</sup> for every ε &gt; 0, partial summation extends the reciprocal series analytically to Re(<i>s</i>) &gt; 1/2. This excludes zeros in that half-plane. The functional equation then excludes nontrivial zeros to the left of 1/2.</p>
+    <p><strong>Open [O].</strong> The Canon asks for this estimate directly from the full integral rapidity lift. One route would choose nonzero evaluation modes as <i>N</i> grows and bound the approximation to augmentation uniformly. Another would combine several modes with a kernel and control the signed sum and its reconstruction error. Estimates at each fixed nonzero mode leave the growing range uncontrolled. The bound obtained by summing the absolute coefficients of the individual lifted terms is at least <i>N</i>/4, so that upper-bound technique supplies no sublinear estimate. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v116/canon/REGISTRY.tsv#L64-L65">Exact obstruction and open evaluation bridge</a>.</p>
+
+    <h2 id="next-test">What would settle a proposed transfer?</h2>
+    <p>For a kernel route, fix the full set of terms through <i>N</i>, its nonzero evaluation modes and weights independently of <i>M</i>(<i>N</i>). Let <i>F</i><sub><i>N</i></sub>(<i>h</i>) be the observed value of <i>P</i><sub><i>N</i></sub> in mode <i>h</i>. Specify how the weighted sum ∑<sub><i>h</i></sub> λ<sub><i>N</i>,<i>h</i></sub><i>F</i><sub><i>N</i></sub>(<i>h</i>) reconstructs augmentation and bound its error. A finite reconstruction draft gives an exact kernel on each complete finite support. The required arithmetic estimate still concerns the signs and phases in the weighted sum as <i>N</i> grows. <a href="https://github.com/mathorn1973/twist-j/blob/canon-v116/notes/RH-FULL-SHELL-FOURIER-CONTRACT-2026-09-05.md">Non-canonical finite Fourier contract</a>.</p>
+    <p>A single exact violation of a proposed reconstruction identity on its declared support, or of an explicit error or signed-sum bound at an admitted <i>N</i>, rejects that proposal. To make a finite check decisive, fix the constants and the range where the bound must hold before testing. Closing the Canon obligation requires a proof of the all-ε estimate with its uniform error controls. <a href="https://github.com/mathorn1973/twist-j/blob/main/canon/FRONTIER.md">Current Frontier and decision conditions</a>.</p>
+
+    <h2 id="external-proof">The external proof and this open question</h2>
+    <p>Levent Alpöge released a Lean proof of the Riemann Hypothesis on 20 November 2026. The Lean and Mathlib communities reported that independent tools matched the theorem to Mathlib’s statement of RH and that multiple checkers verified the exported proof. The TWIST-J obligation concerns a specific derivation through the rapidity lift. The external verification establishes the theorem while that proposed derivation remains open. <a href="https://leanprover-community.github.io/blog/posts/riemann-hypothesis/">Joint verification statement</a>.</p>
+    <p>Our reading of the external proof follows a different sum over prime powers. A ramp weight lets the analytic argument use an upper bound throughout a real interval. The arithmetic argument must supply such control while its chain of theta lifts grows with the length of the prime sum. In the guide, the ramp and the cost of the lifts are worked out separately. For the TWIST-J question above, the corresponding uniform estimate would have to be proved for the signed values of its own rapidity lift. <a href="https://matematyka.cz/en/rh#mapa">Guide to the steps</a> · <a href="https://alpo.ge/remark.pdf">Alpöge’s account of the construction</a>.</p>
+    <ul class="references">
+      <li><a href="https://matematyka.cz/en/rh" hreflang="en">Matematyka’s guide to the proof in English</a></li>
+      <li><a href="https://matematyka.cz/rh" hreflang="cs">Matematyka’s guide to the proof in Czech</a></li>
+    </ul>
+  </main>
+  <footer><a href="#top">Back to top</a> · <a href="../../questions/index.html#numbers">Research questions</a></footer>
+</body>
+</html>
