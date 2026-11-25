@@ -13,7 +13,7 @@ Revision 124 remains the initial translation reference for source sync.
 
 ## Following a public Canon activation
 
-The scheduled editor checks the public scientific repository every 30 minutes.
+The scheduled editor checks the public scientific repository once each night at 03:00 Prague time.
 Start from the current website `origin/main` and run
 `python -B tools/logos/canon_update.py`. Its JSON compares the website pin to
 the active declaration on scientific `main` and its published tag. Unrelated

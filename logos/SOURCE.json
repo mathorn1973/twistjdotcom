@@ -16,19 +16,19 @@
   "current": {
     "kind": "english-editorial-reading",
     "initial_translation_revision": "124",
-    "date": "2026-11-21",
+    "date": "2026-11-25",
     "canon": {
-      "tag": "canon-v116",
-      "activation_commit": "93c36089db57032a6cbca482ff62c95884567d0f",
-      "tag_object": "bf514bdd92d711c10131bebb8ba2b678e999d72d",
-      "content_commit": "0b6ae8e23d7086715b908cce6e1755d2898f55fc",
-      "canon_sha256": "ea4f924dc02838fcfe47d9b983bc0be929da7378ee9278c48831f34a5c393695",
-      "canon_bytes": 1568802
+      "tag": "canon-v117",
+      "activation_commit": "6f2e112aafc4f3aca4222bb4bf3dced1d79fe2ed",
+      "tag_object": "63ff3d2f7edc0c921a6c8ddd033badb59b632436",
+      "content_commit": "d65e32c4b8e9a14496d3b7aba46fc384f51f81dc",
+      "canon_sha256": "93a8d0c17ed88d93a62b56c44d65b6903c980654f7e5ea82da7e363a510a22a9",
+      "canon_bytes": 1624192
     },
     "markdown": "logos.md",
-    "markdown_sha256": "42e8c260d113004c0d2076ac6d52fbd7c18118b7676af96da24b05245d050682",
+    "markdown_sha256": "d91defb9533922df61d2252daec247d995c9b35b11fa25781053a4cc54fab1fa",
     "html": "index.html",
-    "html_sha256": "3aea703ded9d21389d7012643be34709478fd06cec92a2fef1ad9052ea2d21b8",
+    "html_sha256": "1428d734c25d91310d8b70ec8f612e8df334d661c02724eb4163bd44091ebedf",
     "figures": {
       "fig-constructing-J.svg": "0e21b5bac24f6c7f77434f53725bffd460c309da8333ca6ae93f939a55407261",
       "fig-two-projections.svg": "6bcb78cf25429d84d752448428e20d474ddba90b763ba18ad90c3208dbda3dde",
