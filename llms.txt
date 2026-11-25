@@ -24,7 +24,7 @@ Use the Canon registry for the status of each claim and the activation record fo
 - [RH at Augmentation](https://twistj.com/reading/rh/#augmentace): The scalar Möbius coefficients and the signed estimate still required for a derivation.
 - [Papers](https://twistj.com/papers/): Deposited work with edition DOIs, full articles, source files and reader guides.
 - [Twist Numbers](https://twistj.com/papers/twist-numbers/): Exact arithmetic in ℤ[j] and the integer J step.
-- [Logos (Markdown)](https://twistj.com/logos/logos.md): Non-canonical interpretation with citations to the evidence it uses.
+- [Logos (Markdown)](https://twistj.com/logos/logos.md): Non-canonical reading of Public Canon v117, with citations to its evidence.
 - [Logos](https://twistj.com/logos/): Web edition of the interpretation.
 
 ## Optional
